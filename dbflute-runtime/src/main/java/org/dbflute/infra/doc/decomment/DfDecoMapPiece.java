@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * @author hakiba
  * @author cabos
  * @author jflute
+ * @author deco
  */
 public class DfDecoMapPiece {
 
@@ -47,6 +48,7 @@ public class DfDecoMapPiece {
     protected final String databaseComment;
     protected final Long commentVersion;
     protected final List<String> authorList;
+    protected final String branchName;
     protected final String pieceCode;
     protected final LocalDateTime pieceDatetime;
     protected final String pieceOwner;
@@ -56,7 +58,7 @@ public class DfDecoMapPiece {
     //                                                                         Constructor
     //                                                                         ===========
     public DfDecoMapPiece(String formatVersion, String tableName, String columnName, DfDecoMapPieceTargetType targetType, String decomment,
-                          String databaseComment, Long commentVersion, List<String> authorList, String pieceCode,
+                          String databaseComment, Long commentVersion, List<String> authorList, String branchName, String pieceCode,
                           LocalDateTime pieceDatetime, String pieceOwner, List<String> previousPieceList) {
         this.formatVersion = formatVersion;
         this.tableName = tableName;
@@ -66,6 +68,7 @@ public class DfDecoMapPiece {
         this.databaseComment = databaseComment;
         this.commentVersion = commentVersion;
         this.authorList = authorList.stream().distinct().collect(Collectors.toList());
+        this.branchName = branchName;
         this.pieceCode = pieceCode;
         this.pieceDatetime = pieceDatetime;
         this.pieceOwner = pieceOwner;
@@ -89,6 +92,7 @@ public class DfDecoMapPiece {
     //     ; databaseComment = loginable user
     //     ; commentVersion = 0
     //     ; authorList = list:{ deco }
+    //     ; branchName = develop
     //     ; pieceCode = AL3OR1P
     //     ; pieceDatetime = 2017-12-31T12:34:56.789
     //     ; pieceOwner = deco
@@ -103,6 +107,7 @@ public class DfDecoMapPiece {
     //     ; databaseComment = sea mystic
     //     ; commentVersion = 1
     //     ; authorList = list:{ cabos ; hakiba ; deco ; jflute }
+    //     ; branchName = master
     //     ; pieceCode = HF7ELSE
     //     ; pieceDatetime = 2017-10-15T16:17:18.199
     //     ; pieceOwner = jflute
@@ -120,6 +125,7 @@ public class DfDecoMapPiece {
         map.put("databaseComment", this.databaseComment);
         map.put("commentVersion", this.commentVersion);
         map.put("authorList", this.authorList);
+        map.put("branchName", this.branchName);
         map.put("pieceCode", this.pieceCode);
         map.put("pieceDatetime", this.pieceDatetime);
         map.put("pieceOwner", this.pieceOwner);
@@ -169,6 +175,10 @@ public class DfDecoMapPiece {
 
     public List<String> getAuthorList() {
         return Collections.unmodifiableList(authorList);
+    }
+    
+    public String getBranchName() {
+        return branchName;
     }
 
     public String getPieceCode() {
