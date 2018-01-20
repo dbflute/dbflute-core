@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author cabos
+ * @author deco
  */
 public class DfDecoMapPropertyPart {
 
@@ -37,10 +38,11 @@ public class DfDecoMapPropertyPart {
     protected final List<String> previousPieceList;
     protected final Long commentVersion;
     protected final List<String> authorList;
+    protected final String branchName;
 
     public DfDecoMapPropertyPart(String decomment, String databaseComment, String pieceCode, LocalDateTime pieceDatetime,
                                  String pieceOwner, List<String> previousPieceList, long commentVersion,
-                                 List<String> authorList) {
+                                 List<String> authorList, String branchName) {
         this.decomment = decomment;
         this.databaseComment = databaseComment;
         this.pieceCode = pieceCode;
@@ -52,6 +54,7 @@ public class DfDecoMapPropertyPart {
         if (!this.authorList.contains(pieceOwner)) {
             this.authorList.add(pieceOwner);
         }
+        this.branchName = branchName;
     }
 
     public DfDecoMapPropertyPart(Map<String, Object> propertyMap) {
@@ -67,6 +70,7 @@ public class DfDecoMapPropertyPart {
         if (!this.authorList.contains(pieceOwner)) {
             this.authorList.add(pieceOwner);
         }
+        this.branchName = (String) propertyMap.get("branchName");
     }
 
     public String getDecomment() {
@@ -101,6 +105,10 @@ public class DfDecoMapPropertyPart {
         return Collections.unmodifiableList(authorList);
     }
 
+    public String getBranchName() {
+        return branchName;
+    }
+
     public Map<String, Object> convertToMap() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("decomment", this.decomment);
@@ -111,6 +119,7 @@ public class DfDecoMapPropertyPart {
         map.put("previousPieceList", this.previousPieceList);
         map.put("commentVersion", this.commentVersion);
         map.put("authorList", this.authorList);
+        map.put("branchName", this.branchName);
         return map;
     }
 }
