@@ -31,6 +31,7 @@ import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
  * @author hakiba
  * @author cabos
  * @author jflute
+ * @author deco
  */
 public class DfDecoMapPickup {
 
@@ -77,6 +78,7 @@ public class DfDecoMapPickup {
     //                         ; databaseComment = ...
     //                         ; commentVersion = ...
     //                         ; authorList = list:{ deco }
+    //                         ; branchName = develop
     //                         ; pieceCode = DECO0000
     //                         ; pieceDatetime = 2017-11-05T00:38:13.645
     //                         ; pieceOwner = cabos
@@ -95,6 +97,7 @@ public class DfDecoMapPickup {
     //                                 ; databaseComment = sea mystic
     //                                 ; commentVersion = 1
     //                                 ; authorList = list:{ cabos, hakiba, deco, jflute }
+    //                                 ; branchName = master
     //                                 ; pieceCode = HAKIBA00
     //                                 ; pieceDatetime = 2017-11-05T00:38:13.645
     //                                 ; pieceOwner = cabos
