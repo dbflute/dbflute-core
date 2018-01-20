@@ -92,10 +92,10 @@ public class DfDecoMapFile {
     //     ; databaseComment = loginable user
     //     ; commentVersion = 0
     //     ; authorList = list:{ deco }
-    //     ; branchName = develop
     //     ; pieceCode = AL3OR1P
     //     ; pieceDatetime = 2017-12-31T12:34:56.789
     //     ; pieceOwner = deco
+    //     ; pieceGitBranch = develop
     //     ; previousPieceList = list:{}
     // }
     // map:{
@@ -107,10 +107,10 @@ public class DfDecoMapFile {
     //     ; databaseComment = sea mystic
     //     ; commentVersion = 1
     //     ; authorList = list:{ cabos ; hakiba ; deco ; jflute }
-    //     ; branchName = master
     //     ; pieceCode = HF7ELSE
     //     ; pieceDatetime = 2017-10-15T16:17:18.199
     //     ; pieceOwner = jflute
+    //     ; pieceGitBranch = master
     //     ; previousPieceList = list:{ FE893L1 }
     // }
     // done cabos I just noticed that this should be readPieceList()... by jflute (2017/11/18)
@@ -162,14 +162,14 @@ public class DfDecoMapFile {
         Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
         @SuppressWarnings("unchecked")
         List<String> authorList = (List<String>) map.get("authorList");
-        String branchName = (String) map.get("branchName");
         String pieceCode = (String) map.get("pieceCode");
         LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
         String pieceOwner = (String) map.get("pieceOwner");
+        String pieceGitBranch = (String) map.get("pieceGitBranch");
         @SuppressWarnings("unchecked")
         List<String> previousPieceList = (List<String>) map.get("previousPieceList");
         return new DfDecoMapPiece(formatVersion, tableName, columnName, targetType, decomment, databaseComment, commentVersion, authorList,
-                branchName, pieceCode, pieceDatetime, pieceOwner, previousPieceList);
+                pieceCode, pieceDatetime, pieceOwner, pieceGitBranch, previousPieceList);
     }
 
     // -----------------------------------------------------
@@ -188,10 +188,10 @@ public class DfDecoMapFile {
     //                         ; databaseComment = ...
     //                         ; commentVersion = ...
     //                         ; authorList = list:{ deco }
-    //                         ; branchName = develop
     //                         ; pieceCode = DECO0000
     //                         ; pieceDatetime = 2017-11-05T00:38:13.645
     //                         ; pieceOwner = cabos
+    //                         ; pieceGitBranch = develop
     //                         ; previousPieceList = list:{}
     //                     }
     //                     ; map:{ // propertyList size is more than 2 if decomment conflicts exists
@@ -207,10 +207,10 @@ public class DfDecoMapFile {
     //                                 ; databaseComment = sea mystic
     //                                 ; commentVersion = 1
     //                                 ; authorList = list:{ cabos, hakiba, deco, jflute }
-    //                                 ; branchName = master
     //                                 ; pieceCode = HAKIBA00
     //                                 ; pieceDatetime = 2017-11-05T00:38:13.645
     //                                 ; pieceOwner = cabos
+    //                                 ; pieceGitBranch = master
     //                                 ; previousPieceList = list:{ JFLUTE00, CABOS000 }
     //                             }
     //                         }
@@ -572,7 +572,7 @@ public class DfDecoMapFile {
     private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece) {
         String pieceCode = piece.getPieceCode();
         return new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), pieceCode, piece.getPieceDatetime(),
-                piece.getPieceOwner(), piece.getPreviousPieceList(), piece.getCommentVersion(), piece.getAuthorList(), piece.getBranchName());
+                piece.getPieceOwner(), piece.getPieceGitBranch(), piece.getPreviousPieceList(), piece.getCommentVersion(), piece.getAuthorList());
     }
 
     // ===================================================================================
