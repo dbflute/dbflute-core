@@ -35,7 +35,7 @@ public class DfDecoMapPiece {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DEFAULT_FORMAT_VERSION = "1.0";
+    public static final String DEFAULT_FORMAT_VERSION = "1.1";
 
     // ===================================================================================
     //                                                                           Attribute

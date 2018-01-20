@@ -38,7 +38,7 @@ public class DfDecoMapPickup {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DEFAULT_FORMAT_VERSION = "1.0";
+    public static final String DEFAULT_FORMAT_VERSION = "1.1";
     private static final String DECO_MAP_KEY = "tableList";
 
     // ===================================================================================
