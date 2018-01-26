@@ -448,7 +448,7 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 #if ($isAliasDelimiterInDbCommentValid)
 		<td class="aliascell">${table.alias}</td>
 #end
-		<td class="namecell"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
+		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
 		<td class="typecell">${table.type}</td>
 #if ($hasAdditionalSchema)
 		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
@@ -1467,7 +1467,7 @@ Decomment.prototype = {
 		var that = this;
 		var tableList = document.getElementById('table-list-body').querySelectorAll('tr');
 		Array.prototype.forEach.call(tableList, function (table) {
-			var tableName = table.querySelector('.namecell').querySelector('a').innerText;
+			var tableName = table.querySelector('.namecell').getAttribute('data-name');
 			var commentElement = table.querySelector('.commentcell');
 			that.setupSaveTableClickEvent(tableName, commentElement);
 		});
