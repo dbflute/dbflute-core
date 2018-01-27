@@ -992,7 +992,7 @@ Incremental.prototype.util = {
 var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
 searcher.init();
 </script>
-#macro(escape $str)$!str.replaceAll("'", "\\'").replaceAll("\n", "<br>")#end
+#macro(escapeDecommentJsonComment $str)$!str.replaceAll("'", "\\'").replaceAll("\n", "<br>")#end
 <script>
 /**
  * @author deco
@@ -1004,14 +1004,14 @@ function Decomment() {
 		'tables': [
 #foreach($table in $database.embeddedPickup.tableList)
 			#if ($velocityCount > 1), #end{
-				'tableName': '#escape($!{table.tableName})'
+				'tableName': '#escapeDecommentJsonComment($!{table.tableName})'
 				, 'properties': [
 #foreach($property in $table.propertyList)
 						#if ($velocityCount > 1), #end{
-						'decomment': '#escape($!{property.decomment})'
-						, 'databaseComment': '#escape($!{property.databaseComment})'
+						'decomment': '#escapeDecommentJsonComment($!{property.decomment})'
+						, 'databaseComment': '#escapeDecommentJsonComment($!{property.databaseComment})'
 						, 'commentVersion': $!{property.commentVersion}
-						, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end]
+						, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escapeDecommentJsonComment($!{author})'#end]
 						, 'pieceCode': '$!{property.pieceCode}'
 						, 'pieceDatatime': '$!{property.pieceDatetime}'
 						, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
@@ -1021,14 +1021,14 @@ function Decomment() {
 				, 'columns': [
 #foreach($column in $table.columnList)
 					#if ($velocityCount > 1),#end {
-						'columnName': '#escape($!{column.columnName})'
+						'columnName': '#escapeDecommentJsonComment($!{column.columnName})'
 						, 'properties': [
 #foreach($property in $column.propertyList)
 								#if ($velocityCount > 1),#end {
-								'decomment': '#escape($!{property.decomment})'
-								, 'databaseComment': '#escape($!{property.databaseComment})'
+								'decomment': '#escapeDecommentJsonComment($!{property.decomment})'
+								, 'databaseComment': '#escapeDecommentJsonComment($!{property.databaseComment})'
 								, 'commentVersion': $!{property.commentVersion}
-								, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end]
+								, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escapeDecommentJsonComment($!{author})'#end]
 								, 'pieceCode': '$!{property.pieceCode}'
 								, 'pieceDatatime': '$!{property.pieceDatetime}'
 								, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
@@ -1045,12 +1045,12 @@ function Decomment() {
 	this.pickupStore = {
 #foreach ($table in $database.tableDisplaySortedList)
 ## decomment uses display name so fix later
-		#if ($velocityCount > 1), #end'${table.tableDbName}': {
-			'databaseComment': '${table.commentForSchemaHtml}'
+		#if ($velocityCount > 1), #end'#escapeDecommentJsonComment(${table.tableDbName})': {
+			'databaseComment': '#escapeDecommentJsonComment(${table.commentForSchemaHtml})'
 			, 'columns': {
 #foreach ($col in $table.columns)
-				#if ($velocityCount > 1), #end'${col.name}': {
-					'databaseComment': '${col.commentForSchemaHtml}'
+				#if ($velocityCount > 1), #end'#escapeDecommentJsonComment(${col.name})': {
+					'databaseComment': '#escapeDecommentJsonComment(${col.commentForSchemaHtml})'
 				}
 #end
 			}
