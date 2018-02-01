@@ -1141,19 +1141,43 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                             Limited
     //                                                                             =======
-    public boolean isReplaceSchemaLimited() {
+    public boolean isReplaceSchemaLimited() { // closet
         return isProperty("isReplaceSchemaLimited", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================
     //                                                                       Schema Policy
     //                                                                       =============
-    public boolean isCheckSchemaPolicyInReps() {
+    public boolean isCheckSchemaPolicyInReps() { // closet
         return isProperty("isCheckSchemaPolicyInReps", false, getReplaceSchemaMap());
     }
 
     public String getSchemaPolicyInRepsSchemaXml() {
         return SCHEMA_POLICY_CHECK_SCHEMA_XML;
+    }
+
+    // ===================================================================================
+    //                                                                        Data Manager
+    //                                                                        ============
+    public boolean isUseRepsAsDataManager() { // closet
+        return isProperty("isUseRepsAsDataManager", false, getRepsAsDataManagerMap());
+    }
+
+    protected Map<String, Map<String, Object>> _repsAsDataManagerMap;
+
+    protected Map<String, Map<String, Object>> getRepsAsDataManagerMap() {
+        if (_repsAsDataManagerMap != null) {
+            return _repsAsDataManagerMap;
+        }
+        final Object obj = getReplaceSchemaMap().get("repsAsDataManagerMap");
+        if (obj == null) {
+            _repsAsDataManagerMap = DfCollectionUtil.emptyMap();
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, Map<String, Object>> repsMap = (Map<String, Map<String, Object>>) obj;
+            _repsAsDataManagerMap = repsMap;
+        }
+        return _repsAsDataManagerMap;
     }
 
     // ===================================================================================
