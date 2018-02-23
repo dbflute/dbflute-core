@@ -1129,7 +1129,7 @@ Decomment.prototype = {
 		that = this;
 		Array.prototype.forEach.call(decomment["tables"], function (table) {
 			var tableElements = that.extractTableElements(table);
-			if (that.storePickupTableProperties(table)) {
+			if (tableElements && that.storePickupTableProperties(table)) {
 				var newTableComment = that.buildDisplayTableCommentFromServer(table);
 				var authors = that.getTableMapInfoFromStore(that.getTableNameFromJson(table))['authors'];
 				that.storePreviousWholeTableComment(table, newTableComment, authors);
@@ -1138,12 +1138,14 @@ Decomment.prototype = {
 			}
 			Array.prototype.forEach.call(table["columns"], function (column) {
 				var columnElement = that.extractColumnElement(table, column);
-				that.storePickupColumnProperties(table, column);
-				var newComment = that.buildDisplayColumnCommentFromServer(table, column);
-				var authors = that.buildColumnCommentAuthoers(table, column);
-				that.storePreviousWholeColumnComment(table, column, newComment);
-				that.updateDisplayColumnCommentToHtml(columnElement, newComment, authors);
-				that.reflectCommentConflictIfNeed(table, column, columnElement);
+				if (columnElement) {
+					that.storePickupColumnProperties(table, column);
+					var newComment = that.buildDisplayColumnCommentFromServer(table, column);
+					var authors = that.buildColumnCommentAuthoers(table, column);
+					that.storePreviousWholeColumnComment(table, column, newComment);
+					that.updateDisplayColumnCommentToHtml(columnElement, newComment, authors);
+					that.reflectCommentConflictIfNeed(table, column, columnElement);
+				}
 			});
 		});
 	},
@@ -1169,7 +1171,7 @@ Decomment.prototype = {
 		var columnId = (table["tableName"] + "_" + column["columnName"]);
 		columnId = columnId.toLowerCase();
 		var columnElement = document.getElementById(columnId);
-		return columnElement.parentElement
+		return columnElement == null ? null : columnElement.parentElement
 	},
 
 	/**
