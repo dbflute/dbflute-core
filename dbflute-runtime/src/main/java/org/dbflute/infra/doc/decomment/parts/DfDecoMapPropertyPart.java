@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author cabos
+ * @author deco
  */
 public class DfDecoMapPropertyPart {
 
@@ -34,18 +35,20 @@ public class DfDecoMapPropertyPart {
     protected final String pieceCode;
     protected final LocalDateTime pieceDatetime;
     protected final String pieceOwner;
+    protected final String pieceGitBranch;
     protected final List<String> previousPieceList;
     protected final Long commentVersion;
     protected final List<String> authorList;
 
     public DfDecoMapPropertyPart(String decomment, String databaseComment, String pieceCode, LocalDateTime pieceDatetime,
-                                 String pieceOwner, List<String> previousPieceList, long commentVersion,
-                                 List<String> authorList) {
+                                 String pieceOwner, String pieceGitBranch, List<String> previousPieceList, 
+                                 long commentVersion, List<String> authorList) {
         this.decomment = decomment;
         this.databaseComment = databaseComment;
         this.pieceCode = pieceCode;
         this.pieceDatetime = pieceDatetime;
         this.pieceOwner = pieceOwner;
+        this.pieceGitBranch = pieceGitBranch;
         this.previousPieceList = previousPieceList.stream().distinct().collect(Collectors.toList());
         this.commentVersion = commentVersion;
         this.authorList = authorList.stream().distinct().collect(Collectors.toList());
@@ -60,6 +63,7 @@ public class DfDecoMapPropertyPart {
         this.pieceCode = (String) propertyMap.get("pieceCode");
         this.pieceDatetime = new HandyDate((String) propertyMap.get("pieceDatetime")).getLocalDateTime();
         this.pieceOwner = (String) propertyMap.get("pieceOwner");
+        this.pieceGitBranch = (String) propertyMap.get("pieceGitBranch");
         this.previousPieceList =
                 ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).distinct().collect(Collectors.toList());
         this.commentVersion = Long.valueOf((String) propertyMap.get("commentVersion"));
@@ -89,6 +93,10 @@ public class DfDecoMapPropertyPart {
         return pieceOwner;
     }
 
+    public String getPieceGitBranch() {
+        return pieceGitBranch;
+    }
+
     public List<String> getPreviousPieceList() {
         return Collections.unmodifiableList(previousPieceList);
     }
@@ -107,6 +115,7 @@ public class DfDecoMapPropertyPart {
         map.put("databaseComment", this.databaseComment);
         map.put("pieceCode", this.pieceCode);
         map.put("pieceOwner", this.pieceOwner);
+        map.put("pieceGitBranch", this.pieceGitBranch);
         map.put("pieceDatetime", this.pieceDatetime);
         map.put("previousPieceList", this.previousPieceList);
         map.put("commentVersion", this.commentVersion);

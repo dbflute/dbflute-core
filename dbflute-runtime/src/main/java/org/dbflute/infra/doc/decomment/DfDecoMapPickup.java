@@ -31,13 +31,14 @@ import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
  * @author hakiba
  * @author cabos
  * @author jflute
+ * @author deco
  */
 public class DfDecoMapPickup {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DEFAULT_FORMAT_VERSION = "1.0";
+    public static final String DEFAULT_FORMAT_VERSION = "1.1";
     private static final String DECO_MAP_KEY = "tableList";
 
     // ===================================================================================
@@ -80,6 +81,7 @@ public class DfDecoMapPickup {
     //                         ; pieceCode = DECO0000
     //                         ; pieceDatetime = 2017-11-05T00:38:13.645
     //                         ; pieceOwner = cabos
+    //                         ; pieceGitBranch = develop
     //                         ; previousPieceList = list:{}
     //                     }
     //                     ; map:{ // propertyList size is more than 2 if decomment conflicts exists
@@ -98,6 +100,7 @@ public class DfDecoMapPickup {
     //                                 ; pieceCode = HAKIBA00
     //                                 ; pieceDatetime = 2017-11-05T00:38:13.645
     //                                 ; pieceOwner = cabos
+    //                                 ; pieceGitBranch = master
     //                                 ; previousPieceList = list:{ JFLUTE00, CABOS000 }
     //                             }
     //                         }
