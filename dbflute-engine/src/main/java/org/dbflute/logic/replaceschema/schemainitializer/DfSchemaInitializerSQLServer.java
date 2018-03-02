@@ -16,6 +16,7 @@
 package org.dbflute.logic.replaceschema.schemainitializer;
 
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * The schema initializer for SqlServer.
@@ -24,11 +25,28 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSchemaInitializerSQLServer(DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
+    }
+
+    // ===================================================================================
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
     protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
-        return removeSemicolonSuffixIfExists(super.buildProcedureSqlName(metaInfo));
+        final String sqlName = removeSemicolonSuffixIfExists(super.buildProcedureSqlName(metaInfo));
+        if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
+            return filterLocalDBProcedureSqlName(metaInfo, sqlName);
+        } else { // mainly here
+            return sqlName;
+        }
     }
 
     protected String removeSemicolonSuffixIfExists(String procedureSqlName) {
@@ -37,5 +55,18 @@ public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
             procedureSqlName = procedureSqlName.substring(0, semicolonIndex);
         }
         return procedureSqlName;
+    }
+
+    // -----------------------------------------------------
+    //                                               LocalDB
+    //                                               -------
+    protected String filterLocalDBProcedureSqlName(DfProcedureMeta metaInfo, String sqlName) {
+        final String catalog = metaInfo.getProcedureSchema().getPureCatalog();
+        if (catalog == null) {
+            return sqlName;
+        }
+        // "drop procedure xxx.dbo.yyy" occurred error at SqlLocalDB.
+        // but "drop procedure dbo.yyy" is no error.
+        return sqlName.replace(catalog + ".", ""); // thanks, udagawa-san
     }
 }

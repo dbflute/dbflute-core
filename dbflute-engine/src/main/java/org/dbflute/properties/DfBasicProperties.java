@@ -234,6 +234,43 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isDatabaseMSAccess();
     }
 
+    // -----------------------------------------------------
+    //                                              Sub Type
+    //                                              --------
+    public DfSubTypeOnDatabase getSubTypeOnDatabase() {
+        final String subType = getProperty("subTypeOnDatabase", null);
+        if (subType == null) {
+            return DfSubTypeOnDatabase.NO_TYPE;
+        }
+        if (isDatabaseSQLServer() && "localdb".equalsIgnoreCase(subType)) {
+            return DfSubTypeOnDatabase.SQLSERVER_LOCALDB;
+        }
+        throwBasicInfoSubTypeOnDatabaseUnknownException(subType);
+        return null; // unreachable
+    }
+
+    public static enum DfSubTypeOnDatabase {
+        SQLSERVER_LOCALDB, NO_TYPE
+    }
+
+    protected void throwBasicInfoSubTypeOnDatabaseUnknownException(String subType) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown value of the property 'subTypeOnDatabase' in basicInfoMap.dfprop.");
+        br.addItem("Advice");
+        br.addElement("Only supported types can be set.");
+        br.addElement("For example, if database is 'sqlserver', databaseSubType can be 'localdb'.");
+        br.addItem("Target Database");
+        br.addElement(getTargetDatabase());
+        br.addItem("SubType on Database");
+        br.addElement(subType);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    public boolean isSubTypeOnDatabaseSQLServerLocalDB() {
+        return DfSubTypeOnDatabase.SQLSERVER_LOCALDB.equals(getSubTypeOnDatabase());
+    }
+
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========
