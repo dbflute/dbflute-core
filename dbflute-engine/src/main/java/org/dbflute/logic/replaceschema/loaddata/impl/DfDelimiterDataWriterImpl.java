@@ -144,6 +144,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 lineString = filterLineString(lineString);
                 {
                     if (preContinueString != null && !preContinueString.equals("")) {
+                        // #hope performance tuning, suppress incremental strings from many line separators by jflute (2018/03/02)
+                        // it needs to change lineString, preContinueString to StringBuilder type...
                         lineString = preContinueString + "\n" + lineString;
                     }
                     final ValueLineInfo valueLineInfo = arrangeValueList(lineString, _delimiter);
