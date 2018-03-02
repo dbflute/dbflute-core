@@ -33,6 +33,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.helper.process.SystemScript;
+import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
 import org.dbflute.infra.reps.DfRepsSchemaSqlDir;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
@@ -131,12 +132,27 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                          Take Finally
     //                                          ------------
     public List<File> getTakeFinallySqlFileList(String sqlRootDir) {
-        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(sqlRootDir);
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaTakeFinallySqlDir(sqlRootDir);
         return schemaSqlDir.collectTakeFinallySqlFileList();
     }
 
     public Map<String, File> getTakeFinallySqlFileMap(String sqlRootDir) {
         return convertToSchemaSqlFileMap(getTakeFinallySqlFileList(sqlRootDir));
+    }
+
+    protected DfRepsSchemaSqlDir createRepsSchemaTakeFinallySqlDir(String sqlRootDir) {
+        // #for_now suffix logic is in DBFlute Runtime so override it for now until runtime fix by jflute (2018/03/02)
+        return new DfRepsSchemaSqlDir(sqlRootDir) {
+            @Override
+            protected DfSchemaResourceFinder createSchemaResourceFinder() {
+                final DfSchemaResourceFinder finder = super.createSchemaResourceFinder();
+                final List<String> supportedExtList = SystemScript.getSupportedExtList();
+                for (String supportedExt : supportedExtList) {
+                    finder.addSuffix(supportedExt);
+                }
+                return finder;
+            }
+        };
     }
 
     // ===================================================================================
@@ -707,7 +723,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (targetDir == null) {
             return DfCollectionUtil.emptyList();
         }
-        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(targetDir);
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaTakeFinallySqlDir(targetDir);
         return schemaSqlDir.collectTakeFinallySqlFileList();
     }
 

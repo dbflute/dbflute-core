@@ -20,11 +20,11 @@ import java.sql.SQLException;
 /**
  * @author jflute
  */
-public class DfAlterCheckAlterScriptSQLException extends SQLException {
+public class DfFireSqlScriptSQLException extends SQLException {
 
     private static final long serialVersionUID = 1L;
 
-    public DfAlterCheckAlterScriptSQLException(String msg) {
+    public DfFireSqlScriptSQLException(String msg) {
         super(msg);
     }
 }

@@ -37,6 +37,7 @@ import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.helper.process.SystemScript;
 import org.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
 import org.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
@@ -232,15 +233,26 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("* Take Finally *");
         _log.info("*              *");
         _log.info("* * * * * * * **");
+        final DfSqlFileFireMan fireMan = createSqlFileFireMan();
+        return fireMan.fire(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
+    }
+
+    protected DfSqlFileFireMan createSqlFileFireMan() { // similar to alter check
+        final String[] scriptExtAry = SystemScript.getSupportedExtList().toArray(new String[] {});
+        final SystemScript script = new SystemScript();
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan() {
             @Override
             protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
                 _executedSqlFileList.add(sqlFile);
-                return super.processSqlFile(runner, sqlFile);
+                if (isScriptFile(sqlFile, scriptExtAry)) {
+                    return executeScriptFile(script, sqlFile);
+                } else { // mainly here
+                    return super.processSqlFile(runner, sqlFile);
+                }
             }
         };
         fireMan.setExecutorName("Take Finally");
-        return fireMan.fire(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
+        return fireMan;
     }
 
     protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {

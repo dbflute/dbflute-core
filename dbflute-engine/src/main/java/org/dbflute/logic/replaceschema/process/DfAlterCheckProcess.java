@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.tools.ant.util.FileUtils;
-import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
 import org.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.dbflute.exception.DfAlterCheckDifferenceFoundException;
@@ -55,9 +54,7 @@ import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.helper.process.ProcessResult;
 import org.dbflute.helper.process.SystemScript;
-import org.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
 import org.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
@@ -662,7 +659,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
-        fireMan.setExecutorName("Alter Schema");
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         finalInfo.addAlterSqlFileAll(alterSqlFileList);
         try {
@@ -732,44 +728,19 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected DfSqlFileFireMan createSqlFileFireMan() {
         final String[] scriptExtAry = SystemScript.getSupportedExtList().toArray(new String[] {});
         final SystemScript script = new SystemScript();
-        return new DfSqlFileFireMan() {
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan() {
             @Override
             protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
                 _executedAlterSqlFileList.add(sqlFile);
-                final String path = resolvePath(sqlFile);
-                if (!Srl.endsWith(path, scriptExtAry)) { // SQL file
+                if (isScriptFile(sqlFile, scriptExtAry)) {
+                    return executeScriptFile(script, sqlFile);
+                } else { // mainly here
                     return super.processSqlFile(runner, sqlFile);
-                }
-                // script file
-                final String baseDir = Srl.substringLastFront(path, "/");
-                final String scriptName = Srl.substringLastRear(path, "/");
-                _log.info("...Executing the script: " + path);
-                final ProcessResult processResult;
-                try {
-                    processResult = script.execute(new File(baseDir), scriptName);
-                } catch (SystemScriptUnsupportedScriptException ignored) {
-                    _log.info("Skipped the script for system mismatch: " + scriptName);
-                    return null;
-                }
-                final String console = processResult.getConsole();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(console)) {
-                    _log.info("Catched the console for " + scriptName + ":" + ln() + console);
-                }
-                final DfSqlFileRunnerResult runnerResult = new DfSqlFileRunnerResult(sqlFile);
-                runnerResult.setTotalSqlCount(1);
-                final int exitCode = processResult.getExitCode();
-                if (exitCode != 0) {
-                    final String msg = "The script failed: " + scriptName + " exitCode=" + exitCode;
-                    final SQLException sqlEx = new DfAlterCheckAlterScriptSQLException(msg);
-                    final String sqlExp = "(commands on the script)";
-                    runnerResult.addErrorContinuedSql(sqlExp, sqlEx);
-                    return runnerResult;
-                } else {
-                    runnerResult.setGoodSqlCount(1);
-                    return runnerResult;
                 }
             }
         };
+        fireMan.setExecutorName("Alter Schema");
+        return fireMan;
     }
 
     protected DfSqlFileRunner createSqlFileRunner(final DfRunnerInformation runInfo) {
