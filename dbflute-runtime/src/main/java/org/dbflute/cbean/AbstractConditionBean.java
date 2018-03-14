@@ -37,6 +37,7 @@ import org.dbflute.cbean.chelper.HpSpQyDelegatingCall;
 import org.dbflute.cbean.chelper.HpSpQyHas;
 import org.dbflute.cbean.chelper.HpSpQyQy;
 import org.dbflute.cbean.chelper.HpSpecifyColumnRequiredChecker;
+import org.dbflute.cbean.chelper.HpSpecifyColumnRequiredExceptDeterminer;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
@@ -174,6 +175,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** Is SpecifyColumn required? (both local and relation) {Internal} */
     protected boolean _specifyColumnRequired;
+
+    /** The determiner to except SpecifyColumn required. (NullAllowed) {Internal} */
+    protected HpSpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
 
     /** Does it allow selecting undefined classification code? {Internal} */
     protected boolean _undefinedClassificationSelectAllowed;
@@ -1284,11 +1288,24 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** {@inheritDoc} */
     public void xcheckSpecifyColumnRequiredIfNeeds() {
-        if (_specifyColumnRequired) {
-            new HpSpecifyColumnRequiredChecker().checkSpecifyColumnRequiredIfNeeds(this, nonSpecifiedAliasSet -> {
-                createCBExThrower().throwRequiredSpecifyColumnNotFoundException(this, nonSpecifiedAliasSet);
-            });
+        if (!_specifyColumnRequired || xisExceptSpecifyColumnRequired()) {
+            return;
         }
+        xcreateSpecifyColumnRequiredChecker().checkSpecifyColumnRequiredIfNeeds(this, nonSpecifiedAliasSet -> {
+            createCBExThrower().throwRequiredSpecifyColumnNotFoundException(this, nonSpecifiedAliasSet);
+        });
+    }
+
+    protected boolean xisExceptSpecifyColumnRequired() {
+        return _specifyColumnRequiredExceptDeterminer != null && _specifyColumnRequiredExceptDeterminer.isExcept(this);
+    }
+
+    protected HpSpecifyColumnRequiredChecker xcreateSpecifyColumnRequiredChecker() {
+        return new HpSpecifyColumnRequiredChecker();
+    }
+
+    protected void xsetSpecifyColumnRequiredExceptDeterminer(HpSpecifyColumnRequiredExceptDeterminer exceptDeterminer) {
+        _specifyColumnRequiredExceptDeterminer = exceptDeterminer;
     }
 
     // ===================================================================================
