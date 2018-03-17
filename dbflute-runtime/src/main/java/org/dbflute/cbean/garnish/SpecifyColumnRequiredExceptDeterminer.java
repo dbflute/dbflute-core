@@ -46,17 +46,15 @@ public interface SpecifyColumnRequiredExceptDeterminer {
 
         private static final Logger _log = LoggerFactory.getLogger(SpecifyColumnRequiredExceptDeterminer.Bowgun.class);
 
-        protected static SpecifyColumnRequiredExceptDeterminer _defaultDeterminer = cb -> false;
+        protected static final SpecifyColumnRequiredExceptDeterminer _emptyDeterminer = cb -> false;
+        protected static SpecifyColumnRequiredExceptDeterminer _defaultDeterminer;
         protected static boolean _locked = true;
 
         public static SpecifyColumnRequiredExceptDeterminer getDefaultDeterminer() { // not null
-            return _defaultDeterminer;
+            return _defaultDeterminer != null ? _defaultDeterminer : _emptyDeterminer;
         }
 
         public static void setDefaultDeterminer(SpecifyColumnRequiredExceptDeterminer defaultDeterminer) {
-            if (defaultDeterminer == null) {
-                throw new IllegalArgumentException("The argument 'defaultDeterminer' should not be null.");
-            }
             assertUnlocked();
             if (_log.isInfoEnabled()) {
                 _log.info("...Setting default of specifyColumnRequiredExceptDeterminer: " + defaultDeterminer);
