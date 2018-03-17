@@ -67,7 +67,7 @@ public class DfConventionalTakeAssertMap {
     //         ; tableTargetList = list:{}
     //     }
     // }
-    protected Map<String, Map<String, Object>> getConventionalTakeAssertMap() { // closet
+    protected Map<String, Map<String, Object>> getConventionalTakeAssertMap() {
         if (_conventionalTakeAssertMap != null) {
             return _conventionalTakeAssertMap;
         }

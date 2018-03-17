@@ -1202,7 +1202,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     //                                                             =======================
     protected DfConventionalTakeAssertMap _conventionalTakeAssertMap;
 
-    protected DfConventionalTakeAssertMap getConventionalTakeAssertMap() { // closet
+    protected DfConventionalTakeAssertMap getConventionalTakeAssertMap() {
         if (_conventionalTakeAssertMap != null) {
             return _conventionalTakeAssertMap;
         }
