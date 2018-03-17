@@ -23,7 +23,7 @@ import java.util.TreeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
-import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 

@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -41,12 +40,9 @@ import org.dbflute.helper.process.SystemScript;
 import org.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
 import org.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
-import org.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
-import org.dbflute.logic.replaceschema.takefinally.sequence.factory.DfSequenceHandlerFactory;
-import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.logic.replaceschema.takefinally.conventional.DfConventionalTakeAsserter;
+import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceIncrementer;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.dbflute.properties.DfSequenceIdentityProperties;
-import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -57,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
+public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                          Definition
@@ -223,9 +219,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return _rollbackTransaction;
     }
 
-    // -----------------------------------------------------
-    //                                          Take Finally
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Take Finally
+    //                                                                        ============
     protected DfSqlFileFireResult takeFinally(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * **");
@@ -234,7 +230,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("*              *");
         _log.info("* * * * * * * **");
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
-        return fireMan.fire(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
+        final DfSqlFileFireResult result = fireMan.fire(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
+        conventionalTakeAssert();
+        return result;
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() { // similar to alter check
@@ -348,9 +346,28 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return fileList;
     }
 
-    // -----------------------------------------------------
-    //                                    Increment Sequence
-    //                                    ------------------
+    // ===================================================================================
+    //                                                             Conventional TakeAssert
+    //                                                             =======================
+    protected void conventionalTakeAssert() {
+        final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
+        if (!prop.hasConventionalTakeAssert()) {
+            return;
+        }
+        _log.info("");
+        _log.info("...Executing conventional take-assert (in take-finally)");
+        prop.showConventionalTakeAssertProperties();
+        if (prop.isConventionalEmptyTableFailure()) {
+            final DfConventionalTakeAsserter asserter = new DfConventionalTakeAsserter(_dataSource, () -> {
+                return prop.bulidConventionalTakeAssertDispProperties();
+            });
+            asserter.assertConventionally();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                  Increment Sequence
+    //                                                                  ==================
     protected void incrementSequenceToDataMax() {
         if (!getReplaceSchemaProperties().isIncrementSequenceToDataMax()) {
             return;
@@ -364,18 +381,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("* Increment Sequence *");
         _log.info("*                    *");
         _log.info("* * * * * * * * * * **");
-        final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
-        final Map<String, String> tableSequenceMap = sequenceProp.getTableSequenceMap();
-        final DfDatabaseTypeFacadeProp dbTypeProp = getDatabaseTypeFacadeProp();
-        final DfDatabaseProperties databaseProp = getDatabaseProperties();
-        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(_dataSource, dbTypeProp, databaseProp);
-        final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
-        if (sequenceHandler == null) {
-            String databaseType = dbTypeProp.getTargetDatabase();
-            String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseType;
-            throw new UnsupportedOperationException(msg);
-        }
-        sequenceHandler.incrementSequenceToDataMax(tableSequenceMap);
+        new DfRepsSequenceIncrementer(_dataSource).incrementSequenceToDataMax();
     }
 
     // ===================================================================================

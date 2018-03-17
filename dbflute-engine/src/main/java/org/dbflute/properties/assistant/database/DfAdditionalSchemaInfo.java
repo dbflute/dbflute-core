@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant;
+package org.dbflute.properties.assistant.database;
 
 import java.util.List;
 import java.util.Map;

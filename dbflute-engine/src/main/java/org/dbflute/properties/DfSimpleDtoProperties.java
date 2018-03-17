@@ -28,7 +28,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
+public final class DfSimpleDtoProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

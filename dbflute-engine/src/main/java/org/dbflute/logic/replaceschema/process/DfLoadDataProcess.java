@@ -44,6 +44,7 @@ import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlPr
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSQLServer;
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
+import org.dbflute.logic.replaceschema.process.xls.DfXlsWritingResource;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jflute
  */
-public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
+public class DfLoadDataProcess extends DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                          Definition

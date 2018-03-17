@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.replaceschema.process;
+package org.dbflute.logic.replaceschema.process.arrangebefore;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -27,6 +27,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.process.ProcessResult;
 import org.dbflute.helper.process.SystemScript;
 import org.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
+import org.dbflute.logic.replaceschema.process.DfAbstractRepsProcess;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.8.5 (2011/06/17 Friday)
  */
-public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
+public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                          Definition

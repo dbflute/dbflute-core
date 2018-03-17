@@ -9,36 +9,24 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.dispatchvariable;
-
-import java.io.File;
+package org.dbflute.exception;
 
 /**
  * @author jflute
- * @since 1.1.0 (2015/01/16 Friday)
  */
-public class DfOutsideFileVariableInfo {
+public class DfTakeFinallyAssertionFailureEmptyTableException extends DfTakeFinallyAssertionFailureException {
 
-    protected File _dispatchFile;
-    protected String _outsideValue;
+    private static final long serialVersionUID = 1L;
 
-    public File getDispatchFile() {
-        return _dispatchFile;
+    public DfTakeFinallyAssertionFailureEmptyTableException(String msg) {
+        super(msg);
     }
 
-    public void setDispatchFile(File dispatchFile) {
-        _dispatchFile = dispatchFile;
-    }
-
-    public String getOutsideValue() {
-        return _outsideValue;
-    }
-
-    public void setOutsideValue(String outsideValue) {
-        _outsideValue = outsideValue;
+    public DfTakeFinallyAssertionFailureEmptyTableException(String msg, Throwable e) {
+        super(msg, e);
     }
 }

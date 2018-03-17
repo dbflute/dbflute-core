@@ -29,7 +29,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProperties {
+public final class DfAdditionalForeignKeyProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

@@ -13,15 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant;
+package org.dbflute.util;
+
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
- * @since 0.9.9.0D (2011/09/03 Saturday)
  */
-public interface DfTableDeterminer {
+public class DfPropertyUtilTest extends EngineTestCase {
 
-    boolean hasTable(String tableName);
-
-    boolean hasTableColumn(String tableName, String columnName);
+    public void test_deriveBooleanAnotherKey() {
+        assertEquals("aaa", DfPropertyUtil.deriveBooleanAnotherKey("isAaa"));
+        assertEquals(null, DfPropertyUtil.deriveBooleanAnotherKey("aaa"));
+        assertEquals(null, DfPropertyUtil.deriveBooleanAnotherKey("isaaa"));
+        assertEquals(null, DfPropertyUtil.deriveBooleanAnotherKey("is"));
+    }
 }

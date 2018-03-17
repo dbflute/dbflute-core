@@ -37,8 +37,9 @@ import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
 import org.dbflute.infra.reps.DfRepsSchemaSqlDir;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
-import org.dbflute.properties.assistant.DfConnectionProperties;
-import org.dbflute.properties.assistant.dispatchvariable.DfOutsideFileVariableInfo;
+import org.dbflute.properties.assistant.base.dispatch.DfOutsideFileVariableInfo;
+import org.dbflute.properties.assistant.database.DfConnectionProperties;
+import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jflute
  */
-public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties {
+public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition
@@ -1194,6 +1195,39 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             _repsAsDataManagerMap = repsMap;
         }
         return _repsAsDataManagerMap;
+    }
+
+    // ===================================================================================
+    //                                                             Conventional TakeAssert
+    //                                                             =======================
+    protected DfConventionalTakeAssertMap _conventionalTakeAssertMap;
+
+    protected DfConventionalTakeAssertMap getConventionalTakeAssertMap() { // closet
+        if (_conventionalTakeAssertMap != null) {
+            return _conventionalTakeAssertMap;
+        }
+        _conventionalTakeAssertMap = new DfConventionalTakeAssertMap(getReplaceSchemaMap(), _propertyValueHandler);
+        return _conventionalTakeAssertMap;
+    }
+
+    public boolean hasConventionalTakeAssert() {
+        return getConventionalTakeAssertMap().hasConventionalTakeAssert();
+    }
+
+    public void showConventionalTakeAssertProperties() {
+        getConventionalTakeAssertMap().showProperties();
+    }
+
+    public String bulidConventionalTakeAssertDispProperties() {
+        return getConventionalTakeAssertMap().buildDispProperties();
+    }
+
+    public boolean isConventionalEmptyTableFailure() {
+        return getConventionalTakeAssertMap().isEmptyTableFailure();
+    }
+
+    public boolean isConventionalEmptyTableTarget(String tableDbName) {
+        return getConventionalTakeAssertMap().isEmptyTableTarget(tableDbName);
     }
 
     // ===================================================================================

@@ -30,17 +30,17 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
+public class DfRepsSequenceHandlerOracle extends DfRepsSequenceHandlerJdbc {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfSequenceHandlerOracle.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfRepsSequenceHandlerOracle.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerOracle(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+    public DfRepsSequenceHandlerOracle(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         super(dataSource, unifiedSchemaList);
     }
 

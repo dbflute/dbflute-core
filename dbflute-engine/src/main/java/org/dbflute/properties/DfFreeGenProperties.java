@@ -24,7 +24,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 /**
  * @author jflute
  */
-public final class DfFreeGenProperties extends DfAbstractHelperProperties {
+public final class DfFreeGenProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

@@ -27,7 +27,7 @@ import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
  * @author jflute
  * @since 1.1.1 (2015/12/31 Thursday)
  */
-public final class DfSchemaPolicyProperties extends DfAbstractHelperProperties {
+public final class DfSchemaPolicyProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

@@ -21,7 +21,7 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.properties.assistant.DfTableListProvider;
+import org.dbflute.properties.assistant.base.DfTableListProvider;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -29,7 +29,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.8.1 (2009/01/09 Friday)
  */
-public final class DfOptimisticLockProperties extends DfAbstractHelperProperties {
+public final class DfOptimisticLockProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

@@ -13,15 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant;
+package org.dbflute.properties.assistant.base;
+
+import java.util.List;
 
 import org.apache.torque.engine.database.model.Table;
 
 /**
  * @author jflute
- * @since 0.9.5.2 (2009/07/06 Monday)
+ * @since 0.9.9.0D (2011/09/03 Saturday)
  */
-public interface DfTableFinder {
+public interface DfTableListProvider {
 
-    Table findTable(String tableName);
+    List<Table> provideTableList();
 }

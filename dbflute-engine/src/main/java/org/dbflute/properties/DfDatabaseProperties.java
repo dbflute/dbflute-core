@@ -32,8 +32,8 @@ import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
-import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.dbflute.properties.assistant.DfConnectionProperties;
+import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.database.DfConnectionProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jflute
  */
-public final class DfDatabaseProperties extends DfAbstractHelperProperties {
+public final class DfDatabaseProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

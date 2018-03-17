@@ -22,7 +22,7 @@ import org.dbflute.util.DfStringUtil;
 /**
  * @author jflute
  */
-public final class DfAllClassCopyrightProperties extends DfAbstractHelperProperties {
+public final class DfAllClassCopyrightProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

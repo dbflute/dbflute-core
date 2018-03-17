@@ -25,7 +25,7 @@ import org.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
+public final class DfFlexDtoProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

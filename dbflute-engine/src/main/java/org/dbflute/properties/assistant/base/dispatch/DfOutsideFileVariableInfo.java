@@ -13,22 +13,32 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties;
+package org.dbflute.properties.assistant.base.dispatch;
 
-import static org.junit.Assert.assertEquals;
-
-import org.dbflute.properties.DfAbstractHelperProperties;
+import java.io.File;
 
 /**
  * @author jflute
- * @since 0.9.5.1 (2009/06/06 Saturday)
+ * @since 1.1.0 (2015/01/16 Friday)
  */
-public class DfAbstractHelperPropertiesTest {
+public class DfOutsideFileVariableInfo {
 
-    public void test_deriveBooleanAnotherKey() {
-        assertEquals("aaa", DfAbstractHelperProperties.deriveBooleanAnotherKey("isAaa"));
-        assertEquals(null, DfAbstractHelperProperties.deriveBooleanAnotherKey("aaa"));
-        assertEquals(null, DfAbstractHelperProperties.deriveBooleanAnotherKey("isaaa"));
-        assertEquals(null, DfAbstractHelperProperties.deriveBooleanAnotherKey("is"));
+    protected File _dispatchFile;
+    protected String _outsideValue;
+
+    public File getDispatchFile() {
+        return _dispatchFile;
+    }
+
+    public void setDispatchFile(File dispatchFile) {
+        _dispatchFile = dispatchFile;
+    }
+
+    public String getOutsideValue() {
+        return _outsideValue;
+    }
+
+    public void setOutsideValue(String outsideValue) {
+        _outsideValue = outsideValue;
     }
 }

@@ -42,17 +42,17 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
+public class DfRepsSequenceHandlerPostgreSQL extends DfRepsSequenceHandlerJdbc {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfSequenceHandlerPostgreSQL.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfRepsSequenceHandlerPostgreSQL.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerPostgreSQL(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+    public DfRepsSequenceHandlerPostgreSQL(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         super(dataSource, unifiedSchemaList);
     }
 

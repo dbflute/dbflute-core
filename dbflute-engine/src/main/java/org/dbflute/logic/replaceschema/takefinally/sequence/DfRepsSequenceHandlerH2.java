@@ -30,17 +30,17 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public class DfSequenceHandlerDB2 extends DfSequenceHandlerJdbc {
+public class DfRepsSequenceHandlerH2 extends DfRepsSequenceHandlerJdbc {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfSequenceHandlerDB2.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfRepsSequenceHandlerH2.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerDB2(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+    public DfRepsSequenceHandlerH2(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         super(dataSource, unifiedSchemaList);
     }
 
@@ -51,7 +51,7 @@ public class DfSequenceHandlerDB2 extends DfSequenceHandlerJdbc {
     protected Integer selectNextVal(Statement st, String sequenceName) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = st.executeQuery("values nextval for " + sequenceName);
+            rs = st.executeQuery("select next value for " + sequenceName);
             rs.next();
             return rs.getInt(1);
         } finally {

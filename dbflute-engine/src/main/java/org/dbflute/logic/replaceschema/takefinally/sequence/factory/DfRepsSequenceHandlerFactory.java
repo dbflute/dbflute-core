@@ -19,11 +19,11 @@ import java.util.List;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
-import org.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerDB2;
-import org.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerH2;
-import org.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerOracle;
-import org.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerPostgreSQL;
+import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceHandler;
+import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceHandlerDB2;
+import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceHandlerH2;
+import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceHandlerOracle;
+import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceHandlerPostgreSQL;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
@@ -31,29 +31,29 @@ import org.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfSequenceHandlerFactory {
+public class DfRepsSequenceHandlerFactory {
 
     protected DfSchemaSource _dataSource;
     protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected DfDatabaseProperties _databaseProperties;
 
-    public DfSequenceHandlerFactory(DfSchemaSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
+    public DfRepsSequenceHandlerFactory(DfSchemaSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
         _dataSource = dataSource;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;
     }
 
-    public DfSequenceHandler createSequenceHandler() {
+    public DfRepsSequenceHandler createSequenceHandler() {
         final List<UnifiedSchema> targetSchemaList = createTargetSchemaList();
         if (_databaseTypeFacadeProp.isDatabasePostgreSQL()) {
-            return new DfSequenceHandlerPostgreSQL(_dataSource, targetSchemaList);
+            return new DfRepsSequenceHandlerPostgreSQL(_dataSource, targetSchemaList);
         } else if (_databaseTypeFacadeProp.isDatabaseOracle()) {
-            return new DfSequenceHandlerOracle(_dataSource, targetSchemaList);
+            return new DfRepsSequenceHandlerOracle(_dataSource, targetSchemaList);
         } else if (_databaseTypeFacadeProp.isDatabaseDB2()) {
-            return new DfSequenceHandlerDB2(_dataSource, targetSchemaList);
+            return new DfRepsSequenceHandlerDB2(_dataSource, targetSchemaList);
         } else if (_databaseTypeFacadeProp.isDatabaseH2()) {
-            return new DfSequenceHandlerH2(_dataSource, targetSchemaList);
+            return new DfRepsSequenceHandlerH2(_dataSource, targetSchemaList);
         }
         return null;
     }

@@ -22,7 +22,7 @@ import java.util.Properties;
  * @author jflute
  * @since 0.8.0 (2008/09/20 Saturday)
  */
-public final class DfAdditionalTableProperties extends DfAbstractHelperProperties {
+public final class DfAdditionalTableProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

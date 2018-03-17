@@ -29,7 +29,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.5.8 (2007/11/27 Tuesday)
  */
-public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
+public final class DfTypeMappingProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

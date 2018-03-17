@@ -60,7 +60,7 @@ import org.dbflute.logic.jdbc.metadata.synonym.factory.DfProcedureSynonymExtract
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
-import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;

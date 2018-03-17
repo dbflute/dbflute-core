@@ -36,7 +36,7 @@ import org.dbflute.util.Srl.ScopeInfo;
 /**
  * @author jflute
  */
-public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
+public final class DfIncludeQueryProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

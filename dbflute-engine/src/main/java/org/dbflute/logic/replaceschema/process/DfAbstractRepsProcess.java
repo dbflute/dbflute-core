@@ -32,7 +32,7 @@ import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfAbstractReplaceSchemaProcess {
+public abstract class DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                     SQL File Runner

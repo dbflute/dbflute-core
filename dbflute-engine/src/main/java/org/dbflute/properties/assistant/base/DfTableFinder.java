@@ -13,15 +13,15 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.replaceschema.takefinally.sequence;
+package org.dbflute.properties.assistant.base;
 
-import java.util.Map;
+import org.apache.torque.engine.database.model.Table;
 
 /**
  * @author jflute
- * @since 0.9.5.2 (2009/07/09 Thursday)
+ * @since 0.9.5.2 (2009/07/06 Monday)
  */
-public interface DfSequenceHandler {
+public interface DfTableFinder {
 
-    void incrementSequenceToDataMax(Map<String, String> tableSequenceMap);
+    Table findTable(String tableName);
 }

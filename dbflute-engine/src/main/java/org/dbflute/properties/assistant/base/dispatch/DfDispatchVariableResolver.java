@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.dispatchvariable;
+package org.dbflute.properties.assistant.base.dispatch;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -42,7 +42,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.2 (2008/10/20 Monday)
  */
-public final class DfDocumentProperties extends DfAbstractHelperProperties {
+public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

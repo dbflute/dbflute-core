@@ -46,7 +46,7 @@ import org.dbflute.properties.DfSchemaPolicyProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
-import org.dbflute.properties.handler.DfPropertiesHandler;
+import org.dbflute.properties.core.DfPropertiesHandler;
 
 /**
  * The properties to build. <br>

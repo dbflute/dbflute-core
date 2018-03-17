@@ -42,7 +42,7 @@ import org.dbflute.util.Srl;
  * This class is very important for DBFlute.
  * @author jflute
  */
-public final class DfBasicProperties extends DfAbstractHelperProperties {
+public final class DfBasicProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -75,7 +75,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getProperty(String key, String defaultValue) {
-        return getPropertyIfNotBuildProp(key, defaultValue, getBasicInfoMap());
+        return _propertyValueHandler.getPropertyIfNotBuildProp(key, defaultValue, getBasicInfoMap());
     }
 
     public boolean isProperty(String key, boolean defaultValue) {
@@ -866,7 +866,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                             Friends
     //                                                                             =======
     public boolean isFriendsHibernate() {
-        return handler().getHibernateProperties(getProperties()).hasHibernateDefinition();
+        return handler().getHibernateProperties(getNativeProperties()).hasHibernateDefinition();
     }
 
     // ===================================================================================

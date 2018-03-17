@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.handler;
+package org.dbflute.properties.core;
 
 import java.util.Properties;
 

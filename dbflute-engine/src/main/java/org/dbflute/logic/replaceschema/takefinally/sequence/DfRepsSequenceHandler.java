@@ -13,30 +13,15 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.dispatchvariable;
+package org.dbflute.logic.replaceschema.takefinally.sequence;
+
+import java.util.Map;
 
 /**
  * @author jflute
- * @since 1.1.0 (2015/01/16 Friday)
+ * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public class DfEnvironmentVariableInfo {
+public interface DfRepsSequenceHandler {
 
-    protected String _envName;
-    protected String _envValue;
-
-    public String getEnvName() {
-        return _envName;
-    }
-
-    public void setEnvName(String envName) {
-        _envName = envName;
-    }
-
-    public String getEnvValue() {
-        return _envValue;
-    }
-
-    public void setEnvValue(String envValue) {
-        _envValue = envValue;
-    }
+    void incrementSequenceToDataMax(Map<String, String> tableSequenceMap);
 }

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.replaceschema.process;
+package org.dbflute.logic.replaceschema.process.altercheck;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -64,6 +64,8 @@ import org.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
 import org.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
+import org.dbflute.logic.replaceschema.process.DfAbstractRepsProcess;
+import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
@@ -76,7 +78,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
+public class DfAlterCheckProcess extends DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                          Definition

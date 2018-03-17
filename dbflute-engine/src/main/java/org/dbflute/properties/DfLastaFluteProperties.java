@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 1.1.0-sp3 (2015/04/26 Sunday)
  */
-public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
+public final class DfLastaFluteProperties extends DfAbstractDBFluteProperties {
 
     private static final String LASTADOC_HTML_PREFIX = "lastadoc-";
     private static final String LASTADOC_HTML_SUFFIX = ".html";

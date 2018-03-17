@@ -44,12 +44,12 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
+public abstract class DfRepsSequenceHandlerJdbc implements DfRepsSequenceHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfSequenceHandlerJdbc.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfRepsSequenceHandlerJdbc.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -77,7 +77,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerJdbc(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+    public DfRepsSequenceHandlerJdbc(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         _dataSource = dataSource;
         _unifiedSchemaList = unifiedSchemaList;
     }

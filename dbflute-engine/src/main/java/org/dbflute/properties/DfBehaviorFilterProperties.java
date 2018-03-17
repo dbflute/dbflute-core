@@ -25,7 +25,7 @@ import org.dbflute.util.DfStringUtil;
  * Basically closet properties.
  * @author jflute
  */
-public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties {
+public final class DfBehaviorFilterProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

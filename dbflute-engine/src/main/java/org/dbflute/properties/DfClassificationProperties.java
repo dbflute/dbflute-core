@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * The properties for classification.
  * @author jflute
  */
-public final class DfClassificationProperties extends DfAbstractHelperProperties {
+public final class DfClassificationProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

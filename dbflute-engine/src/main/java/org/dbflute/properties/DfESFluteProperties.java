@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 1.1.0-sp9 (2015/10/29 Thursday)
  */
-public final class DfESFluteProperties extends DfAbstractHelperProperties {
+public final class DfESFluteProperties extends DfAbstractDBFluteProperties {
 
     private static final Logger logger = LoggerFactory.getLogger(DfESFluteProperties.class);
 
