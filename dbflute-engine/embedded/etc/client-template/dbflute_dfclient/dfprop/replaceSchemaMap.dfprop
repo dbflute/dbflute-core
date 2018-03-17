@@ -91,7 +91,7 @@ map:{
     #  For example, you can check empty table (no-data).
     #
     #; conventionalTakeAssertMap = map:{
-    #    ; emptyTableMap = map:{ 
+    #    ; emptyTableMap = map:{
     #        ; isFailure = true
     #        ; workableRepsEnvTypeList = list:{ut}
     #        ; tableExceptList = list:{}
