@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.chelper;
+package org.dbflute.cbean.garnish;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -30,7 +30,7 @@ import org.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
  * @author jflute
  * @since 1.1.2 (2016/12/31 Saturday)
  */
-public class HpSpecifyColumnRequiredChecker {
+public class SpecifyColumnRequiredChecker {
 
     public void checkSpecifyColumnRequiredIfNeeds(ConditionBean cb, Consumer<Set<String>> thrower) {
         // cannot embed this to SQL clause because of too complex

@@ -36,8 +36,6 @@ import org.dbflute.cbean.chelper.HpSpQyCall;
 import org.dbflute.cbean.chelper.HpSpQyDelegatingCall;
 import org.dbflute.cbean.chelper.HpSpQyHas;
 import org.dbflute.cbean.chelper.HpSpQyQy;
-import org.dbflute.cbean.chelper.HpSpecifyColumnRequiredChecker;
-import org.dbflute.cbean.chelper.HpSpecifyColumnRequiredExceptDeterminer;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
@@ -48,6 +46,8 @@ import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.dream.ColumnCalculator;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
+import org.dbflute.cbean.garnish.SpecifyColumnRequiredChecker;
+import org.dbflute.cbean.garnish.SpecifyColumnRequiredExceptDeterminer;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
@@ -177,7 +177,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected boolean _specifyColumnRequired;
 
     /** The determiner to except SpecifyColumn required. (NullAllowed) {Internal} */
-    protected HpSpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
+    protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
 
     /** Does it allow selecting undefined classification code? {Internal} */
     protected boolean _undefinedClassificationSelectAllowed;
@@ -1297,14 +1297,18 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected boolean xisExceptSpecifyColumnRequired() {
-        return _specifyColumnRequiredExceptDeterminer != null && _specifyColumnRequiredExceptDeterminer.isExcept(this);
+        if (_specifyColumnRequiredExceptDeterminer != null && _specifyColumnRequiredExceptDeterminer.isExcept(this)) {
+            return true;
+        } else {
+            return SpecifyColumnRequiredExceptDeterminer.Bowgun.getDefaultDeterminer().isExcept(this);
+        }
     }
 
-    protected HpSpecifyColumnRequiredChecker xcreateSpecifyColumnRequiredChecker() {
-        return new HpSpecifyColumnRequiredChecker();
+    protected SpecifyColumnRequiredChecker xcreateSpecifyColumnRequiredChecker() {
+        return new SpecifyColumnRequiredChecker();
     }
 
-    protected void xsetSpecifyColumnRequiredExceptDeterminer(HpSpecifyColumnRequiredExceptDeterminer exceptDeterminer) {
+    protected void xsetSpecifyColumnRequiredExceptDeterminer(SpecifyColumnRequiredExceptDeterminer exceptDeterminer) {
         _specifyColumnRequiredExceptDeterminer = exceptDeterminer;
     }
 
