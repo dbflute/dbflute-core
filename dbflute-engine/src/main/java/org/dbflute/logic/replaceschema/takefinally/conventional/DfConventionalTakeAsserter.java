@@ -67,18 +67,26 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
         if (prop.isConventionalEmptyTableFailure()) {
             _log.info("...Checking conventional empty tables");
-            final List<DfTableMeta> allTableList = extractTableList();
-            final List<DfTableMeta> emptyTableList = DfCollectionUtil.newArrayList();
-            for (DfTableMeta tableMeta : allTableList) {
-                if (prop.isConventionalEmptyTableTarget(tableMeta.getTableDbName())) {
-                    if (determineEmptyTable(tableMeta)) {
-                        emptyTableList.add(tableMeta);
-                    }
+            if (prop.isConventionalEmptyTableWorkableEnv()) {
+                doAssertEmptyTable(prop);
+            } else {
+                _log.info(" => out of target environment so do nothing: currentEnv=" + prop.getRepsEnvType());
+            }
+        }
+    }
+
+    protected void doAssertEmptyTable(DfReplaceSchemaProperties prop) {
+        final List<DfTableMeta> allTableList = extractTableList();
+        final List<DfTableMeta> emptyTableList = DfCollectionUtil.newArrayList();
+        for (DfTableMeta tableMeta : allTableList) {
+            if (prop.isConventionalEmptyTableTarget(tableMeta.getTableDbName())) {
+                if (determineEmptyTable(tableMeta)) {
+                    emptyTableList.add(tableMeta);
                 }
             }
-            if (!emptyTableList.isEmpty()) {
-                throwTakeFinallyAssertionFailureEmptyTableException(emptyTableList);
-            }
+        }
+        if (!emptyTableList.isEmpty()) {
+            throwTakeFinallyAssertionFailureEmptyTableException(emptyTableList);
         }
     }
 

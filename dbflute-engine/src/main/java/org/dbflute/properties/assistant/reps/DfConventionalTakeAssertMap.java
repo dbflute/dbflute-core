@@ -18,11 +18,13 @@ package org.dbflute.properties.assistant.reps;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.properties.assistant.base.DfPropertyValueHandler;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,7 @@ public class DfConventionalTakeAssertMap {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final String _currentRepsEnvType;
     protected final Map<String, Object> _replaceSchemaMap;
     protected final DfPropertyValueHandler _propertyValueHandler;
 
@@ -47,7 +50,9 @@ public class DfConventionalTakeAssertMap {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfConventionalTakeAssertMap(Map<String, Object> replaceSchemaMap, DfPropertyValueHandler propertyValueHandler) {
+    public DfConventionalTakeAssertMap(String currentRepsEnvType, Map<String, Object> replaceSchemaMap,
+            DfPropertyValueHandler propertyValueHandler) {
+        _currentRepsEnvType = currentRepsEnvType;
         _replaceSchemaMap = replaceSchemaMap;
         _propertyValueHandler = propertyValueHandler;
     }
@@ -89,7 +94,7 @@ public class DfConventionalTakeAssertMap {
 
     public String buildDispProperties() {
         final String mapString = new MapListString().buildMapString(getConventionalTakeAssertMap());
-        return KEY_conventionalTakeAssertMap + " = " + mapString;
+        return "; " + KEY_conventionalTakeAssertMap + " = " + mapString;
     }
 
     // ===================================================================================
@@ -97,6 +102,17 @@ public class DfConventionalTakeAssertMap {
     //                                                                         ===========
     public boolean isEmptyTableFailure() {
         return _propertyValueHandler.isProperty("isFailure", false, getEmptyTableMap());
+    }
+
+    public boolean isEmptyTableWorkableEnv() {
+        @SuppressWarnings("unchecked")
+        final List<String> workableRepsEnvTypeList = (List<String>) getEmptyTableMap().get("workableRepsEnvTypeList");
+        if (workableRepsEnvTypeList != null) {
+            return Srl.containsElementAnyIgnoreCase(workableRepsEnvTypeList, "$$ALL$$", _currentRepsEnvType);
+        } else { // no property
+            String msg = "Not found the workableRepsEnvTypeList in emptyTableMap: " + getEmptyTableMap();
+            throw new DfIllegalPropertySettingException(msg);
+        }
     }
 
     public boolean isEmptyTableTarget(String tableDbName) {

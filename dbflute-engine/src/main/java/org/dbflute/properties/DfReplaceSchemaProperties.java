@@ -1206,8 +1206,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         if (_conventionalTakeAssertMap != null) {
             return _conventionalTakeAssertMap;
         }
-        _conventionalTakeAssertMap = new DfConventionalTakeAssertMap(getReplaceSchemaMap(), _propertyValueHandler);
+        _conventionalTakeAssertMap = createConventionalTakeAssertMap();
         return _conventionalTakeAssertMap;
+    }
+
+    protected DfConventionalTakeAssertMap createConventionalTakeAssertMap() {
+        return new DfConventionalTakeAssertMap(getRepsEnvType(), getReplaceSchemaMap(), _propertyValueHandler);
     }
 
     public boolean hasConventionalTakeAssert() {
@@ -1224,6 +1228,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
 
     public boolean isConventionalEmptyTableFailure() {
         return getConventionalTakeAssertMap().isEmptyTableFailure();
+    }
+
+    public boolean isConventionalEmptyTableWorkableEnv() {
+        return getConventionalTakeAssertMap().isEmptyTableWorkableEnv();
     }
 
     public boolean isConventionalEmptyTableTarget(String tableDbName) {

@@ -9,6 +9,8 @@
 # o isErrorSqlContinue: (NotRequired - Default false)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
 # o skipSheet: (NotRequired - Default '')
+# o isCheckSchemaPolicyInReps: (NotRequired - Default false)
+# o conventionalTakeAssertMap: (NotRequired - Default map:{})
 # o isIncrementSequenceToDataMax: (NotRequired - Default false)
 # o isSuppressBatchUpdate: (NotRequired - Default false)
 # o objectTypeTargetList: (NotRequired - Default databaseInfoMap's)
@@ -72,6 +74,30 @@ map:{
     #  You can specify the skip sheet by regular expression
     #
     #; skipSheet = P.+
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isCheckSchemaPolicyInReps: (NotRequired - Default false)
+    #  Does it check schema policy in ReplaceSchema?
+    #  Normally the check is executed in Doc task but it may be late
+    #  so you can check here.
+    #
+    #; isCheckSchemaPolicyInReps = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o conventionalTakeAssertMap: (NotRequired - Default map:{})
+    #  Does it assert data by conventional rule in take-finally
+    #  For example, you can check empty table (no-data).
+    #
+    #; conventionalTakeAssertMap = map:{
+    #    ; emptyTableMap = map:{ 
+    #        ; isFailure = true
+    #        ; workableRepsEnvTypeList = list:{ut}
+    #        ; tableExceptList = list:{}
+    #        ; tableTargetList = list:{}
+    #    }
+    #}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

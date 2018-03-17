@@ -357,12 +357,10 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
         _log.info("");
         _log.info("...Executing conventional take-assert (in take-finally)");
         prop.showConventionalTakeAssertProperties();
-        if (prop.isConventionalEmptyTableFailure()) {
-            final DfConventionalTakeAsserter asserter = new DfConventionalTakeAsserter(_dataSource, () -> {
-                return prop.bulidConventionalTakeAssertDispProperties();
-            });
-            asserter.assertConventionally();
-        }
+        final DfConventionalTakeAsserter asserter = new DfConventionalTakeAsserter(_dataSource, () -> {
+            return prop.bulidConventionalTakeAssertDispProperties();
+        });
+        asserter.assertConventionally();
     }
 
     // ===================================================================================
