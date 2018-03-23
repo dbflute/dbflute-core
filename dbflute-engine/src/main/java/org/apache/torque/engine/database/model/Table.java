@@ -167,10 +167,11 @@ import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
-import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
+import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -3670,13 +3671,20 @@ public class Table {
     //                                      Small Adjustment
     //                                      ----------------
     public boolean isCompatibleNewMyEntityConditionBean() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isCompatibleNewMyEntityConditionBean();
+        return getLittleAdjustmentProperties().isCompatibleNewMyEntityConditionBean();
     }
 
     public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isCompatibleDeleteNonstrictIgnoreDeleted();
+        return getLittleAdjustmentProperties().isCompatibleDeleteNonstrictIgnoreDeleted();
+    }
+
+    public boolean isDeprecatedSelectByPKUQ() {
+        final DfDeprecatedSelectByPKUQMap propMap = getLittleAdjustmentProperties().getDeprecatedSelectByPKUQMap();
+        return propMap.isDeprecated() && propMap.isTableTarget(getTableDbName());
+    }
+
+    public String getDeprecatedSelectByPKUQComment() {
+        return getLittleAdjustmentProperties().getDeprecatedSelectByPKUQMap().getDeprecatedComment();
     }
 
     // ===================================================================================

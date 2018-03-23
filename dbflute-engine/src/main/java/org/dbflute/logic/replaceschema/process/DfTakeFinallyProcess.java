@@ -43,6 +43,7 @@ import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.dbflute.logic.replaceschema.takefinally.conventional.DfConventionalTakeAsserter;
 import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceIncrementer;
 import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -350,15 +351,15 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
     //                                                             Conventional TakeAssert
     //                                                             =======================
     protected void conventionalTakeAssert() {
-        final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
-        if (!prop.hasConventionalTakeAssert()) {
+        DfConventionalTakeAssertMap map = getReplaceSchemaProperties().getConventionalTakeAssertMap();
+        if (!map.hasConventionalTakeAssert()) {
             return;
         }
         _log.info("");
         _log.info("...Executing conventional take-assert (in take-finally)");
-        prop.showConventionalTakeAssertProperties();
+        map.showProperties();
         final DfConventionalTakeAsserter asserter = new DfConventionalTakeAsserter(_dataSource, () -> {
-            return prop.bulidConventionalTakeAssertDispProperties();
+            return map.buildDispProperties();
         });
         asserter.assertConventionally();
     }

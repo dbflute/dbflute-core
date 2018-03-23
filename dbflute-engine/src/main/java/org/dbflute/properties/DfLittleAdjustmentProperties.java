@@ -39,6 +39,7 @@ import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.properties.assistant.base.DfTableDeterminer;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -186,6 +187,20 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
 
     public boolean isMakeBatchUpdateSpecifyColumn() { // closet
         return isProperty("isMakeBatchUpdateSpecifyColumn", isCompatibleBeforeJava8());
+    }
+
+    protected DfDeprecatedSelectByPKUQMap _deprecatedSelectByPKUQMap;
+
+    public DfDeprecatedSelectByPKUQMap getDeprecatedSelectByPKUQMap() {
+        if (_deprecatedSelectByPKUQMap != null) {
+            return _deprecatedSelectByPKUQMap;
+        }
+        _deprecatedSelectByPKUQMap = createDeprecatedSelectByPKUQMap();
+        return _deprecatedSelectByPKUQMap;
+    }
+
+    protected DfDeprecatedSelectByPKUQMap createDeprecatedSelectByPKUQMap() {
+        return new DfDeprecatedSelectByPKUQMap(getLittleAdjustmentMap(), _propertyValueHandler);
     }
 
     // ===================================================================================

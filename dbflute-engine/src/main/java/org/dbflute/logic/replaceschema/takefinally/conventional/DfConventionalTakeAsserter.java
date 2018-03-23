@@ -29,7 +29,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.replaceschema.process.DfAbstractRepsProcess;
-import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -64,22 +64,22 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
     //                                                                             Execute
     //                                                                             =======
     public void assertConventionally() {
-        final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
-        if (prop.isConventionalEmptyTableFailure()) {
+        final DfConventionalTakeAssertMap propMap = getReplaceSchemaProperties().getConventionalTakeAssertMap();
+        if (propMap.isEmptyTableFailure()) {
             _log.info("...Checking conventional empty tables");
-            if (prop.isConventionalEmptyTableWorkableEnv()) {
-                doAssertEmptyTable(prop);
+            if (propMap.isEmptyTableWorkableEnv()) {
+                doAssertEmptyTable(propMap);
             } else {
-                _log.info(" => out of target environment so do nothing: currentEnv=" + prop.getRepsEnvType());
+                _log.info(" => out of target environment so do nothing: currentEnv=" + getReplaceSchemaProperties().getRepsEnvType());
             }
         }
     }
 
-    protected void doAssertEmptyTable(DfReplaceSchemaProperties prop) {
+    protected void doAssertEmptyTable(DfConventionalTakeAssertMap propMap) {
         final List<DfTableMeta> allTableList = extractTableList();
         final List<DfTableMeta> emptyTableList = DfCollectionUtil.newArrayList();
         for (DfTableMeta tableMeta : allTableList) {
-            if (prop.isConventionalEmptyTableTarget(tableMeta.getTableDbName())) {
+            if (propMap.isEmptyTableTarget(tableMeta.getTableDbName())) {
                 if (determineEmptyTable(tableMeta)) {
                     emptyTableList.add(tableMeta);
                 }

@@ -34,9 +34,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DfConventionalTakeAssertMap {
 
-    private static final String KEY_conventionalTakeAssertMap = "conventionalTakeAssertMap";
-
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfConventionalTakeAssertMap.class);
+    private static final String KEY_conventionalTakeAssertMap = "conventionalTakeAssertMap";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -60,7 +62,7 @@ public class DfConventionalTakeAssertMap {
     // ===================================================================================
     //                                                                            Base Map
     //                                                                            ========
-    // conventionalTakeAssertMap = map:{
+    // ; conventionalTakeAssertMap = map:{
     //     ; emptyTableMap = map:{
     //         ; isFailure = true
     //         ; tableExceptList = list:{}
