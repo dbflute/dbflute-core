@@ -120,9 +120,9 @@ public class DfConventionalTakeAssertMap {
     public boolean isEmptyTableTarget(String tableDbName) {
         final Map<String, Object> emptyTableMap = getEmptyTableMap();
         @SuppressWarnings("unchecked")
-        final List<String> tableTargetList = (List<String>) emptyTableMap.getOrDefault("tableTargetList", DfCollectionUtil.emptyMap());
+        final List<String> tableTargetList = (List<String>) emptyTableMap.getOrDefault("tableTargetList", DfCollectionUtil.emptyList());
         @SuppressWarnings("unchecked")
-        final List<String> tableExceptList = (List<String>) emptyTableMap.getOrDefault("tableExceptList", DfCollectionUtil.emptyMap());
+        final List<String> tableExceptList = (List<String>) emptyTableMap.getOrDefault("tableExceptList", DfCollectionUtil.emptyList());
         return DfNameHintUtil.isTargetByHint(tableDbName, tableTargetList, tableExceptList);
     }
 

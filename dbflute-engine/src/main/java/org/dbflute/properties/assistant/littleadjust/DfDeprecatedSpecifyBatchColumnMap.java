@@ -27,12 +27,12 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 1.1.7 (2018/03/23 Friday)
  */
-public class DfDeprecatedSelectByPKUQMap {
+public class DfDeprecatedSpecifyBatchColumnMap {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String KEY_deprecatedSelectByPKUQMap = "deprecatedSelectByPKUQMap";
+    private static final String KEY_deprecatedSpecifyBatchColumnMap = "deprecatedSpecifyBatchColumnMap";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -40,12 +40,12 @@ public class DfDeprecatedSelectByPKUQMap {
     protected final Map<String, Object> _littleAdjustmentMap;
     protected final DfPropertyValueHandler _propertyValueHandler;
 
-    protected Map<String, Object> _deprecatedSelectByPKUQMap; // cache
+    protected Map<String, Object> _deprecatedSpecifyBatchColumnMap; // cache
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDeprecatedSelectByPKUQMap(Map<String, Object> littleAdjustmentMap, DfPropertyValueHandler propertyValueHandler) {
+    public DfDeprecatedSpecifyBatchColumnMap(Map<String, Object> littleAdjustmentMap, DfPropertyValueHandler propertyValueHandler) {
         _littleAdjustmentMap = littleAdjustmentMap;
         _propertyValueHandler = propertyValueHandler;
     }
@@ -53,24 +53,24 @@ public class DfDeprecatedSelectByPKUQMap {
     // ===================================================================================
     //                                                                            Base Map
     //                                                                            ========
-    // ; deprecatedSelectByPKUQMap = map:{
+    // ; deprecatedSpecifyBatchColumnMap = map:{
     //     ; deprecatedComment = ...
     //     ; tableExceptList = list:{}
     //     ; tableTargetList = list:{}
     // }
-    protected Map<String, Object> getDeprecatedSelectByPKUQMap() {
-        if (_deprecatedSelectByPKUQMap != null) {
-            return _deprecatedSelectByPKUQMap;
+    protected Map<String, Object> getDeprecatedSpecifyBatchColumnMap() {
+        if (_deprecatedSpecifyBatchColumnMap != null) {
+            return _deprecatedSpecifyBatchColumnMap;
         }
-        final Object obj = _littleAdjustmentMap.get(KEY_deprecatedSelectByPKUQMap);
+        final Object obj = _littleAdjustmentMap.get(KEY_deprecatedSpecifyBatchColumnMap);
         if (obj == null) {
-            _deprecatedSelectByPKUQMap = DfCollectionUtil.emptyMap();
+            _deprecatedSpecifyBatchColumnMap = DfCollectionUtil.emptyMap();
         } else {
             @SuppressWarnings("unchecked")
             final Map<String, Object> repsMap = (Map<String, Object>) obj;
-            _deprecatedSelectByPKUQMap = repsMap;
+            _deprecatedSpecifyBatchColumnMap = repsMap;
         }
-        return _deprecatedSelectByPKUQMap;
+        return _deprecatedSpecifyBatchColumnMap;
     }
 
     public boolean isDeprecated() {
@@ -78,11 +78,11 @@ public class DfDeprecatedSelectByPKUQMap {
     }
 
     public String getDeprecatedComment() {
-        return _propertyValueHandler.getProperty("deprecatedComment", null, getDeprecatedSelectByPKUQMap());
+        return _propertyValueHandler.getProperty("deprecatedComment", null, getDeprecatedSpecifyBatchColumnMap());
     }
 
     public boolean isTableTarget(String tableDbName) {
-        final Map<String, Object> map = getDeprecatedSelectByPKUQMap();
+        final Map<String, Object> map = getDeprecatedSpecifyBatchColumnMap();
         @SuppressWarnings("unchecked")
         final List<String> tableTargetList = (List<String>) map.getOrDefault("tableTargetList", DfCollectionUtil.emptyList());
         @SuppressWarnings("unchecked")

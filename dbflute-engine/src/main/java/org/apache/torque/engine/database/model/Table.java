@@ -172,6 +172,7 @@ import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSpecifyBatchColumnMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -3652,6 +3653,14 @@ public class Table {
         return prop.isCompatibleSelectScalarOldName();
     }
 
+    public boolean isCompatibleNewMyEntityConditionBean() {
+        return getLittleAdjustmentProperties().isCompatibleNewMyEntityConditionBean();
+    }
+
+    public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {
+        return getLittleAdjustmentProperties().isCompatibleDeleteNonstrictIgnoreDeleted();
+    }
+
     // -----------------------------------------------------
     //                                   Optional Properties
     //                                   -------------------
@@ -3668,16 +3677,8 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                      Small Adjustment
-    //                                      ----------------
-    public boolean isCompatibleNewMyEntityConditionBean() {
-        return getLittleAdjustmentProperties().isCompatibleNewMyEntityConditionBean();
-    }
-
-    public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {
-        return getLittleAdjustmentProperties().isCompatibleDeleteNonstrictIgnoreDeleted();
-    }
-
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
     public boolean isDeprecatedSelectByPKUQ() {
         final DfDeprecatedSelectByPKUQMap propMap = getLittleAdjustmentProperties().getDeprecatedSelectByPKUQMap();
         return propMap.isDeprecated() && propMap.isTableTarget(getTableDbName());
@@ -3785,6 +3786,18 @@ public class Table {
             }
         }
         return null;
+    }
+
+    // -----------------------------------------------------
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
+    public boolean isDeprecatedSpecifyBatchColumn() {
+        final DfDeprecatedSpecifyBatchColumnMap propMap = getLittleAdjustmentProperties().getDeprecatedSpecifyBatchColumnMap();
+        return propMap.isDeprecated() && propMap.isTableTarget(getTableDbName());
+    }
+
+    public String getDeprecatedSpecifyBatchColumnComment() {
+        return getLittleAdjustmentProperties().getDeprecatedSpecifyBatchColumnMap().getDeprecatedComment();
     }
 
     // ===================================================================================

@@ -40,6 +40,7 @@ import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.properties.assistant.base.DfTableDeterminer;
 import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSpecifyBatchColumnMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -189,6 +190,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isMakeBatchUpdateSpecifyColumn", isCompatibleBeforeJava8());
     }
 
+    // -----------------------------------------------------
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
     protected DfDeprecatedSelectByPKUQMap _deprecatedSelectByPKUQMap;
 
     public DfDeprecatedSelectByPKUQMap getDeprecatedSelectByPKUQMap() {
@@ -498,6 +502,23 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
 
     public boolean isMakeDirectConditionManualOrder() { // closet
         return isProperty("isMakeDirectConditionManualOrder", isCompatibleBeforeJava8());
+    }
+
+    // -----------------------------------------------------
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
+    protected DfDeprecatedSpecifyBatchColumnMap _deprecatedSpecifyBatchColumnMap;
+
+    public DfDeprecatedSpecifyBatchColumnMap getDeprecatedSpecifyBatchColumnMap() {
+        if (_deprecatedSpecifyBatchColumnMap != null) {
+            return _deprecatedSpecifyBatchColumnMap;
+        }
+        _deprecatedSpecifyBatchColumnMap = createDeprecatedSpecifyBatchColumnMap();
+        return _deprecatedSpecifyBatchColumnMap;
+    }
+
+    protected DfDeprecatedSpecifyBatchColumnMap createDeprecatedSpecifyBatchColumnMap() {
+        return new DfDeprecatedSpecifyBatchColumnMap(getLittleAdjustmentMap(), _propertyValueHandler);
     }
 
     // ===================================================================================
