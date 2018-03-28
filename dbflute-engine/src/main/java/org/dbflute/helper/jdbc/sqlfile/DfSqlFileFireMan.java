@@ -185,7 +185,12 @@ public class DfSqlFileFireMan {
         return Srl.endsWith(resolvePath(sqlFile), scriptExtAry);
     }
 
-    protected DfSqlFileRunnerResult executeScriptFile(SystemScript script, File sqlFile) {
+    protected DfSqlFileRunnerResult processScriptFile(DfSqlFileRunner runner, SystemScript script, File sqlFile) {
+        runner.prepare(sqlFile);
+        return executeScriptFile(runner, script, sqlFile);
+    }
+
+    protected DfSqlFileRunnerResult executeScriptFile(DfSqlFileRunner runner, SystemScript script, File sqlFile) {
         final String sqlPath = resolvePath(sqlFile);
         final String baseDir = Srl.substringLastFront(sqlPath, "/");
         final String scriptName = Srl.substringLastRear(sqlPath, "/");
@@ -199,16 +204,20 @@ public class DfSqlFileFireMan {
         }
         final String console = processResult.getConsole();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(console)) {
-            _log.info("Catched the console for " + scriptName + ":" + ln() + console);
+            _log.info("Caught the console for " + scriptName + ":" + ln() + console);
         }
         final DfSqlFileRunnerResult runnerResult = new DfSqlFileRunnerResult(sqlFile);
         runnerResult.setTotalSqlCount(1);
         final int exitCode = processResult.getExitCode();
         if (exitCode != 0) {
             final String msg = "The script failed: " + scriptName + " exitCode=" + exitCode;
+            // wrapping quickly because SQLFailureException needs SQLException
+            // (and nested exception message has debug information so simple message here)
             final SQLException sqlEx = new DfFireSqlScriptSQLException(msg);
+            final SQLFailureException failureEx = new SQLFailureException("Break the process for script failure.", sqlEx);
             final String sqlExp = "(commands on the script)";
             runnerResult.addErrorContinuedSql(sqlExp, sqlEx);
+            runnerResult.setBreakCause(failureEx);
             return runnerResult;
         } else {
             runnerResult.setGoodSqlCount(1);

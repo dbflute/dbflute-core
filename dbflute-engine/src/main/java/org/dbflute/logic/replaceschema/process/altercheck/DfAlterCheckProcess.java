@@ -735,7 +735,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
             protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
                 _executedAlterSqlFileList.add(sqlFile);
                 if (isScriptFile(sqlFile, scriptExtAry)) {
-                    return executeScriptFile(script, sqlFile);
+                    return processScriptFile(runner, script, sqlFile);
                 } else { // mainly here
                     return super.processSqlFile(runner, sqlFile);
                 }
