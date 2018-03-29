@@ -46,6 +46,7 @@
     <!-- Embedded Libraries -->
     <fileset dir="${torque.lib.dir}">
       <include name="**/*.jar"/>
+      <exclude name="extlib/*.jar"/> <!-- not to be duplicate -->
     </fileset>
   </path>
 
