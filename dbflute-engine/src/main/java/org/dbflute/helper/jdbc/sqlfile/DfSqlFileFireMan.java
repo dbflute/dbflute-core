@@ -215,8 +215,8 @@ public class DfSqlFileFireMan {
             // (and nested exception message has debug information so simple message here)
             final SQLException sqlEx = new DfFireSqlScriptSQLException(msg);
             final SQLFailureException failureEx = new SQLFailureException("Break the process for script failure.", sqlEx);
-            final String sqlExp = "(commands on the script)";
-            runnerResult.addErrorContinuedSql(sqlExp, sqlEx);
+            // no error continue, script error is treated as programming error
+            // because you can freely skip SQL failure in your script
             runnerResult.setBreakCause(failureEx);
             return runnerResult;
         } else {
