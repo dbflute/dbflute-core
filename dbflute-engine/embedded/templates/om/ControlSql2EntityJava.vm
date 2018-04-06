@@ -239,7 +239,7 @@ $database.backToSql2EntityOutputDirectory()
   #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
 
   #foreach ($table in $database.tableList)
-    #if (!$table.isSql2EntityTypeSafeCursor())
+    #if ($table.isSimpleDtoSql2EntityTarget() && !$table.isSql2EntityTypeSafeCursor())
       #set ($myBaseObjectClassName = "${table.simpleDtoBaseDtoClassName}")
       #set ($myExtendedObjectClassName = "${table.simpleDtoExtendedDtoClassName}")
 
@@ -274,7 +274,7 @@ $database.backToSql2EntityOutputDirectory()
   #set ($myExtendedDtoMapperPackageName = "${database.simpleDtoExtendedMapperPackage}.customize")
 
   #foreach ($table in $database.tableList)
-    #if (!$table.isSql2EntityTypeSafeCursor())
+    #if ($table.isSimpleDtoSql2EntityTarget() && !$table.isSql2EntityTypeSafeCursor())
       $table.switchSql2EntityDtoMapperOutputDirectory()
       #set ($path = $database.getPackageAsPath(${myBaseDtoMapperPackageName}))
       $database.makeDirectory($path)

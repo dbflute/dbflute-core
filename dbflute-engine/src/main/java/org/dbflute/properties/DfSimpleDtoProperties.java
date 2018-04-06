@@ -16,11 +16,13 @@
 package org.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.torque.engine.database.model.Table;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -71,6 +73,65 @@ public final class DfSimpleDtoProperties extends DfAbstractDBFluteProperties {
 
     protected boolean hasDefinitionProperty(String key) {
         return getSimpleDtoDefinitionMap().containsKey(key);
+    }
+
+    // ===================================================================================
+    //                                                                        Domain Table
+    //                                                                        ============
+    protected Map<String, Object> _domainTableMap;
+
+    protected Map<String, Object> getDomainTableMap() {
+        if (_domainTableMap != null) {
+            return _domainTableMap;
+        }
+        final String key = "domainTableMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>) getSimpleDtoDefinitionMap().get(key);
+        if (map != null) {
+            _domainTableMap = map;
+        } else {
+            _domainTableMap = DfCollectionUtil.emptyMap();
+        }
+        return _domainTableMap;
+    }
+
+    // #for_now cannot use tables that have relationship by jflute (2018/04/06)
+    public boolean isDomainTableTarget(Table table) {
+        final Map<String, Object> domainTableMap = getDomainTableMap();
+        @SuppressWarnings("unchecked")
+        final List<String> targetList = (List<String>) domainTableMap.getOrDefault("tableTargetList", Collections.emptyList());
+        @SuppressWarnings("unchecked")
+        final List<String> exceptList = (List<String>) domainTableMap.getOrDefault("tableExceptList", Collections.emptyList());
+        return isTargetByHint(table.getTableDbName(), targetList, exceptList);
+    }
+
+    // ===================================================================================
+    //                                                                    Sql2Entity Table
+    //                                                                    ================
+    protected Map<String, Object> _sql2entityMap;
+
+    protected Map<String, Object> getSql2EntityMap() {
+        if (_sql2entityMap != null) {
+            return _sql2entityMap;
+        }
+        final String key = "sql2entityMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>) getSimpleDtoDefinitionMap().get(key);
+        if (map != null) {
+            _sql2entityMap = map;
+        } else {
+            _sql2entityMap = DfCollectionUtil.emptyMap();
+        }
+        return _sql2entityMap;
+    }
+
+    public boolean isSql2EntityTarget(Table table) {
+        final Map<String, Object> sql2entityMap = getSql2EntityMap();
+        @SuppressWarnings("unchecked")
+        final List<String> targetList = (List<String>) sql2entityMap.getOrDefault("sql2entityTargetList", Collections.emptyList());
+        @SuppressWarnings("unchecked")
+        final List<String> exceptList = (List<String>) sql2entityMap.getOrDefault("sql2entityExceptList", Collections.emptyList());
+        return isTargetByHint(table.getTableDbName(), targetList, exceptList);
     }
 
     // ===================================================================================

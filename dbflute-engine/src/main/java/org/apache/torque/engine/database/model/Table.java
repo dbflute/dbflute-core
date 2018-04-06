@@ -3930,6 +3930,14 @@ public class Table {
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
+    public boolean isSimpleDtoDomainTableTarget() {
+        return getProperties().getSimpleDtoProperties().isDomainTableTarget(this);
+    }
+
+    public boolean isSimpleDtoSql2EntityTarget() {
+        return getProperties().getSimpleDtoProperties().isSql2EntityTarget(this);
+    }
+
     public String getSimpleDtoBaseDtoClassName() {
         final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
         final String prefix = prop.getBaseDtoPrefix();
