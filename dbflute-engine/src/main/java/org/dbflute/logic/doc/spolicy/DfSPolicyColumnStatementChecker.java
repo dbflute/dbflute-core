@@ -98,6 +98,8 @@ public class DfSPolicyColumnStatementChecker {
             }
         } else if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
             return isHitExp(toComparingColumnName(column), ifValue) == !notIfValue;
+        } else if (ifItem.equalsIgnoreCase("tableColumnName")) { // if tableColumnName is ...
+            return isHitExp(toComparingTableColumnName(column), ifValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
             return isHitExp(column.getAlias(), ifValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("dbType")) { // if dbType is ...
@@ -256,6 +258,11 @@ public class DfSPolicyColumnStatementChecker {
             if (!isHitExp(columnName, thenValue) == !notThenValue) {
                 return violationCall.apply(columnName);
             }
+        } else if (thenItem.equalsIgnoreCase("tableColumnName")) { // e.g. tableColumnName is contain:R.M
+            final String tableColumnName = toComparingTableColumnName(column);
+            if (!isHitExp(tableColumnName, thenValue) == !notThenValue) {
+                return violationCall.apply(tableColumnName);
+            }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             final String alias = column.getAlias();
             if (!isHitExp(alias, thenValue) == !notThenValue) {
@@ -303,11 +310,17 @@ public class DfSPolicyColumnStatementChecker {
     }
 
     protected String toComparingTableName(Column column) {
-        return _secretary.toComparingTableName(column.getTable());
+        return _secretary.toComparingTableName(column.getTable()); // e.g. MEMBER
     }
 
     protected String toComparingColumnName(Column column) {
-        return _secretary.toComparingColumnName(column);
+        return _secretary.toComparingColumnName(column); // e.g. MEMBER_NAME
+    }
+
+    protected String toComparingTableColumnName(Column column) {
+        final String tableName = toComparingTableName(column);
+        final String columnName = toComparingColumnName(column);
+        return tableName + "." + columnName; // e.g. MEMBER.MEMBER_NAME
     }
 
     protected String toComparingDbTypeWithSize(Column column) {
