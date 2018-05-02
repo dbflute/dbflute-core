@@ -66,7 +66,7 @@ public class DfSPolicyChecker {
     public DfSPolicyChecker(Supplier<List<Table>> tableListSupplier, Map<String, Object> policyMap) {
         _tableListSupplier = tableListSupplier;
         _policyMap = policyMap;
-        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this, column -> isTargetColumn(column));
+        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
         _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
         _tableStatementChecker = new DfSPolicyTableStatementChecker(this);
         _columnThemeChecker = new DfSPolicyColumnThemeChecker(this);
@@ -248,7 +248,7 @@ public class DfSPolicyChecker {
         return DfNameHintUtil.isTargetByHint(table.getTableDbName(), getTableTargetList(), getTableExceptList());
     }
 
-    protected boolean isTargetColumn(Column column) {
+    public boolean isTargetColumn(Column column) { // may be called by nested checker
         final Map<String, List<String>> columnExceptMap = getColumnExceptMap();
         if (columnExceptMap.isEmpty()) {
             return true;

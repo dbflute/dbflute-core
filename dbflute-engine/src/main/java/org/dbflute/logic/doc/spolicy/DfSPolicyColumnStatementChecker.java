@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.torque.engine.database.model.Column;
+import org.dbflute.logic.doc.spolicy.determiner.DfSPolicyCrossDeterminer;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
@@ -36,6 +37,7 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
+    protected final DfSPolicyCrossDeterminer _crossDeterminer;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
 
     // ===================================================================================
@@ -43,6 +45,7 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                         ===========
     public DfSPolicyColumnStatementChecker(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
+        _crossDeterminer = new DfSPolicyCrossDeterminer(_spolicyChecker);
     }
 
     // ===================================================================================
@@ -155,6 +158,26 @@ public class DfSPolicyColumnStatementChecker {
             } else if (thenTheme.equalsIgnoreCase("classification")) {
                 if (!column.hasClassification() == !notThenClause) {
                     result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
+                }
+            } else if (thenTheme.equalsIgnoreCase("sameColumnAliasIfSameColumnName")) {
+                final String violation = _crossDeterminer.determineSameColumnAliasIfSameColumnName(column);
+                if (violation != null) {
+                    result.violate(policy, violation);
+                }
+            } else if (thenTheme.equalsIgnoreCase("sameColumnDbTypeIfSameColumnName")) {
+                final String violation = _crossDeterminer.determineSameColumnDbTypeIfSameColumnName(column);
+                if (violation != null) {
+                    result.violate(policy, violation);
+                }
+            } else if (thenTheme.equalsIgnoreCase("sameColumnSizeIfSameColumnName")) {
+                final String violation = _crossDeterminer.determineSameColumnSizeIfSameColumnName(column);
+                if (violation != null) {
+                    result.violate(policy, violation);
+                }
+            } else if (thenTheme.equalsIgnoreCase("sameColumnNameIfSameColumnAlias")) {
+                final String violation = _crossDeterminer.determineSameColumnNameIfSameColumnAlias(column);
+                if (violation != null) {
+                    result.violate(policy, violation);
                 }
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);

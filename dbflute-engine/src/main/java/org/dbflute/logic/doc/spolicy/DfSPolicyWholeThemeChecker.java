@@ -15,17 +15,14 @@
  */
 package org.dbflute.logic.doc.spolicy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.logic.doc.spolicy.determiner.DfSPolicyCrossDeterminer;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
 
@@ -44,15 +41,15 @@ public class DfSPolicyWholeThemeChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
-    protected final Predicate<Column> _columnTargetPredicator;
+    protected final DfSPolicyCrossDeterminer _crossDeterminer;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyWholeThemeChecker(DfSPolicyChecker spolicyChecker, Predicate<Column> columnTargetPredicator) {
+    public DfSPolicyWholeThemeChecker(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
-        _columnTargetPredicator = columnTargetPredicator;
+        _crossDeterminer = new DfSPolicyCrossDeterminer(spolicyChecker);
     }
 
     // ===================================================================================
@@ -74,6 +71,10 @@ public class DfSPolicyWholeThemeChecker {
         }
     }
 
+    protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
+        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+    }
+
     protected Map<String, BiConsumer<Database, DfSPolicyResult>> getThemeMap() {
         if (_cachedThemeMap != null) {
             return _cachedThemeMap;
@@ -85,8 +86,8 @@ public class DfSPolicyWholeThemeChecker {
     }
 
     // ===================================================================================
-    //                                                                         Theme Logic
-    //                                                                         ===========
+    //                                                                       Prepare Theme
+    //                                                                       =============
     protected void prepareTableTheme(Map<String, BiConsumer<Database, DfSPolicyResult>> themeMap) {
         // e.g.
         // ; wholeMap = map:{
@@ -108,7 +109,7 @@ public class DfSPolicyWholeThemeChecker {
             return "The column db-type should be same if column name is same: " + violation;
         });
         define(themeMap, "sameColumnSizeIfSameColumnName", database -> {
-            return analyzeSameSizeColumnIfSameColumnName(database);
+            return analyzeSameColumnSizeIfSameColumnName(database);
         }, violation -> {
             return "The column size should be same if column name is same: " + violation;
         });
@@ -130,176 +131,34 @@ public class DfSPolicyWholeThemeChecker {
     }
 
     // ===================================================================================
-    //                                                                         Whole Theme
-    //                                                                         ===========
+    //                                                                       Analyze Theme
+    //                                                                       =============
     // -----------------------------------------------------
     //                                          Unique Table
     //                                          ------------
     protected String analyzeUniqueTableAlias(Database database) {
-        return determineUniqueTableWhat(database, table -> table.getAlias());
-    }
-
-    protected String determineUniqueTableWhat(Database database, Function<Table, Object> valueProvider) {
-        final List<Table> myTableList = toTableList(database);
-        for (Table myTable : myTableList) {
-            for (Table yourTable : myTableList) {
-                if (myTable.equals(yourTable)) {
-                    continue;
-                }
-                final Object myValue = valueProvider.apply(myTable);
-                final Object yourValue = valueProvider.apply(yourTable);
-                if (eitherEmpty(myValue, yourValue)) { // except non-defined value
-                    continue;
-                }
-                if (isEqual(myValue, yourValue)) {
-                    return toTableDisp(myTable) + "=" + myValue + ", " + toTableDisp(yourTable) + "=" + yourValue;
-                }
-            }
-        }
-        return null;
+        return _crossDeterminer.analyzeUniqueTableAlias(database);
     }
 
     // -----------------------------------------------------
     //                                   if same Column Name
     //                                   -------------------
     protected String analyzeSameColumnAliasIfSameColumnName(Database database) {
-        final boolean ignoreEmpty = true; // alias existence should be checked by other process
-        return determineSameWhatIfSameColumnName(database, column -> column.getAlias(), ignoreEmpty);
+        return _crossDeterminer.analyzeSameColumnAliasIfSameColumnName(database);
     }
 
     protected String analyzeSameColumnDbTypeIfSameColumnName(Database database) {
-        return determineSameWhatIfSameColumnName(database, column -> column.getDbType(), false);
+        return _crossDeterminer.analyzeSameColumnDbTypeIfSameColumnName(database);
     }
 
-    protected String analyzeSameSizeColumnIfSameColumnName(Database database) {
-        return determineSameWhatIfSameColumnName(database, column -> column.getColumnSize(), false);
-    }
-
-    protected String determineSameWhatIfSameColumnName(Database database, Function<Column, Object> valueProvider, boolean ignoreEmpty) {
-        final List<Table> myTableList = toTableList(database);
-        for (Table myTable : myTableList) {
-            final List<Column> myColumnList = myTable.getColumnList();
-            for (Column myColumn : myColumnList) {
-                if (!isTargetColumn(myColumn)) {
-                    continue;
-                }
-                for (Table yourTable : myTableList) {
-                    if (myTable.equals(yourTable)) {
-                        continue;
-                    }
-                    final String myColumnName = myColumn.getName();
-                    final Column yourColumn = yourTable.getColumn(myColumnName);
-                    if (yourColumn != null) {
-                        if (!isTargetColumn(yourColumn)) {
-                            continue;
-                        }
-                        final Object myValue = valueProvider.apply(myColumn);
-                        final Object yourValue = valueProvider.apply(yourColumn);
-                        if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
-                            continue;
-                        }
-                        if (!isEqual(myValue, yourValue)) { // different in spite of same column name
-                            return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+    protected String analyzeSameColumnSizeIfSameColumnName(Database database) {
+        return _crossDeterminer.analyzeSameColumnSizeIfSameColumnName(database);
     }
 
     // -----------------------------------------------------
     //                                  if same Column Alias
     //                                  --------------------
     protected String analyzeSameColumnNameIfSameColumnAlias(Database database) {
-        final boolean ignoreEmpty = true; // alias existence should be checked by other process
-        return determineSameWhatIfSameColumnAlias(database, column -> column.getName(), ignoreEmpty);
-    }
-
-    protected String determineSameWhatIfSameColumnAlias(Database database, Function<Column, Object> valueProvider, boolean ignoreEmpty) {
-        final List<Table> myTableList = toTableList(database);
-        for (Table myTable : myTableList) {
-            final List<Column> myColumnList = myTable.getColumnList();
-            for (Column myColumn : myColumnList) {
-                if (!isTargetColumn(myColumn)) {
-                    continue;
-                }
-                if (!myColumn.hasAlias()) {
-                    continue;
-                }
-                for (Table yourTable : myTableList) {
-                    if (myTable.equals(yourTable)) {
-                        continue;
-                    }
-                    final String myColumnAlias = myColumn.getAlias();
-                    final List<Column> yourColumnList = yourTable.getColumnList();
-                    for (Column yourColumn : yourColumnList) {
-                        if (!isTargetColumn(yourColumn)) {
-                            continue;
-                        }
-                        if (!yourColumn.hasAlias()) {
-                            continue;
-                        }
-                        if (myColumnAlias.equals(yourColumn.getAlias())) { // same column alias
-                            final Object myValue = valueProvider.apply(myColumn);
-                            final Object yourValue = valueProvider.apply(yourColumn);
-                            if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
-                                continue;
-                            }
-                            if (!isEqual(myValue, yourValue)) { // different in spite of same column alias
-                                return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    // ===================================================================================
-    //                                                                        Assist Logic
-    //                                                                        ============
-    protected List<Table> toTableList(Database database) {
-        final List<Table> filteredTableList = new ArrayList<Table>();
-        for (Table table : database.getTableList()) {
-            if (_spolicyChecker.isTargetTable(table)) {
-                filteredTableList.add(table);
-            }
-        }
-        return filteredTableList;
-    }
-
-    protected boolean isTargetColumn(Column column) {
-        return _columnTargetPredicator.test(column);
-    }
-
-    protected boolean eitherEmpty(Object myValue, Object yourValue) {
-        if (myValue instanceof String && ((String) myValue).isEmpty()) {
-            return true;
-        }
-        if (yourValue instanceof String && ((String) yourValue).isEmpty()) {
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean isEqual(Object myValue, Object yourValue) { // considering null
-        return (myValue == null && yourValue == null) || (myValue != null && myValue.equals(yourValue));
-    }
-
-    protected String toTableDisp(Table table) {
-        return _secretary.toTableDisp(table);
-    }
-
-    protected String toColumnExp(Column column) { // simple for comparing
-        return column.getTable().getTableDispName() + "." + column.getName();
-    }
-
-    // ===================================================================================
-    //                                                                           Exception
-    //                                                                           =========
-    protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        return _crossDeterminer.analyzeSameColumnNameIfSameColumnAlias(database);
     }
 }
