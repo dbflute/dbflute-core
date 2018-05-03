@@ -167,7 +167,7 @@ public class DfSPolicyTableStatementChecker {
             }
         } else if (thenTheme.contains("hasAlias")) {
             if (!table.hasAlias() == !notThenClause) {
-                result.violate(policy, "The table should " + notOr + "have table comment: " + toTableDisp(table));
+                result.violate(policy, "The table should " + notOr + "have table alias: " + toTableDisp(table));
             }
         } else if (thenTheme.contains("hasComment")) {
             if (!table.hasComment() == !notThenClause) {
