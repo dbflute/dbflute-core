@@ -15,14 +15,17 @@
  */
 package org.dbflute.logic.doc.spolicy.secretary;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -33,13 +36,15 @@ public class DfSPolicyCrossSecretary {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
+    protected final DfSPolicyExceptTargetSecretary _exceptTargetSecretary;
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyCrossSecretary(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
+    public DfSPolicyCrossSecretary(DfSPolicyExceptTargetSecretary exceptTargetSecretary, DfSPolicyLogicalSecretary logicalSecretary) {
+        _exceptTargetSecretary = exceptTargetSecretary;
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================
@@ -95,16 +100,9 @@ public class DfSPolicyCrossSecretary {
     }
 
     protected String doAnalyzeSameWhatIfSameColumnName(Database database, Function<Column, String> determiner) {
-        final List<Table> tableList = database.getTableList();
-        for (Table myTable : tableList) {
-            if (!isTargetTable(myTable)) { // non-target
-                continue;
-            }
-            final List<Column> myColumnList = myTable.getColumnList();
-            for (Column myColumn : myColumnList) {
-                if (!isTargetColumn(myColumn)) { // non-target
-                    continue;
-                }
+        final Map<String, List<Column>> columnListMap = getSameNameColumnListMap(database);
+        for (List<Column> columnList : columnListMap.values()) {
+            for (Column myColumn : columnList) {
                 final String violation = determiner.apply(myColumn);
                 if (violation != null) {
                     return violation;
@@ -112,6 +110,25 @@ public class DfSPolicyCrossSecretary {
             }
         }
         return null;
+
+        // memorable code before performance tuning
+        //final List<Table> tableList = database.getTableList();
+        //for (Table myTable : tableList) {
+        //    if (!isTargetTable(myTable)) { // non-target
+        //        continue;
+        //    }
+        //    final List<Column> myColumnList = myTable.getColumnList();
+        //    for (Column myColumn : myColumnList) {
+        //        if (!isTargetColumn(myColumn)) { // non-target
+        //            continue;
+        //        }
+        //        final String violation = determiner.apply(myColumn);
+        //        if (violation != null) {
+        //            return violation;
+        //        }
+        //    }
+        //}
+        //return null;
     }
 
     // -----------------------------------------------------
@@ -135,34 +152,96 @@ public class DfSPolicyCrossSecretary {
 
     protected String determineSameWhatIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting,
             Function<Column, Object> valueProvider, boolean ignoreEmpty) {
-        final Table myTable = myColumn.getTable();
-        for (Table yourTable : myTable.getDatabase().getTableList()) {
-            if (!isTargetTable(yourTable)) { // non-target
+        final Map<String, List<Column>> columnListMap = getSameNameColumnListMap(myColumn.getTable().getDatabase());
+        final List<Column> columnList = columnListMap.getOrDefault(myColumn.getName(), DfCollectionUtil.emptyList());
+        for (Column yourColumn : columnList) {
+            if (myColumn.equals(yourColumn)) { // myself
                 continue;
             }
-            if (myTable.equals(yourTable)) { // myself
+            if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
                 continue;
             }
-            final String myColumnName = myColumn.getName();
-            final Column yourColumn = yourTable.getColumn(myColumnName);
-            if (yourColumn != null) {
-                if (!isTargetColumn(yourColumn)) { // non-target
-                    continue;
-                }
-                if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
-                    continue;
-                }
-                final Object myValue = valueProvider.apply(myColumn);
-                final Object yourValue = valueProvider.apply(yourColumn);
-                if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
-                    continue;
-                }
-                if (!isEqual(myValue, yourValue)) { // different in spite of same column name
-                    return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
-                }
+            final Object myValue = valueProvider.apply(myColumn);
+            final Object yourValue = valueProvider.apply(yourColumn);
+            if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
+                continue;
+            }
+            if (!isEqual(myValue, yourValue)) { // different in spite of same column name
+                return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
             }
         }
         return null;
+
+        // memorable code before performance tuning
+        //for (Table yourTable : myTable.getDatabase().getTableList()) {
+        //    if (!isTargetTable(yourTable)) { // non-target
+        //        continue;
+        //    }
+        //    if (myTable.equals(yourTable)) { // myself
+        //        continue;
+        //    }
+        //    final String myColumnName = myColumn.getName();
+        //    final Column yourColumn = yourTable.getColumn(myColumnName);
+        //    if (yourColumn != null) {
+        //        if (!isTargetColumn(yourColumn)) { // non-target
+        //            continue;
+        //        }
+        //        if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
+        //            continue;
+        //        }
+        //        final Object myValue = valueProvider.apply(myColumn);
+        //        final Object yourValue = valueProvider.apply(yourColumn);
+        //        if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
+        //            continue;
+        //        }
+        //        if (!isEqual(myValue, yourValue)) { // different in spite of same column name
+        //            return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
+        //        }
+        //    }
+        //}
+        //return null;
+    }
+
+    protected Map<String, List<Column>> _sameNameColumnListMap; // map:{ column-name = list:{ column, ... } }
+
+    protected Map<String, List<Column>> getSameNameColumnListMap(Database database) {
+        if (_sameNameColumnListMap != null) {
+            return _sameNameColumnListMap;
+        }
+        final List<Table> tableList = database.getTableList();
+        final Map<String, List<Column>> sameNameColumnListMap = StringKeyMap.createAsCaseInsensitive();
+        for (Table myTable : tableList) {
+            if (!isTargetTable(myTable)) { // non-target
+                continue;
+            }
+            final List<Column> columnList = myTable.getColumnList();
+            for (Column myColumn : columnList) {
+                if (!isTargetColumn(myColumn)) { // non-target
+                    continue;
+                }
+                final String myName = myColumn.getName();
+                if (sameNameColumnListMap.containsKey(myName)) { // registered by the other same-name column
+                    continue;
+                }
+                for (Table yourTable : tableList) {
+                    final Column yourColumn = yourTable.getColumn(myName);
+                    if (yourColumn != null) {
+                        if (!isTargetColumn(yourColumn)) { // non-target
+                            continue;
+                        }
+                        List<Column> sameColumnList = sameNameColumnListMap.get(myName);
+                        if (sameColumnList == null) {
+                            sameColumnList = new ArrayList<Column>();
+                            sameColumnList.add(myColumn);
+                            sameNameColumnListMap.put(myName, sameColumnList);
+                        }
+                        sameColumnList.add(yourColumn);
+                    }
+                }
+            }
+        }
+        _sameNameColumnListMap = sameNameColumnListMap;
+        return _sameNameColumnListMap;
     }
 
     // ===================================================================================
@@ -249,11 +328,11 @@ public class DfSPolicyCrossSecretary {
     //                                                                        Assist Logic
     //                                                                        ============
     protected boolean isTargetTable(Table table) {
-        return _spolicyChecker.getExceptTargetSecretary().isTargetTable(table);
+        return _exceptTargetSecretary.isTargetTable(table);
     }
 
     protected boolean isTargetColumn(Column column) {
-        return _spolicyChecker.getExceptTargetSecretary().isTargetColumn(column);
+        return _exceptTargetSecretary.isTargetColumn(column);
     }
 
     protected boolean eitherEmpty(Object myValue, Object yourValue) {
@@ -271,7 +350,7 @@ public class DfSPolicyCrossSecretary {
     }
 
     protected String toTableDisp(Table table) {
-        return _spolicyChecker.getLogicalSecretary().toTableDisp(table);
+        return _logicalSecretary.toTableDisp(table);
     }
 
     protected String toColumnExp(Column column) { // simple for comparing

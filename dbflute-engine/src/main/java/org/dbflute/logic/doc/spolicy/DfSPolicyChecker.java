@@ -88,9 +88,9 @@ public class DfSPolicyChecker {
         _policyMap = policyMap;
 
         // should be before creating nested checkers
-        _crossSecretary = new DfSPolicyCrossSecretary(this);
         _exceptTargetSecretary = new DfSPolicyExceptTargetSecretary(policyMap);
         _firstDateSecretary = new DfSPolicyFirstDateSecretary(_schemaDiffListSupplier);
+        _crossSecretary = new DfSPolicyCrossSecretary(_exceptTargetSecretary, _logicalSecretary);
 
         _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
         _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
