@@ -20,12 +20,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
-import org.dbflute.logic.doc.spolicy.determiner.DfSPolicyCrossDeterminer;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyCrossSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.util.Srl;
 
@@ -38,17 +39,17 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyCrossDeterminer _crossDeterminer;
+    protected final DfSPolicyCrossSecretary _crossDeterminer;
+    protected final DfSPolicyFirstDateSecretary _firstDateDeterminer;
     protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfSPolicyColumnStatementChecker(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
-        _crossDeterminer = new DfSPolicyCrossDeterminer(_spolicyChecker);
-        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
+        _crossDeterminer = spolicyChecker.getCrossSecretary();
+        _firstDateDeterminer = spolicyChecker.getFirstDateSecretary();
+        _logicalSecretary = spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -130,7 +131,7 @@ public class DfSPolicyColumnStatementChecker {
     }
 
     protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Column column) {
-        return _spolicyChecker.getFirstDateSecretary().determineColumnFirstDate(statement, ifValue, notIfValue, column);
+        return _firstDateDeterminer.determineColumnFirstDate(statement, ifValue, notIfValue, column);
     }
 
     // ===================================================================================

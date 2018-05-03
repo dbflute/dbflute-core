@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.spolicy.determiner;
+package org.dbflute.logic.doc.spolicy.secretary;
 
 import java.util.List;
 import java.util.function.Function;
@@ -23,26 +23,23 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 
 /**
  * @author jflute
  * @since 1.1.8 (2018/5/2 Wednesday)
  */
-public class DfSPolicyCrossDeterminer {
+public class DfSPolicyCrossSecretary {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyCrossDeterminer(DfSPolicyChecker spolicyChecker) {
+    public DfSPolicyCrossSecretary(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
-        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -274,7 +271,7 @@ public class DfSPolicyCrossDeterminer {
     }
 
     protected String toTableDisp(Table table) {
-        return _logicalSecretary.toTableDisp(table);
+        return _spolicyChecker.getLogicalSecretary().toTableDisp(table);
     }
 
     protected String toColumnExp(Column column) { // simple for comparing

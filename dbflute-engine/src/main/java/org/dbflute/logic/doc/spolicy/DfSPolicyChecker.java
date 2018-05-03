@@ -29,6 +29,7 @@ import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyParsedPolicy;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyParsedPolicy.DfSPolicyParsedPolicyPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyCrossSecretary;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyExceptTargetSecretary;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
@@ -59,6 +60,14 @@ public class DfSPolicyChecker {
     protected final Map<String, Object> _policyMap; // from DBFlute properties
 
     // -----------------------------------------------------
+    //                                             Secretary
+    //                                             ---------
+    protected final DfSPolicyCrossSecretary _crossSecretary;
+    protected final DfSPolicyExceptTargetSecretary _exceptTargetSecretary;
+    protected final DfSPolicyFirstDateSecretary _firstDateSecretary;
+    protected final DfSPolicyLogicalSecretary _logicalSecretary = new DfSPolicyLogicalSecretary();
+
+    // -----------------------------------------------------
     //                                        Nested Checker
     //                                        --------------
     protected final DfSPolicyWholeThemeChecker _wholeThemeChecker;
@@ -66,13 +75,6 @@ public class DfSPolicyChecker {
     protected final DfSPolicyTableStatementChecker _tableStatementChecker;
     protected final DfSPolicyColumnThemeChecker _columnThemeChecker;
     protected final DfSPolicyColumnStatementChecker _columnStatementChecker;
-
-    // -----------------------------------------------------
-    //                                             Secretary
-    //                                             ---------
-    protected final DfSPolicyExceptTargetSecretary _exceptTargetSecretary;
-    protected final DfSPolicyFirstDateSecretary _firstDateSecretary;
-    protected final DfSPolicyLogicalSecretary _logicalSecretary = new DfSPolicyLogicalSecretary();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -84,13 +86,17 @@ public class DfSPolicyChecker {
         _database = database;
         _schemaDiffListSupplier = schemaDiffListSupplier;
         _policyMap = policyMap;
+
+        // should be before creating nested checkers
+        _crossSecretary = new DfSPolicyCrossSecretary(this);
+        _exceptTargetSecretary = new DfSPolicyExceptTargetSecretary(policyMap);
+        _firstDateSecretary = new DfSPolicyFirstDateSecretary(_schemaDiffListSupplier);
+
         _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
         _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
         _tableStatementChecker = new DfSPolicyTableStatementChecker(this);
         _columnThemeChecker = new DfSPolicyColumnThemeChecker(this);
         _columnStatementChecker = new DfSPolicyColumnStatementChecker(this);
-        _exceptTargetSecretary = new DfSPolicyExceptTargetSecretary(policyMap);
-        _firstDateSecretary = new DfSPolicyFirstDateSecretary(_schemaDiffListSupplier);
     }
 
     // ===================================================================================
@@ -262,6 +268,13 @@ public class DfSPolicyChecker {
     // ===================================================================================
     //                                                                           Secretary
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Cross
+    //                                                 -----
+    public DfSPolicyCrossSecretary getCrossSecretary() {
+        return _crossSecretary;
+    }
+
     // -----------------------------------------------------
     //                                         Except/Target
     //                                         -------------
