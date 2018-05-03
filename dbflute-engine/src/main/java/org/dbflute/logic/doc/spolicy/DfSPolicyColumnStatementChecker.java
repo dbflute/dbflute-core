@@ -27,6 +27,7 @@ import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClau
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -184,6 +185,22 @@ public class DfSPolicyColumnStatementChecker {
         } else if (thenTheme.equalsIgnoreCase("classification")) {
             if (!column.hasClassification() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
+            if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
+                result.violate(policy, "The column name should " + notOr + "be on upper case basis: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("lowerCaseBasis")) {
+            if (Srl.isUpperCaseAny(toComparingColumnName(column)) == !notThenClause) {
+                result.violate(policy, "The column name should " + notOr + "be on lower case basis: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("hasAlias")) {
+            if (!column.hasAlias() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "have column alias: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("hasComment")) {
+            if (!column.hasComment() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "have column comment: " + toColumnDisp(column));
             }
         } else if (thenTheme.equalsIgnoreCase("sameColumnAliasIfSameColumnName")) {
             final String vio = _crossDeterminer.determineSameColumnAliasIfSameColumnName(column, prepareYourTargeting(statement));

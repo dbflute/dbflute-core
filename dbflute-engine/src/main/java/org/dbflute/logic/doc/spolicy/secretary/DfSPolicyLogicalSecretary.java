@@ -231,8 +231,8 @@ public class DfSPolicyLogicalSecretary {
     }
 
     // ===================================================================================
-    //                                                                             Display
-    //                                                                             =======
+    //                                                              Conversion for Display
+    //                                                              ======================
     public String toTableDisp(Table table) {
         return table.getAliasExpression() + table.getTableDispName();
     }
@@ -244,6 +244,18 @@ public class DfSPolicyLogicalSecretary {
         final String size = column.hasColumnSize() ? "(" + column.getColumnSize() + ")" : "";
         final String notNull = column.isNotNull() ? "(NotNull)" : "(NullAllowed)";
         return tableDispName + "." + aliasExp + column.getName() + " " + dbType + size + " " + notNull;
+    }
+
+    // ===================================================================================
+    //                                                                       Pattern Logic
+    //                                                                       =============
+    public boolean isNotIdentityIfPureIDPK(Table table) {
+        if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
+            final Column pk = table.getPrimaryKeyAsOne();
+            return !pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity();
+        } else {
+            return false;
+        }
     }
 
     // ===================================================================================

@@ -21,7 +21,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
@@ -99,14 +98,7 @@ public class DfSPolicyTableThemeChecker {
         define(themeMap, "lowerCaseBasis", table -> Srl.isUpperCaseAny(toComparingTableName(table)), table -> {
             return "The table name should be on lower case basis: " + toTableDisp(table);
         });
-        define(themeMap, "identityIfPureIDPK", table -> {
-            if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
-                final Column pk = table.getPrimaryKeyAsOne();
-                return !pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity();
-            } else {
-                return false;
-            }
-        }, table -> {
+        define(themeMap, "identityIfPureIDPK", table -> _logicalSecretary.isNotIdentityIfPureIDPK(table), table -> {
             return "The primary key should be identity: " + toTableDisp(table) + "." + table.getPrimaryKeyAsOne().getName();
         });
         define(themeMap, "hasCommonColumn", table -> !table.hasAllCommonColumn(), table -> {

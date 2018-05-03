@@ -145,9 +145,33 @@ public class DfSPolicyTableStatementChecker {
         final String notOr = notThenClause ? "not " : "";
         if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
             result.violate(policy, "The table is no good: " + toTableDisp(table));
+        } else if (thenTheme.contains("hasPK")) {
+            if (!table.hasPrimaryKey() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have primary key: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("upperCaseBasis")) {
+            if (Srl.isLowerCaseAny(toComparingTableName(table)) == !notThenClause) {
+                result.violate(policy, "The table name should " + notOr + "be on upper case basis: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("lowerCaseBasis")) {
+            if (Srl.isUpperCaseAny(toComparingTableName(table)) == !notThenClause) {
+                result.violate(policy, "The table name should " + notOr + "be on lower case basis: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("identityIfPureIDPK")) {
+            if (_logicalSecretary.isNotIdentityIfPureIDPK(table) == !notThenClause) {
+                result.violate(policy, "The primary key should " + notOr + "be identity: " + toTableDisp(table));
+            }
         } else if (thenTheme.contains("hasCommonColumn")) {
             if (!table.hasAllCommonColumn() == !notThenClause) {
                 result.violate(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("hasAlias")) {
+            if (!table.hasAlias() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have table comment: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("hasComment")) {
+            if (!table.hasComment() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have table comment: " + toTableDisp(table));
             }
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
