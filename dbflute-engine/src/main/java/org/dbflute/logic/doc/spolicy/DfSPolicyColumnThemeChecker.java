@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 import org.apache.torque.engine.database.model.Column;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.util.Srl;
 
 /**
@@ -42,13 +42,14 @@ public class DfSPolicyColumnThemeChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfSPolicyColumnThemeChecker(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
+        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -115,17 +116,17 @@ public class DfSPolicyColumnThemeChecker {
     //                                                                        Assist Logic
     //                                                                        ============
     protected String toComparingColumnName(Column column) {
-        return _secretary.toComparingColumnName(column);
+        return _logicalSecretary.toComparingColumnName(column);
     }
 
     protected String toColumnDisp(Column column) {
-        return _secretary.toColumnDisp(column);
+        return _logicalSecretary.toColumnDisp(column);
     }
 
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 }

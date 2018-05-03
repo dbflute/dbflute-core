@@ -43,7 +43,7 @@ import org.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
-public class DfSPolicyMiscSecretary {
+public class DfSPolicyLogicalSecretary {
 
     // ===================================================================================
     //                                                                          Definition

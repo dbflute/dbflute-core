@@ -22,7 +22,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 
 /**
  * @author jflute
@@ -34,13 +34,14 @@ public class DfSPolicyCrossDeterminer {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfSPolicyCrossDeterminer(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
+        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -242,11 +243,11 @@ public class DfSPolicyCrossDeterminer {
     //                                                                        Assist Logic
     //                                                                        ============
     protected boolean isTargetTable(Table table) {
-        return _spolicyChecker.isTargetTable(table);
+        return _spolicyChecker.getExceptTargetSecretary().isTargetTable(table);
     }
 
     protected boolean isTargetColumn(Column column) {
-        return _spolicyChecker.isTargetColumn(column);
+        return _spolicyChecker.getExceptTargetSecretary().isTargetColumn(column);
     }
 
     protected boolean eitherEmpty(Object myValue, Object yourValue) {
@@ -264,7 +265,7 @@ public class DfSPolicyCrossDeterminer {
     }
 
     protected String toTableDisp(Table table) {
-        return _secretary.toTableDisp(table);
+        return _logicalSecretary.toTableDisp(table);
     }
 
     protected String toColumnExp(Column column) { // simple for comparing

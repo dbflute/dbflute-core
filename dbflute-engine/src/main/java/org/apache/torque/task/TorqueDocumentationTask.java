@@ -283,7 +283,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             throw new IllegalStateException("SchemaPolicyCheck should be before making SchemaHTML because of schema data.");
         }
         final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
-        final DfSPolicyChecker checker = prop.createChecker(() -> _schemaData.getDatabase().getTableList());
+        final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> _selector.getSchemaDiffList());
         checker.checkPolicyIfNeeds();
     }
 

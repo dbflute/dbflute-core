@@ -30,7 +30,7 @@ public class DfSPolicyMiscSecretaryTest extends EngineTestCase {
     //                                                            ========================
     public void test_splitClauseByConnector_and_and() {
         // ## Arrange ##
-        DfSPolicyMiscSecretary secretary = new DfSPolicyMiscSecretary();
+        DfSPolicyLogicalSecretary secretary = new DfSPolicyLogicalSecretary();
 
         // ## Act ##
         List<String> list =
@@ -48,7 +48,7 @@ public class DfSPolicyMiscSecretaryTest extends EngineTestCase {
 
     public void test_splitClauseByConnector_and_or() {
         // ## Arrange ##
-        DfSPolicyMiscSecretary secretary = new DfSPolicyMiscSecretary();
+        DfSPolicyLogicalSecretary secretary = new DfSPolicyLogicalSecretary();
 
         // ## Act ##
         List<String> list = secretary.splitClauseByConnector("tableName is sea and alias is land or piari and tableName is bonvo", " and ");
@@ -65,7 +65,7 @@ public class DfSPolicyMiscSecretaryTest extends EngineTestCase {
 
     public void test_splitClauseByConnector_or_or() {
         // ## Arrange ##
-        DfSPolicyMiscSecretary secretary = new DfSPolicyMiscSecretary();
+        DfSPolicyLogicalSecretary secretary = new DfSPolicyLogicalSecretary();
 
         // ## Act ##
         List<String> list = secretary.splitClauseByConnector("tableName is sea or alias is land or piari or tableName is bonvo", " or ");
@@ -82,7 +82,7 @@ public class DfSPolicyMiscSecretaryTest extends EngineTestCase {
 
     public void test_splitClauseByConnector_or_and() {
         // ## Arrange ##
-        DfSPolicyMiscSecretary secretary = new DfSPolicyMiscSecretary();
+        DfSPolicyLogicalSecretary secretary = new DfSPolicyLogicalSecretary();
 
         // ## Act ##
         List<String> list = secretary.splitClauseByConnector("tableName is sea or alias is land and piari or tableName is bonvo", " or ");

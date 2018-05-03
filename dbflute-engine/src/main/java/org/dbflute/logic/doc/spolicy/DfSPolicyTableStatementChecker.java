@@ -28,7 +28,7 @@ import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.util.Srl;
 
 /**
@@ -41,13 +41,14 @@ public class DfSPolicyTableStatementChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfSPolicyTableStatementChecker(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
+        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -78,10 +79,12 @@ public class DfSPolicyTableStatementChecker {
         final String ifItem = ifPart.getIfItem();
         final String ifValue = ifPart.getIfValue();
         final boolean notIfValue = ifPart.isNotIfValue();
-        if (ifItem.equalsIgnoreCase("tableName")) {
+        if (ifItem.equalsIgnoreCase("tableName")) { // if tableName is ...
             return isHitExp(toComparingTableName(table), ifValue) == !notIfValue;
-        } else if (ifItem.equalsIgnoreCase("alias")) {
+        } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
             return isHitExp(table.getAlias(), ifValue) == !notIfValue;
+        } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
+            return determineFirstDate(statement, ifValue, notIfValue, table);
         } else if (ifItem.equalsIgnoreCase("pk_dbType") || ifItem.equalsIgnoreCase("pkDbType")) { // for compatible
             if (table.hasPrimaryKey()) {
                 final List<Column> pkList = table.getPrimaryKey();
@@ -107,6 +110,10 @@ public class DfSPolicyTableStatementChecker {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
         }
         return false;
+    }
+
+    protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
+        return _spolicyChecker.getFirstDateSecretary().determineTableFirstDate(statement, ifValue, notIfValue, table);
     }
 
     // -----------------------------------------------------
@@ -267,19 +274,19 @@ public class DfSPolicyTableStatementChecker {
     //                                                                        Assist Logic
     //                                                                        ============
     protected boolean isHitExp(String exp, String hint) {
-        return _secretary.isHitExp(exp, hint);
+        return _logicalSecretary.isHitExp(exp, hint);
     }
 
     protected String toComparingTableName(Table table) {
-        return _secretary.toComparingTableName(table);
+        return _logicalSecretary.toComparingTableName(table);
     }
 
     protected String toComparingDbTypeWithSize(Column column) {
-        return _secretary.toComparingDbTypeWithSize(column);
+        return _logicalSecretary.toComparingDbTypeWithSize(column);
     }
 
     protected String toTableDisp(Table table) {
-        return _secretary.toTableDisp(table);
+        return _logicalSecretary.toTableDisp(table);
     }
 
     protected String toPolicy(DfSPolicyStatement statement) {
@@ -290,14 +297,14 @@ public class DfSPolicyTableStatementChecker {
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 
     protected void throwSchemaPolicyCheckUnknownPropertyException(String property) {
-        _secretary.throwSchemaPolicyCheckUnknownPropertyException(property);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownPropertyException(property);
     }
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
-        _secretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+        _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
     }
 }

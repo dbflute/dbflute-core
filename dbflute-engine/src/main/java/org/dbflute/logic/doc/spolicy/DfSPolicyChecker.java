@@ -17,21 +17,23 @@ package org.dbflute.logic.doc.spolicy;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyParsedPolicy;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyParsedPolicy.DfSPolicyParsedPolicyPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyExceptTargetSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
+import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.system.DBFluteSystem;
-import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,26 +53,43 @@ public class DfSPolicyChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Supplier<List<Table>> _tableListSupplier;
-    protected final Map<String, Object> _policyMap;
+    protected final Database _database; // for tables
+    protected final Supplier<List<DfSchemaDiff>> _schemaDiffListSupplier; // callback for lazy-loading
+    protected final Map<String, Object> _policyMap; // from DBFlute properties
+
+    // -----------------------------------------------------
+    //                                        Nested Checker
+    //                                        --------------
     protected final DfSPolicyWholeThemeChecker _wholeThemeChecker;
     protected final DfSPolicyTableThemeChecker _tableThemeChecker;
     protected final DfSPolicyTableStatementChecker _tableStatementChecker;
     protected final DfSPolicyColumnThemeChecker _columnThemeChecker;
     protected final DfSPolicyColumnStatementChecker _columnStatementChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+
+    // -----------------------------------------------------
+    //                                             Secretary
+    //                                             ---------
+    protected final DfSPolicyExceptTargetSecretary _exceptTargetSecretary;
+    protected final DfSPolicyFirstDateSecretary _firstDateSecretary;
+    protected final DfSPolicyLogicalSecretary _logicalSecretary = new DfSPolicyLogicalSecretary();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyChecker(Supplier<List<Table>> tableListSupplier, Map<String, Object> policyMap) {
-        _tableListSupplier = tableListSupplier;
+    public DfSPolicyChecker(Database database // for tables
+            , Supplier<List<DfSchemaDiff>> schemaDiffListSupplier // for firstDate
+            , Map<String, Object> policyMap // from DBFlute properties
+    ) {
+        _database = database;
+        _schemaDiffListSupplier = schemaDiffListSupplier;
         _policyMap = policyMap;
         _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
         _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
         _tableStatementChecker = new DfSPolicyTableStatementChecker(this);
         _columnThemeChecker = new DfSPolicyColumnThemeChecker(this);
         _columnStatementChecker = new DfSPolicyColumnStatementChecker(this);
+        _exceptTargetSecretary = new DfSPolicyExceptTargetSecretary(policyMap);
+        _firstDateSecretary = new DfSPolicyFirstDateSecretary(_schemaDiffListSupplier);
     }
 
     // ===================================================================================
@@ -109,7 +128,7 @@ public class DfSPolicyChecker {
         final DfSPolicyParsedPolicy policy = parsePolicy();
         showParsedPolicy(policy);
         final DfSPolicyResult result = new DfSPolicyResult();
-        final List<Table> tableList = _tableListSupplier.get();
+        final List<Table> tableList = _database.getTableList();
         doCheckWhole(policy, result, tableList);
         for (Table table : tableList) {
             if (!isTargetTable(table)) {
@@ -118,7 +137,7 @@ public class DfSPolicyChecker {
             doCheckTableColumn(policy, result, table);
         }
         if (!result.isEmpty()) {
-            _secretary.throwSchemaPolicyCheckViolationException(_policyMap, result);
+            _logicalSecretary.throwSchemaPolicyCheckViolationException(_policyMap, result);
         } else {
             _log.info(" -> No violation of schema policy. Good DB design!");
             _log.info("");
@@ -176,7 +195,7 @@ public class DfSPolicyChecker {
                 columnPolicyPart = new DfSPolicyParsedPolicyPart(themeList, extractStatementList(columnMap));
             } else {
                 if (!Srl.equalsPlain(key, "tableExceptList", "tableTargetList", "columnExceptMap", "isMainSchemaOnly")) {
-                    _secretary.throwSchemaPolicyCheckUnknownPropertyException(key);
+                    _logicalSecretary.throwSchemaPolicyCheckUnknownPropertyException(key);
                 }
             }
         }
@@ -203,7 +222,7 @@ public class DfSPolicyChecker {
         final List<DfSPolicyStatement> statementList = new ArrayList<DfSPolicyStatement>();
         if (nativeStatementList != null) {
             for (String nativeStatement : nativeStatementList) {
-                statementList.add(_secretary.parseStatement(nativeStatement));
+                statementList.add(_logicalSecretary.parseStatement(nativeStatement));
             }
         }
         return Collections.unmodifiableList(statementList);
@@ -212,10 +231,10 @@ public class DfSPolicyChecker {
     protected void showParsedPolicy(DfSPolicyParsedPolicy policy) {
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append("[Schema Policy]");
-        sb.append(ln()).append(" tableExceptList: ").append(getTableExceptList());
-        sb.append(ln()).append(" tableTargetList: ").append(getTableTargetList());
-        sb.append(ln()).append(" columnExceptMap: ").append(getColumnExceptMap());
-        sb.append(ln()).append(" isMainSchemaOnly: ").append(isMainSchemaOnly());
+        sb.append(ln()).append(" tableExceptList: ").append(_exceptTargetSecretary.getTableExceptList());
+        sb.append(ln()).append(" tableTargetList: ").append(_exceptTargetSecretary.getTableTargetList());
+        sb.append(ln()).append(" columnExceptMap: ").append(_exceptTargetSecretary.getColumnExceptMap());
+        sb.append(ln()).append(" isMainSchemaOnly: ").append(_exceptTargetSecretary.isMainSchemaOnly());
         buildElementMap(sb, "wholeMap", policy.getWholePolicyPart());
         buildElementMap(sb, "tableMap", policy.getTablePolicyPart());
         buildElementMap(sb, "columnMap", policy.getColumnPolicyPart());
@@ -236,74 +255,35 @@ public class DfSPolicyChecker {
     }
 
     // ===================================================================================
-    //                                                                       Except/Target
-    //                                                                       =============
-    public boolean isTargetTable(Table table) { // may be called by nested checker
-        if (table.isTypeView()) {
-            return false; // fixedly
-        }
-        if (isMainSchemaOnly() && table.isAdditionalSchema()) {
-            return false;
-        }
-        return DfNameHintUtil.isTargetByHint(table.getTableDbName(), getTableTargetList(), getTableExceptList());
+    //                                                                           Secretary
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                         Except/Target
+    //                                         -------------
+    public DfSPolicyExceptTargetSecretary getExceptTargetSecretary() { // called by nested checker
+        return _exceptTargetSecretary;
     }
 
-    public boolean isTargetColumn(Column column) { // may be called by nested checker
-        final Map<String, List<String>> columnExceptMap = getColumnExceptMap();
-        if (columnExceptMap.isEmpty()) {
-            return true;
-        }
-        final String tableDbName = column.getTable().getTableDbName();
-        for (Entry<String, List<String>> entry : columnExceptMap.entrySet()) {
-            final String tableHint = entry.getKey();
-            if (DfNameHintUtil.isHitByTheHint(tableDbName, tableHint)) {
-                final List<String> columnExceptList = entry.getValue();
-                if (!DfNameHintUtil.isTargetByHint(column.getName(), Collections.emptyList(), columnExceptList)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    protected boolean isTargetTable(Table table) {
+        return _exceptTargetSecretary.isTargetTable(table);
     }
 
-    protected List<String> _tableExceptList;
-
-    protected List<String> getTableExceptList() {
-        if (_tableExceptList != null) {
-            return _tableExceptList;
-        }
-        @SuppressWarnings("unchecked")
-        final List<String> plainList = (List<String>) _policyMap.get("tableExceptList");
-        _tableExceptList = plainList != null ? plainList : new ArrayList<String>();
-        return _tableExceptList;
+    protected boolean isTargetColumn(Column column) {
+        return _exceptTargetSecretary.isTargetColumn(column);
     }
 
-    protected List<String> _tableTargetList;
-
-    protected List<String> getTableTargetList() {
-        if (_tableTargetList != null) {
-            return _tableTargetList;
-        }
-        @SuppressWarnings("unchecked")
-        final List<String> plainList = (List<String>) _policyMap.get("tableTargetList");
-        _tableTargetList = plainList != null ? plainList : new ArrayList<String>();
-        return _tableTargetList;
+    // -----------------------------------------------------
+    //                                            First Date
+    //                                            ----------
+    public DfSPolicyFirstDateSecretary getFirstDateSecretary() { // called by nested checker
+        return _firstDateSecretary;
     }
 
-    protected Map<String, List<String>> _columnExceptMap;
-
-    protected Map<String, List<String>> getColumnExceptMap() {
-        if (_columnExceptMap != null) {
-            return _columnExceptMap;
-        }
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>> plainList = (Map<String, List<String>>) _policyMap.get("columnExceptMap");
-        _columnExceptMap = plainList != null ? plainList : new HashMap<String, List<String>>();
-        return _columnExceptMap;
-    }
-
-    protected boolean isMainSchemaOnly() {
-        return ((String) _policyMap.getOrDefault("isMainSchemaOnly", "false")).equalsIgnoreCase("true");
+    // -----------------------------------------------------
+    //                                               Logical
+    //                                               -------
+    public DfSPolicyLogicalSecretary getLogicalSecretary() { // called by nested checker
+        return _logicalSecretary;
     }
 
     // ===================================================================================

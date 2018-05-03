@@ -25,7 +25,7 @@ import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 
 /**
  * @author jflute
@@ -38,7 +38,7 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
     protected final DfSPolicyCrossDeterminer _crossDeterminer;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -46,6 +46,7 @@ public class DfSPolicyColumnStatementChecker {
     public DfSPolicyColumnStatementChecker(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
         _crossDeterminer = new DfSPolicyCrossDeterminer(_spolicyChecker);
+        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -115,10 +116,16 @@ public class DfSPolicyColumnStatementChecker {
                 final String exp = toComparingDbTypeWithSize(column);
                 return isHitExp(exp, ifValue) == !notIfValue;
             }
+        } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
+            return determineFirstDate(statement, ifValue, notIfValue, column);
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
         }
         return false;
+    }
+
+    protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Column column) {
+        return _spolicyChecker.getFirstDateSecretary().determineColumnFirstDate(statement, ifValue, notIfValue, column);
     }
 
     // -----------------------------------------------------
@@ -306,15 +313,15 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                        Assist Logic
     //                                                                        ============
     protected boolean isHitExp(String exp, String hint) {
-        return _secretary.isHitExp(exp, hint);
+        return _logicalSecretary.isHitExp(exp, hint);
     }
 
     protected String toComparingTableName(Column column) {
-        return _secretary.toComparingTableName(column.getTable()); // e.g. MEMBER
+        return _logicalSecretary.toComparingTableName(column.getTable()); // e.g. MEMBER
     }
 
     protected String toComparingColumnName(Column column) {
-        return _secretary.toComparingColumnName(column); // e.g. MEMBER_NAME
+        return _logicalSecretary.toComparingColumnName(column); // e.g. MEMBER_NAME
     }
 
     protected String toComparingTableColumnName(Column column) {
@@ -324,11 +331,11 @@ public class DfSPolicyColumnStatementChecker {
     }
 
     protected String toComparingDbTypeWithSize(Column column) {
-        return _secretary.toComparingDbTypeWithSize(column);
+        return _logicalSecretary.toComparingDbTypeWithSize(column);
     }
 
     protected String toColumnDisp(Column column) {
-        return _secretary.toColumnDisp(column);
+        return _logicalSecretary.toColumnDisp(column);
     }
 
     protected String toPolicy(DfSPolicyStatement statement) {
@@ -339,14 +346,14 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 
     protected void throwSchemaPolicyCheckUnknownPropertyException(String property) {
-        _secretary.throwSchemaPolicyCheckUnknownPropertyException(property);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownPropertyException(property);
     }
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
-        _secretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+        _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
     }
 }

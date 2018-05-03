@@ -16,11 +16,9 @@
 package org.dbflute.logic.doc.spolicy.reps;
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
@@ -31,6 +29,7 @@ import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.DfSchemaPolicyProperties;
+import org.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +78,7 @@ public class DfSPolicyInRepsChecker {
             final AppData appData = reader.read();
             final Database database = appData.getDatabase();
             initializeClassificationDeployment(database); // for "then classification"
-            final List<Table> tableList = database.getTableList();
-            final DfSPolicyChecker checker = policyProp.createChecker(() -> tableList);
+            final DfSPolicyChecker checker = createChecker(policyProp, database);
             checker.checkPolicyIfNeeds();
         } finally {
             deleteTemporarySchemaXmlIfExists(schemaXml);
@@ -99,6 +97,14 @@ public class DfSPolicyInRepsChecker {
     protected void initializeClassificationDeployment(final Database database) {
         final DfClassificationProperties clsProp = getClassificationProperties();
         clsProp.initializeClassificationDeployment(database);
+    }
+
+    protected DfSPolicyChecker createChecker(DfSchemaPolicyProperties policyProp, Database database) {
+        return policyProp.createChecker(database, () -> {
+            final DfDocumentSelector selector = new DfDocumentSelector();
+            selector.loadSchemaHistoryAsCore();
+            return selector.getSchemaDiffList(); // for table/column first date
+        });
     }
 
     protected void deleteTemporarySchemaXmlIfExists(String schemaXml) {

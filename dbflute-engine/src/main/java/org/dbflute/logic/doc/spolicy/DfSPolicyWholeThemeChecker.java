@@ -24,7 +24,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.doc.spolicy.determiner.DfSPolicyCrossDeterminer;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class DfSPolicyWholeThemeChecker {
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
     protected final DfSPolicyCrossDeterminer _crossDeterminer;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,6 +50,7 @@ public class DfSPolicyWholeThemeChecker {
     public DfSPolicyWholeThemeChecker(DfSPolicyChecker spolicyChecker) {
         _spolicyChecker = spolicyChecker;
         _crossDeterminer = new DfSPolicyCrossDeterminer(spolicyChecker);
+        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
     }
 
     // ===================================================================================
@@ -72,7 +73,7 @@ public class DfSPolicyWholeThemeChecker {
     }
 
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 
     protected Map<String, BiConsumer<Database, DfSPolicyResult>> getThemeMap() {

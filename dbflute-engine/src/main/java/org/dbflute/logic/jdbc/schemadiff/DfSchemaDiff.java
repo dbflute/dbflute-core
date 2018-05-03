@@ -623,7 +623,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         });
     }
 
-    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff, NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
+    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
+            NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
         final TYPE previousValue = differ.provide(previous);
         if (!differ.isMatch(nextValue, previousValue)) {
@@ -901,8 +902,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return Srl.equalsPlain(nextCommaString, previousCommaString);
     }
 
-    protected void processPrimaryKeyColumnDiff(DfTableDiff tableDiff, Table nextTable, Table previousTable,
-            DfPrimaryKeyDiff primaryKeyDiff, String constraintName) {
+    protected void processPrimaryKeyColumnDiff(DfTableDiff tableDiff, Table nextTable, Table previousTable, DfPrimaryKeyDiff primaryKeyDiff,
+            String constraintName) {
         final String nextColumn = nextTable.getPrimaryKeyNameCommaString();
         final String previousColumn = previousTable.getPrimaryKeyNameCommaString();
         if (!isSame(nextColumn, previousColumn)) {
@@ -1549,6 +1550,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                 -----
     public String getDiffDate() {
         return DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN);
+    }
+
+    public Date getNativeDiffDate() {
+        return _diffDate;
     }
 
     public boolean hasComment() {

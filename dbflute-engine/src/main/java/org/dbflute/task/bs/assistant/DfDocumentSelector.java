@@ -25,6 +25,7 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,7 +241,7 @@ public class DfDocumentSelector {
     }
 
     public List<DfSchemaDiff> getSchemaDiffList() {
-        return _schemaHistory.getSchemaDiffList();
+        return _schemaHistory != null ? _schemaHistory.getSchemaDiffList() : DfCollectionUtil.emptyList();
     }
 
     // -----------------------------------------------------
