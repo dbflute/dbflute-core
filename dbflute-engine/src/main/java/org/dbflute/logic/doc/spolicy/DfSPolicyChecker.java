@@ -34,6 +34,7 @@ import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,6 +126,7 @@ public class DfSPolicyChecker {
         //         }
         //     }
         // }
+        final long before = System.currentTimeMillis();
         final DfSPolicyParsedPolicy policy = parsePolicy();
         showParsedPolicy(policy);
         final DfSPolicyResult result = new DfSPolicyResult();
@@ -136,10 +138,13 @@ public class DfSPolicyChecker {
             }
             doCheckTableColumn(policy, result, table);
         }
+        _log.info("...Ending schema policy check: " + result);
         if (!result.isEmpty()) {
             _logicalSecretary.throwSchemaPolicyCheckViolationException(_policyMap, result);
         } else {
-            _log.info(" -> No violation of schema policy. Good DB design!");
+            final long after = System.currentTimeMillis();
+            final String performanceView = DfTraceViewUtil.convertToPerformanceView(after - before); // for tuning
+            _log.info(" -> No violation of schema policy. Good DB design! [" + performanceView + "]");
             _log.info("");
         }
     }
@@ -171,7 +176,7 @@ public class DfSPolicyChecker {
     //                                                                        Parse Policy
     //                                                                        ============
     protected DfSPolicyParsedPolicy parsePolicy() {
-        _log.info("...Parcing schema policy map: " + _policyMap.keySet());
+        _log.info("...Parsing schema policy map: " + _policyMap.keySet());
         DfSPolicyParsedPolicyPart wholePolicyPart = null;
         DfSPolicyParsedPolicyPart tablePolicyPart = null;
         DfSPolicyParsedPolicyPart columnPolicyPart = null;

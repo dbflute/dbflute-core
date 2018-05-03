@@ -128,13 +128,16 @@ public class DfSPolicyTableStatementChecker {
     protected void evaluateTableThenClause(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
         final String thenTheme = statement.getThenClause().getThenTheme();
         if (thenTheme != null) {
-            evaluateColumnThenTheme(statement, result, table);
+            evaluateTableThenTheme(statement, result, table);
         } else {
-            evaluateColumnThenItemValue(statement, result, table);
+            evaluateTableThenItemValue(statement, result, table);
         }
     }
 
-    protected void evaluateColumnThenTheme(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
+    // -----------------------------------------------------
+    //                                            Then Theme
+    //                                            ----------
+    protected void evaluateTableThenTheme(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
         final String policy = toPolicy(statement);
         final DfSPolicyThenClause thenClause = statement.getThenClause();
         final String thenTheme = thenClause.getThenTheme(); // already not null here
@@ -152,13 +155,9 @@ public class DfSPolicyTableStatementChecker {
     }
 
     // -----------------------------------------------------
-    //                                            Then Theme
-    //                                            ----------
-
-    // -----------------------------------------------------
     //                                       Then Item-Value
     //                                       ---------------
-    protected void evaluateColumnThenItemValue(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
+    protected void evaluateTableThenItemValue(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
         final List<String> violationList = statement.getThenClause().evaluate(thenPart -> {
             return doEvaluateColumnThenItemValue(statement, thenPart, table, actual -> {
                 return buildViolation(table, thenPart, actual);
