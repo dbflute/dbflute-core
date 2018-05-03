@@ -179,7 +179,11 @@ public class DfSPolicyFirstDateSecretary {
     protected List<DfSchemaDiff> _schemaDiffList;
 
     protected List<DfSchemaDiff> prepareSchemaDiffList() {
-        return _schemaDiffList != null ? _schemaDiffList : _schemaDiffListSupplier.get();
+        if (_schemaDiffList != null) {
+            return _schemaDiffList;
+        }
+        _schemaDiffList = _schemaDiffListSupplier.get();
+        return _schemaDiffList;
     }
 
     // ===================================================================================
