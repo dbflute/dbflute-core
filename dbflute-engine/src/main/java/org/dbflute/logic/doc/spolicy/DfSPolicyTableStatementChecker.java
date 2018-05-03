@@ -61,11 +61,11 @@ public class DfSPolicyTableStatementChecker {
     }
 
     // ===================================================================================
-    //                                                                            Evaluate
-    //                                                                            ========
+    //                                                                           If Clause
+    //                                                                           =========
     // -----------------------------------------------------
-    //                                             If Clause
-    //                                             ---------
+    //                                              Evaluate
+    //                                              --------
     // e.g.
     //  if tableName is suffix:_ID then bad
     //  if tableName is suffix:_HISTORY then pkDbType is bigint
@@ -75,6 +75,9 @@ public class DfSPolicyTableStatementChecker {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         If Item-Value
+    //                                         -------------
     protected boolean isIfTrue(DfSPolicyStatement statement, DfSPolicyIfPart ifPart, Table table) {
         final String ifItem = ifPart.getIfItem();
         final String ifValue = ifPart.getIfValue();
@@ -116,30 +119,45 @@ public class DfSPolicyTableStatementChecker {
         return _spolicyChecker.getFirstDateSecretary().determineTableFirstDate(statement, ifValue, notIfValue, table);
     }
 
+    // ===================================================================================
+    //                                                                         Then Clause
+    //                                                                         ===========
     // -----------------------------------------------------
-    //                                           Then Clause
-    //                                           -----------
+    //                                              Evaluate
+    //                                              --------
     protected void evaluateTableThenClause(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
-        final String policy = toPolicy(statement);
-        final DfSPolicyThenClause thenClause = statement.getThenClause();
-        final String thenTheme = thenClause.getThenTheme();
+        final String thenTheme = statement.getThenClause().getThenTheme();
         if (thenTheme != null) {
-            final boolean notThenClause = thenClause.isNotThenTheme();
-            final String notOr = notThenClause ? "not " : "";
-            if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
-                result.violate(policy, "The table is no good: " + toTableDisp(table));
-            } else if (thenTheme.contains("hasCommonColumn")) {
-                if (!table.hasAllCommonColumn() == !notThenClause) {
-                    result.violate(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
-                }
-            } else {
-                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
-            }
+            evaluateColumnThenTheme(statement, result, table);
         } else {
             evaluateColumnThenItemValue(statement, result, table);
         }
     }
 
+    protected void evaluateColumnThenTheme(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
+        final String policy = toPolicy(statement);
+        final DfSPolicyThenClause thenClause = statement.getThenClause();
+        final String thenTheme = thenClause.getThenTheme(); // already not null here
+        final boolean notThenClause = thenClause.isNotThenTheme();
+        final String notOr = notThenClause ? "not " : "";
+        if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
+            result.violate(policy, "The table is no good: " + toTableDisp(table));
+        } else if (thenTheme.contains("hasCommonColumn")) {
+            if (!table.hasAllCommonColumn() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
+            }
+        } else {
+            throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Then Theme
+    //                                            ----------
+
+    // -----------------------------------------------------
+    //                                       Then Item-Value
+    //                                       ---------------
     protected void evaluateColumnThenItemValue(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
         final List<String> violationList = statement.getThenClause().evaluate(thenPart -> {
             return doEvaluateColumnThenItemValue(statement, thenPart, table, actual -> {

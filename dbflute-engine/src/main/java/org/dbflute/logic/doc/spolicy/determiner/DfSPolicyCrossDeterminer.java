@@ -17,6 +17,7 @@ package org.dbflute.logic.doc.spolicy.determiner;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -83,17 +84,17 @@ public class DfSPolicyCrossDeterminer {
     // -----------------------------------------------------
     //                                              Analyzer
     //                                              --------
-    // whole style
+    // whole style (no your targeting)
     public String analyzeSameColumnAliasIfSameColumnName(Database database) {
-        return doAnalyzeSameWhatIfSameColumnName(database, col -> determineSameColumnAliasIfSameColumnName(col));
+        return doAnalyzeSameWhatIfSameColumnName(database, col -> determineSameColumnAliasIfSameColumnName(col, your -> true));
     }
 
     public String analyzeSameColumnDbTypeIfSameColumnName(Database database) {
-        return doAnalyzeSameWhatIfSameColumnName(database, col -> determineSameColumnDbTypeIfSameColumnName(col));
+        return doAnalyzeSameWhatIfSameColumnName(database, col -> determineSameColumnDbTypeIfSameColumnName(col, your -> true));
     }
 
     public String analyzeSameColumnSizeIfSameColumnName(Database database) {
-        return doAnalyzeSameWhatIfSameColumnName(database, col -> determineSameColumnSizeIfSameColumnName(col));
+        return doAnalyzeSameWhatIfSameColumnName(database, col -> determineSameColumnSizeIfSameColumnName(col, your -> true));
     }
 
     protected String doAnalyzeSameWhatIfSameColumnName(Database database, Function<Column, String> determiner) {
@@ -120,22 +121,23 @@ public class DfSPolicyCrossDeterminer {
     //                                            Determiner
     //                                            ----------
     // called by column statement
-    public String determineSameColumnAliasIfSameColumnName(Column myColumn) {
+    public String determineSameColumnAliasIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting) {
         final boolean ignoreEmpty = true; // alias existence should be checked by other process
-        return determineSameWhatIfSameColumnName(myColumn, col -> col.getAlias(), ignoreEmpty);
+        return determineSameWhatIfSameColumnName(myColumn, yourTargeting, col -> col.getAlias(), ignoreEmpty);
     }
 
-    public String determineSameColumnDbTypeIfSameColumnName(Column myColumn) {
+    public String determineSameColumnDbTypeIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting) {
         final boolean ignoreEmpty = false; // basically cannot be empty
-        return determineSameWhatIfSameColumnName(myColumn, col -> col.getDbType(), ignoreEmpty);
+        return determineSameWhatIfSameColumnName(myColumn, yourTargeting, col -> col.getDbType(), ignoreEmpty);
     }
 
-    public String determineSameColumnSizeIfSameColumnName(Column myColumn) {
+    public String determineSameColumnSizeIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting) {
         final boolean ignoreEmpty = false; // basically cannot be empty
-        return determineSameWhatIfSameColumnName(myColumn, col -> col.getColumnSize(), ignoreEmpty);
+        return determineSameWhatIfSameColumnName(myColumn, yourTargeting, col -> col.getColumnSize(), ignoreEmpty);
     }
 
-    protected String determineSameWhatIfSameColumnName(Column myColumn, Function<Column, Object> valueProvider, boolean ignoreEmpty) {
+    protected String determineSameWhatIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting,
+            Function<Column, Object> valueProvider, boolean ignoreEmpty) {
         final Table myTable = myColumn.getTable();
         for (Table yourTable : myTable.getDatabase().getTableList()) {
             if (!isTargetTable(yourTable)) { // non-target
@@ -148,6 +150,9 @@ public class DfSPolicyCrossDeterminer {
             final Column yourColumn = yourTable.getColumn(myColumnName);
             if (yourColumn != null) {
                 if (!isTargetColumn(yourColumn)) { // non-target
+                    continue;
+                }
+                if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
                     continue;
                 }
                 final Object myValue = valueProvider.apply(myColumn);
@@ -169,9 +174,9 @@ public class DfSPolicyCrossDeterminer {
     // -----------------------------------------------------
     //                                              Analyzer
     //                                              --------
-    // whole style
+    // whole style (no your targeting)
     public String analyzeSameColumnNameIfSameColumnAlias(Database database) {
-        return doAnalyzeSameWhatIfSameColumnAlias(database, col -> determineSameColumnNameIfSameColumnAlias(col));
+        return doAnalyzeSameWhatIfSameColumnAlias(database, col -> determineSameColumnNameIfSameColumnAlias(col, your -> true));
     }
 
     protected String doAnalyzeSameWhatIfSameColumnAlias(Database database, Function<Column, String> determiner) {
@@ -198,12 +203,13 @@ public class DfSPolicyCrossDeterminer {
     //                                            Determiner
     //                                            ----------
     // may be called by column statement
-    public String determineSameColumnNameIfSameColumnAlias(Column myColumn) {
+    public String determineSameColumnNameIfSameColumnAlias(Column myColumn, Predicate<Column> yourTargeting) {
         final boolean ignoreEmpty = false; // basically cannot be empty
-        return determineSameWhatIfSameColumnAlias(myColumn, col -> col.getName(), ignoreEmpty);
+        return determineSameWhatIfSameColumnAlias(myColumn, yourTargeting, col -> col.getName(), ignoreEmpty);
     }
 
-    protected String determineSameWhatIfSameColumnAlias(Column myColumn, Function<Column, Object> valueProvider, boolean ignoreEmpty) {
+    protected String determineSameWhatIfSameColumnAlias(Column myColumn, Predicate<Column> yourTargeting,
+            Function<Column, Object> valueProvider, boolean ignoreEmpty) {
         if (!myColumn.hasAlias()) { // cannot determine
             return null;
         }
@@ -219,6 +225,9 @@ public class DfSPolicyCrossDeterminer {
             final List<Column> yourColumnList = yourTable.getColumnList();
             for (Column yourColumn : yourColumnList) {
                 if (!isTargetColumn(yourColumn)) { // non-target
+                    continue;
+                }
+                if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
                     continue;
                 }
                 if (!yourColumn.hasAlias()) { // cannot determine
