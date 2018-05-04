@@ -270,7 +270,7 @@ public class Column {
 
         // others
         _defaultValue = attrib.getValue("default");
-        _plainComment = attrib.getValue("comment");
+        setPlainComment(attrib.getValue("comment")); // setter for sync
 
         handleProgramReservationWord();
         return true;
@@ -280,7 +280,7 @@ public class Column {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isPgReservColumn(_name)) {
             _synonym = prop.resolvePgReservColumn(_name);
-            _plainComment = _plainComment + " (using DBFlute synonym)";
+            setPlainComment(_plainComment + " (using DBFlute synonym)"); // setter for sync
         }
     }
 
@@ -421,15 +421,20 @@ public class Column {
      * @return The column alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
+        if (_cachedColumnAlias != null) {
+            return _cachedColumnAlias;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _plainComment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
             if (alias != null) {
-                return alias;
+                _cachedColumnAlias = alias;
+                return _cachedColumnAlias;
             }
         }
-        return "";
+        _cachedColumnAlias = "";
+        return _cachedColumnAlias;
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
@@ -661,12 +666,17 @@ public class Column {
     // -----------------------------------------------------
     //                                        Column Comment
     //                                        --------------
+    protected String _cachedColumnAlias; // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedColumnComment; // me too
+
     public String getPlainComment() {
         return _plainComment;
     }
 
-    public void setPlainComment(String plainComment) {
+    public void setPlainComment(String plainComment) { // can be protected? (protected in Table.java) by jflute (2018/05/04)
         this._plainComment = plainComment;
+        _cachedColumnAlias = null; // needs to clear because the value is from plain comment
+        _cachedColumnComment = null; // me too
     }
 
     public boolean hasComment() { // means resolved comment (not plain)
@@ -675,13 +685,17 @@ public class Column {
     }
 
     public String getComment() {
+        if (_cachedColumnComment != null) {
+            return _cachedColumnComment;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = prop.extractCommentFromDbComment(_plainComment);
-        return comment != null ? comment : "";
+        _cachedColumnComment = comment != null ? comment : "";
+        return _cachedColumnComment;
     }
 
-    public void setComment(String comment) {
-        this._plainComment = comment;
+    public void setComment(String comment) { // unused? (not exists in Table.java) by jflute (2018/05/04)
+        setPlainComment(comment); // setter for sync
     }
 
     public String getCommentForSchemaHtml() {

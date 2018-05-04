@@ -203,14 +203,18 @@ public class DfSPolicyCrossSecretary {
         //return null;
     }
 
+    // -----------------------------------------------------
+    //                                    Same-Name Resource
+    //                                    ------------------
     protected Map<String, List<Column>> _sameNameColumnListMap; // map:{ column-name = list:{ column, ... } }
 
     protected Map<String, List<Column>> getSameNameColumnListMap(Database database) {
         if (_sameNameColumnListMap != null) {
             return _sameNameColumnListMap;
         }
+        // flexible map because column name is treated as flexible in DBFlute (so MEMBER_NAME and MemberName are same-name)
+        final Map<String, List<Column>> sameNameColumnListMap = StringKeyMap.createAsFlexible();
         final List<Table> targetTableList = database.getTableList().stream().filter(tbl -> isTargetTable(tbl)).collect(Collectors.toList());
-        final Map<String, List<Column>> sameNameColumnListMap = StringKeyMap.createAsCaseInsensitive();
         for (Table myTable : targetTableList) {
             final List<Column> columnList = myTable.getColumnList();
             for (Column myColumn : columnList) {
@@ -254,16 +258,9 @@ public class DfSPolicyCrossSecretary {
     }
 
     protected String doAnalyzeSameWhatIfSameColumnAlias(Database database, Function<Column, String> determiner) {
-        final List<Table> tableList = database.getTableList();
-        for (Table myTable : tableList) {
-            if (!isTargetTable(myTable)) { // non-target
-                continue;
-            }
-            final List<Column> myColumnList = myTable.getColumnList();
-            for (Column myColumn : myColumnList) {
-                if (!isTargetColumn(myColumn)) { // non-target
-                    continue;
-                }
+        final Map<String, List<Column>> columnListMap = getSameAliasColumnListMap(database);
+        for (List<Column> columnList : columnListMap.values()) {
+            for (Column myColumn : columnList) {
                 final String violation = determiner.apply(myColumn);
                 if (violation != null) {
                     return violation;
@@ -271,6 +268,25 @@ public class DfSPolicyCrossSecretary {
             }
         }
         return null;
+
+        // memorable code before performance tuning
+        //final List<Table> tableList = database.getTableList();
+        //for (Table myTable : tableList) {
+        //    if (!isTargetTable(myTable)) { // non-target
+        //        continue;
+        //    }
+        //    final List<Column> myColumnList = myTable.getColumnList();
+        //    for (Column myColumn : myColumnList) {
+        //        if (!isTargetColumn(myColumn)) { // non-target
+        //            continue;
+        //        }
+        //        final String violation = determiner.apply(myColumn);
+        //        if (violation != null) {
+        //            return violation;
+        //        }
+        //    }
+        //}
+        //return null;
     }
 
     // -----------------------------------------------------
@@ -284,42 +300,120 @@ public class DfSPolicyCrossSecretary {
 
     protected String determineSameWhatIfSameColumnAlias(Column myColumn, Predicate<Column> yourTargeting,
             Function<Column, Object> valueProvider, boolean ignoreEmpty) {
-        if (!myColumn.hasAlias()) { // cannot determine
+        if (!myColumn.hasAlias()) { // cannot determine (possible when from statement)
             return null;
         }
-        final String myColumnAlias = myColumn.getAlias();
-        final Table myTable = myColumn.getTable();
-        for (Table yourTable : myTable.getDatabase().getTableList()) {
-            if (!isTargetTable(yourTable)) { // non-target
+        final Map<String, List<Column>> columnListMap = getSameAliasColumnListMap(myColumn.getTable().getDatabase());
+        final List<Column> columnList = columnListMap.getOrDefault(myColumn.getName(), DfCollectionUtil.emptyList());
+        for (Column yourColumn : columnList) { // alias always exists here
+            if (myColumn.equals(yourColumn)) { // myself
                 continue;
             }
-            if (myTable.equals(yourTable)) { // myself
+            if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
                 continue;
             }
-            final List<Column> yourColumnList = yourTable.getColumnList();
-            for (Column yourColumn : yourColumnList) {
-                if (!isTargetColumn(yourColumn)) { // non-target
-                    continue;
-                }
-                if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
-                    continue;
-                }
-                if (!yourColumn.hasAlias()) { // cannot determine
-                    continue;
-                }
-                if (myColumnAlias.equals(yourColumn.getAlias())) { // same column alias
-                    final Object myValue = valueProvider.apply(myColumn);
-                    final Object yourValue = valueProvider.apply(yourColumn);
-                    if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
-                        continue;
-                    }
-                    if (!isEqual(myValue, yourValue)) { // different in spite of same column alias
-                        return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
-                    }
-                }
+            final Object myValue = valueProvider.apply(myColumn);
+            final Object yourValue = valueProvider.apply(yourColumn);
+            if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
+                continue;
+            }
+            if (!isEqual(myValue, yourValue)) { // different in spite of same column alias
+                return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
             }
         }
         return null;
+
+        // memorable code before performance tuning
+        //final String myColumnAlias = myColumn.getAlias();
+        //final Table myTable = myColumn.getTable();
+        //for (Table yourTable : myTable.getDatabase().getTableList()) {
+        //    if (!isTargetTable(yourTable)) { // non-target
+        //        continue;
+        //    }
+        //    if (myTable.equals(yourTable)) { // myself
+        //        continue;
+        //    }
+        //    final List<Column> yourColumnList = yourTable.getColumnList();
+        //    for (Column yourColumn : yourColumnList) {
+        //        if (!isTargetColumn(yourColumn)) { // non-target
+        //            continue;
+        //        }
+        //        if (!yourTargeting.test(yourColumn)) { // non-target (e.g. by statement)
+        //            continue;
+        //        }
+        //        if (!yourColumn.hasAlias()) { // cannot determine
+        //            continue;
+        //        }
+        //        if (myColumnAlias.equals(yourColumn.getAlias())) { // same column alias
+        //            final Object myValue = valueProvider.apply(myColumn);
+        //            final Object yourValue = valueProvider.apply(yourColumn);
+        //            if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
+        //                continue;
+        //            }
+        //            if (!isEqual(myValue, yourValue)) { // different in spite of same column alias
+        //                return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
+        //            }
+        //        }
+        //    }
+        //}
+        //return null;
+    }
+
+    // -----------------------------------------------------
+    //                                    Same-Name Resource
+    //                                    ------------------
+    protected Map<String, List<Column>> _sameAliasColumnListMap; // map:{ column-alias = list:{ column, ... } }
+
+    protected Map<String, List<Column>> getSameAliasColumnListMap(Database database) {
+        if (_sameAliasColumnListMap != null) {
+            return _sameAliasColumnListMap;
+        }
+        // case insensitive (not flexible), alias handling rule does not exist in DBFlute
+        // but flexible is hard to implement and small merit
+        final Map<String, List<Column>> sameAliasColumnListMap = StringKeyMap.createAsCaseInsensitive();
+        final List<Table> targetTableList = database.getTableList().stream().filter(tbl -> isTargetTable(tbl)).collect(Collectors.toList());
+        for (Table myTable : targetTableList) {
+            final List<Column> columnList = myTable.getColumnList();
+            for (Column myColumn : columnList) {
+                if (!isTargetColumn(myColumn)) { // non-target
+                    continue;
+                }
+                if (!myColumn.hasAlias()) { // cannot determine
+                    continue;
+                }
+                final String myAlias = myColumn.getAlias();
+                if (sameAliasColumnListMap.containsKey(myAlias)) { // registered by the other same-name column
+                    continue;
+                }
+                for (Table yourTable : targetTableList) {
+                    List<Column> yourColumnList = yourTable.getColumnList();
+                    Column yourColumn = null;
+                    for (Column currentColumn : yourColumnList) {
+                        if (currentColumn.hasAlias() && myAlias.equalsIgnoreCase(currentColumn.getAlias())) {
+                            yourColumn = currentColumn;
+                            break;
+                        }
+                    }
+                    if (yourColumn != null) {
+                        if (!isTargetColumn(yourColumn)) { // non-target
+                            continue;
+                        }
+                        if (!yourColumn.hasAlias()) { // cannot determine
+                            continue;
+                        }
+                        List<Column> sameColumnList = sameAliasColumnListMap.get(myAlias);
+                        if (sameColumnList == null) {
+                            sameColumnList = new ArrayList<Column>();
+                            sameColumnList.add(myColumn);
+                            sameAliasColumnListMap.put(myAlias, sameColumnList);
+                        }
+                        sameColumnList.add(yourColumn);
+                    }
+                }
+            }
+        }
+        _sameAliasColumnListMap = sameAliasColumnListMap;
+        return _sameAliasColumnListMap;
     }
 
     // ===================================================================================

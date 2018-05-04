@@ -279,7 +279,7 @@ public class Table {
         if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, _name)) {
             return false;
         }
-        _plainComment = attrib.getValue("comment");
+        setPlainComment(attrib.getValue("comment")); // setter for sync
         _javaName = attrib.getValue("javaName");
         return true;
     }
@@ -474,15 +474,20 @@ public class Table {
      * @return The table alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
+        if (_cachedColumnAlias != null) {
+            return _cachedColumnAlias;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _plainComment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
             if (alias != null) {
-                return alias;
+                _cachedColumnAlias = alias;
+                return _cachedColumnAlias;
             }
         }
-        return "";
+        _cachedColumnAlias = "";
+        return _cachedColumnAlias;
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
@@ -567,8 +572,17 @@ public class Table {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
+    protected String _cachedColumnAlias; // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedColumnComment; // me too
+
     public String getPlainComment() { // may contain its alias name
         return _plainComment;
+    }
+
+    protected void setPlainComment(String _plainComment) { // added for clearing cache so protected
+        this._plainComment = _plainComment;
+        _cachedColumnAlias = null; // needs to clear because the value is from plain comment
+        _cachedColumnComment = null; // me too
     }
 
     public boolean hasComment() { // means resolved comment (not plain)
@@ -577,9 +591,13 @@ public class Table {
     }
 
     public String getComment() {
+        if (_cachedColumnComment != null) {
+            return _cachedColumnComment;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = prop.extractCommentFromDbComment(_plainComment);
-        return comment != null ? comment : "";
+        _cachedColumnComment = comment != null ? comment : "";
+        return _cachedColumnComment;
     }
 
     public String getCommentForSchemaHtml() {
