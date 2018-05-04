@@ -46,10 +46,11 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyColumnStatementChecker(DfSPolicyChecker spolicyChecker) {
-        _crossDeterminer = spolicyChecker.getCrossSecretary();
-        _firstDateDeterminer = spolicyChecker.getFirstDateSecretary();
-        _logicalSecretary = spolicyChecker.getLogicalSecretary();
+    public DfSPolicyColumnStatementChecker(DfSPolicyCrossSecretary crossDeterminer, DfSPolicyFirstDateSecretary firstDateDeterminer,
+            DfSPolicyLogicalSecretary logicalSecretary) {
+        _crossDeterminer = crossDeterminer;
+        _firstDateDeterminer = firstDateDeterminer;
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================

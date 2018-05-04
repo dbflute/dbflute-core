@@ -28,6 +28,7 @@ import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
 import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.util.Srl;
 
@@ -40,15 +41,15 @@ public class DfSPolicyTableStatementChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
+    protected final DfSPolicyFirstDateSecretary _firstDateSecretary;
     protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyTableStatementChecker(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
-        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
+    public DfSPolicyTableStatementChecker(DfSPolicyFirstDateSecretary firstDateSecretary, DfSPolicyLogicalSecretary logicalSecretary) {
+        _firstDateSecretary = firstDateSecretary;
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================
@@ -116,7 +117,7 @@ public class DfSPolicyTableStatementChecker {
     }
 
     protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
-        return _spolicyChecker.getFirstDateSecretary().determineTableFirstDate(statement, ifValue, notIfValue, table);
+        return _firstDateSecretary.determineTableFirstDate(statement, ifValue, notIfValue, table);
     }
 
     // ===================================================================================

@@ -92,11 +92,12 @@ public class DfSPolicyChecker {
         _firstDateSecretary = new DfSPolicyFirstDateSecretary(_schemaDiffListSupplier);
         _crossSecretary = new DfSPolicyCrossSecretary(_exceptTargetSecretary, _logicalSecretary);
 
-        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
-        _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
-        _tableStatementChecker = new DfSPolicyTableStatementChecker(this);
-        _columnThemeChecker = new DfSPolicyColumnThemeChecker(this);
-        _columnStatementChecker = new DfSPolicyColumnStatementChecker(this);
+        // checkers using secretaries
+        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(_crossSecretary, _logicalSecretary);
+        _tableThemeChecker = new DfSPolicyTableThemeChecker(_logicalSecretary);
+        _tableStatementChecker = new DfSPolicyTableStatementChecker(_firstDateSecretary, _logicalSecretary);
+        _columnThemeChecker = new DfSPolicyColumnThemeChecker(_logicalSecretary);
+        _columnStatementChecker = new DfSPolicyColumnStatementChecker(_crossSecretary, _firstDateSecretary, _logicalSecretary);
     }
 
     // ===================================================================================

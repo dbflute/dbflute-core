@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -208,12 +209,9 @@ public class DfSPolicyCrossSecretary {
         if (_sameNameColumnListMap != null) {
             return _sameNameColumnListMap;
         }
-        final List<Table> tableList = database.getTableList();
+        final List<Table> targetTableList = database.getTableList().stream().filter(tbl -> isTargetTable(tbl)).collect(Collectors.toList());
         final Map<String, List<Column>> sameNameColumnListMap = StringKeyMap.createAsCaseInsensitive();
-        for (Table myTable : tableList) {
-            if (!isTargetTable(myTable)) { // non-target
-                continue;
-            }
+        for (Table myTable : targetTableList) {
             final List<Column> columnList = myTable.getColumnList();
             for (Column myColumn : columnList) {
                 if (!isTargetColumn(myColumn)) { // non-target
@@ -223,7 +221,7 @@ public class DfSPolicyCrossSecretary {
                 if (sameNameColumnListMap.containsKey(myName)) { // registered by the other same-name column
                     continue;
                 }
-                for (Table yourTable : tableList) {
+                for (Table yourTable : targetTableList) {
                     final Column yourColumn = yourTable.getColumn(myName);
                     if (yourColumn != null) {
                         if (!isTargetColumn(yourColumn)) { // non-target

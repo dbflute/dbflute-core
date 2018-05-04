@@ -41,15 +41,13 @@ public class DfSPolicyTableThemeChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
     protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyTableThemeChecker(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
-        _logicalSecretary = _spolicyChecker.getLogicalSecretary();
+    public DfSPolicyTableThemeChecker(DfSPolicyLogicalSecretary logicalSecretary) {
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================

@@ -46,9 +46,9 @@ public class DfSPolicyWholeThemeChecker {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyWholeThemeChecker(DfSPolicyChecker spolicyChecker) {
-        _crossDeterminer = spolicyChecker.getCrossSecretary();
-        _logicalSecretary = spolicyChecker.getLogicalSecretary();
+    public DfSPolicyWholeThemeChecker(DfSPolicyCrossSecretary crossDeterminer, DfSPolicyLogicalSecretary logicalSecretary) {
+        _crossDeterminer = crossDeterminer;
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================
