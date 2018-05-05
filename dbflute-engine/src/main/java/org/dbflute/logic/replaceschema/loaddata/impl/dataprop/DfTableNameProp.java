@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.dbflute.util.DfCollectionUtil;
 
@@ -63,7 +63,7 @@ public class DfTableNameProp {
             final Table table = entry.getValue();
             map.put(sheetName, table.getTableSqlName());
         }
-        final String mapString = new MapListString().buildMapString(map);
+        final String mapString = new DfMapStyle().toMapString(map);
         final File dataPropFile = new File(baseDir + "/tableNameMap.dataprop");
         BufferedWriter bw = null;
         try {

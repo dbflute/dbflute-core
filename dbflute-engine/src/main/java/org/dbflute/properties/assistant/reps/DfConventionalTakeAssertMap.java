@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.properties.assistant.base.DfPropertyValueHandler;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
@@ -95,7 +95,7 @@ public class DfConventionalTakeAssertMap {
     }
 
     public String buildDispProperties() {
-        final String mapString = new MapListString().buildMapString(getConventionalTakeAssertMap());
+        final String mapString = new DfMapStyle().toMapString(getConventionalTakeAssertMap());
         return "; " + KEY_conventionalTakeAssertMap + " = " + mapString;
     }
 

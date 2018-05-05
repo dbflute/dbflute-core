@@ -176,7 +176,7 @@ public class DfPropertyValueHandler {
         if (!outsidePropList.isEmpty()) {
             return outsidePropList;
         }
-        return DfPropertyUtil.listProp(_buildProperties, key, ";");
+        return DfPropertyUtil.listProp(_buildProperties, key);
     }
 
     /**
@@ -191,7 +191,7 @@ public class DfPropertyValueHandler {
             if (!outsidePropList.isEmpty()) {
                 return outsidePropList;
             }
-            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, ";");
+            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key);
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -215,7 +215,7 @@ public class DfPropertyValueHandler {
         if (!outsidePropMap.isEmpty()) {
             return outsidePropMap;
         }
-        return DfPropertyUtil.mapProp(_buildProperties, key, ";");
+        return DfPropertyUtil.mapProp(_buildProperties, key);
     }
 
     /**
@@ -230,7 +230,7 @@ public class DfPropertyValueHandler {
             if (!outsidePropMap.isEmpty()) {
                 return outsidePropMap;
             }
-            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");
+            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key);
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
