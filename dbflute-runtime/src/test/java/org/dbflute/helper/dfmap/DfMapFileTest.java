@@ -22,6 +22,7 @@ import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
+ * @since 1.1.8 (2018/05/05 Saturday)
  */
 public class DfMapFileTest extends RuntimeTestCase {
 
