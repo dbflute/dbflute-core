@@ -29,10 +29,10 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  * The string for map and list.
  * <pre>
  * e.g. map-string
- *   map:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
+ *   map:{key1=value1;key2=list:{value21;value22;value23};key3=map:{key31=value31}}
  * 
  * e.g. list-string
- *   list:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
+ *   list:{key1=value1;key2=list:{value21;value22;value23};key3=map:{key31=value31}}
  * </pre>
  * @author jflute
  */
