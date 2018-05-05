@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.dbflute.helper.dfmap.DfMapStyle;
+import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
 import org.dbflute.util.Srl;
@@ -119,7 +119,7 @@ public class DfRefreshResourceProcess {
                 return;
             }
             final String ports = props.getProperty("retry.port");
-            final List<Object> portList = new DfMapStyle().fromListString(ports);
+            final List<Object> portList = new MapListString().generateList(ports);
             int refreshLevel = 2;
             boolean retrySuccess = false;
             for (Object portObj : portList) {
