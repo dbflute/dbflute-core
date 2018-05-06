@@ -39,6 +39,11 @@ import org.dbflute.util.Srl;
 public class DfSPolicyTableStatementChecker {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String ADDITIONAL_SUFFIX = "(additional)";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyFirstDateSecretary _firstDateSecretary;
@@ -222,7 +227,8 @@ public class DfSPolicyTableStatementChecker {
                 final String pkName = pk.getPrimaryKeyName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(pkName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(pkName);
+                    final String disp = pkName + (pk.isAdditionalPrimaryKey() ? ADDITIONAL_SUFFIX : "");
+                    return violationCall.apply(disp);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
@@ -230,7 +236,8 @@ public class DfSPolicyTableStatementChecker {
                 final String fkName = fk.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(fkName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(fkName);
+                    final String disp = fkName + (fk.isAdditionalForeignKey() ? ADDITIONAL_SUFFIX : "");
+                    return violationCall.apply(disp);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
@@ -238,7 +245,8 @@ public class DfSPolicyTableStatementChecker {
                 final String uqName = uq.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(uqName, comparingValue)) {
-                    return violationCall.apply(uqName);
+                    final String disp = uqName + (uq.isAdditional() ? ADDITIONAL_SUFFIX : "");
+                    return violationCall.apply(disp);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
