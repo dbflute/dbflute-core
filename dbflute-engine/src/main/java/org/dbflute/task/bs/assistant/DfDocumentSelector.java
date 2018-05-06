@@ -227,7 +227,7 @@ public class DfDocumentSelector {
 
     protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {
         _log.info("...Loading schema history");
-        _schemaHistory = schemaHistory;
+        _schemaHistory = schemaHistory; // also loaded mark
         _schemaHistory.loadHistory();
         if (existsSchemaHistory()) {
             _log.info(" -> found history: count=" + getSchemaDiffList().size());
@@ -242,6 +242,13 @@ public class DfDocumentSelector {
 
     public List<DfSchemaDiff> getSchemaDiffList() {
         return _schemaHistory != null ? _schemaHistory.getSchemaDiffList() : DfCollectionUtil.emptyList();
+    }
+
+    public List<DfSchemaDiff> lazyLoadIfNeedsCoreSchemaDiffList() { // for e,g, SchemaPolicy, ConventionalTakeAssert
+        if (_schemaHistory == null) { // means not loaded yet
+            loadSchemaHistoryAsCore();
+        }
+        return getSchemaDiffList();
     }
 
     // -----------------------------------------------------

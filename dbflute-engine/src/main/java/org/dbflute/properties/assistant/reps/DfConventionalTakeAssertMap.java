@@ -15,10 +15,12 @@
  */
 package org.dbflute.properties.assistant.reps;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.properties.assistant.base.DfPropertyValueHandler;
 import org.dbflute.system.DBFluteSystem;
@@ -129,5 +131,10 @@ public class DfConventionalTakeAssertMap {
     protected Map<String, Object> getEmptyTableMap() {
         final Map<String, Object> emptyTableMap = getConventionalTakeAssertMap().get("emptyTableMap");
         return emptyTableMap != null ? emptyTableMap : DfCollectionUtil.emptyMap();
+    }
+
+    public Date getOnlyFirstDateAfterTargetDate() { // null allowed
+        final String prop = _propertyValueHandler.getProperty("onlyFirstDateAfterTargetDate", null, getEmptyTableMap());
+        return prop != null ? new HandyDate(prop).getDate() : null;
     }
 }

@@ -17,7 +17,6 @@ package org.dbflute.logic.doc.spolicy.secretary;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -25,12 +24,10 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.exception.DfSchemaPolicyCheckIllegalFirstDateException;
 import org.dbflute.helper.HandyDate;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
-import org.dbflute.logic.jdbc.schemadiff.DfColumnDiff;
+import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
-import org.dbflute.logic.jdbc.schemadiff.DfTableDiff;
 import org.dbflute.util.Srl;
 
 /**
@@ -42,13 +39,13 @@ public class DfSPolicyFirstDateSecretary {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Supplier<List<DfSchemaDiff>> _schemaDiffListSupplier;
+    protected final DfFirstDateAgent _firstDateAgent;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfSPolicyFirstDateSecretary(Supplier<List<DfSchemaDiff>> schemaDiffListSupplier) {
-        _schemaDiffListSupplier = schemaDiffListSupplier;
+        _firstDateAgent = new DfFirstDateAgent(schemaDiffListSupplier);
     }
 
     // ===================================================================================
@@ -89,101 +86,12 @@ public class DfSPolicyFirstDateSecretary {
     //                                                                           =========
     // e.g. firstDate is after:2018/05/03
     protected boolean isTableFirstDateAfter(Table table, Date targetDate) {
-        final Map<String, Date> tableFirstDateMap = getTableFirstDateMap();
-        final Date firstDate = tableFirstDateMap.get(table.getTableDbName());
-        if (firstDate != null) {
-            return firstDate.after(targetDate);
-        } else { // no new difference
-            return true; // treated as new table
-        }
+        return _firstDateAgent.isTableFirstDateAfter(table.getTableDbName(), targetDate);
     }
 
     // e.g. columnFirstDate is after:2018/05/03
     protected boolean isColumnFirstDateAfter(Column column, Date targetDate) {
-        final String tableDbName = column.getTable().getTableDbName();
-        final Map<String, Date> columnFirstDateMap = getColumnFirstDateMap();
-        final String columnKey = generateColumnKey(tableDbName, column.getName());
-        final Date firstDate = columnFirstDateMap.get(columnKey);
-        if (firstDate != null) {
-            return firstDate.after(targetDate);
-        } else { // no new difference, means that it may be in new table difference
-            final Map<String, Date> tableFirstDateMap = getTableFirstDateMap();
-            final Date tableFirstDate = tableFirstDateMap.get(tableDbName);
-            if (tableFirstDate != null) { // so use table first date
-                return tableFirstDate.after(targetDate);
-            } else {
-                return true; // treated as new column
-            }
-        }
-    }
-
-    // ===================================================================================
-    //                                                                     Cached Resource
-    //                                                                     ===============
-    // -----------------------------------------------------
-    //                                      Table First Date
-    //                                      ----------------
-    protected Map<String, Date> _tableFirstDateMap;
-
-    protected Map<String, Date> getTableFirstDateMap() { // case insensitive (not flexible because of historical changes)
-        if (_tableFirstDateMap != null) {
-            return _tableFirstDateMap;
-        }
-        final Map<String, Date> tableFirstDateMap = StringKeyMap.createAsCaseInsensitiveOrdered();
-        final List<DfSchemaDiff> schemaDiffList = prepareSchemaDiffList();
-        for (DfSchemaDiff schemaDiff : schemaDiffList) {
-            List<DfTableDiff> tableDiffList = schemaDiff.getAddedTableDiffList();
-            for (DfTableDiff tableDiff : tableDiffList) {
-                final String tableName = tableDiff.getTableName();
-                tableFirstDateMap.put(tableName, schemaDiff.getNativeDiffDate());
-            }
-        }
-        _tableFirstDateMap = tableFirstDateMap;
-        return _tableFirstDateMap;
-    }
-
-    // -----------------------------------------------------
-    //                                     Column First Date
-    //                                     -----------------
-    protected Map<String, Date> _columnFirstDateMap; // key is table.column
-
-    protected Map<String, Date> getColumnFirstDateMap() { // case insensitive (not flexible because of historical changes)
-        if (_columnFirstDateMap != null) {
-            return _columnFirstDateMap;
-        }
-        final Map<String, Date> columnFirstDateMap = StringKeyMap.createAsCaseInsensitiveOrdered();
-        final List<DfSchemaDiff> schemaDiffList = prepareSchemaDiffList();
-        for (DfSchemaDiff schemaDiff : schemaDiffList) {
-            final List<DfTableDiff> tableDiffList = schemaDiff.getAddedTableDiffList();
-            for (DfTableDiff tableDiff : tableDiffList) {
-                final String tableName = tableDiff.getTableName();
-                final List<DfColumnDiff> columnDiffList = tableDiff.getAddedColumnDiffList();
-                for (DfColumnDiff columnDiff : columnDiffList) {
-                    final String columnName = columnDiff.getColumnName();
-                    final String keyName = generateColumnKey(tableName, columnName);
-                    columnFirstDateMap.put(keyName, schemaDiff.getNativeDiffDate());
-                }
-            }
-        }
-        _columnFirstDateMap = columnFirstDateMap;
-        return _columnFirstDateMap;
-    }
-
-    protected String generateColumnKey(String tableName, String columnName) {
-        return tableName + "." + columnName;
-    }
-
-    // -----------------------------------------------------
-    //                                            SchemaDiff
-    //                                            ----------
-    protected List<DfSchemaDiff> _schemaDiffList;
-
-    protected List<DfSchemaDiff> prepareSchemaDiffList() {
-        if (_schemaDiffList != null) {
-            return _schemaDiffList;
-        }
-        _schemaDiffList = _schemaDiffListSupplier.get();
-        return _schemaDiffList;
+        return _firstDateAgent.isColumnFirstDateAfter(column.getTable().getTableDbName(), column.getName(), targetDate);
     }
 
     // ===================================================================================

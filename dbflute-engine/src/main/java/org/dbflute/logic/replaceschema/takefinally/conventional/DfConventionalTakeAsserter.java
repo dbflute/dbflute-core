@@ -18,17 +18,22 @@ package org.dbflute.logic.replaceschema.takefinally.conventional;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 
 import org.dbflute.exception.DfTakeFinallyAssertionFailureEmptyTableException;
 import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.logic.replaceschema.process.DfAbstractRepsProcess;
+import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -51,38 +56,60 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
     //                                                                           =========
     protected final DfSchemaSource _dataSource;
     protected final Supplier<String> _dispPropertiesProvider;
+    protected final DfFirstDateAgent _firstDateAgent;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfConventionalTakeAsserter(DfSchemaSource dataSource, Supplier<String> dispPropertiesProvider) {
+    public DfConventionalTakeAsserter(DfSchemaSource dataSource, Supplier<String> dispPropertiesProvider,
+            Supplier<List<DfSchemaDiff>> schemaDiffListSupplier) {
         _dataSource = dataSource;
         _dispPropertiesProvider = dispPropertiesProvider;
+        _firstDateAgent = new DfFirstDateAgent(schemaDiffListSupplier);
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     public void assertConventionally() {
-        final DfConventionalTakeAssertMap propMap = getReplaceSchemaProperties().getConventionalTakeAssertMap();
+        final DfReplaceSchemaProperties repsProp = getReplaceSchemaProperties();
+        final DfConventionalTakeAssertMap propMap = repsProp.getConventionalTakeAssertMap();
         if (propMap.isEmptyTableFailure()) {
             _log.info("...Checking conventional empty tables");
             if (propMap.isEmptyTableWorkableEnv()) {
                 doAssertEmptyTable(propMap);
             } else {
-                _log.info(" => out of target environment so do nothing: currentEnv=" + getReplaceSchemaProperties().getRepsEnvType());
+                _log.info(" => out of target environment so do nothing: currentEnv=" + repsProp.getRepsEnvType());
             }
         }
     }
 
+    // ===================================================================================
+    //                                                                         Empty Table
+    //                                                                         ===========
     protected void doAssertEmptyTable(DfConventionalTakeAssertMap propMap) {
         final List<DfTableMeta> allTableList = extractTableList();
         final List<DfTableMeta> emptyTableList = DfCollectionUtil.newArrayList();
+        final Date targetDate = propMap.getOnlyFirstDateAfterTargetDate(); // null allowed
+        if (targetDate != null) {
+            _log.info("...Using first-date for targeting of empty tables: targetDate=" + new HandyDate(targetDate).toString());
+        }
         for (DfTableMeta tableMeta : allTableList) {
-            if (propMap.isEmptyTableTarget(tableMeta.getTableDbName())) {
-                if (determineEmptyTable(tableMeta)) {
+            if (!propMap.isEmptyTableTarget(tableMeta.getTableDbName())) {
+                continue;
+            }
+            if (!determineEmptyTable(tableMeta)) {
+                continue;
+            }
+            // empty table here
+            if (targetDate != null) { // more determination
+                if (isTableFirstDateAfter(tableMeta, targetDate)) { // new table: is target so keep
                     emptyTableList.add(tableMeta);
+                } else {
+                    _log.info("...Skipping the empty table by first-date: old-table=" + tableMeta.toString());
                 }
+            } else { // fixedly keep
+                emptyTableList.add(tableMeta);
             }
         }
         if (!emptyTableList.isEmpty()) {
@@ -143,5 +170,12 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         }
         final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureEmptyTableException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                          First Date
+    //                                                                          ==========
+    protected boolean isTableFirstDateAfter(DfTableMeta tableMeta, Date targetDate) {
+        return _firstDateAgent.isTableFirstDateAfter(tableMeta.getTableDbName(), targetDate);
     }
 }

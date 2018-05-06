@@ -44,6 +44,7 @@ import org.dbflute.logic.replaceschema.takefinally.conventional.DfConventionalTa
 import org.dbflute.logic.replaceschema.takefinally.sequence.DfRepsSequenceIncrementer;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
+import org.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -70,11 +71,13 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
     //                                        --------------
     protected final String _sqlRootDir;
     protected final DfSchemaSource _dataSource;
-    protected final DfTakeFinallySqlFileProvider _sqlFileProvider; // NullAllowed: if null, use default
+    protected final DfTakeFinallySqlFileProvider _sqlFileProvider; // null allowed: if null, use default
+    protected final DfDocumentSelector _documentSelector; // conventionalTakeAssert needs, null allowed: depends on purpose
 
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
+    protected boolean _suppressConventionalTakeAssert;
     protected boolean _suppressSequenceIncrement;
     protected boolean _skipIfNonAssetionSql;
     protected boolean _restrictIfNonAssetionSql;
@@ -91,33 +94,35 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
     //                                                                         Constructor
     //                                                                         ===========
     protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema,
-            DfTakeFinallySqlFileProvider sqlFileProvider) {
+            DfTakeFinallySqlFileProvider sqlFileProvider, DfDocumentSelector documentSelector) {
         _sqlRootDir = sqlRootDir;
         _dataSource = new DfSchemaSource(dataSource, mainSchema);
         _sqlFileProvider = sqlFileProvider;
+        _documentSelector = documentSelector;
     }
 
     public static interface DfTakeFinallySqlFileProvider {
         List<File> provide();
     }
 
-    public static DfTakeFinallyProcess createAsCore(String sqlRootDir, DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsCore(String sqlRootDir, DataSource dataSource, DfDocumentSelector documentSelector) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
+        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null, documentSelector);
     }
 
     public static DfTakeFinallyProcess createAsTakeAssert(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
-        return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction().continueIfAssetionFailure();
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null, null);
+        return process.suppressConventionalTakeAssert() // take-assert is not only for test data (if needs, option?)
+                .suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction().continueIfAssetionFailure();
     }
 
     public static DfTakeFinallyProcess createAsPrevious(final String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null, null);
         // previous may not match with current sequence definition
         // and other settings are same as core
-        return process.suppressSequenceIncrement();
+        return process.suppressConventionalTakeAssert().suppressSequenceIncrement();
     }
 
     public static DfTakeFinallyProcess createAsAlterSchema(final String sqlRootDir, DataSource dataSource) {
@@ -127,10 +132,15 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
                 return getReplaceSchemaProperties().getMigrationAlterTakeFinallySqlFileList(sqlRootDir);
             }
         };
-        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, provider);
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, provider, null);
         // this take-finally is only for assertion (so roll-back transaction)
         // but increment sequences for development after AlterCheck
-        return process.restrictIfNonAssetionSql().rollbackTransaction();
+        return process.suppressConventionalTakeAssert().restrictIfNonAssetionSql().rollbackTransaction();
+    }
+
+    protected DfTakeFinallyProcess suppressConventionalTakeAssert() {
+        _suppressConventionalTakeAssert = true;
+        return this;
     }
 
     protected DfTakeFinallyProcess suppressSequenceIncrement() {
@@ -232,7 +242,7 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
         _log.info("* * * * * * * **");
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         final DfSqlFileFireResult result = fireMan.fire(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
-        conventionalTakeAssert();
+        conventionalTakeAssertIfNeeds();
         return result;
     }
 
@@ -350,18 +360,25 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
     // ===================================================================================
     //                                                             Conventional TakeAssert
     //                                                             =======================
-    protected void conventionalTakeAssert() {
-        DfConventionalTakeAssertMap map = getReplaceSchemaProperties().getConventionalTakeAssertMap();
+    protected void conventionalTakeAssertIfNeeds() {
+        if (_suppressConventionalTakeAssert) { // e.g. as previous, alter-check
+            return;
+        }
+        final DfConventionalTakeAssertMap map = getReplaceSchemaProperties().getConventionalTakeAssertMap();
         if (!map.hasConventionalTakeAssert()) {
             return;
         }
         _log.info("");
         _log.info("...Executing conventional take-assert (in take-finally)");
         map.showProperties();
-        final DfConventionalTakeAsserter asserter = new DfConventionalTakeAsserter(_dataSource, () -> {
-            return map.buildDispProperties();
-        });
+        final DfConventionalTakeAsserter asserter = createConventionalTakeAsserter(map);
         asserter.assertConventionally();
+    }
+
+    protected DfConventionalTakeAsserter createConventionalTakeAsserter(DfConventionalTakeAssertMap map) {
+        return new DfConventionalTakeAsserter(_dataSource, () -> map.buildDispProperties(), () -> {
+            return _documentSelector.lazyLoadIfNeedsCoreSchemaDiffList(); // for table/column first date
+        });
     }
 
     // ===================================================================================

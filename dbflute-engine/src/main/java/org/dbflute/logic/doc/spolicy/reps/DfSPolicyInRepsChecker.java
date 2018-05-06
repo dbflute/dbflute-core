@@ -48,12 +48,14 @@ public class DfSPolicyInRepsChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSchemaSource _dataSource;
+    protected final DfDocumentSelector _documentSelector;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyInRepsChecker(DfSchemaSource dataSource) {
+    public DfSPolicyInRepsChecker(DfSchemaSource dataSource, DfDocumentSelector documentSelector) {
         _dataSource = dataSource;
+        _documentSelector = documentSelector;
     }
 
     // ===================================================================================
@@ -101,9 +103,7 @@ public class DfSPolicyInRepsChecker {
 
     protected DfSPolicyChecker createChecker(DfSchemaPolicyProperties policyProp, Database database) {
         return policyProp.createChecker(database, () -> {
-            final DfDocumentSelector selector = new DfDocumentSelector();
-            selector.loadSchemaHistoryAsCore();
-            return selector.getSchemaDiffList(); // for table/column first date
+            return _documentSelector.lazyLoadIfNeedsCoreSchemaDiffList(); // for table/column first date
         });
     }
 

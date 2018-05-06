@@ -96,6 +96,7 @@ map:{
     #        ; workableRepsEnvTypeList = list:{ut}
     #        ; tableExceptList = list:{}
     #        ; tableTargetList = list:{}
+    #        ; onlyFirstDateAfterTargetDate = null
     #    }
     #}
     # - - - - - - - - - -/
