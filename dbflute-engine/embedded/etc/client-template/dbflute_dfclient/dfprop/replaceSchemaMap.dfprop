@@ -80,7 +80,7 @@ map:{
     # o isCheckSchemaPolicyInReps: (NotRequired - Default false)
     #  Does it check schema policy in ReplaceSchema?
     #  Normally the check is executed in Doc task but it may be late
-    #  so you can check here.
+    #  so you can also check (as far as possible) here.
     #
     #; isCheckSchemaPolicyInReps = false
     # - - - - - - - - - -/
