@@ -133,8 +133,8 @@ public class DfConventionalTakeAssertMap {
         return emptyTableMap != null ? emptyTableMap : DfCollectionUtil.emptyMap();
     }
 
-    public Date getOnlyFirstDateAfterTargetDate() { // null allowed
-        final String prop = _propertyValueHandler.getProperty("onlyFirstDateAfterTargetDate", null, getEmptyTableMap());
+    public Date getErrorIfFirstDateAfter() { // null allowed
+        final String prop = _propertyValueHandler.getProperty("errorIfFirstDateAfter", null, getEmptyTableMap());
         return prop != null ? new HandyDate(prop).getDate() : null;
     }
 }

@@ -90,7 +90,7 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
     protected void doAssertEmptyTable(DfConventionalTakeAssertMap propMap) {
         final List<DfTableMeta> allTableList = extractTableList();
         final List<DfTableMeta> emptyTableList = DfCollectionUtil.newArrayList();
-        final Date targetDate = propMap.getOnlyFirstDateAfterTargetDate(); // null allowed
+        final Date targetDate = propMap.getErrorIfFirstDateAfter(); // null allowed
         if (targetDate != null) {
             _log.info("...Using first-date for targeting of empty tables: targetDate=" + new HandyDate(targetDate).toString());
         }
