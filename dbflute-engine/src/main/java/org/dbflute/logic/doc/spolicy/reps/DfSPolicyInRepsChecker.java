@@ -34,6 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The checker of SchemaPolicyCheck in ReplaceSchema. <br>
+ * SchemaPolicyCheck in ReplaceSchema is merely limited facade to get errors earlier. <br> 
+ * So the differences exist between Doc and ReplaceSchema:
+ * <pre>
+ * o except AdditionalSchema in ReplaceSchema (should not do)
+ * o except AdditionalForeignKey (also PK, UQ) in ReplaceSchema (should not do)
+ * </pre>
  * @author jflute
  * @since 1.1.2 (2017/1/4 Wednesday)
  */
