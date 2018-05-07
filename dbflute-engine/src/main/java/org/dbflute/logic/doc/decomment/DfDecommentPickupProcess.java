@@ -15,9 +15,11 @@
  */
 package org.dbflute.logic.doc.decomment;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.dbflute.infra.doc.decomment.DfDecoMapFile;
+import org.dbflute.infra.doc.decomment.DfDecoMapMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.infra.doc.decomment.DfDecoMapPiece;
 import org.dbflute.optional.OptionalThing;
@@ -27,12 +29,13 @@ import org.dbflute.optional.OptionalThing;
  */
 public class DfDecommentPickupProcess {
 
-    private final DfDecoMapFile _decoMapFile = new DfDecoMapFile();
+    private final DfDecoMapFile _decoMapFile = new DfDecoMapFile(() -> LocalDateTime.now());
 
     public DfDecoMapPickup pickupDecomment(String clientPath) {
-        List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
-        OptionalThing<DfDecoMapPickup> optPickup = readPickup(clientPath);
-        DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList);
+        final List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
+        final List<DfDecoMapMapping> mappingList = readMappingList(clientPath);
+        final OptionalThing<DfDecoMapPickup> optPickup = readPickup(clientPath);
+        final DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList, mappingList);
         if (!mergedPickup.getTableList().isEmpty()) { // not to make empty file if no decomments
             writePickup(clientPath, mergedPickup);
         }
@@ -44,12 +47,17 @@ public class DfDecommentPickupProcess {
         return _decoMapFile.readPieceList(clientPath);
     }
 
+    private List<DfDecoMapMapping> readMappingList(String clientPath) {
+        return _decoMapFile.readMappingList(clientPath);
+    }
+
     private OptionalThing<DfDecoMapPickup> readPickup(String clientPath) {
         return _decoMapFile.readPickup(clientPath);
     }
 
-    private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList) {
-        return _decoMapFile.merge(optPickup, pieceList);
+    private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList,
+            List<DfDecoMapMapping> mappingList) {
+        return _decoMapFile.merge(optPickup, pieceList, mappingList);
     }
 
     private void writePickup(String clientPath, DfDecoMapPickup mergedPickup) {

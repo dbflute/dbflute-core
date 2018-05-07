@@ -55,7 +55,7 @@ public enum DfDecoMapPieceTargetType implements Classification {
     private static final Map<String, DfDecoMapPieceTargetType> _nameClsMap = new HashMap<String, DfDecoMapPieceTargetType>();
 
     static {
-        for (DfDecoMapPieceTargetType value : values()) {
+        for (org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType value : values()) {
             _codeClsMap.put(value.code().toLowerCase(), value);
             for (String sister : value.sisterSet()) {
                 _codeClsMap.put(sister.toLowerCase(), value);
@@ -95,22 +95,22 @@ public enum DfDecoMapPieceTargetType implements Classification {
 
             @Override
             public String classificationName() {
-                return DfDecoMapPieceTargetType.class.getSimpleName();
+                return org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType.class.getSimpleName();
             }
 
             @Override
             public Classification codeOf(Object code) { // null if not found
-                return DfDecoMapPieceTargetType.of(code).orElse(null);
+                return of(code).orElse(null);
             }
 
             @Override
             public Classification nameOf(String name) { // null if not found
-                return DfDecoMapPieceTargetType.byName(name).orElse(null);
+                return byName(name).orElse(null);
             }
 
             @Override
             public List<Classification> listAll() {
-                return DfDecoMapPieceTargetType.listAll().stream().map(el -> {
+                return org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType.listAll().stream().map(el -> {
                     return (Classification) el; // cannot cast directly so convert explicitly for now
                 }).collect(Collectors.toList());
             }
@@ -147,8 +147,8 @@ public enum DfDecoMapPieceTargetType implements Classification {
                 throw new ClassificationNotFoundException("null code specified");
             });
         }
-        if (code instanceof DfDecoMapPieceTargetType) {
-            return OptionalThing.of((DfDecoMapPieceTargetType) code);
+        if (code instanceof org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType) {
+            return OptionalThing.of((org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType) code);
         }
         if (code instanceof OptionalThing<?>) {
             return of(((OptionalThing<?>) code).orElse(null));
@@ -179,12 +179,12 @@ public enum DfDecoMapPieceTargetType implements Classification {
      * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
      * @deprecated use of()
      */
-    public static DfDecoMapPieceTargetType codeOf(Object code) {
+    public static org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType codeOf(Object code) {
         if (code == null) {
             return null;
         }
-        if (code instanceof DfDecoMapPieceTargetType) {
-            return (DfDecoMapPieceTargetType) code;
+        if (code instanceof org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType) {
+            return (org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType) code;
         }
         return _codeClsMap.get(code.toString().toLowerCase());
     }
@@ -195,7 +195,7 @@ public enum DfDecoMapPieceTargetType implements Classification {
      * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
      * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
      */
-    public static DfDecoMapPieceTargetType nameOf(String name) {
+    public static org.dbflute.infra.doc.decomment.DfDecoMapPieceTargetType nameOf(String name) {
         if (name == null) {
             return null;
         }
