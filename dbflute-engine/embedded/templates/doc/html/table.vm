@@ -57,6 +57,7 @@ ${table.aliasExpression}${table.tableDispName}
 #end
 	</tr>
 	</thead>
+	<tbody id="${table.tableIdForSchemaHtml}-body">
 #set ($rownum = 1)
 #foreach ($col in $table.columns)
 	<tr>
@@ -87,4 +88,5 @@ ${table.aliasExpression}${table.tableDispName}
 	</tr>
 #set ($rownum = $rownum + 1)
 #end
+	</tbody>
 </table>
