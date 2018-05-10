@@ -15,7 +15,6 @@
  */
 package org.dbflute.logic.doc.decomment;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.dbflute.infra.doc.decomment.DfDecoMapFile;
@@ -23,13 +22,17 @@ import org.dbflute.infra.doc.decomment.DfDecoMapMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.infra.doc.decomment.DfDecoMapPiece;
 import org.dbflute.optional.OptionalThing;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author cabos
+ * @author jflute
  */
 public class DfDecommentPickupProcess {
 
-    private final DfDecoMapFile _decoMapFile = new DfDecoMapFile(() -> LocalDateTime.now());
+    private final DfDecoMapFile _decoMapFile = new DfDecoMapFile(() -> {
+        return DBFluteSystem.currentLocalDateTime();
+    });
 
     public DfDecoMapPickup pickupDecomment(String clientPath) {
         final List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
