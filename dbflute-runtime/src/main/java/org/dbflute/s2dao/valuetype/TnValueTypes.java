@@ -100,6 +100,7 @@ public class TnValueTypes {
 
     // plug-in
     public static final ValueType STRING_CLOB = new StringClobType();
+    public static final ValueType BYTES_BLOB = new BytesType(BytesType.BLOB_TRAIT);
     public static final ValueType POSTGRESQL_BYTEA = new PostgreSQLByteaType();
     public static final ValueType POSTGRESQL_OID = new PostgreSQLOidType();
     public static final ValueType FIXED_LENGTH_STRING = new FixedLengthStringType();

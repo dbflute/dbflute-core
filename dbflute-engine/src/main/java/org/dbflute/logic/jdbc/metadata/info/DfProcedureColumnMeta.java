@@ -191,8 +191,7 @@ public class DfProcedureColumnMeta {
 
     public boolean isInputParameter() {
         final DfProcedureColumnType columnType = _procedureColumnType;
-        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)
-                || DfProcedureColumnType.procedureColumnResult.equals(columnType) // just in case
+        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType) || DfProcedureColumnType.procedureColumnResult.equals(columnType) // just in case
                 || isSQLServerTableReturnValue()) { // pinpoint patch
             return false;
         }
@@ -304,8 +303,8 @@ public class DfProcedureColumnMeta {
     //                                                                      Procedure Type
     //                                                                      ==============
     public enum DfProcedureColumnType {
-        procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut("Out"), procedureColumnReturn(
-                "Return"), procedureColumnResult("Result");
+        procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut(
+                "Out"), procedureColumnReturn("Return"), procedureColumnResult("Result");
         private final String _alias;
 
         private DfProcedureColumnType(String alias) {

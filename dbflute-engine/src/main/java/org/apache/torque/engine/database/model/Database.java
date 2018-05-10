@@ -772,6 +772,10 @@ public class Database {
         return getPmbBasicHandler().needsStringClobHandling(className, propertyName);
     }
 
+    public boolean needsPmbMetaDataProcedureParameterBytesBlobHandling(String className, String propertyName) {
+        return getPmbBasicHandler().needsBytesBlobHandling(className, propertyName);
+    }
+
     public boolean needsPmbMetaDataProcedureParameterFixedLengthStringHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsFixedLengthStringHandling(className, propertyName);
     }

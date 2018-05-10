@@ -488,6 +488,11 @@ public class Column {
         return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
 
+    // not use here for now, because only when procedure parameter by jflute (2018/05/11)
+    //public boolean isDbTypeBytesBlob() { // as pinpoint
+    //    return hasDbType() && _columnHandler.isConceptTypeBytesBlob(_dbType);
+    //}
+
     public boolean isDbTypeMySQLDatetime() { // as pinpoint
         return hasDbType() && _columnHandler.isMySQLDatetime(_dbType);
     }

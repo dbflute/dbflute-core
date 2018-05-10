@@ -337,6 +337,10 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return getJdbcTypeMapper().isConceptTypeStringClob(dbTypeName);
     }
 
+    public boolean isConceptTypeBytesBlob(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeBytesBlob(dbTypeName);
+    }
+
     public boolean isConceptTypeFixedLengthString(final String dbTypeName) {
         return getJdbcTypeMapper().isConceptTypeFixedLengthString(dbTypeName);
     }

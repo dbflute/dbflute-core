@@ -85,7 +85,8 @@ public class DfProcedureExecutionMetaExtractor {
             final String procedureSchemaQualifiedName = procedure.getProcedureSchemaQualifiedName();
             final String procedureName = procedure.getProcedureName();
             if (prop.isExecutionMetaProcedureName(procedureFullQualifiedName)
-                    || prop.isExecutionMetaProcedureName(procedureSchemaQualifiedName) || prop.isExecutionMetaProcedureName(procedureName)) {
+                    || prop.isExecutionMetaProcedureName(procedureSchemaQualifiedName)
+                    || prop.isExecutionMetaProcedureName(procedureName)) {
                 doExtractExecutionMetaData(dataSource, procedure);
             }
         }
@@ -274,8 +275,7 @@ public class DfProcedureExecutionMetaExtractor {
         // Here Oracle or PostgreSQL (that don't support notParamResult)
         for (DfProcedureColumnMeta column : columnList) {
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
-            if (DfProcedureColumnType.procedureColumnOut.equals(columnType)
-                    || DfProcedureColumnType.procedureColumnInOut.equals(columnType)
+            if (DfProcedureColumnType.procedureColumnOut.equals(columnType) || DfProcedureColumnType.procedureColumnInOut.equals(columnType)
                     || DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
                 return true;
             }
@@ -455,8 +455,8 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected void registerOutParameter(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType, DfProcedureColumnMeta column)
-            throws SQLException {
+    protected void registerOutParameter(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType,
+            DfProcedureColumnMeta column) throws SQLException {
         final ValueType valueType;
         {
             final ValueType forcedType = getForcedValueType(column);
@@ -538,6 +538,10 @@ public class DfProcedureExecutionMetaExtractor {
             valueType = _stringType;
         } else if (column.isConceptTypeStringClob()) {
             valueType = _stringClobType;
+            // not use here for now, because hard to test
+            // and large data problem is only procedure out parameter on Oracle
+            //} else if (column.isConceptTypeBytesBlob()) {
+            //    valueType = _bytesBlobType;
         } else if (column.isConceptTypeFixedLengthString()) {
             valueType = _fixedLengthStringType;
         } else if (column.isConceptTypeObjectBindingBigDecimal()) {
