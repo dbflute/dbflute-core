@@ -15,7 +15,6 @@
  */
 package org.dbflute.infra.doc.decomment.parts;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,34 +31,44 @@ public class DfDecoMapTablePart {
     //                                                                           Attribute
     //                                                                           =========
     protected final String tableName;
-    protected final Map<String, DfDecoMapPropertyPart> propertyMap = new LinkedHashMap<>();
-    protected final List<DfDecoMapColumnPart> columnList = new ArrayList<>();
+    protected final List<DfDecoMapMappingPart> mappingList;
+    protected final List<DfDecoMapPropertyPart> propertyList;
+    protected final List<DfDecoMapColumnPart> columnList;
 
     // ===================================================================================
     //                                                           Constructor and Converter
     //                                                           =========================
-    public DfDecoMapTablePart(String tableName) {
+    public DfDecoMapTablePart(String tableName, List<DfDecoMapMappingPart> mappingList, List<DfDecoMapPropertyPart> propertyList,
+            List<DfDecoMapColumnPart> columnList) {
         this.tableName = tableName;
+        this.mappingList = mappingList;
+        this.propertyList = propertyList;
+        this.columnList = columnList;
     }
 
     @SuppressWarnings("unchecked")
     public DfDecoMapTablePart(Map<String, Object> tablePartMap) {
         this.tableName = (String) tablePartMap.get("tableName");
+        // not exists mapping list if format version is less equal 1.0
+        final List<Map<String, Object>> mappingMapList =
+                (List<Map<String, Object>>) tablePartMap.getOrDefault("mappingList", Collections.emptyList());
+        this.mappingList = mappingMapList.stream().map(DfDecoMapMappingPart::new).collect(Collectors.toList());
         final List<Map<String, Object>> propertyMapList = (List<Map<String, Object>>) tablePartMap.get("propertyList");
+        this.propertyList = propertyMapList.stream().map(DfDecoMapPropertyPart::new).collect(Collectors.toList());
         final List<Map<String, Object>> columnMapList = (List<Map<String, Object>>) tablePartMap.get("columnList");
-        propertyMapList.stream().map(DfDecoMapPropertyPart::new).forEach(property -> {
-            propertyMap.put(property.getPieceCode(), property);
-        });
-        final List<DfDecoMapColumnPart> columnList = columnMapList.stream().map(DfDecoMapColumnPart::new).collect(Collectors.toList());
-        this.columnList.addAll(columnList);
+        this.columnList = columnMapList.stream().map(DfDecoMapColumnPart::new).collect(Collectors.toList());
     }
 
     public Map<String, Object> convertPickupMap() {
-        final List<Map<String, Object>> columnMapList = columnList.stream().map(DfDecoMapColumnPart::convertToMap).collect(Collectors.toList());
-        final List<Map<String, Object>> propertyMapList = propertyMap.values().stream()
-                .map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
+        final List<Map<String, Object>> columnMapList =
+                this.columnList.stream().map(DfDecoMapColumnPart::convertToMap).collect(Collectors.toList());
+        final List<Map<String, Object>> propertyMapList =
+                this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
+        final List<Map<String, Object>> mappingMapList =
+                this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
         final Map<String, Object> map = new LinkedHashMap<>();
         map.put("tableName", tableName);
+        map.put("mappingMapList", mappingMapList);
         map.put("propertyList", propertyMapList);
         map.put("columnList", columnMapList);
         return map;
@@ -72,26 +81,15 @@ public class DfDecoMapTablePart {
         return tableName;
     }
 
+    public List<DfDecoMapMappingPart> getMappingList() {
+        return mappingList;
+    }
+
     public List<DfDecoMapPropertyPart> getPropertyList() {
-        return Collections.unmodifiableList(new ArrayList<>(propertyMap.values()));
-    }
-
-    public void addProperty(DfDecoMapPropertyPart property) {
-        this.propertyMap.put(property.getPieceCode(), property);
-    }
-
-    public void removeProperty(String pieceCode) {
-        if (pieceCode == null) {
-            throw new IllegalArgumentException("piece code is Null , piece code : " + pieceCode);
-        }
-        propertyMap.remove(pieceCode);
+        return Collections.unmodifiableList(this.propertyList);
     }
 
     public List<DfDecoMapColumnPart> getColumnList() {
         return columnList;
-    }
-
-    public void addColumn(DfDecoMapColumnPart column) {
-        this.columnList.add(column);
     }
 }
