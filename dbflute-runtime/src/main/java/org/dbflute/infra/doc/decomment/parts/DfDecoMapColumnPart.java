@@ -57,7 +57,7 @@ public class DfDecoMapColumnPart {
     // done cabos convertToMap()? by jflute (2017/11/11)
     public Map<String, Object> convertToMap() {
         final List<Map<String, Object>> mappingMapList =
-                this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
+                this.mappingList.stream().map(DfDecoMapMappingPart::convertToMap).collect(Collectors.toList());
         final List<Map<String, Object>> propertyMapList =
                 this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
         final Map<String, Object> map = new LinkedHashMap<>();

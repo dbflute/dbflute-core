@@ -65,10 +65,10 @@ public class DfDecoMapTablePart {
         final List<Map<String, Object>> propertyMapList =
                 this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
         final List<Map<String, Object>> mappingMapList =
-                this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
+                this.mappingList.stream().map(DfDecoMapMappingPart::convertToMap).collect(Collectors.toList());
         final Map<String, Object> map = new LinkedHashMap<>();
         map.put("tableName", tableName);
-        map.put("mappingMapList", mappingMapList);
+        map.put("mappingList", mappingMapList);
         map.put("propertyList", propertyMapList);
         map.put("columnList", columnMapList);
         return map;
