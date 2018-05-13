@@ -143,12 +143,12 @@ public class DfFreeGenManager {
 
     public String resolveTextForSchemaHtml(String text) { // public for compatible
         final DfDocumentProperties prop = getDocumentProperties();
-        return prop.resolveTextForSchemaHtml(text);
+        return prop.resolveSchemaHtmlContent(text);
     }
 
     public String resolveTextForJavaDoc(String text, String indent) {
         final DfDocumentProperties prop = getDocumentProperties();
-        return prop.resolveTextForJavaDoc(text, indent);
+        return prop.resolveJavaDocContent(text, indent);
     }
 
     // ===================================================================================

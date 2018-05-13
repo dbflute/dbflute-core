@@ -75,6 +75,6 @@ public class DfSchemaHtmlBuilder {
     }
 
     protected String resolveTitle(String title) {
-        return _documentProperties.resolveAttributeForSchemaHtml(title);
+        return _documentProperties.resolveSchemaHtmlTagAttr(title);
     }
 }

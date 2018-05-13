@@ -173,7 +173,7 @@ public class DfPmbCommentSetupper {
         if (pmbMetaData.isTypedParameterBean()) {
             final String bhvClassName = pmbMetaData.getBehaviorClassName();
             final String bhvQueryPath = pmbMetaData.getBehaviorQueryPath();
-            final String sqlTitle = docprop.resolveTextForJavaDoc(pmbMetaData.getSqlTitle(), indent);
+            final String sqlTitle = docprop.resolveJavaDocContent(pmbMetaData.getSqlTitle(), indent);
             sb.append(indent).append("The typed parameter-bean of ").append(pmbBizName).append(". ");
             final String typedDisp = pmbMetaData.buildTypedDisp();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(typedDisp)) {

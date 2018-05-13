@@ -33,7 +33,7 @@ import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.dbflute.logic.doc.supplement.escape.DfDocumentTextResolver;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
@@ -60,6 +60,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected static final String BASIC_CRAFT_DIFF_DIR = "./schema/craftdiff";
     protected static final String CORE_CRAFT_META_DIR = BASIC_CRAFT_DIFF_DIR; // same as basic
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfDocumentTextResolver _documentTextResolver = new DfDocumentTextResolver();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -191,114 +196,47 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // ===================================================================================
-    //                                                                     Escape Resolver
-    //                                                                     ===============
-    // these are utilities (needs to refactor)
-    public String resolveTextForSchemaHtml(String text) {
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        // escape
-        text = Srl.replace(text, "<", "&lt;");
-        text = Srl.replace(text, ">", "&gt;");
-        text = Srl.replace(text, " ", "&nbsp;");
-
-        // line separator
-        text = removeCR(text);
-        final String htmlLineSeparator = "<br>";
-        if (text.contains(BASIC_LINE_SEPARATOR)) {
-            text = text.replaceAll(BASIC_LINE_SEPARATOR, htmlLineSeparator);
-        }
-        if (text.contains(SPECIAL_LINE_SEPARATOR)) {
-            text = text.replaceAll(SPECIAL_LINE_SEPARATOR, htmlLineSeparator);
-        }
-        return text;
+    //                                                                       Escape Facade
+    //                                                                       =============
+    // these are facade as utilities (for compatible)
+    // -----------------------------------------------------
+    //                                            SchemaHTML
+    //                                            ----------
+    public String resolveSchemaHtmlContent(String text) {
+        return _documentTextResolver.resolveSchemaHtmlContent(text);
     }
 
-    public String resolveAttributeForSchemaHtml(String text) {
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        // escape
-        text = Srl.replace(text, "<", "&lt;");
-        text = Srl.replace(text, ">", "&gt;");
-        text = Srl.replace(text, "\"", "&quot;");
-
-        // line separator
-        text = removeCR(text);
-        return text;
+    public String resolveSchemaHtmlPreText(String text) {
+        return _documentTextResolver.resolveSchemaHtmlPreText(text);
     }
 
-    public String resolvePreTextForSchemaHtml(String text) {
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        // escape
-        text = Srl.replace(text, "<", "&lt;");
-        text = Srl.replace(text, ">", "&gt;");
-
-        // line separator
-        text = removeCR(text);
-        return text;
+    public String resolveSchemaHtmlTagAttr(String text) {
+        return _documentTextResolver.resolveSchemaHtmlTagAttr(text);
     }
 
-    public String resolveTextForJavaDoc(String comment, String indent) {
-        return doResolveTextForJavaDoc(comment, indent, false);
+    // -----------------------------------------------------
+    //                                               JavaDoc
+    //                                               -------
+    public String resolveJavaDocContent(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocContent(comment, indent);
     }
 
-    public String resolveTextForJavaDocIndentDirectly(String comment, String indent) {
-        return doResolveTextForJavaDoc(comment, indent, true);
+    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocContentIndentDirectly(comment, indent);
     }
 
-    protected String doResolveTextForJavaDoc(String comment, String indent, boolean directIndent) {
-        if (comment == null || comment.trim().length() == 0) {
-            return null;
-        }
-        String work = comment;
-        final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
-        work = grammar.escapeJavaDocString(work);
-        work = removeCR(work);
-        final String sourceCodeLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
-        final String javaDocLineSeparator;
-        if (directIndent) {
-            javaDocLineSeparator = grammar.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, indent);
-        } else {
-            javaDocLineSeparator = grammar.buildJavaDocLineAndIndent(sourceCodeLineSeparator, indent);
-        }
-        if (work.contains(BASIC_LINE_SEPARATOR)) {
-            work = work.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
-        }
-        if (work.contains(SPECIAL_LINE_SEPARATOR)) {
-            work = work.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
-        }
-        return work;
+    // -----------------------------------------------------
+    //                                               JavaDoc
+    //                                               -------
+    public String resolveSimpleLineHtmlContent(String text) {
+        return _documentTextResolver.resolveSimpleLineHtmlContent(text);
     }
 
-    public String resolveTextForSimpleLineHtml(String text) {
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        // escape
-        text = Srl.replace(text, "<", "&lt;");
-        text = Srl.replace(text, ">", "&gt;");
-        return text;
-    }
-
-    public String resolveTextForDBMeta(String text) { // C# same as Java
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        text = removeCR(text);
-        text = Srl.replace(text, "\"", "\\\""); // escape double quotation
-
-        final String literalLineSeparator = "\\\\n";
-        if (text.contains(BASIC_LINE_SEPARATOR)) {
-            text = text.replaceAll(BASIC_LINE_SEPARATOR, literalLineSeparator);
-        }
-        if (text.contains(SPECIAL_LINE_SEPARATOR)) {
-            text = text.replaceAll(SPECIAL_LINE_SEPARATOR, literalLineSeparator);
-        }
-        return text;
+    // -----------------------------------------------------
+    //                                           DBMeta code
+    //                                           -----------
+    public String resolveDBMetaCodeSettingText(String text) { // C# same as Java
+        return _documentTextResolver.resolveDBMetaCodeSettingText(text);
     }
 
     // ===================================================================================

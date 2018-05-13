@@ -151,7 +151,7 @@ public class DfProcedureColumnMeta {
     public String getColumnCommentForSchemaHtml() {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         String comment = _columnComment;
-        comment = prop.resolvePreTextForSchemaHtml(comment);
+        comment = prop.resolveSchemaHtmlPreText(comment);
         return comment;
     }
 

@@ -705,13 +705,13 @@ public class Column {
 
     public String getCommentForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForSchemaHtml(getComment());
+        final String comment = prop.resolveSchemaHtmlContent(getComment());
         return comment != null ? comment : "";
     }
 
     public String getCommentForSchemaHtmlPre() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolvePreTextForSchemaHtml(getComment());
+        final String comment = prop.resolveSchemaHtmlPreText(getComment());
         return comment != null ? comment : "";
     }
 
@@ -722,7 +722,7 @@ public class Column {
 
     public String getCommentForJavaDoc() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForJavaDoc(getComment(), "    ");
+        final String comment = prop.resolveJavaDocContent(getComment(), "    ");
         return comment != null ? comment : "";
     }
 
@@ -736,7 +736,7 @@ public class Column {
             return "null";
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForDBMeta(getComment());
+        final String comment = prop.resolveDBMetaCodeSettingText(getComment());
         return comment != null ? "\"" + comment + "\"" : "null";
     }
 
@@ -870,7 +870,7 @@ public class Column {
 
     public String getPrimaryKeyTitleForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String value = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
+        final String value = prop.resolveSchemaHtmlTagAttr(_primaryKeyName);
         if (value == null) {
             return "";
         }
@@ -914,7 +914,7 @@ public class Column {
         } else {
             title = _primaryKeyName;
         }
-        return " title=\"" + prop.resolveAttributeForSchemaHtml(title) + "\"";
+        return " title=\"" + prop.resolveSchemaHtmlTagAttr(title) + "\"";
     }
 
     // ===================================================================================
@@ -1395,7 +1395,7 @@ public class Column {
             sb.append(")");
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
     }
 
@@ -1501,7 +1501,7 @@ public class Column {
             sb.append(")");
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
     }
 

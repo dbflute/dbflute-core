@@ -602,13 +602,13 @@ public class Table {
 
     public String getCommentForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        String comment = prop.resolveTextForSchemaHtml(getComment());
+        String comment = prop.resolveSchemaHtmlContent(getComment());
         return comment != null ? comment : "";
     }
 
     public String getCommentForSchemaHtmlPre() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolvePreTextForSchemaHtml(getComment());
+        final String comment = prop.resolveSchemaHtmlPreText(getComment());
         return comment != null ? comment : "";
     }
 
@@ -619,7 +619,7 @@ public class Table {
 
     public String getCommentForJavaDoc() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForJavaDoc(getComment(), "");
+        final String comment = prop.resolveJavaDocContent(getComment(), "");
         return comment != null ? comment : "";
     }
 
@@ -630,7 +630,7 @@ public class Table {
 
     public String getCommentForDBMeta() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForDBMeta(getComment());
+        final String comment = prop.resolveDBMetaCodeSettingText(getComment());
         return comment != null ? comment : "";
     }
 
@@ -664,7 +664,7 @@ public class Table {
         sb.append(", nameLength=").append(getTableDbName().length());
         sb.append(", columnCount=").append(getColumns().length);
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        return " title=\"" + prop.resolveAttributeForSchemaHtml(sb.toString()) + "\"";
+        return " title=\"" + prop.resolveSchemaHtmlTagAttr(sb.toString()) + "\"";
     }
 
     // ===================================================================================
@@ -4233,7 +4233,7 @@ public class Table {
         String title = getBehaviorQueryPathTitle(behaviorQueryPath);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(title)) {
             final DfDocumentProperties prop = getProperties().getDocumentProperties();
-            title = prop.resolveTextForSchemaHtml(title);
+            title = prop.resolveSchemaHtmlContent(title);
             return "(" + title + ")";
         } else {
             return "&nbsp;";
@@ -4254,7 +4254,7 @@ public class Table {
         String description = getBehaviorQueryPathDescription(behaviorQueryPath);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(description)) {
             final DfDocumentProperties prop = getProperties().getDocumentProperties();
-            description = prop.resolvePreTextForSchemaHtml(description);
+            description = prop.resolveSchemaHtmlPreText(description);
             return description;
         } else {
             return "&nbsp;";
