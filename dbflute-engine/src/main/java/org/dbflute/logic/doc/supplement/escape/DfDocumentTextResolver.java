@@ -147,6 +147,7 @@ public class DfDocumentTextResolver {
             return null;
         }
         text = removeCR(text);
+        text = Srl.replace(text, "\\", "\\\\"); // escape escape character
         text = Srl.replace(text, "\"", "\\\""); // escape double quotation
 
         final String literalLineSeparator = "\\\\n";
