@@ -60,12 +60,12 @@ public class DfDecoMapTablePart {
     }
 
     public Map<String, Object> convertPickupMap() {
+        final List<Map<String, Object>> mappingMapList =
+                this.mappingList.stream().map(DfDecoMapMappingPart::convertToMap).collect(Collectors.toList());
         final List<Map<String, Object>> columnMapList =
                 this.columnList.stream().map(DfDecoMapColumnPart::convertToMap).collect(Collectors.toList());
         final List<Map<String, Object>> propertyMapList =
                 this.propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
-        final List<Map<String, Object>> mappingMapList =
-                this.mappingList.stream().map(DfDecoMapMappingPart::convertToMap).collect(Collectors.toList());
         final Map<String, Object> map = new LinkedHashMap<>();
         map.put("tableName", tableName);
         map.put("mappingList", mappingMapList);
