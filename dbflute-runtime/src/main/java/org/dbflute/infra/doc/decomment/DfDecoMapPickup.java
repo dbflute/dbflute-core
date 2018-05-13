@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
 
 /**
@@ -153,7 +153,7 @@ public class DfDecoMapPickup {
     //                                                                            ========
     @Override
     public String toString() {
-        return new MapListString().buildMapString(this.convertToMap());
+        return new DfMapStyle().toMapString(this.convertToMap());
     }
 
     // ===================================================================================
