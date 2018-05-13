@@ -65,8 +65,8 @@ public class DfDecoMapPickup {
     }
 
     public DfDecoMapPickup(List<DfDecoMapTablePart> tableList, LocalDateTime pickupDatetime) {
+        this.formatVersion = DEFAULT_FORMAT_VERSION;
         this.pickupDatetime = pickupDatetime;
-        this.formatVersion = getFormatVersion();
         this.tableList = tableList;
     }
 
