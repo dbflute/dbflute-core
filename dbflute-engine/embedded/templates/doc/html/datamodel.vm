@@ -26,6 +26,9 @@ ${database.schemaHtmlStyleSheetEmbedded}
 	${database.schemaHtmlStyleSheetLink}
 #else
 	<style type="text/css">
+/* -------------------------------------------------
+                                             Core
+------------------------------------------------- */
 * {
 	margin: 0;
 	padding: 0;
@@ -37,7 +40,9 @@ body {
 	background-color: #ffffe0;
 }
 
-/* heading */
+/* -------------------------------------------------
+                                        Structure
+------------------------------------------------- */
 h1 {
 	font-size: 1.5em;
 	border-bottom: 2px solid #af0000;
@@ -67,7 +72,9 @@ h4 {
 	color: #333333;
 }
 
-/* total info */
+/* -------------------------------------------------
+                                     Whole Header
+------------------------------------------------- */
 .updatedate {
 	text-align: right;
 }
@@ -93,7 +100,9 @@ h4 {
 	font-size: 100%;
 }
 
-/* keyword search */
+/* -------------------------------------------------
+                                   Keyword Search
+------------------------------------------------- */
 .keywordsearch {
 	padding: 0.7em 0 0.7em 0;
 }
@@ -113,7 +122,9 @@ h4 {
 	list-style-type: none;
 }
 
-/* table */
+/* -------------------------------------------------
+                                   Database Table
+------------------------------------------------- */
 table {
 	border-collapse:collapse;
 }
@@ -223,6 +234,10 @@ table.child, table.child td, table.child th {
 span.tableschema {
 	font-size: 0.6em;
 }
+
+/* -------------------------------------------------
+                             Behavior Query Path
+------------------------------------------------- */
 span.bqpcount {
 	font-size: 0.5em;
 }
@@ -257,6 +272,10 @@ dl.bqplist dd.subinfo span.ctet {
 dl.bqplist dd.subinfo span.pmb {
 	color: green;
 }
+
+/* -------------------------------------------------
+                                 Stored Procedure
+------------------------------------------------- */
 dl.procedurelist {
 	padding-left: 2em;
 }
@@ -291,7 +310,9 @@ dl.procedurelist dd.column pre {
 	padding-left: 1em;
 }
 
-/** decomment modal for dbflute intro */
+/* -------------------------------------------------
+                                  Decomment Modal
+------------------------------------------------- */
 .decommentmodal {
 	display: none;
 	position: fixed;
