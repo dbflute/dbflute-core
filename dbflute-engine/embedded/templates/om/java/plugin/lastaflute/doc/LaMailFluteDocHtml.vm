@@ -20,8 +20,8 @@
     <tr>
         <th>No.</th>
         <th>file</th>
-        <th>class</th>
         <th>title</th>
+        <th>class</th>
         <th>parameter count</th>
     </tr>
     </thead>
@@ -30,8 +30,8 @@
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell"><a href="#$manager.htmlEscape($mail.resourcePath)">$manager.htmlEscape($mail.resourcePath)</a></td>
-        <td class="rowcell"><span title="$manager.htmlEscape($table.tableMap.mailPackage).$manager.htmlEscape($mail.className)">$!manager.htmlEscape($mail.className)</span></td>
         <td class="rowcell">$!manager.htmlEscape($mail.title)</td>
+        <td class="rowcell"><span title="$manager.htmlEscape($table.tableMap.mailPackage).$manager.htmlEscape($mail.className)">$!manager.htmlEscape($mail.className)</span></td>
         <td class="rowcellnum">$mail.propertyList.size()</td>
     </tr>
 #end
@@ -42,15 +42,15 @@
 <h3 id="$manager.htmlEscape($mail.resourcePath)">
 $manager.htmlEscape($mail.resourcePath)
 </h3>
-<h4>
-$manager.htmlEscape($mail.title)
-</h4>
 <p>
-<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($table.tableMap.mailPackage).$manager.htmlEscape($mail.className)</span>
+	<span class="doctitle">Title:</span> <span class="mailtitle">$manager.htmlEscape($mail.title)</span>
+</p>
+<p>
+	<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($table.tableMap.mailPackage).$manager.htmlEscape($mail.className)</span>
 </p>
 <p class="docsubitem">
-<span class="docsubtitle">hasOptionPlusHtml:</span>
-<span class="docannotations docsubvalue">$mail.hasOptionPlusHtml</span>
+	<span class="docsubtitle">hasOptionPlusHtml:</span>
+	<span class="docannotations docsubvalue">$mail.hasOptionPlusHtml</span>
 </p>
 
 <p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($mail.headerComment)</p>

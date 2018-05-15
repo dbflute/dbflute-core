@@ -89,7 +89,9 @@ $generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", 
 #end
 #if ($actionDocMeta.returnTypeDocMeta)
 <span class="doctitle">Return as:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
+#if ($actionDocMeta.returnTypeDocMeta.description)
 <p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.description)</p>
+#end
 #if ($actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse' && $actionDocMeta.returnTypeDocMeta.value)
 <p class="docsubitem"><span class="docsubtitle">implementations:</span> <span class="docsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
 #end
