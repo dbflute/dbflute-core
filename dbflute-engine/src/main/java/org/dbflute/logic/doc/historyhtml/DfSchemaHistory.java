@@ -15,6 +15,20 @@
  */
 package org.dbflute.logic.doc.historyhtml;
 
+import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.infra.diffmap.DfDiffMapFile;
+import org.dbflute.infra.doc.hacomment.DfHacoMapDiffPart;
+import org.dbflute.infra.doc.hacomment.DfHacoMapFile;
+import org.dbflute.infra.doc.hacomment.DfHacoMapPickup;
+import org.dbflute.infra.doc.hacomment.DfHacoMapPiece;
+import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
+import org.dbflute.optional.OptionalThing;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
+import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,14 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.dbflute.DfBuildProperties;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.infra.diffmap.DfDiffMapFile;
-import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
-import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
-import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -46,6 +52,11 @@ public class DfSchemaHistory {
     //                                        Basic Resource
     //                                        --------------
     protected final String _historyFile;
+
+    // -----------------------------------------------------
+    //                                             Hacomment
+    //                                             ---------
+    protected DfHacoMapPickup _hacoMapPickup; // loaded when call loadHacoMap
 
     // -----------------------------------------------------
     //                                          Load History
@@ -145,7 +156,8 @@ public class DfSchemaHistory {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
         }
         try {
@@ -171,8 +183,7 @@ public class DfSchemaHistory {
             final String key = entry.getKey(); // diffDate
             final Object value = entry.getValue();
             assertDiffElementMap(key, value);
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
+            @SuppressWarnings("unchecked") final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
             final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsHistory();
             schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
             if (index == 0) {
@@ -191,11 +202,24 @@ public class DfSchemaHistory {
         }
     }
 
+    public void loadHacoMap() {
+        String clientDirPath = ".";
+        DfHacoMapFile hacoMapFile = new DfHacoMapFile(() -> DBFluteSystem.currentLocalDateTime());
+        // TODO hakiba add exception handling  (2018/04/28)
+        List<DfHacoMapPiece> pieceList = hacoMapFile.readPieceList(clientDirPath);
+        OptionalThing<DfHacoMapPickup> optPickup = hacoMapFile.readPickup(clientDirPath);
+        _hacoMapPickup = hacoMapFile.merge(optPickup, pieceList);
+    }
+
     // ===================================================================================
     //                                                                              Status
     //                                                                              ======
     public boolean existsHistory() {
         return _existsSchemaDiff && !_schemaDiffList.isEmpty();
+    }
+
+    public boolean existsHacoMapPickup() {
+        return _hacoMapPickup != null && !getHacoMapDiffList().isEmpty();
     }
 
     // ===================================================================================
@@ -214,5 +238,9 @@ public class DfSchemaHistory {
 
     public List<DfSchemaDiff> getSchemaDiffList() {
         return _schemaDiffList;
+    }
+
+    public List<DfHacoMapDiffPart> getHacoMapDiffList() {
+        return _hacoMapPickup.getDiffList();
     }
 }

@@ -134,7 +134,9 @@ import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
+import org.dbflute.infra.doc.hacomment.DfHacoMapPickup;
 import org.dbflute.logic.doc.decomment.DfDecommentPickupProcess;
+import org.dbflute.logic.doc.hacomment.DfHacommentPickupProcess;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
@@ -167,6 +169,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected String _varyingArg;
     protected boolean _syncCheckGhastlyTragedy;
     protected DfDecoMapPickup _decoMapPickup;
+    protected DfHacoMapPickup _hacoMapPickup;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -261,6 +264,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _selector.selectPropertiesHtml(); // option
         _selector.selectLastaDocHtml(); // option
         processDecommentPickup();
+        processHacommentPickup();
         fireVelocityProcess();
     }
 
@@ -273,6 +277,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected DfDecommentPickupProcess createDecommentPickupProcess() {
         return new DfDecommentPickupProcess();
+    }
+
+    // -----------------------------------------------------
+    //                                       pickupHacomment
+    //                                       ---------------
+    protected void processHacommentPickup() {
+        _hacoMapPickup = createHacommentPickupProcess().pickupHacomment(".");
+    }
+
+    protected DfHacommentPickupProcess createHacommentPickupProcess() {
+        return new DfHacommentPickupProcess();
     }
 
     // -----------------------------------------------------

@@ -9,15 +9,14 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.dbflute.task.bs.assistant;
 
-import java.util.List;
-
 import org.dbflute.DfBuildProperties;
+import org.dbflute.infra.doc.hacomment.DfHacoMapDiffPart;
 import org.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.dbflute.logic.doc.prophtml.DfPropHtmlManager;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -29,6 +28,8 @@ import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * @author jflute
  */
@@ -37,7 +38,9 @@ public class DfDocumentSelector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The logger instance for this class. (NotNull) */
+    /**
+     * The logger instance for this class. (NotNull)
+     */
     private static final Logger _log = LoggerFactory.getLogger(DfDocumentSelector.class);
 
     // ===================================================================================
@@ -252,6 +255,21 @@ public class DfDocumentSelector {
     }
 
     // -----------------------------------------------------
+    //                                             Hacomment
+    //                                             ---------
+    public void loadHacoMap() {
+        _schemaHistory.loadHacoMap();
+    }
+
+    public List<DfHacoMapDiffPart> getHacoMapDiffList() {
+        return _schemaHistory.getHacoMapDiffList();
+    }
+
+    public boolean existHacoMap() {
+        return _schemaHistory.existsHacoMapPickup();
+    }
+
+    // -----------------------------------------------------
     //                                           File System
     //                                           -----------
     public String getHistoryHtmlFileName() {
@@ -320,6 +338,7 @@ public class DfDocumentSelector {
     // -----------------------------------------------------
     //                                         Basic Process
     //                                         -------------
+
     /**
      * Load requests for properties HTML. <br>
      * If no property, do nothing.
