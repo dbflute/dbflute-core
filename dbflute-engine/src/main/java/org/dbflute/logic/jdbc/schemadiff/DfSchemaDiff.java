@@ -15,6 +15,14 @@
  */
 package org.dbflute.logic.jdbc.schemadiff;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Procedure;
@@ -32,14 +40,6 @@ import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author jflute
@@ -164,6 +164,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                          ==========
     public static final String DIFF_DATE_KEY = "diffDate";
     public static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    public static final String DIFF_DATE_DATE_PART_PATTERN = "yyyy/MM/dd";
+    public static final String DIFF_DATE_TIME_PART_PATTERN = "HH:mm:ss";
     public static final String DIFF_DATE_CODE_PATTERN = "yyyyMMddHHmmss";
     public static final String COMMENT_KEY = "comment";
     public static final String TABLE_COUNT_KEY = "tableCount";
@@ -627,7 +629,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
-                                           NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
+            NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
         final TYPE previousValue = differ.provide(previous);
         if (!differ.isMatch(nextValue, previousValue)) {
@@ -828,7 +830,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <ITEM, TYPE> void diffNextPrevious(Column next, Column previous, DfColumnDiff diff,
-                                                 NextPreviousDiffer<Column, DfColumnDiff, TYPE> differ) {
+            NextPreviousDiffer<Column, DfColumnDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
         final TYPE previousValue = differ.provide(previous);
         if (!differ.isMatch(nextValue, previousValue)) {
@@ -910,7 +912,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processPrimaryKeyColumnDiff(DfTableDiff tableDiff, Table nextTable, Table previousTable, DfPrimaryKeyDiff primaryKeyDiff,
-                                               String constraintName) {
+            String constraintName) {
         final String nextColumn = nextTable.getPrimaryKeyNameCommaString();
         final String previousColumn = previousTable.getPrimaryKeyNameCommaString();
         if (!isSame(nextColumn, previousColumn)) {
@@ -947,13 +949,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                  Constraint Process
     //                                                                  ==================
     protected <KEY, DIFF extends DfConstraintDiff> void processConstraintKey(Table nextTable, Table previousTable,
-                                                                             DfConstraintKeyDiffer<KEY, DIFF> differ) { // for except PK
+            DfConstraintKeyDiffer<KEY, DIFF> differ) { // for except PK
         final List<KEY> keyList = differ.keyList(nextTable);
         final Set<String> sameStructureNextSet = DfCollectionUtil.newHashSet();
         final Map<String, KEY> nextPreviousMap = DfCollectionUtil.newLinkedHashMap();
         final Map<String, KEY> previousNextMap = DfCollectionUtil.newLinkedHashMap();
-        nextLoop:
-        for (KEY nextKey : keyList) {
+        nextLoop: for (KEY nextKey : keyList) {
             final String nextName = differ.constraintName(nextKey);
             if (nextName == null) {
                 continue;
@@ -968,8 +969,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 }
             }
         }
-        nextLoop:
-        for (KEY nextKey : keyList) {
+        nextLoop: for (KEY nextKey : keyList) {
             final String nextName = differ.constraintName(nextKey);
             if (nextName == null || nextPreviousMap.containsKey(nextName)) {
                 continue;
@@ -1004,7 +1004,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <KEY, DIFF extends DfConstraintDiff> void processChangedConstraintKeyDiff(KEY nextKey, KEY previousKey, String nextName,
-                                                                                        String previousName, DfConstraintKeyDiffer<KEY, DIFF> differ) {
+            String previousName, DfConstraintKeyDiffer<KEY, DIFF> differ) {
         if (differ.isSameConstraintName(nextName, previousName)) { // same name, different structure
             final String nextColumn = differ.column(nextKey);
             final String previousColumn = differ.column(previousKey);
@@ -1024,7 +1024,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <KEY, DIFF extends DfConstraintDiff> void processAddedConstraintKey(Table nextTable, DfConstraintKeyDiffer<KEY, DIFF> differ,
-                                                                                  Map<String, KEY> nextPreviousMap) {
+            Map<String, KEY> nextPreviousMap) {
         final List<KEY> keyList = differ.keyList(nextTable);
         for (KEY nextKey : keyList) {
             final String nextName = differ.constraintName(nextKey);
@@ -1045,7 +1045,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <KEY, DIFF extends DfConstraintDiff> void processDeletedConstraintKey(Table previousTable,
-                                                                                    DfConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> previousNextMap) { // for except PK
+            DfConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> previousNextMap) { // for except PK
         final List<KEY> keyList = differ.keyList(previousTable);
         for (KEY previousKey : keyList) {
             final String previousName = differ.constraintName(previousKey);
@@ -1172,7 +1172,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <TYPE> void diffNextPrevious(Sequence next, Sequence previous, DfSequenceDiff diff,
-                                           NextPreviousDiffer<Sequence, DfSequenceDiff, TYPE> differ) {
+            NextPreviousDiffer<Sequence, DfSequenceDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
         final TYPE previousValue = differ.provide(previous);
         if (!differ.isMatch(nextValue, previousValue)) {
@@ -1355,7 +1355,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <TYPE> void diffNextPrevious(Procedure next, Procedure previous, DfProcedureDiff diff,
-                                           NextPreviousDiffer<Procedure, DfProcedureDiff, TYPE> differ) {
+            NextPreviousDiffer<Procedure, DfProcedureDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
         final TYPE previousValue = differ.provide(previous);
         if (!differ.isMatch(nextValue, previousValue)) {
@@ -1558,12 +1558,20 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    public String getDiffDate() {
+    public String getDiffDate() { // as display string (for compatible)
         return DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN);
     }
 
-    public String getDiffDateAsCode() {
+    public String getDiffDateAsCode() { // for e.g. Hacomment of DBFlute Intro
         return DfTypeUtil.toString(_diffDate, DIFF_DATE_CODE_PATTERN);
+    }
+
+    public String getDiffDateAsDatePart() { // for e.g. title in HistoryHTML
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_DATE_PART_PATTERN);
+    }
+
+    public String getDiffDateAsTimePart() { // for e.g. title in HistoryHTML
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_TIME_PART_PATTERN);
     }
 
     public Date getNativeDiffDate() {

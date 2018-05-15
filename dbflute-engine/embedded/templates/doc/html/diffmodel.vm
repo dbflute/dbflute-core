@@ -26,6 +26,9 @@ ${selector.historyHtmlStyleSheetEmbedded}
 	${selector.historyHtmlStyleSheetLink}
 #else
 	<style type="text/css">
+/* -------------------------------------------------
+                                             Core
+------------------------------------------------- */
 * {
 	margin: 0;
 	padding: 0;
@@ -37,14 +40,16 @@ body {
 	background-color: #ffffee;
 }
 
-/* heading */
+/* -------------------------------------------------
+                                        Structure
+------------------------------------------------- */
 h1 {
-	font-size: 1.5em;
+	font-size: 1.6em;
 	border-bottom: 2px solid #af0000;
 	border-top: 2px solid #af0000;
 }
 h2 {
-	margin-top: 2em;
+	margin: 30px 0 5px 0;
 	border-bottom: 2px solid #af0000;
 	border-left: 10px solid #af0000;
 	text-indent: 1em;
@@ -55,7 +60,7 @@ h3 {
 	margin: 0.8em 0;
 	padding-left: 1.8em;
 	border-bottom: solid 1px #333;
-	color: #555;
+	color: #AA7777;
 	font-size: 1.2em;
 }
 h4 {
@@ -66,13 +71,15 @@ h4 {
 }
 h5 {
 	width: 11em;
-	font-size: 80%;
+	font-size: 0.8em;
 	border-bottom: solid 1px #333;
 	text-indent: 0.3em;
-	color: #555;
+	color: #AA7777;
 }
 
-/* total info */
+/* -------------------------------------------------
+                                     Whole Header
+------------------------------------------------- */
 .updatedate {
 	text-align: right;
 }
@@ -84,14 +91,42 @@ h5 {
 }
 .sisterlink {
 	margin-top: 0.6em;
-	font-size: 110%;
+	font-size: 1.2em;
 }
 .sistersublink {
 	margin-top: 0.6em;
-	font-size: 80%;
+	font-size: 0.85em;
 }
 
-/* history info */
+/* -------------------------------------------------
+                                Difference Header
+------------------------------------------------- */
+.titlediffno {
+	font-size: 0.8em;
+	font-weight: normal;
+	font-style: italic;
+}
+.titlediffdatepart {
+	font-size: 1.1em;
+}
+.titledifftimepart {
+	font-size: 0.8em;
+}
+.diffcomment {
+	font-size: 1.0em;
+	color: #3F7E5E;
+	padding:0 0 0.2em 1em;
+}
+.commenterror {
+	color: red;
+}
+.tablecount {
+	margin: 0.5em 0 0.5em 1em;
+}
+
+/* -------------------------------------------------
+                               Difference Content
+------------------------------------------------- */
 .table-content {
 	margin: 0 6em;
 }
@@ -118,26 +153,12 @@ dl.column-content dd span {
 	border-right: dotted 2px #333;
 	font-weight: bold;
 	font-size: 80%;
-	color: #555;
+	color: #AA7777;
 }
 
-span.dt {
-	font-size: 80%;
-}
-p.comment {
-	margin-left: 23em;
-}
-p.tablecount {
-	margin-left: 23em;
-}
-.diffcomment {
-	font-size: 0.7em;
-	color: #3F7E5E;
-}
-.commenterror {
-	color: red;
-}
-/** hacomment modal for dbflute intro */
+/* -------------------------------------------------
+                                  Hacomment Modal
+------------------------------------------------- */
 .hacommentmodal {
 	display: none;
 	position: fixed;
@@ -215,16 +236,18 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 </div>
 
+#set ($diffCount = $selector.schemaDiffList.size())
 #foreach ($schemaDiff in $selector.schemaDiffList)
+#set ($diffNo = $diffCount - $velocityCount + 1)
 <div class="section diffCode_${schemaDiff.diffDateAsCode}">
-	<h2><span class="dt">Diff Date: </span>${schemaDiff.diffDate}</h2>
+	<h2><span class="titlediffno">diffNo. ${diffNo}:</span> <span class="titlediffdatepart">${schemaDiff.diffDateAsDatePart}</span> <span class="titledifftimepart">${schemaDiff.diffDateAsTimePart}</span></h2>
 #if ($schemaDiff.hasComment())
-		<pre class="diffcomment">${schemaDiff.comment}</pre>
-	#else
-		<pre class="diffcomment"></pre> ## add empty comment element to reflect hacomment
+	<pre class="diffcomment">${schemaDiff.comment}</pre>
+#else
+	<pre class="diffcomment"></pre> ## add empty comment element to reflect hacomment
 #end
 #if ($schemaDiff.tableCount.hasDiff())
-	<p class="tablecount"><span class="dt">table count: </span>${schemaDiff.tableCount.displayForHtml}</p>
+	<p class="tablecount">table count: ${schemaDiff.tableCount.displayForHtml}</p>
 #end
 
 ## ======================================================================================= 
