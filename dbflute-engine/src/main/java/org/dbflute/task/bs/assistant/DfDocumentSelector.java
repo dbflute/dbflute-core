@@ -32,6 +32,7 @@ import java.util.List;
 
 /**
  * @author jflute
+ * @author hakiba
  */
 public class DfDocumentSelector {
 

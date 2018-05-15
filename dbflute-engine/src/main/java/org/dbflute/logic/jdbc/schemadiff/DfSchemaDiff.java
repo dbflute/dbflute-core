@@ -43,6 +43,7 @@ import org.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @author hakiba
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
 public class DfSchemaDiff extends DfAbstractDiff {
