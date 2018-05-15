@@ -498,7 +498,7 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 #if ($isAliasDelimiterInDbCommentValid)
 		<td class="aliascell">${table.alias}</td>
 #end
-		<td class="namecell"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
+		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
 		<td class="typecell">${table.type}</td>
 #if ($hasAdditionalSchema)
 		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
@@ -1276,11 +1276,11 @@ function StoreClient() {
 #foreach ($table in $database.tableDisplaySortedList)
 ## decomment uses display name so fix later
 		#if ($velocityCount > 1), #end'${table.tableDbName}': {
-			'databaseComment': '${table.commentForSchemaHtml}'
+			'databaseComment': '#escape(${table.commentForSchemaHtml})'
 			, 'columns': {
 #foreach ($col in $table.columns)
 				#if ($velocityCount > 1), #end'${col.name}': {
-					'databaseComment': '${col.commentForSchemaHtml}'
+					'databaseComment': '#escape(${col.commentForSchemaHtml})'
 				}
 #end
 			}
@@ -1534,9 +1534,7 @@ PickupTableProperty.prototype = {
 	buildDisplayComment: function () {
 		var displayComment = "";
 		if (this.isDatabaseCommentConflict) {
-			displayComment = DecommentUtil.unescapeWhitespace(this.databaseComment);
-			displayComment = DecommentUtil.escapeNewlineCharacter(displayComment);
-			displayComment = DecommentUtil.escapeInputText(displayComment);
+            displayComment = this.getEscapedDatabaseComment();
 			displayComment = displayComment + '\n(from database comment)\n\n=======\n\n';
 		}
 
@@ -1559,6 +1557,16 @@ PickupTableProperty.prototype = {
 	},
 
 	/**
+	 * Get escaped database comment
+	 * @return {string} escaped database comment
+	 */
+	getEscapedDatabaseComment: function() {
+		var escapedComment = "";
+		escapedComment = DecommentUtil.escapeNewlineCharacter(escapedComment);
+		return escapedComment;
+	},
+
+	/**
 	 * Select target html element
 	 * @return {Array} html elements
 	 */
@@ -1573,6 +1581,18 @@ PickupTableProperty.prototype = {
 			}
 		});
 		return result;
+	},
+
+	/**
+	 * Get display html comment
+	 * @return {string} display html comment
+	 */
+	getDisplayHtmlComment: function() {
+		var child = this.selectTargetHtmlElements()[0].childNodes[0];
+		if (child != null && child.nodeName === "#text") {
+			return child.nodeValue.trim();
+		}
+		return ""
 	},
 
 	/**
@@ -1662,10 +1682,8 @@ PickupColumnProperty.prototype = {
 	buildDisplayComment: function () {
 		var displayComment = "";
 		if (this.isDatabaseCommentConflict) {
-			displayComment = DecommentUtil.unescapeWhitespace(this.databaseComment);
-			displayComment = DecommentUtil.escapeNewlineCharacter(this.databaseComment);
-			displayComment = DecommentUtil.escapeInputText(this.databaseComment);
-			displayComment = this.databaseComment + '\n(from database comment)\n\n=======\n\n';
+			displayComment = this.getEscapedDatabaseComment();
+			displayComment = displayComment + '\n(from database comment)\n\n=======\n\n';
 		}
 
 		var commentCount = this.decomments.length;
@@ -1687,6 +1705,16 @@ PickupColumnProperty.prototype = {
 	},
 
 	/**
+	 * Get escaped database comment
+	 * @return {string} escaped database comment
+	 */
+	getEscapedDatabaseComment: function() {
+		var escapedComment = "";
+		escapedComment = DecommentUtil.escapeNewlineCharacter(escapedComment);
+		return escapedComment;
+	},
+
+	/**
 	 * Select target html element
 	 * @return {Object} html element
 	 */
@@ -1698,6 +1726,18 @@ PickupColumnProperty.prototype = {
 			return null;
 		}
 		return columnElement.parentElement.querySelector('.commentcell').querySelector('pre')
+	},
+
+	/**
+	 * Get display html comment
+	 * @return {string} display html comment
+	 */
+	getDisplayHtmlComment: function() {
+		var child = this.selectTargetHtmlElement().childNodes[0];
+		if (child != null && child.nodeName === "#text") {
+			return child.nodeValue.trim();
+		}
+		return ""
 	},
 
 	/**
@@ -1806,7 +1846,7 @@ Decomment.prototype = {
 		var that = this;
 		var tableList = document.getElementById('table-list-body').querySelectorAll('tr');
 		Array.prototype.forEach.call(tableList, function (table) {
-			var tableName = table.querySelector('.namecell').querySelector('a').innerText;
+			var tableName = table.querySelector('.namecell').getAttribute('data-name');
 			var commentElement = table.querySelector('.commentcell');
 			that.setupSaveTableClickEvent(tableName, commentElement);
 		});
@@ -1824,7 +1864,7 @@ Decomment.prototype = {
 	 */
 	setupSaveTableClickEvent: function(tableName, commentElement) {
 		var tableProperty = this.storeClient.getTablePickup(tableName) || new PickupTableProperty(tableName, null)
-		commentElement.onclick = this.createSaveDecommentFunction(tableProperty, commentElement);
+		commentElement.onclick = this.createSaveDecommentFunction(tableProperty);
 	},
 
 	/**
@@ -1844,19 +1884,17 @@ Decomment.prototype = {
 				var tableName = that.getTableNameFromElement(table);
 				var columnName = column.querySelector('.columnnamecell').innerText;
 				var columnProperty = that.storeClient.getColumnPickup(tableName, columnName) || new PickupTableProperty(tableName, columnName)
-				commentElement.onclick = that.createSaveDecommentFunction(columnProperty, commentElement);
+				commentElement.onclick = that.createSaveDecommentFunction(columnProperty);
 			});
 		});
 	},
 
 	/**
  	 * Create save decomment function
-	 * param {string} tableName - Table name
-	 * param {string} columnName - Column name
+	 * param {object} commentProperty - Comment property
 	 * returns {function} Save decomment function
-	 * returns {Object} Coment element of table or column
 	 */
-	createSaveDecommentFunction: function (commentProperty, commentElement) {
+	createSaveDecommentFunction: function (commentProperty) {
 		var that = this;
  		return function () {
 	 		var modalElement = document.getElementById("decomment-modal");
@@ -1865,8 +1903,8 @@ Decomment.prototype = {
 			document.getElementById("decomment-modal-column-info").innerText = commentProperty.toDialogTitle();
 
 			var inputElement = document.getElementById("decomment-input");
-			var previousWholeComment = commentProperty.buildDisplayComment()
-			inputElement.value = previousWholeComment.length > 0 ? previousWholeComment : commentProperty.databaseComment;
+			var previousWholeComment = commentProperty.getDisplayHtmlComment();
+			inputElement.value = previousWholeComment;
 			inputElement.focus();
 
 			document.getElementById("decomment-close").onclick = function () {
@@ -1976,7 +2014,7 @@ UnmappedTableRow.prototype = {
 		return '<tr id="unmapped-table-row-' + this.tableName + '">'
 		+ '<td class="rownumcell">' + this.rowNum + '</td>'
 		+ '<td class="namecell">' + this.tableName + '</td>'
-		+ '<td class="namecell conflictcell">' + this.toConflictDisplayHtmlString() + '</td>'
+		+ '<td class="namecell tableconflictcell">' + this.toConflictDisplayHtmlString() + '</td>'
 		+ '<td class="tableselectorcell">' + '</td>'
 		+ '</tr>';
 	},
@@ -2059,7 +2097,9 @@ UnmappedTableArea.prototype = {
 
 		if (!this.isTableNameConflict()) {
 			document.querySelector('#unmapped-table-head th.conflictcell').style.display = 'none';
-			document.querySelector('#unmapped-table-body td.conflictcell').style.display = 'none';
+			Array.prototype.forEach.call(document.getElementsByClassName('tableconflictcell'), function (cell) {
+				cell.style.display = 'none'
+			});
 		}
 	},
 
@@ -2145,7 +2185,7 @@ UnmappedTableArea.prototype = {
 
 	postMappingTable: function() {
 		var mappings = Array.prototype.map.call(this.rows, function (row) {
-			var newTableName = document.querySelector('#unmapped-table-row-' + row.tableName + ' td.tableselectorcell select').value;
+			var newTableName = document.getElementById('unmapped-table-row-' + row.tableName).children[3].children[0].value;
 			return {
 				oldTableName: row.tableName,
 				newTableName: newTableName,
@@ -2214,7 +2254,7 @@ UnmappedColumnRow.prototype = {
 		+ '<td class="rownumcell">' + this.rowNum + '</td>'
 		+ '<td class="namecell">' + this.tableName + '</td>'
 		+ '<td class="namecell">' + this.oldColumnName + '</td>'
-		+ '<td class="namecell conflictcell">' + this.toConflictDisplayHtmlString() + '</td>'
+		+ '<td class="namecell columnconflictcell">' + this.toConflictDisplayHtmlString() + '</td>'
 		+ '<td id="columnselectorcell-' + this.tableName + '-' + this.oldColumnName + '">' + '</td>'
 		+ '</tr>';
 	},
@@ -2294,13 +2334,15 @@ UnmappedColumnArea.prototype = {
 		var tbody = this.getColumnBodyElement();
 		var that = this;
 		Array.prototype.forEach.call(this.rows, function (row) {
-			tbody.innerHTML = row.toDisplayHtmlString();
+			tbody.innerHTML += row.toDisplayHtmlString();
 			that.displayColumnSelector(row.tableName, row.oldColumnName);
 		});
 
 		if (!this.isColumnNameConflict()) {
 			document.querySelector('#unmapped-column-head th.conflictcell').style.display = 'none';
-			document.querySelector('#unmapped-column-body td.conflictcell').style.display = 'none';
+			Array.prototype.forEach.call(document.getElementsByClassName('columnconflictcell'), function (cell) {
+				cell.style.display = 'none'
+			});
 		}
 	},
 
@@ -2346,7 +2388,11 @@ UnmappedColumnArea.prototype = {
 		var columnList = [];
 		for (var i = 0, max = trs.length; i < max; i++) {
 			// TODO check that column name column num is 6
+#if ($isAliasDelimiterInDbCommentValid)
+			columnList.push(trs[i].getElementsByTagName('td')[7].innerText);
+#else
 			columnList.push(trs[i].getElementsByTagName('td')[6].innerText);
+#end
 		}
 		return columnList;
 	},
@@ -2388,8 +2434,8 @@ UnmappedColumnArea.prototype = {
 		var mappings = Array.prototype.map.call(this.rows, function (row) {
 			var tableName = row.tableName;
 			var oldColumnName = row.oldColumnName;
-			var selector = '#columnselectorcell-' + tableName + '-' + oldColumnName + ' select';
-			var newColumnName = document.querySelector(selector).value;
+			var selectorCellId = 'columnselectorcell-' + tableName + '-' + oldColumnName;
+			var newColumnName = document.getElementById(selectorCellId).children[0].value;
 			return {
 				oldTableName: tableName,
 				oldColumnName: oldColumnName,

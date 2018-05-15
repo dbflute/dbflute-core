@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.helper.dfmap.DfMapStyle;
 
 /**
  * @author hakiba
@@ -138,7 +138,7 @@ public class DfDecoMapPiece {
     //                                                                            ========
     @Override
     public String toString() {
-        return new MapListString().buildMapString(this.convertToMap());
+        return new DfMapStyle().toMapString(this.convertToMap());
     }
 
     // ===================================================================================
