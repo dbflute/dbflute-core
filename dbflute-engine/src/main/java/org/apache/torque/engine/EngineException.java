@@ -69,17 +69,15 @@
  * individuals on behalf of the Apache Software Foundation.  For more
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
- * 
+ *
  * - - - - - - - - - -/
  */
 package org.apache.torque.engine;
 
-import org.apache.commons.lang.exception.NestableException;
-
 /**
  * @author modified by jflute (originated in Apache Torque)
  */
-public class EngineException extends NestableException {
+public class EngineException extends Exception {
 
     // ===================================================================================
     //                                                                          Definition
