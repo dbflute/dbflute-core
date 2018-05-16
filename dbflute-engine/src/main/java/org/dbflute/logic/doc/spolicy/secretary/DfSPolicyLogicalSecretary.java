@@ -238,12 +238,13 @@ public class DfSPolicyLogicalSecretary {
     }
 
     public String toColumnDisp(Column column) {
-        final String tableDispName = column.getTable().getTableDispName();
-        final String aliasExp = column.getAliasExpression();
+        final Table table = column.getTable();
+        final String tableExp = table.getAliasExpression() + table.getTableDispName();
+        final String columnExp = column.getAliasExpression() + column.getName();
         final String dbType = column.hasDbType() ? column.getDbType() : "(unknownType)";
         final String size = column.hasColumnSize() ? "(" + column.getColumnSize() + ")" : "";
         final String notNull = column.isNotNull() ? "(NotNull)" : "(NullAllowed)";
-        return tableDispName + "." + aliasExp + column.getName() + " " + dbType + size + " " + notNull;
+        return tableExp + "." + columnExp + " " + dbType + size + " " + notNull;
     }
 
     // ===================================================================================
