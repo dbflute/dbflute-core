@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
@@ -105,9 +106,9 @@ public class DfSPolicyColumnStatementChecker {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
         } else if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
-            return isHitExp(toComparingColumnName(column), ifValue) == !notIfValue;
+            return isHitExp(toComparingColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("tableColumnName")) { // if tableColumnName is ...
-            return isHitExp(toComparingTableColumnName(column), ifValue) == !notIfValue;
+            return isHitExp(toComparingTableColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
             return isHitExp(column.getAlias(), ifValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("dbType")) { // if dbType is ...
@@ -129,6 +130,15 @@ public class DfSPolicyColumnStatementChecker {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
         }
         return false;
+    }
+
+    protected String toColumnNameComparingIfValue(Column column, String ifValue) { // patch for now @since 1.1.8
+        final String tableName = toComparingTableName(column);
+        String comparingValue = ifValue;
+        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
+        return comparingValue;
     }
 
     protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Column column) {
@@ -314,7 +324,7 @@ public class DfSPolicyColumnStatementChecker {
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             final String alias = column.getAlias();
-            if (!isHitExp(alias, thenValue) == !notThenValue) {
+            if (!isHitExp(alias, toAliasComparingThenValue(column, thenValue)) == !notThenValue) {
                 return violationCall.apply(alias);
             }
         } else if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
@@ -341,6 +351,17 @@ public class DfSPolicyColumnStatementChecker {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-item: " + thenItem);
         }
         return null; // no violation
+    }
+
+    protected String toAliasComparingThenValue(Column column, String thenValue) { // patch for now @since 1.1.8
+        final Table table = column.getTable();
+        String comparingValue = thenValue;
+        if (table.hasAlias()) {
+            final String tableAlias = table.getAlias();
+            comparingValue = Srl.replace(comparingValue, "$$tableAlias$$", tableAlias);
+            comparingValue = Srl.replace(comparingValue, "$$TableAlias$$", tableAlias);
+        }
+        return comparingValue;
     }
 
     protected String buildViolation(Column column, DfSPolicyThenPart thenPart, String actual) {
