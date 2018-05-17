@@ -237,14 +237,26 @@ public class DfSPolicyLogicalSecretary {
         return table.getAliasExpression() + table.getTableDispName();
     }
 
-    public String toColumnDisp(Column column) {
+    public String toColumnDisp(Column column) { // e.g. (Sea.Sea Name)SEA.SEA_NAME VARCHAR(100) (NotNull) 
         final Table table = column.getTable();
-        final String tableExp = table.getAliasExpression() + table.getTableDispName();
-        final String columnExp = column.getAliasExpression() + column.getName();
-        final String dbType = column.hasDbType() ? column.getDbType() : "(unknownType)";
-        final String size = column.hasColumnSize() ? "(" + column.getColumnSize() + ")" : "";
-        final String notNull = column.isNotNull() ? "(NotNull)" : "(NullAllowed)";
-        return tableExp + "." + columnExp + " " + dbType + size + " " + notNull;
+        final StringBuilder sb = new StringBuilder();
+        if (table.hasAlias()) {
+            sb.append("(");
+            sb.append(table.getAlias());
+            if (column.hasAlias()) {
+                sb.append(".");
+                sb.append(column.getAlias());
+            }
+            sb.append(")");
+        }
+        sb.append(table.getTableDispName());
+        sb.append(".").append(column.getName());
+        sb.append(" ").append(column.hasDbType() ? column.getDbType() : "(unknownType)");
+        if (column.hasColumnSize()) {
+            sb.append("(").append(column.getColumnSize()).append(")");
+        }
+        sb.append(" ").append(column.isNotNull() ? "(NotNull)" : "(NullAllowed)");
+        return sb.toString();
     }
 
     // ===================================================================================
