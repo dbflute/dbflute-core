@@ -110,7 +110,7 @@ public class DfSPolicyColumnStatementChecker {
         } else if (ifItem.equalsIgnoreCase("tableColumnName")) { // if tableColumnName is ...
             return isHitExp(toComparingTableColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
-            return isHitExp(column.getAlias(), ifValue) == !notIfValue;
+            return isHitExp(column.getAlias(), toAliasComparingIfValue(column, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("dbType")) { // if dbType is ...
             if (column.hasDbType()) { // just in case
                 return isHitExp(column.getDbType(), ifValue) == !notIfValue;
@@ -132,13 +132,12 @@ public class DfSPolicyColumnStatementChecker {
         return false;
     }
 
-    protected String toColumnNameComparingIfValue(Column column, String ifValue) { // patch for now @since 1.1.8
-        final String tableName = toComparingTableName(column);
-        String comparingValue = ifValue;
-        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
-        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
-        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
-        return comparingValue;
+    protected String toColumnNameComparingIfValue(Column column, String ifValue) {
+        return convertToColumnNameComparingValue(column, ifValue);
+    }
+
+    protected String toAliasComparingIfValue(Column column, String ifValue) {
+        return convertToAliasComparingValue(column, ifValue);
     }
 
     protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Column column) {
@@ -314,12 +313,12 @@ public class DfSPolicyColumnStatementChecker {
             }
         } else if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
             final String columnName = toComparingColumnName(column);
-            if (!isHitExp(columnName, thenValue) == !notThenValue) {
+            if (!isHitExp(columnName, toColumnNameComparingThenValue(column, thenValue)) == !notThenValue) {
                 return violationCall.apply(columnName);
             }
         } else if (thenItem.equalsIgnoreCase("tableColumnName")) { // e.g. tableColumnName is contain:R.M
             final String tableColumnName = toComparingTableColumnName(column);
-            if (!isHitExp(tableColumnName, thenValue) == !notThenValue) {
+            if (!isHitExp(tableColumnName, toColumnNameComparingThenValue(column, thenValue)) == !notThenValue) {
                 return violationCall.apply(tableColumnName);
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
@@ -353,15 +352,12 @@ public class DfSPolicyColumnStatementChecker {
         return null; // no violation
     }
 
-    protected String toAliasComparingThenValue(Column column, String thenValue) { // patch for now @since 1.1.8
-        final Table table = column.getTable();
-        String comparingValue = thenValue;
-        if (table.hasAlias()) {
-            final String tableAlias = table.getAlias();
-            comparingValue = Srl.replace(comparingValue, "$$tableAlias$$", tableAlias);
-            comparingValue = Srl.replace(comparingValue, "$$TableAlias$$", tableAlias);
-        }
-        return comparingValue;
+    protected String toColumnNameComparingThenValue(Column column, String thenValue) {
+        return convertToColumnNameComparingValue(column, thenValue);
+    }
+
+    protected String toAliasComparingThenValue(Column column, String thenValue) {
+        return convertToAliasComparingValue(column, thenValue);
     }
 
     protected String buildViolation(Column column, DfSPolicyThenPart thenPart, String actual) {
@@ -370,6 +366,29 @@ public class DfSPolicyColumnStatementChecker {
         final String notOr = thenPart.isNotThenValue() ? "not " : "";
         final String columnDisp = toColumnDisp(column);
         return "The " + thenItem + " should " + notOr + "be " + thenValue + " but " + actual + ": " + columnDisp;
+    }
+
+    // ===================================================================================
+    //                                                                     Comparing Value
+    //                                                                     ===============
+    protected String convertToColumnNameComparingValue(Column column, String yourValue) { // @since 1.1.8
+        String comparingValue = yourValue;
+        final String tableName = toComparingTableName(column); // e.g. columnName is $$table$$_ID
+        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
+        return comparingValue;
+    }
+
+    protected String convertToAliasComparingValue(Column column, String yourValue) { // @since 1.1.8
+        String comparingValue = yourValue;
+        final Table table = column.getTable();
+        if (table.hasAlias()) {
+            final String tableAlias = table.getAlias(); // alias is $$tableAlias$$ID
+            comparingValue = Srl.replace(comparingValue, "$$tableAlias$$", tableAlias);
+            comparingValue = Srl.replace(comparingValue, "$$TableAlias$$", tableAlias);
+        }
+        return comparingValue;
     }
 
     // ===================================================================================
