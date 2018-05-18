@@ -1945,6 +1945,10 @@ Decomment.prototype = {
 
 			document.getElementById("decomment-ok").onclick = function () {
 				var decomment = inputElement.value;
+				if (that.isStillConflicting(decomment)) {
+					alert('Still conflicting. please resolve.');
+					return;
+				}
 				if (!that.isCommentChanged(previousWholeComment, decomment)) {
 					modalElement.style.display = "none";
 					return;
@@ -1990,6 +1994,14 @@ Decomment.prototype = {
 		return previousElement.value;
 	},
 
+	/**
+	 * Check still conflicting
+	 * @param {string} decomment - decomment
+	 * @returns {Boolean} is still conflicting
+	 */
+	isStillConflicting: function(decomment) {
+		return decomment.includes('=======');
+	},
 
 	/**
 	 * Check new decomment and previous comment is different
