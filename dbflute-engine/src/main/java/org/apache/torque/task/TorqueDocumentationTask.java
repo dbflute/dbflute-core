@@ -260,10 +260,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*    Schema HTML    *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        _selector.selectSchemaHtml(); // regular
-        _selector.selectHistoryHtml(); // regular
-        _selector.selectPropertiesHtml(); // option
-        _selector.selectLastaDocHtml(); // option
+        _documentSelector.selectSchemaHtml(); // regular
+        _documentSelector.selectHistoryHtml(); // regular
+        _documentSelector.selectPropertiesHtml(); // option
+        _documentSelector.selectLastaDocHtml(); // option
         processDecommentPickup();
         processHacommentPickup();
         fireVelocityProcess();
@@ -299,7 +299,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             throw new IllegalStateException("SchemaPolicyCheck should be before making SchemaHTML because of schema data.");
         }
         final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
-        final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> _selector.getSchemaDiffList());
+        final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> _documentSelector.getSchemaDiffList());
         checker.checkPolicyIfNeeds();
     }
 
@@ -376,7 +376,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         try {
             checker.checkSync();
         } catch (DfSchemaSyncCheckGhastlyTragedyException e) {
-            _selector.selectSchemaSyncCheckResultHtml();
+            _documentSelector.selectSchemaSyncCheckResultHtml();
             fireVelocityProcess();
             throw e;
         }
@@ -467,7 +467,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     public Context initControlContext() throws Exception {
         final Context context = super.initControlContext();
         context.put("escape", new Escape());
-        context.put("selector", _selector);
+        context.put("selector", _documentSelector);
         return context;
     }
 

@@ -81,7 +81,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected final DfTaskControlLogic _controlLogic = createTaskControlLogic(_databaseResource);
 
     /** The selector of documents for velocity context. (NotNull) */
-    protected final DfDocumentSelector _selector = new DfDocumentSelector();
+    protected final DfDocumentSelector _documentSelector = new DfDocumentSelector();
 
     // ===================================================================================
     //                                                                     Task Controller

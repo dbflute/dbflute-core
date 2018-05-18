@@ -74,6 +74,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     protected VelocityContext createVelocityContext(final AppData appData) {
         final DfVelocityContextFactory factory = createVelocityContextFactory();
-        return factory.createAsCore(appData, _selector);
+        return factory.createAsCore(appData, _documentSelector);
     }
 }
