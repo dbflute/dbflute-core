@@ -233,11 +233,11 @@ table.child, table.child td, table.child th {
 /* table supplementary info */
 span.tableschematitle {
 	font-size: 0.5em;
-	color: #888888
+	color: #888888;
 }
 span.tablefirstdatetitle {
 	font-size: 0.5em;
-	color: #888888
+	color: #888888;
 }
 
 /* -------------------------------------------------
