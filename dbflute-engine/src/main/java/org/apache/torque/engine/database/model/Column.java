@@ -128,6 +128,7 @@ package org.apache.torque.engine.database.model;
  */
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -136,6 +137,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -143,6 +145,7 @@ import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -1972,6 +1975,32 @@ public class Column {
      */
     public void setSql2EntityHintedClassification(String sql2EntityHintedClassification) {
         _sql2EntityHintedClassification = sql2EntityHintedClassification;
+    }
+
+    // ===================================================================================
+    //                                                                          First Date
+    //                                                                          ==========
+    public boolean hasFirstDate() {
+        return findFirstDate().isPresent();
+    }
+
+    public String getFirstDateSimpleExp() { // e.g. "2017/05/18"
+        return findFirstDate().map(firstDate -> {
+            return new HandyDate(firstDate).toDisp("yyyy/MM/dd");
+        }).orElse("");
+    }
+
+    public String getFirstDateRelatedExp() { // e.g. "2017/05/18" or "first"
+        return findFirstDate().map(firstDate -> {
+            return new HandyDate(firstDate).toDisp("yyyy/MM/dd");
+        }).orElse("first");
+    }
+
+    public OptionalThing<Date> findFirstDate() {
+        final Table table = getTable();
+        return table.getDatabase().getFirstDateAgent().flatMap(agent -> {
+            return agent.findColumnFirstDate(table.getTableDbName(), getName());
+        });
     }
 
     // ===================================================================================

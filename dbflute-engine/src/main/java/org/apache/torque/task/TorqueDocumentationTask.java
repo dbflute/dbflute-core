@@ -128,6 +128,7 @@ package org.apache.torque.task;
  */
 
 import org.apache.torque.engine.database.model.AppData;
+import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
@@ -139,6 +140,7 @@ import org.dbflute.logic.doc.decomment.DfDecommentPickupProcess;
 import org.dbflute.logic.doc.hacomment.DfHacommentPickupProcess;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
+import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
@@ -407,7 +409,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
         } else { // normally here
             super.initializeSchemaData();
-            _schemaData.getDatabase().setEmbeddedPickup(_decoMapPickup);
+            final Database database = _schemaData.getDatabase();
+            database.setEmbeddedPickup(_decoMapPickup);
+            database.setFirstDateAgent(new DfFirstDateAgent(() -> _documentSelector.getSchemaDiffList()));
         }
     }
 

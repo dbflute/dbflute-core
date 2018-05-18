@@ -129,6 +129,7 @@ package org.apache.torque.engine.database.model;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -147,6 +148,7 @@ import org.dbflute.cbean.chelper.HpSDRFunction;
 import org.dbflute.cbean.chelper.dbms.HpSDRFunctionMySql;
 import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbway.DBDef;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
@@ -157,6 +159,7 @@ import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.properties.DfClassificationProperties;
@@ -1111,7 +1114,7 @@ public class Table {
      * Returns all parts of the primary key, separated by commas.
      * @return A CSV list of primary key parts.
      */
-    public String printPrimaryKey() {
+    public String printPrimaryKey() { // who is using? by jflute (2018/05/18)
         return printList(_columnList);
     }
 
@@ -2706,6 +2709,33 @@ public class Table {
             final String outputDirectory = getProperties().getSimpleDtoProperties().getDtoMapperOutputDirectory();
             prop.switchSql2EntityOutputDirectory(outputDirectory);
         }
+    }
+
+    // ===================================================================================
+    //                                                                          First Date
+    //                                                                          ==========
+    public boolean hasFirstDate() {
+        return findFirstDate().isPresent();
+    }
+
+    public String getFirstDateSimpleExp() { // e.g. "2017/05/18"
+        return findFirstDate().map(firstDate -> {
+            return new HandyDate(firstDate).toDisp("yyyy/MM/dd");
+        }).orElse("");
+    }
+
+    public OptionalThing<Date> findFirstDate() {
+        return getDatabase().getFirstDateAgent().flatMap(agent -> agent.findTableFirstDate(getTableDbName()));
+    }
+
+    public boolean hasColumnFirstDate() {
+        List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.hasFirstDate()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

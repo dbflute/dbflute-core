@@ -231,8 +231,13 @@ table.child, table.child td, table.child th {
 }
 
 /* table supplementary info */
-span.tableschema {
-	font-size: 0.6em;
+span.tableschematitle {
+	font-size: 0.5em;
+	color: #888888
+}
+span.tablefirstdatetitle {
+	font-size: 0.5em;
+	color: #888888
 }
 
 /* -------------------------------------------------
@@ -509,6 +514,9 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 		<th>ReferrerTable</th>
 		<th>TableComment</th>
 		<th>EntityName</th>
+#if ($database.hasTableFirstDate())
+		<th>Since</th>
+#end
 	</tr>
 	</thead>
 	<tbody id="table-list-body">
@@ -528,6 +536,9 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
 		<td class="commentcell ${table.tableDbName}_comment"><pre>#if($table.hasComment())${table.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
 		<td class="subcell">${table.javaName}</td>
+#if ($database.hasTableFirstDate())
+		<td class="subcell">$table.firstDateSimpleExp</td>
+#end
 	</tr>
 #set ($rownum = $rownum + 1)
 #end

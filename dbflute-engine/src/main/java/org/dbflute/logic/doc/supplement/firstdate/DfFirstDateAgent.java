@@ -24,6 +24,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.schemadiff.DfColumnDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfTableDiff;
+import org.dbflute.optional.OptionalThing;
 
 /**
  * @author jflute
@@ -41,6 +42,22 @@ public class DfFirstDateAgent {
     //                                                                         ===========
     public DfFirstDateAgent(Supplier<List<DfSchemaDiff>> schemaDiffListSupplier) {
         _schemaDiffListSupplier = schemaDiffListSupplier;
+    }
+
+    // ===================================================================================
+    //                                                                             Finding
+    //                                                                             =======
+    public OptionalThing<Date> findTableFirstDate(String tableDbName) {
+        return OptionalThing.ofNullable(getTableFirstDateMap().get(tableDbName), () -> {
+            throw new IllegalStateException("Not found the first date of the table: " + tableDbName);
+        });
+    }
+
+    public OptionalThing<Date> findColumnFirstDate(String tableDbName, String columnDbName) {
+        final String columnKey = generateColumnKey(tableDbName, columnDbName);
+        return OptionalThing.ofNullable(getColumnFirstDateMap().get(columnKey), () -> {
+            throw new IllegalStateException("Not found the first date of the column: " + tableDbName + "." + columnDbName);
+        });
     }
 
     // ===================================================================================
@@ -112,7 +129,7 @@ public class DfFirstDateAgent {
         final Map<String, Date> columnFirstDateMap = StringKeyMap.createAsCaseInsensitiveOrdered();
         final List<DfSchemaDiff> schemaDiffList = prepareSchemaDiffList();
         for (DfSchemaDiff schemaDiff : schemaDiffList) {
-            final List<DfTableDiff> tableDiffList = schemaDiff.getAddedTableDiffList();
+            final List<DfTableDiff> tableDiffList = schemaDiff.getChangedTableDiffList();
             for (DfTableDiff tableDiff : tableDiffList) {
                 final String tableName = tableDiff.getTableName();
                 final List<DfColumnDiff> columnDiffList = tableDiff.getAddedColumnDiffList();
