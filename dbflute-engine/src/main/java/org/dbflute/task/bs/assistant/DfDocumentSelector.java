@@ -15,6 +15,8 @@
  */
 package org.dbflute.task.bs.assistant;
 
+import java.util.List;
+
 import org.dbflute.DfBuildProperties;
 import org.dbflute.infra.doc.hacomment.DfHacoMapDiffPart;
 import org.dbflute.logic.doc.historyhtml.DfSchemaHistory;
@@ -27,8 +29,6 @@ import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @author jflute
@@ -298,6 +298,17 @@ public class DfDocumentSelector {
     }
 
     // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    public boolean isHistoryHtmlShowDiffAuthor() {
+        return !isSuppressHistoryHtmlDiffAuthor();
+    }
+
+    public boolean isHistoryHtmlShowDiffGitBranch() {
+        return !isSuppressHistoryHtmlDiffGitBranch();
+    }
+
+    // -----------------------------------------------------
     //                                                Design
     //                                                ------
     // HistoryHTML only uses the determinations via selector... (others use $database) by jflute
@@ -422,6 +433,14 @@ public class DfDocumentSelector {
 
     protected boolean isSuppressHistoryHtmlToSisterLink() {
         return getDocumentProperties().isSuppressHistoryHtmlToSisterLink();
+    }
+
+    protected boolean isSuppressHistoryHtmlDiffAuthor() {
+        return getDocumentProperties().isSuppressHistoryHtmlDiffAuthor();
+    }
+
+    protected boolean isSuppressHistoryHtmlDiffGitBranch() {
+        return getDocumentProperties().isSuppressHistoryHtmlDiffGitBranch();
     }
 
     protected boolean isSuppressPropertiesHtmlToSisterLink() {

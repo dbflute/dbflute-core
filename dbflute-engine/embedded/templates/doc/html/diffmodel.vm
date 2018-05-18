@@ -123,6 +123,18 @@ h5 {
 .tablecount {
 	margin: 0.5em 0 0.5em 1em;
 }
+.titlediffauthor {
+	font-size: 0.7em;
+	font-weight: normal;
+	font-style: italic;
+	color: #888888;
+}
+.titlediffgitbranch {
+	font-size: 0.7em;
+	font-weight: normal;
+	font-style: italic;
+	color: #888888;
+}
 
 /* -------------------------------------------------
                                Difference Content
@@ -240,11 +252,20 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #foreach ($schemaDiff in $selector.schemaDiffList)
 #set ($diffNo = $diffCount - $velocityCount + 1)
 <div class="section diffCode_${schemaDiff.diffDateAsCode}">
-	<h2><span class="titlediffno">diffNo. ${diffNo}:</span> <span class="titlediffdatepart">${schemaDiff.diffDateAsDatePart}</span> <span class="titledifftimepart">${schemaDiff.diffDateAsTimePart}</span></h2>
+	<h2>
+		<span class="titlediffno">diffNo. ${diffNo}:</span> <span class="titlediffdatepart">${schemaDiff.diffDateAsDatePart}</span> <span class="titledifftimepart">${schemaDiff.diffDateAsTimePart}</span>
+#if ($selector.isHistoryHtmlShowDiffAuthor() && $schemaDiff.hasDiffAuthor())
+		<span class="titlediffauthor">by ${schemaDiff.diffAuthorHtmlExp}</span>
+#end
+#if ($selector.isHistoryHtmlShowDiffGitBranch() && $schemaDiff.hasDiffGitBranch())
+		<span class="titlediffgitbranch">on ${schemaDiff.diffGitBranchHtmlExp}</span>
+#end
+	</h2>
 #if ($schemaDiff.hasComment())
 	<pre class="diffcomment">${schemaDiff.comment}</pre>
 #else
-	<pre class="diffcomment"></pre> ## add empty comment element to reflect hacomment
+## add empty comment element to reflect hacomment
+	<pre class="diffcomment"></pre>
 #end
 #if ($schemaDiff.tableCount.hasDiff())
 	<p class="tablecount">table count: ${schemaDiff.tableCount.displayForHtml}</p>

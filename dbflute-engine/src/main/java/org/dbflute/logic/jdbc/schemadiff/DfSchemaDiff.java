@@ -30,6 +30,8 @@ import org.apache.torque.engine.database.model.Sequence;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.supplement.author.DfDocumentAuthorLogic;
+import org.dbflute.logic.doc.supplement.escape.DfDocumentTextResolver;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfConstraintKeyDiffer;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfForeignKeyDiffer;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfIndexDiffer;
@@ -40,6 +42,8 @@ import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -163,6 +167,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaDiff.class);
     public static final String DIFF_DATE_KEY = "diffDate";
     public static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
     public static final String DIFF_DATE_DATE_PART_PATTERN = "yyyy/MM/dd";
@@ -170,6 +175,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String DIFF_DATE_CODE_PATTERN = "yyyyMMddHHmmss";
     public static final String COMMENT_KEY = "comment";
     public static final String TABLE_COUNT_KEY = "tableCount";
+    public static final String DIFF_AUTHOR_KEY = "diffAuthor";
+    public static final String DIFF_GIT_BRANCH_KEY = "diffGitBranch";
     public static final String TABLE_DIFF_KEY = "tableDiff";
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
     public static final String KEYWORD_DB2_SYSTEM_SEQUENCE = "SQL";
@@ -198,6 +205,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected Date _diffDate; // not null after loading next schema
     protected String _comment; // after restoring
     protected DfNextPreviousDiff _tableCountDiff; // not null after next loading
+    protected String _diffAuthor; // null allowed even if after next loading, just in case
+    protected String _diffGitBranch; // null allowed even if after next loading, may not be git management
 
     // -----------------------------------------------------
     //                                                Option
@@ -302,6 +311,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                             ---------
     protected boolean _latest;
 
+    // -----------------------------------------------------
+    //                                         Text Resolver
+    //                                         -------------
+    protected DfDocumentTextResolver _documentTextResolver = new DfDocumentTextResolver();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -380,9 +394,24 @@ public class DfSchemaDiff extends DfAbstractDiff {
         } catch (RuntimeException e) {
             handleReadingException(e, reader);
         }
-        _diffDate = new Date(DBFluteSystem.currentTimeMillis());
+        _diffDate = DBFluteSystem.currentDate();
         final int nextTableCount = _nextDb.getTableList().size();
         _tableCountDiff = createNextPreviousDiff(nextTableCount, _previousTableCount);
+        setupDocumentAuthorOfNextSchema();
+    }
+
+    protected void setupDocumentAuthorOfNextSchema() {
+        final DfDocumentAuthorLogic authorLogic = new DfDocumentAuthorLogic();
+        try {
+            _diffAuthor = authorLogic.getAuthor();
+        } catch (RuntimeException continued) { // just in case
+            _log.info("*Cannot get author of next schema.", continued);
+        }
+        try {
+            _diffGitBranch = authorLogic.getGitBranch().orElse(null);
+        } catch (RuntimeException continued) { // just in case
+            _log.info("*Cannot get git branch of next schema.", continued);
+        }
     }
 
     protected void handleReadingException(Exception e, DfSchemaXmlReader reader) {
@@ -1421,6 +1450,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (_tableCountDiff.hasDiff()) {
             schemaDiffMap.put(TABLE_COUNT_KEY, _tableCountDiff.createNextPreviousDiffMap());
         }
+        if (_diffAuthor != null) {
+            schemaDiffMap.put(DIFF_AUTHOR_KEY, _diffAuthor);
+        }
+        if (_diffGitBranch != null) {
+            schemaDiffMap.put(DIFF_GIT_BRANCH_KEY, _diffGitBranch);
+        }
 
         final List<NestDiffSetupper> nestDiffList = _nestDiffList;
         for (NestDiffSetupper setupper : nestDiffList) {
@@ -1449,10 +1484,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 _diffDate = DfTypeUtil.toDate(value, DIFF_DATE_PATTERN);
                 assertDiffDateExists(key, _diffDate, schemaDiffMap);
             } else if (COMMENT_KEY.equals(key)) {
-                _comment = (String) value; // nullable
+                _comment = (String) value; // null allowed
             } else if (TABLE_COUNT_KEY.equals(key)) {
                 _tableCountDiff = restoreNextPreviousDiff(schemaDiffMap, key);
                 assertTableCountExists(key, _tableCountDiff, schemaDiffMap);
+            } else if (DIFF_AUTHOR_KEY.equals(key)) {
+                _diffAuthor = (String) value; // null allowed
+            } else if (DIFF_GIT_BRANCH_KEY.equals(key)) {
+                _diffGitBranch = (String) value; // null allowed
             } else {
                 final List<NestDiffSetupper> nestDiffList = _nestDiffList;
                 for (NestDiffSetupper setupper : nestDiffList) {
@@ -1589,6 +1628,22 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public DfNextPreviousDiff getTableCount() {
         return _tableCountDiff;
+    }
+
+    public boolean hasDiffAuthor() {
+        return _diffAuthor != null && _diffAuthor.trim().length() > 0;
+    }
+
+    public String getDiffAuthorHtmlExp() {
+        return _diffAuthor != null ? _documentTextResolver.resolveSchemaHtmlContent(_diffAuthor) : null;
+    }
+
+    public boolean hasDiffGitBranch() {
+        return _diffGitBranch != null && _diffGitBranch.trim().length() > 0;
+    }
+
+    public String getDiffGitBranchHtmlExp() {
+        return _diffGitBranch != null ? _documentTextResolver.resolveSchemaHtmlContent(_diffGitBranch) : null;
     }
 
     // -----------------------------------------------------

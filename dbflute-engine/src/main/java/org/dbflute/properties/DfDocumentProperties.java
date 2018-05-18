@@ -674,6 +674,17 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isSuppressHistoryHtmlToSisterLink", false, getDocumentMap());
     }
 
+    // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    public boolean isSuppressHistoryHtmlDiffAuthor() { // closet
+        return isProperty("isSuppressHistoryHtmlDiffAuthor", false, getDocumentMap());
+    }
+
+    public boolean isSuppressHistoryHtmlDiffGitBranch() { // closet
+        return isProperty("isSuppressHistoryHtmlDiffGitBranch", false, getDocumentMap());
+    }
+
     // ===================================================================================
     //                                                                     LoadDataReverse
     //                                                                     ===============
