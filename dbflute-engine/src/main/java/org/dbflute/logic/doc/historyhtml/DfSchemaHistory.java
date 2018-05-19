@@ -15,6 +15,16 @@
  */
 package org.dbflute.logic.doc.historyhtml;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.diffmap.DfDiffMapFile;
@@ -29,18 +39,9 @@ import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 /**
  * @author jflute
+ * @author hakiba
  * @since 0.9.7.1 (2010/06/07 Monday)
  */
 public class DfSchemaHistory {
@@ -156,8 +157,7 @@ public class DfSchemaHistory {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         try {
@@ -183,7 +183,8 @@ public class DfSchemaHistory {
             final String key = entry.getKey(); // diffDate
             final Object value = entry.getValue();
             assertDiffElementMap(key, value);
-            @SuppressWarnings("unchecked") final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
             final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsHistory();
             schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
             if (index == 0) {
@@ -202,10 +203,13 @@ public class DfSchemaHistory {
         }
     }
 
+    // ===================================================================================
+    //                                                                        Load HacoMap
+    //                                                                        ============
     public void loadHacoMap() {
         String clientDirPath = ".";
         DfHacoMapFile hacoMapFile = new DfHacoMapFile(() -> DBFluteSystem.currentLocalDateTime());
-        // TODO done hakiba add exception handling  (2018/04/28)
+        // done hakiba add exception handling  (2018/04/28)
         try {
             List<DfHacoMapPiece> pieceList = hacoMapFile.readPieceList(clientDirPath);
             OptionalThing<DfHacoMapPickup> optPickup = hacoMapFile.readPickup(clientDirPath);
