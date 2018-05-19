@@ -587,33 +587,33 @@ ${selector.historyHtmlJavaScriptEmbedded}
     function Hacomment() {
         this.embeddedPickup = {
             'diffList' : [
-				#foreach($diff in $selector.hacoMapDiffList)
-					#if ($velocityCount > 1), #end{
+#foreach($diff in $selector.hacoMapDiffList)
+                #if ($velocityCount > 1), #end{
                     'diffCode' : '${diff.diffCode}',
                     'diffDate' : '${diff.diffDate}',
                     'properties' : [
-						#foreach($property in $diff.propertyList)
-							#if ($velocityCount > 1), #end{
+#foreach($property in $diff.propertyList)
+                        #if ($velocityCount > 1), #end{
                             'hacomment' : '#escape($!{property.hacomment})',
                             'authorList' : [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end],
                             'pieceCode' : '$!{property.pieceCode}',
                             'pieceDatetime' : '$!{property.pieceDatetime}',
                             'previousPieces' : [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
                         }
-						#end
+#end
                     ]
                 }
-				#end
+#end
             ]
         };
-            this.pickupStore = {
-		#foreach($schemaDiff in $selector.schemaDiffList)
-			#if ($velocityCount > 1), #end'${schemaDiff.diffDateAsCode}' : {
-            'diffDate' : '${schemaDiff.diffDate}',
-                    'diffComment' : '#escape($!{schemaDiff.comment})'
+        this.pickupStore = {
+#foreach($schemaDiff in $selector.schemaDiffList)
+            #if ($velocityCount > 1), #end'${schemaDiff.diffDateAsCode}' : {
+                'diffDate' : '${schemaDiff.diffDate}',
+                'diffComment' : '#escape($!{schemaDiff.comment})'
+            }
+#end
         }
-		#end
-    }
     }
     Hacomment.prototype = {
 
@@ -879,6 +879,10 @@ ${selector.historyHtmlJavaScriptEmbedded}
                 // set ok event
                 document.getElementById("hacomment-ok").onclick = function () {
                     var hacomment = inputElement.value;
+                    if (that.isStillConflicting(hacomment)) {
+                      alert('Still conflicting. please resolve.')
+                      return;
+                    }
                     if (!that.isCommentChanged(diffCode, hacomment)) {
                         modalElement.style.display = "none";
                         return;
