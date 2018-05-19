@@ -210,12 +210,11 @@ public class DfSchemaHistory {
             List<DfHacoMapPiece> pieceList = hacoMapFile.readPieceList(clientDirPath);
             OptionalThing<DfHacoMapPickup> optPickup = hacoMapFile.readPickup(clientDirPath);
             _hacoMapPickup = hacoMapFile.merge(optPickup, pieceList);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Failed to load haco-map.");
-            br.addItem("Exception");
-            br.addElement(e.getClass().getName());
-            br.addElement(e.getMessage());
+            br.addItem("File Path");
+            br.addElement(clientDirPath);
             final String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg, e);
         }
