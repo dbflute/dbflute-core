@@ -271,7 +271,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 	<p class="tablecount">table count: ${schemaDiff.tableCount.displayForHtml}</p>
 #end
 
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                               TableDiff
 ##                                                                               =========
 #if (!$schemaDiff.addedTableDiffList.isEmpty())
@@ -331,7 +331,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                            SequenceDiff
 ##                                                                            ============
 #if (!$schemaDiff.addedSequenceDiffList.isEmpty())
@@ -364,7 +364,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                           ProcedureDiff
 ##                                                                           =============
 #if (!$schemaDiff.addedProcedureDiffList.isEmpty())
@@ -397,7 +397,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                               CraftDiff
 ##                                                                               =========
 #foreach ($titleDiff in $schemaDiff.craftTitleDiffList)
@@ -724,7 +724,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
                 }
             });
             // delete duplicate authors
-            authors.filter(function (value, index, self) {
+            authors = authors.filter(function (value, index, self) {
                 return self.indexOf(value) === index;
             });
 
@@ -771,8 +771,8 @@ ${selector.historyHtmlJavaScriptEmbedded}
          * @param {Array} authors - Comment authoers
          */
         updateDisplayHacommentToHtml: function(diffCode, diffCommentElement, newComment, authors) {
-            var authroStrForHtml = authors.join(',');
-            var comment = newComment + "\n<span>@author(" + authroStrForHtml + ")</span>";
+            var authorStrForHtml = authors.join(',');
+            var comment = newComment + "\n<span>@author(" + authorStrForHtml + ")</span>";
             diffCommentElement.innerHTML = comment;
 
             // reflect conflict
@@ -819,7 +819,11 @@ ${selector.historyHtmlJavaScriptEmbedded}
 
                 // add click-event (open hacomment modal window, save function)
                 var diffMap = this.getDiffMapFromStore(diffCode);
-                sectionElement.onclick = this.createSaveHacommentFunction(diffCode, diffMap);
+                // to Title Element
+                sectionElement.querySelector('h2').onclick = this.createSaveHacommentFunction(diffCode, diffMap);
+                // to Hacommet Element
+                sectionElement.querySelector('pre').onclick = this.createSaveHacommentFunction(diffCode, diffMap);
+
             }
         },
 
@@ -957,19 +961,28 @@ ${selector.historyHtmlJavaScriptEmbedded}
             return ""
         },
 
-        /**
-         * Setup key down event
-         */
-        setupKeyDownEvent : function() {
-            document.onkeydown = function (e) {
-                // ESC
-                if(e.keyCode === 27){
-                    var modalElement = document.getElementById("hacomment-modal");
-                    modalElement.style.display = "none";
-                }
-            }
-        }
-    };
+  /**
+   * Check still conflicting
+   * @param {string} hacomment - hacomment
+   * @returns {Boolean} is still conflicting
+   */
+  isStillConflicting: function(hacomment) {
+    return hacomment.includes('=======');
+  },
+
+  /**
+   * Setup key down event
+   */
+  setupKeyDownEvent : function() {
+    document.onkeydown = function (e) {
+      // ESC
+      if(e.keyCode === 27){
+        var modalElement = document.getElementById("hacomment-modal");
+        modalElement.style.display = "none";
+      }
+    }
+  }
+};
 
     new Hacomment().init();
 </script>
