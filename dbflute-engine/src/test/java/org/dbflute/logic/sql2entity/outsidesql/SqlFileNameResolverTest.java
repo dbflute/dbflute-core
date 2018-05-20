@@ -144,7 +144,6 @@ public class SqlFileNameResolverTest extends EngineTestCase {
     }
 
     // *Properties is needed to test 
-    //@Test
     //public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath() {
     //    // ## Arrange ##
     //    DfOutsideSqlNameResolver resolver = new DfOutsideSqlNameResolver();
@@ -158,7 +157,6 @@ public class SqlFileNameResolverTest extends EngineTestCase {
     //    assertEquals("SimpleMember", actual);
     //}
     //
-    //@Test
     //public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_DBSuffix() {
     //    // ## Arrange ##
     //    DfOutsideSqlNameResolver resolver = new DfOutsideSqlNameResolver();
@@ -172,7 +170,6 @@ public class SqlFileNameResolverTest extends EngineTestCase {
     //    assertEquals("SimpleMember", actual);
     //}
     //
-    //@Test
     //public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_Unsupport() {
     //    // ## Arrange ##
     //    DfOutsideSqlNameResolver resolver = new DfOutsideSqlNameResolver();
@@ -185,23 +182,23 @@ public class SqlFileNameResolverTest extends EngineTestCase {
     //    log(actual);
     //    assertEquals("Member", actual);
     //}
-
-    public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_startsWithUnderScore() {
-        // ## Arrange ##
-        DfOutsideSqlNameResolver resolver = new DfOutsideSqlNameResolver();
-        String className = DfOutsideSqlNameResolver.ENTITY_MARK;
-
-        // ## Act ##
-        try {
-            resolver.resolveEntityNameIfNeeds(className, "_selectSimpleMember.sql");
-
-            // ## Assert ##
-            fail();
-        } catch (IllegalStateException e) {
-            // OK
-            log(e.getMessage());
-        }
-    }
+    //
+    //public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_startsWithUnderScore() {
+    //    // ## Arrange ##
+    //    DfOutsideSqlNameResolver resolver = new DfOutsideSqlNameResolver();
+    //    String className = DfOutsideSqlNameResolver.ENTITY_MARK;
+    //
+    //    // ## Act ##
+    //    try {
+    //        resolver.resolveEntityNameIfNeeds(className, "_selectSimpleMember.sql");
+    //
+    //        // ## Assert ##
+    //        fail();
+    //    } catch (IllegalStateException e) {
+    //        // OK
+    //        log(e.getMessage());
+    //    }
+    //}
 
     public void test_resolveObjectNameIfNeeds_entity_no_SQLFile() {
         // ## Arrange ##

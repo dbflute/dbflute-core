@@ -28,7 +28,8 @@ import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.util.Srl;
 
 /**
@@ -38,16 +39,22 @@ import org.dbflute.util.Srl;
 public class DfSPolicyTableStatementChecker {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String ADDITIONAL_SUFFIX = "(additional)";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyFirstDateSecretary _firstDateSecretary;
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyTableStatementChecker(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
+    public DfSPolicyTableStatementChecker(DfSPolicyFirstDateSecretary firstDateSecretary, DfSPolicyLogicalSecretary logicalSecretary) {
+        _firstDateSecretary = firstDateSecretary;
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================
@@ -60,11 +67,11 @@ public class DfSPolicyTableStatementChecker {
     }
 
     // ===================================================================================
-    //                                                                            Evaluate
-    //                                                                            ========
+    //                                                                           If Clause
+    //                                                                           =========
     // -----------------------------------------------------
-    //                                             If Clause
-    //                                             ---------
+    //                                              Evaluate
+    //                                              --------
     // e.g.
     //  if tableName is suffix:_ID then bad
     //  if tableName is suffix:_HISTORY then pkDbType is bigint
@@ -74,14 +81,19 @@ public class DfSPolicyTableStatementChecker {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         If Item-Value
+    //                                         -------------
     protected boolean isIfTrue(DfSPolicyStatement statement, DfSPolicyIfPart ifPart, Table table) {
         final String ifItem = ifPart.getIfItem();
         final String ifValue = ifPart.getIfValue();
         final boolean notIfValue = ifPart.isNotIfValue();
-        if (ifItem.equalsIgnoreCase("tableName")) {
+        if (ifItem.equalsIgnoreCase("tableName")) { // if tableName is ...
             return isHitExp(toComparingTableName(table), ifValue) == !notIfValue;
-        } else if (ifItem.equalsIgnoreCase("alias")) {
+        } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
             return isHitExp(table.getAlias(), ifValue) == !notIfValue;
+        } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
+            return determineFirstDate(statement, ifValue, notIfValue, table);
         } else if (ifItem.equalsIgnoreCase("pk_dbType") || ifItem.equalsIgnoreCase("pkDbType")) { // for compatible
             if (table.hasPrimaryKey()) {
                 final List<Column> pkList = table.getPrimaryKey();
@@ -109,31 +121,73 @@ public class DfSPolicyTableStatementChecker {
         return false;
     }
 
+    protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
+        return _firstDateSecretary.determineTableFirstDate(statement, ifValue, notIfValue, table);
+    }
+
+    // ===================================================================================
+    //                                                                         Then Clause
+    //                                                                         ===========
     // -----------------------------------------------------
-    //                                           Then Clause
-    //                                           -----------
+    //                                              Evaluate
+    //                                              --------
     protected void evaluateTableThenClause(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
-        final String policy = toPolicy(statement);
-        final DfSPolicyThenClause thenClause = statement.getThenClause();
-        final String thenTheme = thenClause.getThenTheme();
+        final String thenTheme = statement.getThenClause().getThenTheme();
         if (thenTheme != null) {
-            final boolean notThenClause = thenClause.isNotThenTheme();
-            final String notOr = notThenClause ? "not " : "";
-            if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
-                result.violate(policy, "The table is no good: " + toTableDisp(table));
-            } else if (thenTheme.contains("hasCommonColumn")) {
-                if (!table.hasAllCommonColumn() == !notThenClause) {
-                    result.violate(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
-                }
-            } else {
-                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
-            }
+            evaluateTableThenTheme(statement, result, table);
         } else {
-            evaluateColumnThenItemValue(statement, result, table);
+            evaluateTableThenItemValue(statement, result, table);
         }
     }
 
-    protected void evaluateColumnThenItemValue(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
+    // -----------------------------------------------------
+    //                                            Then Theme
+    //                                            ----------
+    protected void evaluateTableThenTheme(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
+        final String policy = toPolicy(statement);
+        final DfSPolicyThenClause thenClause = statement.getThenClause();
+        final String thenTheme = thenClause.getThenTheme(); // already not null here
+        final boolean notThenClause = thenClause.isNotThenTheme();
+        final String notOr = notThenClause ? "not " : "";
+        if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
+            result.violate(policy, "The table is no good: " + toTableDisp(table));
+        } else if (thenTheme.contains("hasPK")) {
+            if (!table.hasPrimaryKey() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have primary key: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("upperCaseBasis")) {
+            if (Srl.isLowerCaseAny(toComparingTableName(table)) == !notThenClause) {
+                result.violate(policy, "The table name should " + notOr + "be on upper case basis: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("lowerCaseBasis")) {
+            if (Srl.isUpperCaseAny(toComparingTableName(table)) == !notThenClause) {
+                result.violate(policy, "The table name should " + notOr + "be on lower case basis: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("identityIfPureIDPK")) {
+            if (_logicalSecretary.isNotIdentityIfPureIDPK(table) == !notThenClause) {
+                result.violate(policy, "The primary key should " + notOr + "be identity: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("hasCommonColumn")) {
+            if (!table.hasAllCommonColumn() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("hasAlias")) {
+            if (!table.hasAlias() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have table alias: " + toTableDisp(table));
+            }
+        } else if (thenTheme.contains("hasComment")) {
+            if (!table.hasComment() == !notThenClause) {
+                result.violate(policy, "The table should " + notOr + "have table comment: " + toTableDisp(table));
+            }
+        } else {
+            throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                       Then Item-Value
+    //                                       ---------------
+    protected void evaluateTableThenItemValue(DfSPolicyStatement statement, DfSPolicyResult result, Table table) {
         final List<String> violationList = statement.getThenClause().evaluate(thenPart -> {
             return doEvaluateColumnThenItemValue(statement, thenPart, table, actual -> {
                 return buildViolation(table, thenPart, actual);
@@ -173,7 +227,8 @@ public class DfSPolicyTableStatementChecker {
                 final String pkName = pk.getPrimaryKeyName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(pkName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(pkName);
+                    final String disp = pkName + (pk.isAdditionalPrimaryKey() ? ADDITIONAL_SUFFIX : "");
+                    return violationCall.apply(disp);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
@@ -181,7 +236,8 @@ public class DfSPolicyTableStatementChecker {
                 final String fkName = fk.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(fkName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(fkName);
+                    final String disp = fkName + (fk.isAdditionalForeignKey() ? ADDITIONAL_SUFFIX : "");
+                    return violationCall.apply(disp);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
@@ -189,7 +245,8 @@ public class DfSPolicyTableStatementChecker {
                 final String uqName = uq.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(uqName, comparingValue)) {
-                    return violationCall.apply(uqName);
+                    final String disp = uqName + (uq.isAdditional() ? ADDITIONAL_SUFFIX : "");
+                    return violationCall.apply(disp);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
@@ -267,19 +324,19 @@ public class DfSPolicyTableStatementChecker {
     //                                                                        Assist Logic
     //                                                                        ============
     protected boolean isHitExp(String exp, String hint) {
-        return _secretary.isHitExp(exp, hint);
+        return _logicalSecretary.isHitExp(exp, hint);
     }
 
     protected String toComparingTableName(Table table) {
-        return _secretary.toComparingTableName(table);
+        return _logicalSecretary.toComparingTableName(table);
     }
 
     protected String toComparingDbTypeWithSize(Column column) {
-        return _secretary.toComparingDbTypeWithSize(column);
+        return _logicalSecretary.toComparingDbTypeWithSize(column);
     }
 
     protected String toTableDisp(Table table) {
-        return _secretary.toTableDisp(table);
+        return _logicalSecretary.toTableDisp(table);
     }
 
     protected String toPolicy(DfSPolicyStatement statement) {
@@ -290,14 +347,14 @@ public class DfSPolicyTableStatementChecker {
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 
     protected void throwSchemaPolicyCheckUnknownPropertyException(String property) {
-        _secretary.throwSchemaPolicyCheckUnknownPropertyException(property);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownPropertyException(property);
     }
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
-        _secretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+        _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
     }
 }

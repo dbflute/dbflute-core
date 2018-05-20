@@ -33,11 +33,13 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.helper.process.SystemScript;
+import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
 import org.dbflute.infra.reps.DfRepsSchemaSqlDir;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
-import org.dbflute.properties.assistant.DfConnectionProperties;
-import org.dbflute.properties.assistant.dispatchvariable.DfOutsideFileVariableInfo;
+import org.dbflute.properties.assistant.base.dispatch.DfOutsideFileVariableInfo;
+import org.dbflute.properties.assistant.database.DfConnectionProperties;
+import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
@@ -47,7 +49,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jflute
  */
-public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties {
+public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition
@@ -131,12 +133,27 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                          Take Finally
     //                                          ------------
     public List<File> getTakeFinallySqlFileList(String sqlRootDir) {
-        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(sqlRootDir);
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaTakeFinallySqlDir(sqlRootDir);
         return schemaSqlDir.collectTakeFinallySqlFileList();
     }
 
     public Map<String, File> getTakeFinallySqlFileMap(String sqlRootDir) {
         return convertToSchemaSqlFileMap(getTakeFinallySqlFileList(sqlRootDir));
+    }
+
+    protected DfRepsSchemaSqlDir createRepsSchemaTakeFinallySqlDir(String sqlRootDir) {
+        // #for_now suffix logic is in DBFlute Runtime so override it for now until runtime fix by jflute (2018/03/02)
+        return new DfRepsSchemaSqlDir(sqlRootDir) {
+            @Override
+            protected DfSchemaResourceFinder createSchemaResourceFinder() {
+                final DfSchemaResourceFinder finder = super.createSchemaResourceFinder();
+                final List<String> supportedExtList = SystemScript.getSupportedExtList();
+                for (String supportedExt : supportedExtList) {
+                    finder.addSuffix(supportedExt);
+                }
+                return finder;
+            }
+        };
     }
 
     // ===================================================================================
@@ -707,7 +724,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (targetDir == null) {
             return DfCollectionUtil.emptyList();
         }
-        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(targetDir);
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaTakeFinallySqlDir(targetDir);
         return schemaSqlDir.collectTakeFinallySqlFileList();
     }
 
@@ -1141,19 +1158,60 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                             Limited
     //                                                                             =======
-    public boolean isReplaceSchemaLimited() {
+    public boolean isReplaceSchemaLimited() { // closet
         return isProperty("isReplaceSchemaLimited", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================
     //                                                                       Schema Policy
     //                                                                       =============
-    public boolean isCheckSchemaPolicyInReps() {
+    public boolean isCheckSchemaPolicyInReps() { // closet
         return isProperty("isCheckSchemaPolicyInReps", false, getReplaceSchemaMap());
     }
 
     public String getSchemaPolicyInRepsSchemaXml() {
         return SCHEMA_POLICY_CHECK_SCHEMA_XML;
+    }
+
+    // ===================================================================================
+    //                                                                        Data Manager
+    //                                                                        ============
+    public boolean isUseRepsAsDataManager() { // closet
+        return isProperty("isUseRepsAsDataManager", false, getRepsAsDataManagerMap());
+    }
+
+    protected Map<String, Map<String, Object>> _repsAsDataManagerMap;
+
+    protected Map<String, Map<String, Object>> getRepsAsDataManagerMap() {
+        if (_repsAsDataManagerMap != null) {
+            return _repsAsDataManagerMap;
+        }
+        final Object obj = getReplaceSchemaMap().get("repsAsDataManagerMap");
+        if (obj == null) {
+            _repsAsDataManagerMap = DfCollectionUtil.emptyMap();
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, Map<String, Object>> repsMap = (Map<String, Map<String, Object>>) obj;
+            _repsAsDataManagerMap = repsMap;
+        }
+        return _repsAsDataManagerMap;
+    }
+
+    // ===================================================================================
+    //                                                             Conventional TakeAssert
+    //                                                             =======================
+    protected DfConventionalTakeAssertMap _conventionalTakeAssertMap;
+
+    public DfConventionalTakeAssertMap getConventionalTakeAssertMap() {
+        if (_conventionalTakeAssertMap != null) {
+            return _conventionalTakeAssertMap;
+        }
+        _conventionalTakeAssertMap = createConventionalTakeAssertMap();
+        return _conventionalTakeAssertMap;
+    }
+
+    protected DfConventionalTakeAssertMap createConventionalTakeAssertMap() {
+        return new DfConventionalTakeAssertMap(getRepsEnvType(), getReplaceSchemaMap(), _propertyValueHandler);
     }
 
     // ===================================================================================

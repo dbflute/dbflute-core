@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
  * @author jflute
  * @since 0.9.5.3 (2009/08/01 Saturday)
  */
-public final class DfAdditionalUniqueKeyProperties extends DfAbstractHelperProperties {
+public final class DfAdditionalUniqueKeyProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

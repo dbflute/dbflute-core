@@ -24,7 +24,7 @@ import org.dbflute.helper.StringKeyMap;
 /**
  * @author jflute
  */
-public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProperties {
+public final class DfMultipleFKPropertyProperties extends DfAbstractDBFluteProperties {
     // /- - - - - - - - - - - - - - - - - - - 
     // It's closet until it becomes to need!
     // - - - - - - - - - -/

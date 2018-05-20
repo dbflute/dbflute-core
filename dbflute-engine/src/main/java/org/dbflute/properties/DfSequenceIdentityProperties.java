@@ -33,7 +33,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
-import org.dbflute.properties.assistant.DfTableDeterminer;
+import org.dbflute.properties.assistant.base.DfTableDeterminer;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -41,7 +41,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public final class DfSequenceIdentityProperties extends DfAbstractHelperProperties {
+public final class DfSequenceIdentityProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

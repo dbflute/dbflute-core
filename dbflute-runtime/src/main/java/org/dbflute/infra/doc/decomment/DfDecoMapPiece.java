@@ -15,26 +15,27 @@
  */
 package org.dbflute.infra.doc.decomment;
 
-import org.dbflute.helper.mapstring.MapListString;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import org.dbflute.helper.dfmap.DfMapStyle;
 
 /**
  * @author hakiba
  * @author cabos
  * @author jflute
+ * @author deco
  */
 public class DfDecoMapPiece {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DEFAULT_FORMAT_VERSION = "1.0";
+    public static final String DEFAULT_FORMAT_VERSION = "1.1";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -50,14 +51,15 @@ public class DfDecoMapPiece {
     protected final String pieceCode;
     protected final LocalDateTime pieceDatetime;
     protected final String pieceOwner;
+    protected final String pieceGitBranch;
     protected final List<String> previousPieceList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfDecoMapPiece(String formatVersion, String tableName, String columnName, DfDecoMapPieceTargetType targetType, String decomment,
-                          String databaseComment, Long commentVersion, List<String> authorList, String pieceCode,
-                          LocalDateTime pieceDatetime, String pieceOwner, List<String> previousPieceList) {
+            String databaseComment, Long commentVersion, List<String> authorList, String pieceCode, LocalDateTime pieceDatetime,
+            String pieceOwner, String pieceGitBranch, List<String> previousPieceList) {
         this.formatVersion = formatVersion;
         this.tableName = tableName;
         this.columnName = columnName;
@@ -65,14 +67,15 @@ public class DfDecoMapPiece {
         this.decomment = decomment;
         this.databaseComment = databaseComment;
         this.commentVersion = commentVersion;
-        this.authorList = authorList.stream().distinct().collect(Collectors.toList());
+        this.authorList = new ArrayList<>(authorList);
+        if (!authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
         this.pieceCode = pieceCode;
         this.pieceDatetime = pieceDatetime;
         this.pieceOwner = pieceOwner;
-        this.previousPieceList = previousPieceList.stream().distinct().collect(Collectors.toList());
-        if (!this.authorList.contains(pieceOwner)) {
-            this.authorList.add(pieceOwner);
-        }
+        this.pieceGitBranch = pieceGitBranch;
+        this.previousPieceList = previousPieceList;
     }
 
     // done cabos move to before accessor by jflute (2017/08/10)
@@ -92,6 +95,7 @@ public class DfDecoMapPiece {
     //     ; pieceCode = AL3OR1P
     //     ; pieceDatetime = 2017-12-31T12:34:56.789
     //     ; pieceOwner = deco
+    //     ; pieceGitBranch = develop
     //     ; previousPieceList = list:{}
     // }
     // map:{
@@ -106,6 +110,7 @@ public class DfDecoMapPiece {
     //     ; pieceCode = HF7ELSE
     //     ; pieceDatetime = 2017-10-15T16:17:18.199
     //     ; pieceOwner = jflute
+    //     ; pieceGitBranch = master
     //     ; previousPieceList = list:{ FE893L1 }
     // }
     public Map<String, Object> convertToMap() {
@@ -123,6 +128,7 @@ public class DfDecoMapPiece {
         map.put("pieceCode", this.pieceCode);
         map.put("pieceDatetime", this.pieceDatetime);
         map.put("pieceOwner", this.pieceOwner);
+        map.put("pieceGitBranch", this.pieceGitBranch);
         map.put("previousPieceList", this.previousPieceList);
         return map;
     }
@@ -132,7 +138,7 @@ public class DfDecoMapPiece {
     //                                                                            ========
     @Override
     public String toString() {
-        return new MapListString().buildMapString(this.convertToMap());
+        return new DfMapStyle().toMapString(this.convertToMap());
     }
 
     // ===================================================================================
@@ -153,6 +159,14 @@ public class DfDecoMapPiece {
 
     public DfDecoMapPieceTargetType getTargetType() {
         return targetType;
+    }
+
+    public boolean isTargetTypeTable() {
+        return targetType == DfDecoMapPieceTargetType.Table;
+    }
+
+    public boolean isTargetTypeColumn() {
+        return targetType == DfDecoMapPieceTargetType.Column;
     }
 
     public String getDecomment() {
@@ -181,6 +195,10 @@ public class DfDecoMapPiece {
 
     public String getPieceOwner() {
         return pieceOwner;
+    }
+
+    public String getPieceGitBranch() {
+        return pieceGitBranch;
     }
 
     public List<String> getPreviousPieceList() {

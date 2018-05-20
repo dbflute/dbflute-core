@@ -16,11 +16,9 @@
 package org.dbflute.logic.doc.spolicy.reps;
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
@@ -31,10 +29,19 @@ import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.DfSchemaPolicyProperties;
+import org.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The checker of SchemaPolicyCheck in ReplaceSchema. <br>
+ * SchemaPolicyCheck in ReplaceSchema is merely limited facade to get errors earlier. <br>
+ * So the differences exist between Doc and ReplaceSchema: <br>
+ * <pre>
+ * o basically all checks are in Doc.
+ * o except AdditionalSchema in ReplaceSchema (should not do)
+ * o except AdditionalForeignKey (also PK, UQ) in ReplaceSchema (should not do)
+ * </pre>
  * @author jflute
  * @since 1.1.2 (2017/1/4 Wednesday)
  */
@@ -49,12 +56,14 @@ public class DfSPolicyInRepsChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSchemaSource _dataSource;
+    protected final DfDocumentSelector _documentSelector;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyInRepsChecker(DfSchemaSource dataSource) {
+    public DfSPolicyInRepsChecker(DfSchemaSource dataSource, DfDocumentSelector documentSelector) {
         _dataSource = dataSource;
+        _documentSelector = documentSelector;
     }
 
     // ===================================================================================
@@ -79,8 +88,7 @@ public class DfSPolicyInRepsChecker {
             final AppData appData = reader.read();
             final Database database = appData.getDatabase();
             initializeClassificationDeployment(database); // for "then classification"
-            final List<Table> tableList = database.getTableList();
-            final DfSPolicyChecker checker = policyProp.createChecker(() -> tableList);
+            final DfSPolicyChecker checker = createChecker(policyProp, database);
             checker.checkPolicyIfNeeds();
         } finally {
             deleteTemporarySchemaXmlIfExists(schemaXml);
@@ -99,6 +107,12 @@ public class DfSPolicyInRepsChecker {
     protected void initializeClassificationDeployment(final Database database) {
         final DfClassificationProperties clsProp = getClassificationProperties();
         clsProp.initializeClassificationDeployment(database);
+    }
+
+    protected DfSPolicyChecker createChecker(DfSchemaPolicyProperties policyProp, Database database) {
+        return policyProp.createChecker(database, () -> {
+            return _documentSelector.lazyLoadIfNeedsCoreSchemaDiffList(); // for table/column first date
+        });
     }
 
     protected void deleteTemporarySchemaXmlIfExists(String schemaXml) {

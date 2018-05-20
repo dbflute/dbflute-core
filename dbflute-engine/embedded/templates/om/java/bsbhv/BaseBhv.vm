@@ -352,6 +352,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
      * @throws EntityDuplicatedException When the entity has been duplicated.
      * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+#if ($table.isDeprecatedSelectByPKUQ())
+     * @deprecated ${table.deprecatedSelectByPKUQComment}
+#end
      */
     public ${table.filterSelectByPKOptionalReturnIfNeeds($myExtendedObjectClassName)} selectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsString}) {
         return facadeSelectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsCallingString});
@@ -381,6 +384,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @throws EntityDuplicatedException When the entity has been duplicated.
      * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+#if ($table.isDeprecatedSelectByPKUQ())
+     * @deprecated ${table.deprecatedSelectByPKUQComment}
+#end
      */
     public ${myExtendedObjectClassName} selectByPK${table.selectByPKSuffix}WithDeletedCheck(${table.primaryKeyArgsString}) {
         return doSelectByPKWithDeletedCheck(${table.primaryKeyArgsCallingString}, typeOfSelectedEntity());
@@ -405,6 +411,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
      * @throws EntityDuplicatedException When the entity has been duplicated.
      * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+#if ($table.isDeprecatedSelectByPKUQ())
+     * @deprecated ${table.deprecatedSelectByPKUQComment}
+#end
      */
     public ${table.filterSelectEntityOptionalReturn(${myExtendedObjectClassName})} selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
         return facadeSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.7.5 (2008/06/25 Wednesday)
  */
-public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
+public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition

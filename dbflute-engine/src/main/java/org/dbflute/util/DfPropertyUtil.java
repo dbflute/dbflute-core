@@ -89,25 +89,17 @@ public class DfPropertyUtil {
     }
 
     public static List<Object> listProp(Properties prop, String key) {
-        final MapListString mapListString = new MapListString();
-        return mapListString.generateList(stringProp(prop, key));
-    }
-
-    public static List<Object> listProp(Properties prop, String key, String delimiter) {
-        final MapListString mapListString = new MapListString();
-        mapListString.setDelimiter(delimiter);
+        final MapListString mapListString = createMapListString();
         return mapListString.generateList(stringProp(prop, key));
     }
 
     public static Map<String, Object> mapProp(Properties prop, String key) {
-        final MapListString mapListString = new MapListString();
+        final MapListString mapListString = createMapListString();
         return mapListString.generateMap(stringProp(prop, key));
     }
 
-    public static Map<String, Object> mapProp(Properties prop, String key, String delimiter) {
-        final MapListString mapListString = new MapListString();
-        mapListString.setDelimiter(delimiter);
-        return mapListString.generateMap(stringProp(prop, key));
+    protected static MapListString createMapListString() {
+        return new MapListString();
     }
 
     public static String getLogStrKey(String key) {

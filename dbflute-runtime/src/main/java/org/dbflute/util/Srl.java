@@ -1229,15 +1229,16 @@ public class Srl {
     protected static int doCount(String str, String element, boolean ignoreCase) {
         assertStringNotNull(str);
         assertElementNotNull(element);
-        String filteredStr = ignoreCase ? str.toLowerCase() : str;
+        final String filteredStr = ignoreCase ? str.toLowerCase() : str;
         final String filteredElement = ignoreCase ? element.toLowerCase() : element;
         int count = 0;
+        int baseIndex = 0;
         while (true) {
-            final int index = filteredStr.indexOf(filteredElement);
+            final int index = filteredStr.indexOf(filteredElement, baseIndex);
             if (index < 0) {
                 break;
             }
-            filteredStr = filteredStr.substring(index + filteredElement.length());
+            baseIndex = index + filteredElement.length();
             ++count;
         }
         return count;

@@ -124,7 +124,7 @@ public class DfSchemaInitializerFactory {
     }
 
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
-        final DfSchemaInitializerSQLServer initializer = new DfSchemaInitializerSQLServer();
+        final DfSchemaInitializerSQLServer initializer = new DfSchemaInitializerSQLServer(_databaseTypeFacadeProp);
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }

@@ -18,7 +18,11 @@ package org.dbflute.unit;
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,39 +30,51 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-import junit.framework.TestCase;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.function.Supplier;
 
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.hook.AccessContext;
+import org.dbflute.system.DBFluteSystem;
+import org.dbflute.system.provider.DfCurrentDateProvider;
 import org.dbflute.unit.markhere.MarkHereManager;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfResourceUtil;
-import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.TestCase;
 
 /**
  * @author jflute
  * @since 1.1.0 (2014/10/12 Sunday)
  */
-public abstract class EngineTestCase extends TestCase {
+public abstract class EngineTestCase extends TestCase { // similar to PlainTestCase
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for sub class. (NotNull) */
-    protected final Logger _xlogger = LoggerFactory.getLogger(getClass());
+    private final Logger _xlogger = LoggerFactory.getLogger(getClass());
+    // UTFlute wants to use logger for caller output
+    // but should remove the dependency to Log4j
+    // (logging through commons-logging gives us fixed caller...)
+    //protected final Logger _xlogger = Logger.getLogger(getClass());
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The manager of mark here. (NullAllowed: lazy-loaded) */
-    protected MarkHereManager _xmarkHereManager;
+    private MarkHereManager _xmarkHereManager;
 
     /** The reserved title for logging test case beginning. (NullAllowed: before preparation or already showed) */
-    protected String _xreservedTitle;
+    private String _xreservedTitle;
+
+    /** Does it use switchedCurrentDate in this test case? */
+    private boolean _xuseSwitchedCurrentDate;
 
     // ===================================================================================
     //                                                                            Settings
@@ -75,40 +91,30 @@ public abstract class EngineTestCase extends TestCase {
         _xreservedTitle = "<<< " + xgetCaseDisp() + " >>>";
     }
 
+    protected String xgetCaseDisp() {
+        return getClass().getSimpleName() + "." + getName() + "()";
+    }
+
+    @Override
+    protected void runTest() throws Throwable {
+        try {
+            super.runTest();
+            postTest();
+        } catch (Throwable e) { // to record in application log
+            log("Failed to finish the test: " + xgetCaseDisp(), e);
+            throw e;
+        }
+    }
+
+    protected void postTest() {
+    }
+
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         xclearAccessContext();
-        xclearMark();
-    }
-
-    protected void xprepareAccessContext() {
-        final AccessContext context = new AccessContext();
-        context.setAccessTimestamp(currentTimestamp());
-        context.setAccessDate(currentDate());
-        context.setAccessUser(Thread.currentThread().getName());
-        context.setAccessProcess(getClass().getSimpleName());
-        AccessContext.setAccessContextOnThread(context);
-    }
-
-    /**
-     * Get the access context for common column auto setup of DBFlute.
-     * @return The instance of access context on the thread. (basically NotNull)
-     */
-    protected AccessContext getAccessContext() { // user method
-        return AccessContext.getAccessContextOnThread();
-    }
-
-    protected void xclearAccessContext() {
-        AccessContext.clearAccessContextOnThread();
-    }
-
-    protected void xclearMark() {
-        if (xhasMarkHereManager()) {
-            xgetMarkHereManager().checkNonAssertedMark();
-            xgetMarkHereManager().clearMarkMap();
-            xdestroyMarkHereManager();
-        }
+        xclearSwitchedCurrentDate();
+        xclearMark(); // last process to be able to be used in tearDown()
     }
 
     // ===================================================================================
@@ -181,10 +187,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "Foo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keyword The keyword string. (NotNull) 
+     * @param keyword The keyword string. (NotNull)
      */
     protected void assertContains(String str, String keyword) {
-        if (!DfStringUtil.contains(str, keyword)) {
+        if (!Srl.contains(str, keyword)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should have the keyword but not found: " + keyword);
         }
@@ -201,10 +207,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "ux"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keyword The keyword string. (NotNull) 
+     * @param keyword The keyword string. (NotNull)
      */
     protected void assertContainsIgnoreCase(String str, String keyword) {
-        if (!DfStringUtil.containsIgnoreCase(str, keyword)) {
+        if (!Srl.containsIgnoreCase(str, keyword)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should have the keyword but not found: " + keyword);
         }
@@ -220,10 +226,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "fx", "oo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsAll(String str, String... keywords) {
-        if (!DfStringUtil.containsAll(str, keywords)) {
+        if (!Srl.containsAll(str, keywords)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should have all keywords but not found: " + newArrayList(keywords));
         }
@@ -239,10 +245,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "fx", "oo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsAllIgnoreCase(String str, String... keywords) {
-        if (!DfStringUtil.containsAllIgnoreCase(str, keywords)) {
+        if (!Srl.containsAllIgnoreCase(str, keywords)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should have all keywords but not found: " + newArrayList(keywords));
         }
@@ -259,10 +265,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "fx", "ux"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsAny(String str, String... keywords) {
-        if (!DfStringUtil.containsAny(str, keywords)) {
+        if (!Srl.containsAny(str, keywords)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should have any keyword but not found: " + newArrayList(keywords));
         }
@@ -279,10 +285,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "fx", "ux"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsAnyIgnoreCase(String str, String... keywords) {
-        if (!DfStringUtil.containsAnyIgnoreCase(str, keywords)) {
+        if (!Srl.containsAnyIgnoreCase(str, keywords)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should have any keyword but not found: " + newArrayList(keywords));
         }
@@ -299,10 +305,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertNotContains(str, "foo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keyword The keyword string. (NotNull) 
+     * @param keyword The keyword string. (NotNull)
      */
     protected void assertNotContains(String str, String keyword) {
-        if (DfStringUtil.contains(str, keyword)) {
+        if (Srl.contains(str, keyword)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should not have the keyword but found: " + keyword);
         }
@@ -319,10 +325,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContains(str, "foo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param str The string to assert. (NotNull)
-     * @param keyword The keyword string. (NotNull) 
+     * @param keyword The keyword string. (NotNull)
      */
     protected void assertNotContainsIgnoreCase(String str, String keyword) {
-        if (DfStringUtil.containsIgnoreCase(str, keyword)) {
+        if (Srl.containsIgnoreCase(str, keyword)) {
             log("Asserted string: " + str); // might be large so show at log
             fail("the string should not have the keyword but found: " + keyword);
         }
@@ -342,10 +348,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContainsKeyword(strList, "ux"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param strList The list of string. (NotNull)
-     * @param keyword The keyword string. (NotNull) 
+     * @param keyword The keyword string. (NotNull)
      */
     protected void assertContainsKeyword(Collection<String> strList, String keyword) {
-        if (!DfStringUtil.containsKeyword(newArrayList(strList), keyword)) {
+        if (!Srl.containsKeyword(strList, keyword)) {
             fail("the list should have the keyword but not found: " + keyword);
         }
     }
@@ -359,10 +365,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContainsKeyword(strList, "fo", "ux", "foo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param strList The list of string. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsKeywordAll(Collection<String> strList, String... keywords) {
-        if (!DfStringUtil.containsKeywordAll(newArrayList(strList), keywords)) {
+        if (!Srl.containsKeywordAll(strList, keywords)) {
             fail("the list should have all keywords but not found: " + newArrayList(keywords));
         }
     }
@@ -376,10 +382,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContainsKeyword(strList, "fo", "ux", "foo"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param strList The list of string. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsKeywordAllIgnoreCase(Collection<String> strList, String... keywords) {
-        if (!DfStringUtil.containsKeywordAllIgnoreCase(newArrayList(strList), keywords)) {
+        if (!Srl.containsKeywordAllIgnoreCase(strList, keywords)) {
             fail("the list should have all keywords (case ignored) but not found: " + newArrayList(keywords));
         }
     }
@@ -393,10 +399,10 @@ public abstract class EngineTestCase extends TestCase {
      * assertContainsKeyword(strList, "Fo", "ux", "qux"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param strList The list of string. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsKeywordAny(Collection<String> strList, String... keywords) {
-        if (!DfStringUtil.containsKeywordAny(newArrayList(strList), keywords)) {
+        if (!Srl.containsKeywordAny(strList, keywords)) {
             fail("the list should have any keyword but not found: " + newArrayList(keywords));
         }
     }
@@ -411,16 +417,16 @@ public abstract class EngineTestCase extends TestCase {
      * assertContainsKeyword(strList, "po", "ux", "qux"); <span style="color: #3F7E5E">// false</span>
      * </pre>
      * @param strList The list of string. (NotNull)
-     * @param keywords The array of keyword string. (NotNull) 
+     * @param keywords The array of keyword string. (NotNull)
      */
     protected void assertContainsKeywordAnyIgnoreCase(Collection<String> strList, String... keywords) {
-        if (!DfStringUtil.containsKeywordAnyIgnoreCase(newArrayList(strList), keywords)) {
+        if (!Srl.containsKeywordAnyIgnoreCase(strList, keywords)) {
             fail("the list should have any keyword (case ignored) but not found: " + newArrayList(keywords));
         }
     }
 
     /**
-     * Assert that the list has any element (not empty). <br />
+     * Assert that the list has any element (not empty). <br>
      * You can use this to guarantee assertion in loop like this:
      * <pre>
      * List&lt;Member&gt; memberList = memberBhv.selectList(cb);
@@ -455,28 +461,16 @@ public abstract class EngineTestCase extends TestCase {
         }
     }
 
-    /**
-     * @param list
-     * @deprecated use {@link #assertHasAnyElement(Collection)}
-     */
-    protected void assertListNotEmpty(List<?> list) { // old style
-        if (list.isEmpty()) {
-            fail("the list should NOT be empty but empty.");
-        }
-    }
-
     // -----------------------------------------------------
     //                                             Mark Here
     //                                             ---------
     /**
      * Mark here to assert that it goes through the road.
      * <pre>
-     * final String mark = "cursor";
-     * MemberCB cb = new MemberCB();
-     * memberBhv.selectCursor(cb, entity -&gt; {
-     *     <span style="color: #FD4747">markHere</span>(mark);
+     * memberBhv.selectCursor(<span style="color: #553000">cb</span> -&gt; ..., entity -&gt; {
+     *     <span style="color: #FD4747">markHere</span>("cursor");
      * });
-     * assertMarked(mark); <span style="color: #3F7E5E">// the callback called</span>
+     * <span style="color: #994747">assertMarked</span>("cursor"); <span style="color: #3F7E5E">// the callback called</span>
      * </pre>
      * @param mark The your original mark expression as string. (NotNull)
      */
@@ -488,12 +482,10 @@ public abstract class EngineTestCase extends TestCase {
     /**
      * Assert the mark is marked. (found in existing marks)
      * <pre>
-     * final String mark = "cursor";
-     * MemberCB cb = new MemberCB();
-     * memberBhv.selectCursor(cb, entity -&gt; {
-     *     markHere(mark);
+     * memberBhv.selectCursor(<span style="color: #553000">cb</span> -&gt; ..., entity -&gt; {
+     *     <span style="color: #994747">markHere</span>("cursor");
      * });
-     * <span style="color: #FD4747">assertMarked</span>(mark); <span style="color: #3F7E5E">// the callback called</span>
+     * <span style="color: #FD4747">assertMarked</span>("cursor"); <span style="color: #3F7E5E">// the callback called</span>
      * </pre>
      * @param mark The your original mark expression as string. (NotNull)
      */
@@ -527,17 +519,25 @@ public abstract class EngineTestCase extends TestCase {
         _xmarkHereManager = null;
     }
 
+    protected void xclearMark() {
+        if (xhasMarkHereManager()) {
+            xgetMarkHereManager().checkNonAssertedMark();
+            xgetMarkHereManager().clearMarkMap();
+            xdestroyMarkHereManager();
+        }
+    }
+
     // ===================================================================================
     //                                                                      Logging Helper
     //                                                                      ==============
     /**
-     * Log the messages. <br />
+     * Log the messages. <br>
      * If you set an exception object to the last element, it shows stack traces.
      * <pre>
      * Member member = ...;
      * <span style="color: #FD4747">log</span>(member.getMemberName(), member.getBirthdate());
      * <span style="color: #3F7E5E">// -&gt; Stojkovic, 1965/03/03</span>
-     * 
+     *
      * Exception e = ...;
      * <span style="color: #FD4747">log</span>(member.getMemberName(), member.getBirthdate(), e);
      * <span style="color: #3F7E5E">// -&gt; Stojkovic, 1965/03/03</span>
@@ -559,9 +559,14 @@ public abstract class EngineTestCase extends TestCase {
         }
         final StringBuilder sb = new StringBuilder();
         int index = 0;
+        int skipCount = 0;
         for (Object msg : msgs) {
             if (index == arrayLength - 1 && cause != null) { // last loop and it is cause
                 break;
+            }
+            if (skipCount > 0) { // already resolved as variable
+                --skipCount; // until count zero
+                continue;
             }
             if (sb.length() > 0) {
                 sb.append(", ");
@@ -572,7 +577,26 @@ public abstract class EngineTestCase extends TestCase {
             } else if (msg instanceof Date) {
                 appended = toString(msg, "yyyy/MM/dd");
             } else {
-                appended = msg != null ? msg.toString() : null;
+                String strMsg = msg != null ? msg.toString() : null;
+                int nextIndex = index + 1;
+                skipCount = 0; // just in case
+                while (strMsg != null && strMsg.contains("{}")) {
+                    if (arrayLength <= nextIndex) {
+                        break;
+                    }
+                    final Object nextObj = msgs[nextIndex];
+                    final String replacement;
+                    if (nextObj != null) {
+                        // escape two special characters of replaceFirst() to avoid illegal group reference
+                        replacement = Srl.replace(Srl.replace(nextObj.toString(), "\\", "\\\\"), "$", "\\$");
+                    } else {
+                        replacement = "null";
+                    }
+                    strMsg = strMsg.replaceFirst("\\{\\}", replacement);
+                    ++skipCount;
+                    ++nextIndex;
+                }
+                appended = strMsg;
             }
             sb.append(appended);
             ++index;
@@ -595,17 +619,6 @@ public abstract class EngineTestCase extends TestCase {
     // ===================================================================================
     //                                                                         Show Helper
     //                                                                         ===========
-    protected void showPage(PagingResultBean<?>... pages) {
-        int count = 1;
-        for (PagingResultBean<? extends Object> page : pages) {
-            log("[page" + count + "]");
-            for (Object entity : page) {
-                log("  " + entity);
-            }
-            ++count;
-        }
-    }
-
     protected void showList(List<?>... list) {
         int count = 1;
         for (List<? extends Object> ls : list) {
@@ -617,19 +630,30 @@ public abstract class EngineTestCase extends TestCase {
         }
     }
 
+    protected void showPage(PagingResultBean<?>... pages) {
+        int count = 1;
+        for (PagingResultBean<? extends Object> page : pages) {
+            log("[page" + count + "]");
+            for (Object entity : page) {
+                log("  " + entity);
+            }
+            ++count;
+        }
+    }
+
     // ===================================================================================
     //                                                                       String Helper
     //                                                                       =============
     protected String replace(String str, String fromStr, String toStr) {
-        return DfStringUtil.replace(str, fromStr, toStr);
+        return Srl.replace(str, fromStr, toStr);
     }
 
     protected List<String> splitList(String str, String delimiter) {
-        return DfStringUtil.splitList(str, delimiter);
+        return Srl.splitList(str, delimiter);
     }
 
     protected List<String> splitListTrimmed(String str, String delimiter) {
-        return DfStringUtil.splitListTrimmed(str, delimiter);
+        return Srl.splitListTrimmed(str, delimiter);
     }
 
     protected String toString(Object obj) {
@@ -658,20 +682,65 @@ public abstract class EngineTestCase extends TestCase {
     // ===================================================================================
     //                                                                         Date Helper
     //                                                                         ===========
+    protected LocalDate currentLocalDate() {
+        return toLocalDate(currentUtilDate());
+    }
+
+    protected LocalDateTime currentLocalDateTime() {
+        return toLocalDateTime(currentUtilDate());
+    }
+
+    protected LocalTime currentLocalTime() {
+        return toLocalTime(currentUtilDate());
+    }
+
+    /**
+     * @return The current utility date. (NotNull)
+     * @deprecated use currentUtilDate()
+     */
     protected Date currentDate() {
-        return new Date(System.currentTimeMillis());
+        return currentUtilDate();
+    }
+
+    protected Date currentUtilDate() {
+        return DBFluteSystem.currentDate();
     }
 
     protected Timestamp currentTimestamp() {
-        return new Timestamp(System.currentTimeMillis());
+        return new Timestamp(DBFluteSystem.currentTimeMillis());
     }
 
+    protected LocalDate toLocalDate(Object obj) {
+        return DfTypeUtil.toLocalDate(obj, getUnitTimeZone());
+    }
+
+    protected LocalDateTime toLocalDateTime(Object obj) {
+        return DfTypeUtil.toLocalDateTime(obj, getUnitTimeZone());
+    }
+
+    protected LocalTime toLocalTime(Object obj) {
+        return DfTypeUtil.toLocalTime(obj, getUnitTimeZone());
+    }
+
+    /**
+     * @param obj The source of date. (NullAllowed)
+     * @return The utility date. (NotNull)
+     * @deprecated use currentUtilDate()
+     */
     protected Date toDate(Object obj) {
+        return toUtilDate(obj);
+    }
+
+    protected Date toUtilDate(Object obj) {
         return DfTypeUtil.toDate(obj);
     }
 
     protected Timestamp toTimestamp(Object obj) {
         return DfTypeUtil.toTimestamp(obj);
+    }
+
+    protected TimeZone getUnitTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
     }
 
     // ===================================================================================
@@ -738,14 +807,41 @@ public abstract class EngineTestCase extends TestCase {
     }
 
     // ===================================================================================
+    //                                                                       System Helper
+    //                                                                       =============
+    /**
+     * Get the line separator. (LF fixedly)
+     * @return The string of the line separator. (NotNull)
+     */
+    protected String ln() {
+        return "\n";
+    }
+
+    // ===================================================================================
     //                                                                          Filesystem
     //                                                                          ==========
     /**
-     * Get the directory object of the (application or Eclipse) project. (default: target/test-classes/../../)
+     * Get the directory object of the (application or Eclipse) project.
      * @return The file object of the directory. (NotNull)
      */
-    protected File getProjectDir() { // customize point
-        return getTestCaseBuildDir().getParentFile().getParentFile(); // target/test-classes/../../
+    protected File getProjectDir() { // you can override
+        final Set<String> markSet = defineProjectDirMarkSet();
+        for (File dir = getTestCaseBuildDir(); dir != null; dir = dir.getParentFile()) {
+            if (dir.isDirectory()) {
+                if (Arrays.stream(dir.listFiles()).anyMatch(file -> markSet.contains(file.getName()))) {
+                    return dir;
+                }
+            }
+        }
+        throw new IllegalStateException("Not found the project dir marks: " + markSet);
+    }
+
+    /**
+     * Define the marks of the (application or Eclipse) project.
+     * @return the set of mark file name for the project. (NotNull)
+     */
+    protected Set<String> defineProjectDirMarkSet() {
+        return DfCollectionUtil.newHashSet("build.xml", "pom.xml", "build.gradle", ".project", ".idea");
     }
 
     /**
@@ -757,17 +853,78 @@ public abstract class EngineTestCase extends TestCase {
     }
 
     // ===================================================================================
-    //                                                                       System Helper
-    //                                                                       =============
-    /**
-     * Get the line separator. (LF fixedly)
-     * @return The string of the line separator. (NotNull)
-     */
-    protected String ln() {
-        return "\n";
+    //                                                                             DBFlute
+    //                                                                             =======
+    // -----------------------------------------------------
+    //                                         AccessContext
+    //                                         -------------
+    protected void xprepareAccessContext() {
+        final AccessContext context = new AccessContext();
+        context.setAccessLocalDate(currentLocalDate());
+        context.setAccessLocalDateTime(currentLocalDateTime());
+        context.setAccessTimestamp(currentTimestamp());
+        context.setAccessDate(currentUtilDate());
+        context.setAccessUser(Thread.currentThread().getName());
+        context.setAccessProcess(getClass().getSimpleName());
+        context.setAccessModule(getClass().getSimpleName());
+        AccessContext.setAccessContextOnThread(context);
     }
 
-    protected String xgetCaseDisp() {
-        return getClass().getSimpleName() + "." + getName() + "()";
+    /**
+     * Get the access context for common column auto setup of DBFlute.
+     * @return The instance of access context on the thread. (basically NotNull)
+     */
+    protected AccessContext getAccessContext() { // user method
+        return AccessContext.getAccessContextOnThread();
+    }
+
+    protected void xclearAccessContext() {
+        AccessContext.clearAccessContextOnThread();
+    }
+
+    // -----------------------------------------------------
+    //                                         DBFluteSystem
+    //                                         -------------
+    protected void switchCurrentDate(Supplier<LocalDateTime> dateTimeSupplier) {
+        assertNotNull(dateTimeSupplier);
+        if (DBFluteSystem.hasCurrentDateProvider()) {
+            String msg = "The current date provider already exists, cannot use new provider: " + dateTimeSupplier;
+            throw new IllegalStateException(msg);
+        }
+        _xuseSwitchedCurrentDate = true;
+        DBFluteSystem.unlock();
+        DBFluteSystem.setCurrentDateProvider(new DfCurrentDateProvider() {
+            public long currentTimeMillis() {
+                final LocalDateTime currentDateTime = dateTimeSupplier.get();
+                assertNotNull(currentDateTime);
+                return DfTypeUtil.toDate(currentDateTime).getTime();
+            }
+        });
+    }
+
+    protected void xclearSwitchedCurrentDate() {
+        if (_xuseSwitchedCurrentDate) {
+            DBFluteSystem.unlock();
+            DBFluteSystem.setCurrentDateProvider(null);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    protected Logger xgetLogger() {
+        return _xlogger;
+    }
+
+    protected String xgetReservedTitle() {
+        return _xreservedTitle;
+    }
+
+    protected void xsetReservedTitle(String reservedTitle) {
+        _xreservedTitle = reservedTitle;
+    }
+
+    public boolean xisUseSwitchedCurrentDate() {
+        return _xuseSwitchedCurrentDate;
     }
 }

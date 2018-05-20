@@ -91,9 +91,14 @@ public class DfTableMeta {
     }
 
     public String getTableSqlName() {
-        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         final String quotedName = prop.quoteTableNameIfNeedsDirectUse(_tableName);
         return _unifiedSchema.buildSqlName(quotedName); // driven is resolved here so it uses pure name here
+    }
+
+    public String getTableDispName() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.filterTableDispNameIfNeeds(getTableDbName());
     }
 
     // ===================================================================================
@@ -107,6 +112,20 @@ public class DfTableMeta {
         if (userTabComments != null && userTabComments.hasComments()) {
             _tableComment = userTabComments.getComments();
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================
@@ -137,13 +156,6 @@ public class DfTableMeta {
             }
         }
         return getTableFullQualifiedName() + "(" + _tableType + ")" + (comment.trim().length() > 0 ? " // " + comment : "");
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

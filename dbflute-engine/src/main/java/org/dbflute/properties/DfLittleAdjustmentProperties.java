@@ -38,14 +38,16 @@ import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.optional.OptionalEntity;
-import org.dbflute.properties.assistant.DfTableDeterminer;
+import org.dbflute.properties.assistant.base.DfTableDeterminer;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSpecifyBatchColumnMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperties {
+public final class DfLittleAdjustmentProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                          Definition
@@ -75,11 +77,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String getProperty(String key, String defaultValue) {
-        return getPropertyIfNotBuildProp(key, defaultValue, getLittleAdjustmentMap());
+        return _propertyValueHandler.getPropertyIfNotBuildProp(key, defaultValue, getLittleAdjustmentMap());
     }
 
     public boolean isProperty(String key, boolean defaultValue) {
-        return isPropertyIfNotExistsFromBuildProp(key, defaultValue, getLittleAdjustmentMap());
+        return _propertyValueHandler.isPropertyIfNotExistsFromBuildProp(key, defaultValue, getLittleAdjustmentMap());
     }
 
     // -----------------------------------------------------
@@ -186,6 +188,23 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isMakeBatchUpdateSpecifyColumn() { // closet
         return isProperty("isMakeBatchUpdateSpecifyColumn", isCompatibleBeforeJava8());
+    }
+
+    // -----------------------------------------------------
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
+    protected DfDeprecatedSelectByPKUQMap _deprecatedSelectByPKUQMap;
+
+    public DfDeprecatedSelectByPKUQMap getDeprecatedSelectByPKUQMap() {
+        if (_deprecatedSelectByPKUQMap != null) {
+            return _deprecatedSelectByPKUQMap;
+        }
+        _deprecatedSelectByPKUQMap = createDeprecatedSelectByPKUQMap();
+        return _deprecatedSelectByPKUQMap;
+    }
+
+    protected DfDeprecatedSelectByPKUQMap createDeprecatedSelectByPKUQMap() {
+        return new DfDeprecatedSelectByPKUQMap(getLittleAdjustmentMap(), _propertyValueHandler);
     }
 
     // ===================================================================================
@@ -483,6 +502,23 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isMakeDirectConditionManualOrder() { // closet
         return isProperty("isMakeDirectConditionManualOrder", isCompatibleBeforeJava8());
+    }
+
+    // -----------------------------------------------------
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
+    protected DfDeprecatedSpecifyBatchColumnMap _deprecatedSpecifyBatchColumnMap;
+
+    public DfDeprecatedSpecifyBatchColumnMap getDeprecatedSpecifyBatchColumnMap() {
+        if (_deprecatedSpecifyBatchColumnMap != null) {
+            return _deprecatedSpecifyBatchColumnMap;
+        }
+        _deprecatedSpecifyBatchColumnMap = createDeprecatedSpecifyBatchColumnMap();
+        return _deprecatedSpecifyBatchColumnMap;
+    }
+
+    protected DfDeprecatedSpecifyBatchColumnMap createDeprecatedSpecifyBatchColumnMap() {
+        return new DfDeprecatedSpecifyBatchColumnMap(getLittleAdjustmentMap(), _propertyValueHandler);
     }
 
     // ===================================================================================
@@ -1611,7 +1647,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isCompatibleFreeGenPropVariableNotOrdered() { // closet
         return isProperty("isCompatibleFreeGenPropVariableNotOrdered", false);
     }
-    
+
     public boolean isCompatibleUserMessagesVariableNotOrdered() { // closet
         return isProperty("isCompatibleUserMessagesVariableNotOrdered", false);
     }

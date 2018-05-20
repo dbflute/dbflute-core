@@ -72,7 +72,7 @@ public class DfProcedureMeta {
     public String getProcedureCommentForSchemaHtml() {
         final DfDocumentProperties prop = getDocumentProperties();
         String comment = _procedureComment;
-        comment = prop.resolvePreTextForSchemaHtml(comment);
+        comment = prop.resolveSchemaHtmlPreText(comment);
         return comment;
     }
 

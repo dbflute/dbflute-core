@@ -436,12 +436,12 @@ public class DfClassificationTop {
     //                                                                         ===========
     protected String resolveTextForJavaDoc(String comment, String indent) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveTextForJavaDoc(comment, indent);
+        return prop.resolveJavaDocContent(comment, indent);
     }
 
     protected String resolveTextForSchemaHtml(String comment) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveTextForSchemaHtml(comment);
+        return prop.resolveSchemaHtmlContent(comment);
     }
 
     // ===============================================================================

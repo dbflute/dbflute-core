@@ -968,6 +968,12 @@ public class DfPmbMetaData {
         return metaInfo != null && _columnHandler.isConceptTypeStringClob(metaInfo.getDbTypeName());
     }
 
+    public boolean needsBytesBlobHandling(String propertyName) {
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
+        return metaInfo != null && _columnHandler.isConceptTypeBytesBlob(metaInfo.getDbTypeName());
+    }
+
     public boolean needsFixedLengthStringHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);

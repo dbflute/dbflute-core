@@ -82,7 +82,7 @@ public class DfPropHtmlPropertyLangElement {
 
     public String getPropertyValueHtmlEncoded() {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        final String resolved = prop.resolveTextForSchemaHtml(_propertyValue);
+        final String resolved = prop.resolveSchemaHtmlContent(_propertyValue);
         return resolved != null ? resolved : "";
     }
 
@@ -100,7 +100,7 @@ public class DfPropHtmlPropertyLangElement {
 
     public String getCommentHtmlEncoded() {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        final String resolved = prop.resolveTextForSchemaHtml(_comment);
+        final String resolved = prop.resolveSchemaHtmlContent(_comment);
         return resolved != null ? resolved : "";
     }
 

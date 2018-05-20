@@ -28,7 +28,7 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.8.1 (2009/01/07 Wednesday)
  */
-public final class DfDependencyInjectionProperties extends DfAbstractHelperProperties {
+public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

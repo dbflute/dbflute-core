@@ -1842,7 +1842,7 @@ public class ForeignKey implements Constraint {
     //                                         Common Helper
     //                                         -------------
     protected String resolveCommentForJavaDoc(String comment, String indent) {
-        return getDocumentProperties().resolveTextForJavaDoc(comment, indent);
+        return getDocumentProperties().resolveJavaDocContent(comment, indent);
     }
 
     // ===================================================================================

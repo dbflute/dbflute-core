@@ -224,7 +224,7 @@ public class DfBqpBehaviorFile {
     }
 
     private String buildJavaDocComment(DfLanguageGrammar grammar, DfDocumentProperties docprop, String title, String adjustedIndent) {
-        final String resolvedTitle = docprop.resolveTextForJavaDocIndentDirectly(title, adjustedIndent);
+        final String resolvedTitle = docprop.resolveJavaDocContentIndentDirectly(title, adjustedIndent);
         return grammar.buildJavaDocCommentWithTitleIndentDirectly(resolvedTitle, adjustedIndent);
     }
 

@@ -128,6 +128,7 @@ package org.apache.torque.engine.database.model;
  */
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -136,6 +137,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -143,6 +145,7 @@ import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -270,7 +273,7 @@ public class Column {
 
         // others
         _defaultValue = attrib.getValue("default");
-        _plainComment = attrib.getValue("comment");
+        setPlainComment(attrib.getValue("comment")); // setter for sync
 
         handleProgramReservationWord();
         return true;
@@ -280,7 +283,7 @@ public class Column {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isPgReservColumn(_name)) {
             _synonym = prop.resolvePgReservColumn(_name);
-            _plainComment = _plainComment + " (using DBFlute synonym)";
+            setPlainComment(_plainComment + " (using DBFlute synonym)"); // setter for sync
         }
     }
 
@@ -421,15 +424,20 @@ public class Column {
      * @return The column alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
+        if (_cachedColumnAlias != null) {
+            return _cachedColumnAlias;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _plainComment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
             if (alias != null) {
-                return alias;
+                _cachedColumnAlias = alias;
+                return _cachedColumnAlias;
             }
         }
-        return "";
+        _cachedColumnAlias = "";
+        return _cachedColumnAlias;
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
@@ -482,6 +490,11 @@ public class Column {
     public boolean isDbTypeStringClob() { // as pinpoint
         return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
+
+    // not use here for now, because only when procedure parameter by jflute (2018/05/11)
+    //public boolean isDbTypeBytesBlob() { // as pinpoint
+    //    return hasDbType() && _columnHandler.isConceptTypeBytesBlob(_dbType);
+    //}
 
     public boolean isDbTypeMySQLDatetime() { // as pinpoint
         return hasDbType() && _columnHandler.isMySQLDatetime(_dbType);
@@ -661,12 +674,17 @@ public class Column {
     // -----------------------------------------------------
     //                                        Column Comment
     //                                        --------------
+    protected String _cachedColumnAlias; // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedColumnComment; // me too
+
     public String getPlainComment() {
         return _plainComment;
     }
 
-    public void setPlainComment(String plainComment) {
+    public void setPlainComment(String plainComment) { // can be protected? (protected in Table.java) by jflute (2018/05/04)
         this._plainComment = plainComment;
+        _cachedColumnAlias = null; // needs to clear because the value is from plain comment
+        _cachedColumnComment = null; // me too
     }
 
     public boolean hasComment() { // means resolved comment (not plain)
@@ -675,24 +693,28 @@ public class Column {
     }
 
     public String getComment() {
+        if (_cachedColumnComment != null) {
+            return _cachedColumnComment;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = prop.extractCommentFromDbComment(_plainComment);
-        return comment != null ? comment : "";
+        _cachedColumnComment = comment != null ? comment : "";
+        return _cachedColumnComment;
     }
 
-    public void setComment(String comment) {
-        this._plainComment = comment;
+    public void setComment(String comment) { // unused? (not exists in Table.java) by jflute (2018/05/04)
+        setPlainComment(comment); // setter for sync
     }
 
     public String getCommentForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForSchemaHtml(getComment());
+        final String comment = prop.resolveSchemaHtmlContent(getComment());
         return comment != null ? comment : "";
     }
 
     public String getCommentForSchemaHtmlPre() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolvePreTextForSchemaHtml(getComment());
+        final String comment = prop.resolveSchemaHtmlPreText(getComment());
         return comment != null ? comment : "";
     }
 
@@ -703,7 +725,7 @@ public class Column {
 
     public String getCommentForJavaDoc() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForJavaDoc(getComment(), "    ");
+        final String comment = prop.resolveJavaDocContent(getComment(), "    ");
         return comment != null ? comment : "";
     }
 
@@ -717,7 +739,7 @@ public class Column {
             return "null";
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForDBMeta(getComment());
+        final String comment = prop.resolveDBMetaCodeSettingText(getComment());
         return comment != null ? "\"" + comment + "\"" : "null";
     }
 
@@ -851,7 +873,7 @@ public class Column {
 
     public String getPrimaryKeyTitleForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String value = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
+        final String value = prop.resolveSchemaHtmlTagAttr(_primaryKeyName);
         if (value == null) {
             return "";
         }
@@ -895,7 +917,7 @@ public class Column {
         } else {
             title = _primaryKeyName;
         }
-        return " title=\"" + prop.resolveAttributeForSchemaHtml(title) + "\"";
+        return " title=\"" + prop.resolveSchemaHtmlTagAttr(title) + "\"";
     }
 
     // ===================================================================================
@@ -1376,7 +1398,7 @@ public class Column {
             sb.append(")");
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
     }
 
@@ -1482,7 +1504,7 @@ public class Column {
             sb.append(")");
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
     }
 
@@ -1953,6 +1975,32 @@ public class Column {
      */
     public void setSql2EntityHintedClassification(String sql2EntityHintedClassification) {
         _sql2EntityHintedClassification = sql2EntityHintedClassification;
+    }
+
+    // ===================================================================================
+    //                                                                          First Date
+    //                                                                          ==========
+    public boolean hasFirstDate() {
+        return findFirstDate().isPresent();
+    }
+
+    public String getFirstDateSimpleExp() { // e.g. "2017/05/18"
+        return findFirstDate().map(firstDate -> {
+            return new HandyDate(firstDate).toDisp("yyyy/MM/dd");
+        }).orElse("");
+    }
+
+    public String getFirstDateRelatedExp() { // e.g. "2017/05/18" or "first"
+        return findFirstDate().map(firstDate -> {
+            return new HandyDate(firstDate).toDisp("yyyy/MM/dd");
+        }).orElse("first");
+    }
+
+    public OptionalThing<Date> findFirstDate() {
+        final Table table = getTable();
+        return table.getDatabase().getFirstDateAgent().flatMap(agent -> {
+            return agent.findColumnFirstDate(table.getTableDbName(), getName());
+        });
     }
 
     // ===================================================================================

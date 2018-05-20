@@ -30,6 +30,9 @@ public class DfDatabaseTypeFacadeProp {
         _basicProp = basicProp;
     }
 
+    // ===================================================================================
+    //                                                                     Target Database
+    //                                                                     ===============
     public String getTargetDatabase() {
         return _basicProp.getTargetDatabase();
     }
@@ -94,9 +97,9 @@ public class DfDatabaseTypeFacadeProp {
         return _basicProp.isDatabaseAsSubSupported();
     }
 
-    // /- - - - - - - - - - - - - - - - - - - -
-    // simple DBMS definition about generating
-    // - - - - - - - - - -/
+    // ===================================================================================
+    //                                                                       DBMS Behavior
+    //                                                                       =============
     public boolean isDatabaseAsSchemaSpecificationOmittable() {
         return _basicProp.isDatabaseAsSchemaSpecificationOmittable();
     }
@@ -111,5 +114,12 @@ public class DfDatabaseTypeFacadeProp {
 
     public boolean isDatabaseAsForeignKeyExtractingUnsupported() {
         return _basicProp.isDatabaseAsForeignKeyExtractingUnsupported();
+    }
+
+    // ===================================================================================
+    //                                                                Sub Type on Database
+    //                                                                ====================            ========
+    public boolean isSubTypeOnDatabaseSQLServerLocalDB() {
+        return _basicProp.isSubTypeOnDatabaseSQLServerLocalDB();
     }
 }

@@ -21,7 +21,7 @@ import java.util.Properties;
 /**
  * @author jflute
  */
-public final class DfHibernateProperties extends DfAbstractHelperProperties {
+public final class DfHibernateProperties extends DfAbstractDBFluteProperties {
 
     // 
     // ...Making (2009/07/11 Saturday)

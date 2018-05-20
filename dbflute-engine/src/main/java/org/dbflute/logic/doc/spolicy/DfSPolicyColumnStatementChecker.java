@@ -17,14 +17,19 @@ package org.dbflute.logic.doc.spolicy;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyCrossSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyFirstDateSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -35,14 +40,18 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyCrossSecretary _crossDeterminer;
+    protected final DfSPolicyFirstDateSecretary _firstDateDeterminer;
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyColumnStatementChecker(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
+    public DfSPolicyColumnStatementChecker(DfSPolicyCrossSecretary crossDeterminer, DfSPolicyFirstDateSecretary firstDateDeterminer,
+            DfSPolicyLogicalSecretary logicalSecretary) {
+        _crossDeterminer = crossDeterminer;
+        _firstDateDeterminer = firstDateDeterminer;
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================
@@ -55,11 +64,11 @@ public class DfSPolicyColumnStatementChecker {
     }
 
     // ===================================================================================
-    //                                                                            Evaluate
-    //                                                                            ========
+    //                                                                           If Clause
+    //                                                                           =========
     // -----------------------------------------------------
-    //                                             If Clause
-    //                                             ---------
+    //                                              Evaluate
+    //                                              --------
     // e.g.
     //  if columnName is suffix:_FLG then notNull
     //  if columnName is suffix:_FLG then dbType is integer
@@ -69,6 +78,9 @@ public class DfSPolicyColumnStatementChecker {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         If Item-Value
+    //                                         -------------
     protected boolean isIfTrue(DfSPolicyStatement statement, DfSPolicyIfPart ifPart, Column column) {
         final String ifItem = ifPart.getIfItem();
         final String ifValue = ifPart.getIfValue();
@@ -94,9 +106,11 @@ public class DfSPolicyColumnStatementChecker {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
         } else if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
-            return isHitExp(toComparingColumnName(column), ifValue) == !notIfValue;
+            return isHitExp(toComparingColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
+        } else if (ifItem.equalsIgnoreCase("tableColumnName")) { // if tableColumnName is ...
+            return isHitExp(toComparingTableColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
-            return isHitExp(column.getAlias(), ifValue) == !notIfValue;
+            return isHitExp(column.getAlias(), toAliasComparingIfValue(column, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("dbType")) { // if dbType is ...
             if (column.hasDbType()) { // just in case
                 return isHitExp(column.getDbType(), ifValue) == !notIfValue;
@@ -110,60 +124,129 @@ public class DfSPolicyColumnStatementChecker {
                 final String exp = toComparingDbTypeWithSize(column);
                 return isHitExp(exp, ifValue) == !notIfValue;
             }
+        } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
+            return determineFirstDate(statement, ifValue, notIfValue, column);
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
         }
         return false;
     }
 
+    protected String toColumnNameComparingIfValue(Column column, String ifValue) {
+        return convertToColumnNameComparingValue(column, ifValue);
+    }
+
+    protected String toAliasComparingIfValue(Column column, String ifValue) {
+        return convertToAliasComparingValue(column, ifValue);
+    }
+
+    protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Column column) {
+        return _firstDateDeterminer.determineColumnFirstDate(statement, ifValue, notIfValue, column);
+    }
+
+    // ===================================================================================
+    //                                                                         Then Clause
+    //                                                                         ===========
     // -----------------------------------------------------
-    //                                           Then Clause
-    //                                           -----------
+    //                                              Evaluate
+    //                                              --------
     protected void evaluateColumnThenClause(DfSPolicyStatement statement, DfSPolicyResult result, Column column) {
-        final String policy = toPolicy(statement);
-        final DfSPolicyThenClause thenClause = statement.getThenClause();
-        final String thenTheme = thenClause.getThenTheme();
-        if (thenTheme != null) {
-            final boolean notThenClause = thenClause.isNotThenTheme();
-            final String notOr = notThenClause ? "not " : "";
-            if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
-                result.violate(policy, "The column is no good: " + toColumnDisp(column));
-            } else if (thenTheme.equalsIgnoreCase("notNull")) {
-                if (!column.isNotNull() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "be not-null: " + toColumnDisp(column));
-                }
-            } else if (thenTheme.equalsIgnoreCase("identity")) {
-                if (!column.isAutoIncrement() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "be identity (auto increment): " + toColumnDisp(column));
-                }
-            } else if (thenTheme.equalsIgnoreCase("pk")) {
-                if (!column.isPrimaryKey() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "be primary key: " + toColumnDisp(column));
-                }
-            } else if (thenTheme.equalsIgnoreCase("fk")) {
-                if (!column.isForeignKey() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "be foreign key: " + toColumnDisp(column));
-                }
-            } else if (thenTheme.equalsIgnoreCase("unique")) {
-                if (!column.isUnique() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "be unique: " + toColumnDisp(column));
-                }
-            } else if (thenTheme.equalsIgnoreCase("index")) {
-                if (!column.hasIndex() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "have index: " + toColumnDisp(column));
-                }
-            } else if (thenTheme.equalsIgnoreCase("classification")) {
-                if (!column.hasClassification() == !notThenClause) {
-                    result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
-                }
-            } else {
-                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
-            }
+        if (statement.getThenClause().getThenTheme() != null) {
+            evaluateColumnThenTheme(statement, result, column);
         } else {
             evaluateColumnThenItemValue(statement, result, column);
         }
     }
 
+    // -----------------------------------------------------
+    //                                            Then Theme
+    //                                            ----------
+    protected void evaluateColumnThenTheme(DfSPolicyStatement statement, DfSPolicyResult result, Column column) {
+        final String policy = toPolicy(statement);
+        final DfSPolicyThenClause thenClause = statement.getThenClause();
+        final String thenTheme = thenClause.getThenTheme(); // already not null here
+        final boolean notThenClause = thenClause.isNotThenTheme();
+        final String notOr = notThenClause ? "not " : "";
+        if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
+            result.violate(policy, "The column is no good: " + toColumnDisp(column));
+        } else if (thenTheme.equalsIgnoreCase("notNull")) {
+            if (!column.isNotNull() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be not-null: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("identity")) {
+            if (!column.isAutoIncrement() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be identity (auto increment): " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("pk")) {
+            if (!column.isPrimaryKey() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be primary key: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("fk")) {
+            if (!column.isForeignKey() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be foreign key: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("unique")) {
+            if (!column.isUnique() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be unique: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("index")) {
+            if (!column.hasIndex() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "have index: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("classification")) {
+            if (!column.hasClassification() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
+            if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
+                result.violate(policy, "The column name should " + notOr + "be on upper case basis: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("lowerCaseBasis")) {
+            if (Srl.isUpperCaseAny(toComparingColumnName(column)) == !notThenClause) {
+                result.violate(policy, "The column name should " + notOr + "be on lower case basis: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("hasAlias")) {
+            if (!column.hasAlias() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "have column alias: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("hasComment")) {
+            if (!column.hasComment() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "have column comment: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("sameColumnAliasIfSameColumnName")) {
+            final String vio = _crossDeterminer.determineSameColumnAliasIfSameColumnName(column, prepareYourTargeting(statement));
+            if (vio != null) {
+                result.violate(policy, vio);
+            }
+        } else if (thenTheme.equalsIgnoreCase("sameColumnDbTypeIfSameColumnName")) {
+            final String vio = _crossDeterminer.determineSameColumnDbTypeIfSameColumnName(column, prepareYourTargeting(statement));
+            if (vio != null) {
+                result.violate(policy, vio);
+            }
+        } else if (thenTheme.equalsIgnoreCase("sameColumnSizeIfSameColumnName")) {
+            final String vio = _crossDeterminer.determineSameColumnSizeIfSameColumnName(column, prepareYourTargeting(statement));
+            if (vio != null) {
+                result.violate(policy, vio);
+            }
+        } else if (thenTheme.equalsIgnoreCase("sameColumnNameIfSameColumnAlias")) {
+            final String vio = _crossDeterminer.determineSameColumnNameIfSameColumnAlias(column, prepareYourTargeting(statement));
+            if (vio != null) {
+                result.violate(policy, vio);
+            }
+        } else {
+            throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+        }
+    }
+
+    protected Predicate<Column> prepareYourTargeting(DfSPolicyStatement statement) { // to evaluate same condition to your column
+        return your -> {
+            return statement.getIfClause().evaluate(ifPart -> isIfTrue(statement, ifPart, your));
+        };
+    }
+
+    // -----------------------------------------------------
+    //                                       Then Item-Value
+    //                                       ---------------
     protected void evaluateColumnThenItemValue(DfSPolicyStatement statement, DfSPolicyResult result, Column column) {
         final List<String> violationList = statement.getThenClause().evaluate(thenPart -> {
             return doEvaluateColumnThenItemValue(statement, thenPart, column, actual -> {
@@ -230,12 +313,17 @@ public class DfSPolicyColumnStatementChecker {
             }
         } else if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
             final String columnName = toComparingColumnName(column);
-            if (!isHitExp(columnName, thenValue) == !notThenValue) {
+            if (!isHitExp(columnName, toColumnNameComparingThenValue(column, thenValue)) == !notThenValue) {
                 return violationCall.apply(columnName);
+            }
+        } else if (thenItem.equalsIgnoreCase("tableColumnName")) { // e.g. tableColumnName is contain:R.M
+            final String tableColumnName = toComparingTableColumnName(column);
+            if (!isHitExp(tableColumnName, toColumnNameComparingThenValue(column, thenValue)) == !notThenValue) {
+                return violationCall.apply(tableColumnName);
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             final String alias = column.getAlias();
-            if (!isHitExp(alias, thenValue) == !notThenValue) {
+            if (!isHitExp(alias, toAliasComparingThenValue(column, thenValue)) == !notThenValue) {
                 return violationCall.apply(alias);
             }
         } else if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
@@ -264,6 +352,14 @@ public class DfSPolicyColumnStatementChecker {
         return null; // no violation
     }
 
+    protected String toColumnNameComparingThenValue(Column column, String thenValue) {
+        return convertToColumnNameComparingValue(column, thenValue);
+    }
+
+    protected String toAliasComparingThenValue(Column column, String thenValue) {
+        return convertToAliasComparingValue(column, thenValue);
+    }
+
     protected String buildViolation(Column column, DfSPolicyThenPart thenPart, String actual) {
         final String thenItem = thenPart.getThenItem();
         final String thenValue = thenPart.getThenValue();
@@ -273,26 +369,55 @@ public class DfSPolicyColumnStatementChecker {
     }
 
     // ===================================================================================
+    //                                                                     Comparing Value
+    //                                                                     ===============
+    protected String convertToColumnNameComparingValue(Column column, String yourValue) { // @since 1.1.8
+        String comparingValue = yourValue;
+        final String tableName = toComparingTableName(column); // e.g. columnName is $$table$$_ID
+        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
+        return comparingValue;
+    }
+
+    protected String convertToAliasComparingValue(Column column, String yourValue) { // @since 1.1.8
+        String comparingValue = yourValue;
+        final Table table = column.getTable();
+        if (table.hasAlias()) {
+            final String tableAlias = table.getAlias(); // alias is $$tableAlias$$ID
+            comparingValue = Srl.replace(comparingValue, "$$tableAlias$$", tableAlias);
+            comparingValue = Srl.replace(comparingValue, "$$TableAlias$$", tableAlias);
+        }
+        return comparingValue;
+    }
+
+    // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
     protected boolean isHitExp(String exp, String hint) {
-        return _secretary.isHitExp(exp, hint);
+        return _logicalSecretary.isHitExp(exp, hint);
     }
 
     protected String toComparingTableName(Column column) {
-        return _secretary.toComparingTableName(column.getTable());
+        return _logicalSecretary.toComparingTableName(column.getTable()); // e.g. MEMBER
     }
 
     protected String toComparingColumnName(Column column) {
-        return _secretary.toComparingColumnName(column);
+        return _logicalSecretary.toComparingColumnName(column); // e.g. MEMBER_NAME
+    }
+
+    protected String toComparingTableColumnName(Column column) {
+        final String tableName = toComparingTableName(column);
+        final String columnName = toComparingColumnName(column);
+        return tableName + "." + columnName; // e.g. MEMBER.MEMBER_NAME
     }
 
     protected String toComparingDbTypeWithSize(Column column) {
-        return _secretary.toComparingDbTypeWithSize(column);
+        return _logicalSecretary.toComparingDbTypeWithSize(column);
     }
 
     protected String toColumnDisp(Column column) {
-        return _secretary.toColumnDisp(column);
+        return _logicalSecretary.toColumnDisp(column);
     }
 
     protected String toPolicy(DfSPolicyStatement statement) {
@@ -303,14 +428,14 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 
     protected void throwSchemaPolicyCheckUnknownPropertyException(String property) {
-        _secretary.throwSchemaPolicyCheckUnknownPropertyException(property);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownPropertyException(property);
     }
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
-        _secretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+        _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
     }
 }

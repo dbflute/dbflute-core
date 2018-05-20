@@ -27,7 +27,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
-import org.dbflute.properties.assistant.DfTableListProvider;
+import org.dbflute.properties.assistant.base.DfTableListProvider;
 import org.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.dbflute.util.DfPropertyUtil;
 import org.dbflute.util.DfStringUtil;
@@ -35,7 +35,7 @@ import org.dbflute.util.DfStringUtil;
 /**
  * @author jflute
  */
-public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
+public final class DfCommonColumnProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                         Constructor

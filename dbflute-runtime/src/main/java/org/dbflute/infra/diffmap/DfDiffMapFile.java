@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.dbflute.exception.DfPropFileReadFailureException;
 import org.dbflute.exception.DfPropFileWriteFailureException;
-import org.dbflute.helper.mapstring.MapListFile;
+import org.dbflute.helper.dfmap.DfMapFile;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
@@ -32,12 +32,12 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 public class DfDiffMapFile {
 
     // ===================================================================================
-    //                                                                                Read
-    //                                                                                ====
+    //                                                                               Read
+    //                                                                              ======
     public Map<String, Object> readMap(InputStream ins) {
-        final MapListFile mapListFile = createMapListFile();
+        final DfMapFile mapFile = createMapFile();
         try {
-            return mapListFile.readMap(ins);
+            return mapFile.readMap(ins);
         } catch (Exception e) {
             throwDfPropFileReadFailureException(ins, e);
             return null; // unreachable
@@ -60,9 +60,9 @@ public class DfDiffMapFile {
     //                                                                               Write
     //                                                                               =====
     public void writeMap(OutputStream ous, Map<String, Object> map) {
-        final MapListFile mapListFile = createMapListFile();
+        final DfMapFile mapFile = createMapFile();
         try {
-            mapListFile.writeMap(ous, map);
+            mapFile.writeMap(ous, map);
         } catch (Exception e) {
             throwDfPropFileWriteFailureException(ous, e);
         }
@@ -78,9 +78,9 @@ public class DfDiffMapFile {
     }
 
     // ===================================================================================
-    //                                                                        MapList File
-    //                                                                        ============
-    protected MapListFile createMapListFile() {
-        return new MapListFile();
+    //                                                                            Map File
+    //                                                                            ========
+    protected DfMapFile createMapFile() {
+        return new DfMapFile(); // migrated for performance (2018/05/05) 
     }
 }

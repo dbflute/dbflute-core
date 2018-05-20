@@ -129,6 +129,7 @@ package org.apache.torque.engine.database.model;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -147,6 +148,7 @@ import org.dbflute.cbean.chelper.HpSDRFunction;
 import org.dbflute.cbean.chelper.dbms.HpSDRFunctionMySql;
 import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbway.DBDef;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
@@ -157,6 +159,7 @@ import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.properties.DfClassificationProperties;
@@ -170,7 +173,9 @@ import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
-import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
+import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSpecifyBatchColumnMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -277,7 +282,7 @@ public class Table {
         if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, _name)) {
             return false;
         }
-        _plainComment = attrib.getValue("comment");
+        setPlainComment(attrib.getValue("comment")); // setter for sync
         _javaName = attrib.getValue("javaName");
         return true;
     }
@@ -472,15 +477,20 @@ public class Table {
      * @return The table alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
+        if (_cachedColumnAlias != null) {
+            return _cachedColumnAlias;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _plainComment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
             if (alias != null) {
-                return alias;
+                _cachedColumnAlias = alias;
+                return _cachedColumnAlias;
             }
         }
-        return "";
+        _cachedColumnAlias = "";
+        return _cachedColumnAlias;
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
@@ -565,8 +575,17 @@ public class Table {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
+    protected String _cachedColumnAlias; // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedColumnComment; // me too
+
     public String getPlainComment() { // may contain its alias name
         return _plainComment;
+    }
+
+    protected void setPlainComment(String _plainComment) { // added for clearing cache so protected
+        this._plainComment = _plainComment;
+        _cachedColumnAlias = null; // needs to clear because the value is from plain comment
+        _cachedColumnComment = null; // me too
     }
 
     public boolean hasComment() { // means resolved comment (not plain)
@@ -575,20 +594,24 @@ public class Table {
     }
 
     public String getComment() {
+        if (_cachedColumnComment != null) {
+            return _cachedColumnComment;
+        }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = prop.extractCommentFromDbComment(_plainComment);
-        return comment != null ? comment : "";
+        _cachedColumnComment = comment != null ? comment : "";
+        return _cachedColumnComment;
     }
 
     public String getCommentForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        String comment = prop.resolveTextForSchemaHtml(getComment());
+        String comment = prop.resolveSchemaHtmlContent(getComment());
         return comment != null ? comment : "";
     }
 
     public String getCommentForSchemaHtmlPre() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolvePreTextForSchemaHtml(getComment());
+        final String comment = prop.resolveSchemaHtmlPreText(getComment());
         return comment != null ? comment : "";
     }
 
@@ -599,7 +622,7 @@ public class Table {
 
     public String getCommentForJavaDoc() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForJavaDoc(getComment(), "");
+        final String comment = prop.resolveJavaDocContent(getComment(), "");
         return comment != null ? comment : "";
     }
 
@@ -610,7 +633,7 @@ public class Table {
 
     public String getCommentForDBMeta() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForDBMeta(getComment());
+        final String comment = prop.resolveDBMetaCodeSettingText(getComment());
         return comment != null ? comment : "";
     }
 
@@ -644,7 +667,7 @@ public class Table {
         sb.append(", nameLength=").append(getTableDbName().length());
         sb.append(", columnCount=").append(getColumns().length);
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        return " title=\"" + prop.resolveAttributeForSchemaHtml(sb.toString()) + "\"";
+        return " title=\"" + prop.resolveSchemaHtmlTagAttr(sb.toString()) + "\"";
     }
 
     // ===================================================================================
@@ -1091,7 +1114,7 @@ public class Table {
      * Returns all parts of the primary key, separated by commas.
      * @return A CSV list of primary key parts.
      */
-    public String printPrimaryKey() {
+    public String printPrimaryKey() { // who is using? by jflute (2018/05/18)
         return printList(_columnList);
     }
 
@@ -2689,6 +2712,33 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                          First Date
+    //                                                                          ==========
+    public boolean hasFirstDate() {
+        return findFirstDate().isPresent();
+    }
+
+    public String getFirstDateSimpleExp() { // e.g. "2017/05/18"
+        return findFirstDate().map(firstDate -> {
+            return new HandyDate(firstDate).toDisp("yyyy/MM/dd");
+        }).orElse("");
+    }
+
+    public OptionalThing<Date> findFirstDate() {
+        return getDatabase().getFirstDateAgent().flatMap(agent -> agent.findTableFirstDate(getTableDbName()));
+    }
+
+    public boolean hasColumnFirstDate() {
+        List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.hasFirstDate()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                             Utility
     //                                                                             =======
     /**
@@ -3651,6 +3701,14 @@ public class Table {
         return prop.isCompatibleSelectScalarOldName();
     }
 
+    public boolean isCompatibleNewMyEntityConditionBean() {
+        return getLittleAdjustmentProperties().isCompatibleNewMyEntityConditionBean();
+    }
+
+    public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {
+        return getLittleAdjustmentProperties().isCompatibleDeleteNonstrictIgnoreDeleted();
+    }
+
     // -----------------------------------------------------
     //                                   Optional Properties
     //                                   -------------------
@@ -3667,16 +3725,15 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                      Small Adjustment
-    //                                      ----------------
-    public boolean isCompatibleNewMyEntityConditionBean() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isCompatibleNewMyEntityConditionBean();
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
+    public boolean isDeprecatedSelectByPKUQ() {
+        final DfDeprecatedSelectByPKUQMap propMap = getLittleAdjustmentProperties().getDeprecatedSelectByPKUQMap();
+        return propMap.isDeprecated() && propMap.isTableTarget(getTableDbName());
     }
 
-    public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isCompatibleDeleteNonstrictIgnoreDeleted();
+    public String getDeprecatedSelectByPKUQComment() {
+        return getLittleAdjustmentProperties().getDeprecatedSelectByPKUQMap().getDeprecatedComment();
     }
 
     // ===================================================================================
@@ -3777,6 +3834,18 @@ public class Table {
             }
         }
         return null;
+    }
+
+    // -----------------------------------------------------
+    //                                   Pinpoint Deprecated
+    //                                   -------------------
+    public boolean isDeprecatedSpecifyBatchColumn() {
+        final DfDeprecatedSpecifyBatchColumnMap propMap = getLittleAdjustmentProperties().getDeprecatedSpecifyBatchColumnMap();
+        return propMap.isDeprecated() && propMap.isTableTarget(getTableDbName());
+    }
+
+    public String getDeprecatedSpecifyBatchColumnComment() {
+        return getLittleAdjustmentProperties().getDeprecatedSpecifyBatchColumnMap().getDeprecatedComment();
     }
 
     // ===================================================================================
@@ -3909,6 +3978,14 @@ public class Table {
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
+    public boolean isSimpleDtoDomainTableTarget() {
+        return getProperties().getSimpleDtoProperties().isDomainTableTarget(this);
+    }
+
+    public boolean isSimpleDtoSql2EntityTarget() {
+        return getProperties().getSimpleDtoProperties().isSql2EntityTarget(this);
+    }
+
     public String getSimpleDtoBaseDtoClassName() {
         final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
         final String prefix = prop.getBaseDtoPrefix();
@@ -4186,7 +4263,7 @@ public class Table {
         String title = getBehaviorQueryPathTitle(behaviorQueryPath);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(title)) {
             final DfDocumentProperties prop = getProperties().getDocumentProperties();
-            title = prop.resolveTextForSchemaHtml(title);
+            title = prop.resolveSchemaHtmlContent(title);
             return "(" + title + ")";
         } else {
             return "&nbsp;";
@@ -4207,7 +4284,7 @@ public class Table {
         String description = getBehaviorQueryPathDescription(behaviorQueryPath);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(description)) {
             final DfDocumentProperties prop = getProperties().getDocumentProperties();
-            description = prop.resolvePreTextForSchemaHtml(description);
+            description = prop.resolveSchemaHtmlPreText(description);
             return description;
         } else {
             return "&nbsp;";

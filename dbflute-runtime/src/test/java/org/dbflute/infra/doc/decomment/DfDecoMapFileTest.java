@@ -48,7 +48,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     //                                                                              ======
     public void test_readPickup() throws Exception {
         // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
 
         // ## Act ##
         OptionalThing<DfDecoMapPickup> optPickup = decoMapFile.readPickup(buildTestResourcePath());
@@ -92,7 +92,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     //                                                                               =====
     public void test_merge_OnlyColumnComment() throws Exception {
         // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
         final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
         final DfDecoMapPiece piece1 = preparePieceColumn("MEMBER", "MEMBER_NAME", "hakiba", Collections.emptyList(), "SAMPLEPI");
         final DfDecoMapPiece piece2 = preparePieceColumn("MEMBER", "MEMBER_STATUS", "cabos", Collections.emptyList(), "ECECODED");
@@ -100,7 +100,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3);
 
         // ## Act ##
-        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList);
+        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList, Collections.emptyList());
 
         // ## Assert ##
         assertNotNull(result);
@@ -135,7 +135,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
 
     public void test_merge_noConflict() throws Exception {
         // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
         final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
         final String tableName = "MEMBER";
         final String columnName = "MEMBER_NAME";
@@ -151,7 +151,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3, piece4);
 
         // ## Act ##
-        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList);
+        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList, Collections.emptyList());
 
         // ## Assert ##
         assertNotNull(result);
@@ -180,7 +180,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
 
     public void test_merge_conflict() throws Exception {
         // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
         final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
         final String tableName = "MEMBER";
         final String columnName = "MEMBER_NAME";
@@ -197,7 +197,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3, piece4, piece5);
 
         // ## Act ##
-        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList);
+        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList, Collections.emptyList());
 
         // ## Assert ##
         assertNotNull(result);
@@ -236,7 +236,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
 
     public void test_merge_OverwritePickupByPiece() {
         // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
         final String tableName = "MEMBER_LOGIN";
         final String pieceCode = "NEWPIECE";
         final String author = "borderman";
@@ -248,13 +248,13 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final DfDecoMapPiece piece = preparePieceTable(tableName, author, Collections.emptyList(), pieceCode, pieceCodeList);
 
         // ## Act ##
-        DfDecoMapPickup mergedPickUp = decoMapFile.merge(optPickup, Collections.singletonList(piece));
+        DfDecoMapPickup mergedPickUp = decoMapFile.merge(optPickup, Collections.singletonList(piece), Collections.emptyList());
 
         // ## Assert ##
         assertNotNull(mergedPickUp);
         log(mergedPickUp);
 
-        DfDecoMapTablePart mergedTable = extractPickupTableAsOne(optPickup.get(), tableName);
+        DfDecoMapTablePart mergedTable = extractPickupTableAsOne(mergedPickUp, tableName);
         assertNotNull(mergedTable);
         assertEquals(tableName, mergedTable.getTableName());
 
@@ -268,12 +268,12 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
 
     public void test_merge_AllTestPiecesAndPickupAtResources() throws Exception {
         // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
         final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
         final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup(buildTestResourcePath());
 
         // ## Act ##
-        final DfDecoMapPickup mergedPickUp = decoMapFile.merge(optPickUp, pieceList);
+        final DfDecoMapPickup mergedPickUp = decoMapFile.merge(optPickUp, pieceList, Collections.emptyList());
 
         // ## Assert ##
         assertNotNull(mergedPickUp);
@@ -327,7 +327,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final String sampleAuthor = "cabos";
         final String samplePieceCode = "FE893L1";
         DfDecoMapPiece piece = preparePieceTable(sampleTableName, sampleAuthor, Collections.emptyList(), samplePieceCode);
-        DfDecoMapFile decoMapFile = new DfDecoMapFile() {
+        DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime()) {
             @Override
             protected String getCurrentDateStr() {
                 return currentDateStr;
@@ -355,7 +355,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final String samplePieceCode = "FE893L1";
         DfDecoMapPiece piece =
                 preparePieceColumn(sampleTableName, sampleColumnName, sampleAuthor, Collections.emptyList(), samplePieceCode);
-        DfDecoMapFile decoMapFile = new DfDecoMapFile() {
+        DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime()) {
             @Override
             protected String getCurrentDateStr() {
                 return currentDateStr;
@@ -378,7 +378,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     public void test_getCurrentDateStr() throws Exception {
         // ## Arrange ##
         final LocalDateTime currentDate = currentLocalDateTime();
-        DfDecoMapFile decoMapFile = new DfDecoMapFile() {
+        DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime()) {
 
             @Override
             protected LocalDateTime getCurrentLocalDateTime() {
@@ -423,7 +423,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
             List<String> authorList, String pieceCode, List<String> previousPieceList) {
         return new DfDecoMapPiece("1.0", tableName, columnName, type, "decomment",
                 "decomment does't mean database comment, means deco chan comment", 1L, authorList, pieceCode, currentLocalDateTime(),
-                author, previousPieceList);
+                author, "BRANCH_NAME", previousPieceList);
     }
 
     private DfDecoMapTablePart extractPickupTableAsOne(DfDecoMapPickup pickup, String tableName) {

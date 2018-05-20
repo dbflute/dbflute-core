@@ -38,13 +38,13 @@ import org.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
-import org.dbflute.logic.replaceschema.process.DfAlterCheckProcess;
-import org.dbflute.logic.replaceschema.process.DfAlterCheckProcess.CoreProcessPlayer;
-import org.dbflute.logic.replaceschema.process.DfArrangeBeforeRepsProcess;
 import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
 import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess.CoreProcessPlayer;
+import org.dbflute.logic.replaceschema.process.arrangebefore.DfArrangeBeforeRepsProcess;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
@@ -77,7 +77,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     protected String _areYouReadyAnswer; // from environment variable
     protected boolean _cancelled;
     protected String _varyingArg;
-    protected final DfDocumentSelector _selector = new DfDocumentSelector(); // e.g. AlterCheck
+    protected final DfDocumentSelector _documentSelector = new DfDocumentSelector(); // e.g. AlterCheck, SchemaPolicy
 
     // ===================================================================================
     //                                                                           Beginning
@@ -155,7 +155,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         if (isAlterProcess()) {
             processAlterCheck();
         } else { // normally here
-            processMain();
+            processReplaceSchema();
         }
     }
 
@@ -204,52 +204,93 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected DfAlterCheckProcess createAlterCheckProcess() {
-        final boolean schemaOnly = getReplaceSchemaProperties().isSchemaOnlyAlterCheck();
+        final boolean schemaOnly = isSchemaOnlyAlterCheck();
         return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
             public void playNext(String sqlRootDirectory) {
-                executeCoreProcess(sqlRootDirectory, false, schemaOnly);
+                executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().schemaOnly(schemaOnly));
             }
 
             public void playPrevious(String sqlRootDirectory) {
-                executeCoreProcess(sqlRootDirectory, true, schemaOnly);
+                executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().asPrevious().schemaOnly(schemaOnly));
             }
         });
     }
 
     protected void outputAlterCheckResultHtml() {
-        _selector.selectAlterCheckResultHtml();
+        _documentSelector.selectAlterCheckResultHtml();
         fireVelocityProcess();
+    }
+
+    // ===================================================================================
+    //                                                                       ReplaceSchema
+    //                                                                       =============
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // <<< main process here! >>>
+    // _/_/_/_/_/_/_/_/_/_/
+    protected void processReplaceSchema() {
+        final boolean dataOnly = isUseRepsAsDataManager();
+        executeCoreProcess(getPlaySqlDir(), new DfRepsCoreProcessSelector().dataOnly(dataOnly));
     }
 
     // ===================================================================================
     //                                                                        Core Process
     //                                                                        ============
-    protected void processMain() {
-        executeCoreProcess(getPlaySqlDir(), false);
-    }
-
-    protected void executeCoreProcess(String sqlRootDir, boolean previous) { // for main
-        doExecuteCoreProcess(sqlRootDir, previous, false);
-    }
-
-    protected void executeCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) { // for alter check
-        doExecuteCoreProcess(sqlRootDir, previous, schemaOnly);
-    }
-
-    protected void doExecuteCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) {
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // both ReplaceSchema, AlterCheck use this
+    // _/_/_/_/_/_/_/_/_/_/
+    protected void executeCoreProcess(String sqlRootDir, DfRepsCoreProcessSelector selector) {
         // ReplaceSchema flow here
         try {
-            createSchema(sqlRootDir, previous);
-            if (!schemaOnly) { // normally load data
-                loadData(sqlRootDir, previous);
-                takeFinally(sqlRootDir, previous);
-            } else {
+            final boolean asPrevious = selector.isAsPrevious();
+            if (!selector.isDataOnly()) { // basically here
+                createSchema(sqlRootDir, asPrevious);
+            } else { // e.g. using data manager option
+                _log.info("*Skipped create schema because of dataOnly option.");
+            }
+            if (!selector.isSchemaOnly()) { // basically here
+                loadData(sqlRootDir, asPrevious);
+                takeFinally(sqlRootDir, asPrevious);
+            } else { // e.g. using schema-only option for alter check
                 _log.info("*Skipped load data and take-finally because of schemaOnly option.");
             }
         } finally {
             setupReplaceSchemaFinalInfo();
         }
         handleSchemaContinuedFailure();
+    }
+
+    protected static class DfRepsCoreProcessSelector {
+
+        protected boolean _asPrevious;
+        protected boolean _dataOnly;
+        protected boolean _schemaOnly;
+
+        public DfRepsCoreProcessSelector asPrevious() {
+            _asPrevious = true;
+            return this;
+        }
+
+        public DfRepsCoreProcessSelector dataOnly(boolean dataOnly) {
+            _dataOnly = dataOnly;
+            return this;
+        }
+
+        public DfRepsCoreProcessSelector schemaOnly(boolean schemaOnly) {
+            _schemaOnly = schemaOnly;
+            return this;
+        }
+
+        public boolean isAsPrevious() {
+            return _asPrevious;
+        }
+
+        public boolean isDataOnly() {
+            return _dataOnly;
+        }
+
+        public boolean isSchemaOnly() {
+            return _schemaOnly;
+        }
     }
 
     // -----------------------------------------------------
@@ -287,7 +328,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void checkSchemaPolicyInRepsIfNeeds() {
-        new DfSPolicyInRepsChecker(getDataSource()).checkSchemaPolicyInRepsIfNeeds();
+        new DfSPolicyInRepsChecker(getDataSource(), _documentSelector).checkSchemaPolicyInRepsIfNeeds();
     }
 
     // -----------------------------------------------------
@@ -326,7 +367,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         if (previous) {
             return DfTakeFinallyProcess.createAsPrevious(sqlRootDir, getDataSource());
         } else {
-            return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
+            return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource(), _documentSelector);
         }
     }
 
@@ -527,7 +568,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     protected VelocityContext createVelocityContext() {
         final DfVelocityContextFactory factory = createVelocityContextFactory();
         final AppData appData = AppData.createAsEmpty();
-        return factory.createAsCore(appData, _selector);
+        return factory.createAsCore(appData, _documentSelector);
     }
 
     // ===================================================================================
@@ -547,6 +588,14 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
 
     public boolean hasMigrationSavePreviousMark() {
         return getReplaceSchemaProperties().hasMigrationSavePreviousMark();
+    }
+
+    protected boolean isSchemaOnlyAlterCheck() {
+        return getReplaceSchemaProperties().isSchemaOnlyAlterCheck();
+    }
+
+    protected boolean isUseRepsAsDataManager() {
+        return getReplaceSchemaProperties().isUseRepsAsDataManager();
     }
 
     // ===================================================================================

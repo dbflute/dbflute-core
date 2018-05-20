@@ -261,6 +261,10 @@ public class DfJdbcTypeMapper {
         return isOracleClob(dbTypeName); // only Oracle's CLOB (it can get all text by getString() on DB2)
     }
 
+    public boolean isConceptTypeBytesBlob(final String dbTypeName) { // needs special handling as BLOB
+        return isOracleBlob(dbTypeName); // only Oracle's BLOB for now
+    }
+
     public boolean isConceptTypeFixedLengthString(final String dbTypeName) {
         return isPostgreSQLBpChar(dbTypeName); // procedure only
     }
@@ -306,6 +310,10 @@ public class DfJdbcTypeMapper {
 
     public boolean isOracleClob(final String dbTypeName) {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "clob");
+    }
+
+    public boolean isOracleBlob(final String dbTypeName) {
+        return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "blob");
     }
 
     public boolean isOracleNCharOrNVarchar(final String dbTypeName) {

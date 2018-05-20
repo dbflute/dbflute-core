@@ -12,8 +12,7 @@ ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-oracle
 ant -f build.xml reflect-to-test-dbms-db2
-# *for now waiting SQLServer on docker
-#ant -f build.xml reflect-to-test-dbms-sqlserver
+ant -f build.xml reflect-to-test-dbms-sqlserver
 ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
@@ -50,6 +49,7 @@ rm ./log/*.log
 . nextdb-renewal.sh
 . slave-replace-schema.sh
 . manage.sh renewal
+. manage.sh load-data-reverse
 cd ../dbflute_resortlinedb
 rm ./log/*.log
 . manage.sh renewal
@@ -80,12 +80,11 @@ rm ./log/*.log
 cd ..
 mvn -e compile
 
-# *for now waiting SQLServer on docker
-#cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
-#rm ./log/*.log
-#. manage.sh renewal
-#cd ..
-#mvn -e compile
+cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
 
 cd ../dbflute-test-dbms-derby/dbflute_maihamadb
 rm ./log/*.log

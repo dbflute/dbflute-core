@@ -19,10 +19,14 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
+import org.dbflute.exception.DfFireSqlScriptSQLException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
+import org.dbflute.helper.process.ProcessResult;
+import org.dbflute.helper.process.SystemScript;
+import org.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
 import org.dbflute.helper.token.line.LineToken;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,16 +168,61 @@ public class DfSqlFileFireMan {
      * @param sqlFile The SQL file. (NotNull)
      * @return The result of the running. (NullAllowed: means skipped)
      */
-    protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
+    protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) { // may be overridden
         runner.prepare(sqlFile);
         return runner.runTransaction();
     }
 
     protected boolean isShowSQLState(SQLException sqlEx) {
-        if (sqlEx instanceof DfAlterCheckAlterScriptSQLException) {
+        if (sqlEx instanceof DfFireSqlScriptSQLException) {
             return false;
         }
         return true;
+    }
+
+    // for extension at sub class
+    protected boolean isScriptFile(File sqlFile, String[] scriptExtAry) {
+        return Srl.endsWith(resolvePath(sqlFile), scriptExtAry);
+    }
+
+    protected DfSqlFileRunnerResult processScriptFile(DfSqlFileRunner runner, SystemScript script, File sqlFile) {
+        runner.prepare(sqlFile);
+        return executeScriptFile(runner, script, sqlFile);
+    }
+
+    protected DfSqlFileRunnerResult executeScriptFile(DfSqlFileRunner runner, SystemScript script, File sqlFile) {
+        final String sqlPath = resolvePath(sqlFile);
+        final String baseDir = Srl.substringLastFront(sqlPath, "/");
+        final String scriptName = Srl.substringLastRear(sqlPath, "/");
+        _log.info("...Executing the script: " + sqlPath);
+        final ProcessResult processResult;
+        try {
+            processResult = script.execute(new File(baseDir), scriptName);
+        } catch (SystemScriptUnsupportedScriptException ignored) {
+            _log.info("Skipped the script for system mismatch: " + scriptName);
+            return null;
+        }
+        final String console = processResult.getConsole();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(console)) {
+            _log.info("Caught the console for " + scriptName + ":" + ln() + console);
+        }
+        final DfSqlFileRunnerResult runnerResult = new DfSqlFileRunnerResult(sqlFile);
+        runnerResult.setTotalSqlCount(1);
+        final int exitCode = processResult.getExitCode();
+        if (exitCode != 0) {
+            final String msg = "The script failed: " + scriptName + " exitCode=" + exitCode;
+            // wrapping quickly because SQLFailureException needs SQLException
+            // (and nested exception message has debug information so simple message here)
+            final SQLException sqlEx = new DfFireSqlScriptSQLException(msg);
+            final SQLFailureException failureEx = new SQLFailureException("Break the process for script failure.", sqlEx);
+            // no error continue, script error is treated as programming error
+            // because you can freely skip SQL failure in your script
+            runnerResult.setBreakCause(failureEx);
+            return runnerResult;
+        } else {
+            runnerResult.setGoodSqlCount(1);
+            return runnerResult;
+        }
     }
 
     // ===================================================================================
@@ -181,6 +230,10 @@ public class DfSqlFileFireMan {
     //                                                                      ==============
     protected String ln() {
         return "\n";
+    }
+
+    protected String resolvePath(File file) {
+        return Srl.replace(file.getPath(), "\\", "/");
     }
 
     // ===================================================================================

@@ -24,7 +24,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfIncludeQueryProperties;
-import org.dbflute.properties.assistant.DfTableFinder;
+import org.dbflute.properties.assistant.base.DfTableFinder;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;

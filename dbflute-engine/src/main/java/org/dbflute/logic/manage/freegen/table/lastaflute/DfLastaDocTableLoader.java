@@ -46,6 +46,7 @@ import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
+import org.dbflute.properties.assistant.lastaflute.DfLastaDocContentsMap.DfLastaDocContentsActionMap;
 import org.dbflute.task.manage.DfFreeGenTask;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
@@ -92,21 +93,8 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         if (!rootDir.exists()) {
             throw new IllegalStateException("Not found the targetDir: " + targetDir);
         }
-        final DfLastaInfo lastaInfo = new DfLastaInfo();
-        final FileHierarchyTracer tracer = new FileHierarchyTracer();
-        tracer.trace(rootDir, new FileHierarchyTracingHandler() {
-            public boolean isTargetFileOrDir(File currentFile) {
-                return true;
-            }
-
-            public void handleFile(File currentFile) throws IOException {
-                final String path = toPath(currentFile);
-                if (path.contains("/app/web/") && path.endsWith("Action.java")) {
-                    lastaInfo.addAction(currentFile);
-                }
-            }
-        });
-        final List<Map<String, Object>> columnList = prepareColumnList(lastaInfo);
+        final DfLastaFlutePhysicalHolder physicalHolder = preparePhysicalHolder(rootDir);
+        final List<Map<String, Object>> columnList = prepareColumnList(physicalHolder);
         executeTestDocument(optionMap);
         final Path lastaDocFile = acceptLastaDocFile(optionMap);
         if (Files.exists(lastaDocFile)) {
@@ -145,8 +133,26 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
                 optionMap.put("namedclsList", loadedList); // override, convert to loaded list
             }
         }
-        prepareSchemaHtmlLink(optionMap);
+        setupContentsAdjustment(optionMap);
         return DfFreeGenMetaData.asOnlyOne(optionMap, "unused", columnList);
+    }
+
+    protected DfLastaFlutePhysicalHolder preparePhysicalHolder(File rootDir) {
+        final DfLastaFlutePhysicalHolder physicalHolder = new DfLastaFlutePhysicalHolder();
+        final FileHierarchyTracer tracer = new FileHierarchyTracer();
+        tracer.trace(rootDir, new FileHierarchyTracingHandler() {
+            public boolean isTargetFileOrDir(File currentFile) {
+                return true;
+            }
+
+            public void handleFile(File currentFile) throws IOException {
+                final String path = toPath(currentFile);
+                if (path.contains("/app/web/") && path.endsWith("Action.java")) {
+                    physicalHolder.addAction(currentFile);
+                }
+            }
+        });
+        return physicalHolder;
     }
 
     protected DfFreeGenResource createDocResource(DfFreeGenResource resource, final Map<String, Object> optionMap, final String clsTheme) {
@@ -163,9 +169,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         return new DfFreeGenMapProp(DfCollectionUtil.newLinkedHashMap(optionMap), mapProp.getMappingMap(), mapProp.getRequestMap());
     }
 
-    protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
+    protected List<Map<String, Object>> prepareColumnList(DfLastaFlutePhysicalHolder physicalHolder) {
         final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
-        final List<File> actionList = lastaInfo.getActionList();
+        final List<File> actionList = physicalHolder.getActionList();
         for (File action : actionList) {
             final Map<String, Object> columnMap = new LinkedHashMap<String, Object>();
             final String className = Srl.substringLastFront(action.getName(), ".");
@@ -212,26 +218,6 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             return app.get("appName").compareTo(app2.get("appName"));
         }).collect(Collectors.toList());
         return appList;
-    }
-
-    protected void prepareSchemaHtmlLink(final Map<String, Object> tableMap) {
-        final DfLastaFluteProperties prop = getLastaFluteProperties();
-        final boolean hasSchemaHtml;
-        final String schemaHtmlPath;
-        if (prop.isSuppressLastaDocSchemaHtmlLink()) {
-            hasSchemaHtml = false;
-            schemaHtmlPath = null;
-        } else {
-            final String outputDirectory = prop.getLastaDocOutputDirectory();
-            final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
-            final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
-            hasSchemaHtml = schemaHtmlFile.exists();
-            schemaHtmlPath = "./" + schemaHtmlFileName; // current directory only supported
-        }
-        tableMap.put("hasSchemaHtml", hasSchemaHtml);
-        if (hasSchemaHtml) {
-            tableMap.put("schemaHtmlPath", schemaHtmlPath);
-        }
     }
 
     // -----------------------------------------------------
@@ -353,9 +339,44 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     // -----------------------------------------------------
+    //                                   Contents Adjustment
+    //                                   --------------------
+    protected void setupContentsAdjustment(Map<String, Object> optionMap) {
+        doSetupContentsHeader(optionMap);
+        doSetupContentsAction(optionMap);
+    }
+
+    protected void doSetupContentsHeader(Map<String, Object> optionMap) {
+        final DfLastaFluteProperties prop = getLastaFluteProperties();
+        final boolean hasSchemaHtml;
+        final String schemaHtmlPath;
+        if (prop.isSuppressLastaDocSchemaHtmlLink()) {
+            hasSchemaHtml = false;
+            schemaHtmlPath = null;
+        } else {
+            final String outputDirectory = prop.getLastaDocOutputDirectory();
+            final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
+            final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
+            hasSchemaHtml = schemaHtmlFile.exists();
+            schemaHtmlPath = "./" + schemaHtmlFileName; // current directory only supported
+        }
+        optionMap.put("hasSchemaHtml", hasSchemaHtml);
+        if (hasSchemaHtml) {
+            optionMap.put("schemaHtmlPath", schemaHtmlPath);
+        }
+    }
+
+    protected void doSetupContentsAction(Map<String, Object> optionMap) {
+        final DfLastaFluteProperties prop = getLastaFluteProperties();
+        final DfLastaDocContentsActionMap actionMap = prop.getLastaDocContentsMap().getActionMap();
+        optionMap.put("isSuppressDescriptionInList", actionMap.isSuppressDescriptionInList());
+        optionMap.put("isSuppressAuthorInList", actionMap.isSuppressAuthorInList());
+    }
+
+    // -----------------------------------------------------
     //                                            Lasta Info
     //                                            ----------
-    public static class DfLastaInfo {
+    public static class DfLastaFlutePhysicalHolder {
 
         protected final List<File> actionList = new ArrayList<File>();
 

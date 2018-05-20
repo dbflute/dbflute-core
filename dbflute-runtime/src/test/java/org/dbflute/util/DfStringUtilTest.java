@@ -935,7 +935,7 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(0, count("foo.bar", "Foo"));
         assertEquals(2, count("foo.bar.baz", "."));
         assertEquals(4, count(".foo.bar.baz.", "."));
-        assertEquals(1, count("foo.bar", "foo"));
+        assertEquals(1, count("fooo.bar", "oo"));
     }
 
     public void test_countIgnoreCase_basic() {
@@ -945,6 +945,7 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(1, countIgnoreCase("foo.bar", "foo"));
         assertEquals(2, countIgnoreCase("foo.bar.baz", "."));
         assertEquals(4, countIgnoreCase(".foo.bar.baz.", "."));
+        assertEquals(1, countIgnoreCase("fooo.bar", "Oo"));
     }
 
     // ===================================================================================

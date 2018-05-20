@@ -77,7 +77,7 @@ public class DfNameHintUtil {
     //                                                                               Basic
     //                                                                               =====
     /**
-     * Does it hit the target name by the hint. {CaseInsensitive}
+     * Does it hit the target name by the hint. {CaseInsensitive, Flexible}
      * @param name The target name. (NotNull)
      * @param hint The hint of the name. (NotNull)
      * @return The determination, true or false.
@@ -88,22 +88,23 @@ public class DfNameHintUtil {
         final String containMark = CONTAIN_MARK;
         final String patternMark = PATTERN_MARK;
 
-        if (hint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
+        final String lowerHint = hint.toLowerCase();
+        if (lowerHint.startsWith(prefixMark.toLowerCase())) {
             final String pureHint = hint.substring(prefixMark.length(), hint.length());
             if (name.toLowerCase().startsWith(pureHint.toLowerCase())) {
                 return true;
             }
-        } else if (hint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
+        } else if (lowerHint.startsWith(suffixMark.toLowerCase())) {
             final String pureHint = hint.substring(suffixMark.length(), hint.length());
             if (name.toLowerCase().endsWith(pureHint.toLowerCase())) {
                 return true;
             }
-        } else if (hint.toLowerCase().startsWith(containMark.toLowerCase())) {
+        } else if (lowerHint.startsWith(containMark.toLowerCase())) {
             final String pureHint = hint.substring(containMark.length(), hint.length());
             if (name.toLowerCase().contains(pureHint.toLowerCase())) {
                 return true;
             }
-        } else if (hint.toLowerCase().startsWith(patternMark.toLowerCase())) {
+        } else if (lowerHint.startsWith(patternMark.toLowerCase())) {
             final String pureHint = hint.substring(patternMark.length(), hint.length());
             final Pattern pattern = Pattern.compile(pureHint);
             if (pattern.matcher(name).matches()) {

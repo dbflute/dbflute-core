@@ -42,7 +42,7 @@ import org.dbflute.util.Srl;
  * This class is very important for DBFlute.
  * @author jflute
  */
-public final class DfBasicProperties extends DfAbstractHelperProperties {
+public final class DfBasicProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -75,7 +75,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getProperty(String key, String defaultValue) {
-        return getPropertyIfNotBuildProp(key, defaultValue, getBasicInfoMap());
+        return _propertyValueHandler.getPropertyIfNotBuildProp(key, defaultValue, getBasicInfoMap());
     }
 
     public boolean isProperty(String key, boolean defaultValue) {
@@ -232,6 +232,43 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     public boolean isDatabaseAsForeignKeyExtractingUnsupported() {
         return isDatabaseMSAccess();
+    }
+
+    // -----------------------------------------------------
+    //                                              Sub Type
+    //                                              --------
+    public DfSubTypeOnDatabase getSubTypeOnDatabase() {
+        final String subType = getProperty("subTypeOnDatabase", null);
+        if (subType == null) {
+            return DfSubTypeOnDatabase.NO_TYPE;
+        }
+        if (isDatabaseSQLServer() && "localdb".equalsIgnoreCase(subType)) {
+            return DfSubTypeOnDatabase.SQLSERVER_LOCALDB;
+        }
+        throwBasicInfoSubTypeOnDatabaseUnknownException(subType);
+        return null; // unreachable
+    }
+
+    public static enum DfSubTypeOnDatabase {
+        SQLSERVER_LOCALDB, NO_TYPE
+    }
+
+    protected void throwBasicInfoSubTypeOnDatabaseUnknownException(String subType) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown value of the property 'subTypeOnDatabase' in basicInfoMap.dfprop.");
+        br.addItem("Advice");
+        br.addElement("Only supported types can be set.");
+        br.addElement("For example, if database is 'sqlserver', databaseSubType can be 'localdb'.");
+        br.addItem("Target Database");
+        br.addElement(getTargetDatabase());
+        br.addItem("SubType on Database");
+        br.addElement(subType);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    public boolean isSubTypeOnDatabaseSQLServerLocalDB() {
+        return DfSubTypeOnDatabase.SQLSERVER_LOCALDB.equals(getSubTypeOnDatabase());
     }
 
     // ===================================================================================
@@ -829,7 +866,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                             Friends
     //                                                                             =======
     public boolean isFriendsHibernate() {
-        return handler().getHibernateProperties(getProperties()).hasHibernateDefinition();
+        return handler().getHibernateProperties(getNativeProperties()).hasHibernateDefinition();
     }
 
     // ===================================================================================

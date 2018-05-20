@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
+public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                          Definition

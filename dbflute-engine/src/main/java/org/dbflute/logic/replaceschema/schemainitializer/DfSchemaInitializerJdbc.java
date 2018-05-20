@@ -252,7 +252,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildTruncateTableSql(DfTableMeta metaInfo);
     }
 
-    protected void callbackTruncateTableByJdbc(Connection conn, List<DfTableMeta> tableMetaInfoList, DfTruncateTableByJdbcCallback callback) {
+    protected void callbackTruncateTableByJdbc(Connection conn, List<DfTableMeta> tableMetaInfoList,
+            DfTruncateTableByJdbcCallback callback) {
         for (DfTableMeta metaInfo : tableMetaInfoList) {
             final String truncateTableSql = callback.buildTruncateTableSql(metaInfo);
             Statement st = null;
@@ -366,12 +367,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMeta tableMeta) {
-        final String tableName = tableMeta.getTableSqlName();
+        final String tableName = buildDropTableSqlName(tableMeta);
         if (tableMeta.isTableTypeView()) {
             sb.append("drop view ").append(tableName);
         } else {
             sb.append("drop table ").append(tableName);
         }
+    }
+
+    protected String buildDropTableSqlName(DfTableMeta tableMeta) {
+        return tableMeta.getTableSqlName();
     }
 
     protected static interface DfDropTableByJdbcCallback {

@@ -26,6 +26,9 @@ ${selector.historyHtmlStyleSheetEmbedded}
 	${selector.historyHtmlStyleSheetLink}
 #else
 	<style type="text/css">
+/* -------------------------------------------------
+                                             Core
+------------------------------------------------- */
 * {
 	margin: 0;
 	padding: 0;
@@ -37,14 +40,16 @@ body {
 	background-color: #ffffee;
 }
 
-/* heading */
+/* -------------------------------------------------
+                                        Structure
+------------------------------------------------- */
 h1 {
-	font-size: 1.5em;
+	font-size: 1.6em;
 	border-bottom: 2px solid #af0000;
 	border-top: 2px solid #af0000;
 }
 h2 {
-	margin-top: 2em;
+	margin: 30px 0 5px 0;
 	border-bottom: 2px solid #af0000;
 	border-left: 10px solid #af0000;
 	text-indent: 1em;
@@ -55,7 +60,7 @@ h3 {
 	margin: 0.8em 0;
 	padding-left: 1.8em;
 	border-bottom: solid 1px #333;
-	color: #555;
+	color: #AA7777;
 	font-size: 1.2em;
 }
 h4 {
@@ -66,13 +71,15 @@ h4 {
 }
 h5 {
 	width: 11em;
-	font-size: 80%;
+	font-size: 0.8em;
 	border-bottom: solid 1px #333;
 	text-indent: 0.3em;
-	color: #555;
+	color: #AA7777;
 }
 
-/* total info */
+/* -------------------------------------------------
+                                     Whole Header
+------------------------------------------------- */
 .updatedate {
 	text-align: right;
 }
@@ -84,14 +91,54 @@ h5 {
 }
 .sisterlink {
 	margin-top: 0.6em;
-	font-size: 110%;
+	font-size: 1.2em;
 }
 .sistersublink {
 	margin-top: 0.6em;
-	font-size: 80%;
+	font-size: 0.85em;
 }
 
-/* history info */
+/* -------------------------------------------------
+                                Difference Header
+------------------------------------------------- */
+.titlediffno {
+	font-size: 0.8em;
+	font-weight: normal;
+	font-style: italic;
+}
+.titlediffdatepart {
+	font-size: 1.1em;
+}
+.titledifftimepart {
+	font-size: 0.8em;
+}
+.diffcomment {
+	font-size: 1.0em;
+	color: #3F7E5E;
+	padding:0 0 0.2em 1em;
+}
+.commenterror {
+	color: red;
+}
+.tablecount {
+	margin: 0.5em 0 0.5em 1em;
+}
+.titlediffauthor {
+	font-size: 0.7em;
+	font-weight: normal;
+	font-style: italic;
+	color: #888888;
+}
+.titlediffgitbranch {
+	font-size: 0.7em;
+	font-weight: normal;
+	font-style: italic;
+	color: #888888;
+}
+
+/* -------------------------------------------------
+                               Difference Content
+------------------------------------------------- */
 .table-content {
 	margin: 0 6em;
 }
@@ -118,17 +165,66 @@ dl.column-content dd span {
 	border-right: dotted 2px #333;
 	font-weight: bold;
 	font-size: 80%;
-	color: #555;
+	color: #AA7777;
 }
 
-span.dt {
-	font-size: 80%;
+/* -------------------------------------------------
+                                  Hacomment Modal
+------------------------------------------------- */
+.hacommentmodal {
+	display: none;
+	position: fixed;
+	z-index: 5;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	padding-top: 50px;
+	background-color: rgba(0, 0, 0, 0.5);
 }
-p.comment {
-	margin-left: 23em;
+.hacommentmodalcontent {
+	position: relative;
+	z-index: 10;
+	width: 50%;
+	margin: 0 auto;
+	border: 1px solid #999999;
+	padding: 15px;
+	background-color: #ffffff;
+	border-radius: 4px;
 }
-p.tablecount {
-	margin-left: 23em;
+.hacommentmodalcontent p {
+	font-size: 14px;
+}
+.hacommentinput {
+	display: block;
+	width: 100%;
+	margin-top: 10px;
+	font-size: 12px;
+}
+.hacommentmodal-ok-btn {
+	margin: 10px 5px 0 0;
+	padding: 5px 10px;
+	border-radius: 4px;
+}
+.hacommentmodal-close-btn {
+	position: absolute;
+	margin-left: 10px;
+	padding: 0;
+	right: 10px;
+	top: 5px;
+	cursor: pointer;
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 50%;
+	color: #657786;
+	font-size: 14px;
+	line-height: 24px;
+	text-align: center;
+	transition: box-shadow .15s ease-in-out;
+}
+.hacommentmodal-close-btn:hover {
+	background-color: #eed;
 }
 	</style>
 #end
@@ -152,17 +248,30 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 </div>
 
+#set ($diffCount = $selector.schemaDiffList.size())
 #foreach ($schemaDiff in $selector.schemaDiffList)
-<div class="section">
-	<h2><span class="dt">Diff Date: </span>${schemaDiff.diffDate}</h2>
+#set ($diffNo = $diffCount - $velocityCount + 1)
+<div class="section diffCode_${schemaDiff.diffDateAsCode}">
+	<h2>
+		<span class="titlediffno">diffNo. ${diffNo}:</span> <span class="titlediffdatepart">${schemaDiff.diffDateAsDatePart}</span> <span class="titledifftimepart">${schemaDiff.diffDateAsTimePart}</span>
+#if ($selector.isHistoryHtmlShowDiffAuthor() && $schemaDiff.hasDiffAuthor())
+		<span class="titlediffauthor">by ${schemaDiff.diffAuthorHtmlExp}</span>
+#end
+#if ($selector.isHistoryHtmlShowDiffGitBranch() && $schemaDiff.hasDiffGitBranch())
+		<span class="titlediffgitbranch">on ${schemaDiff.diffGitBranchHtmlExp}</span>
+#end
+	</h2>
 #if ($schemaDiff.hasComment())
-	<p class="comment">${schemaDiff.comment}</p>
+	<pre class="diffcomment">${schemaDiff.comment}</pre>
+#else
+## add empty comment element to reflect hacomment
+	<pre class="diffcomment"></pre>
 #end
 #if ($schemaDiff.tableCount.hasDiff())
-	<p class="tablecount"><span class="dt">table count: </span>${schemaDiff.tableCount.displayForHtml}</p>
+	<p class="tablecount">table count: ${schemaDiff.tableCount.displayForHtml}</p>
 #end
 
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                               TableDiff
 ##                                                                               =========
 #if (!$schemaDiff.addedTableDiffList.isEmpty())
@@ -222,7 +331,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                            SequenceDiff
 ##                                                                            ============
 #if (!$schemaDiff.addedSequenceDiffList.isEmpty())
@@ -255,7 +364,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                           ProcedureDiff
 ##                                                                           =============
 #if (!$schemaDiff.addedProcedureDiffList.isEmpty())
@@ -288,7 +397,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-## ======================================================================================= 
+## =======================================================================================
 ##                                                                               CraftDiff
 ##                                                                               =========
 #foreach ($titleDiff in $schemaDiff.craftTitleDiffList)
@@ -330,5 +439,555 @@ ${selector.historyHtmlJavaScriptEmbedded}
 <p>
 	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
 </p>
+<!-- Only used by dbflute intro http://dbflute.seasar.org/ja/manual/function/helper/intro/index.html -->
+<div id="hacomment-modal" class="hacommentmodal">
+    <div class="hacommentmodalcontent">
+        <div id="hacomment-close" class="hacommentmodal-close-btn"><span>x</span></div>
+        <p>Input the new comment of diffdate: <span id="hacomment-modal-column-info"></span></p>
+        <textarea id="hacomment-input" class="hacommentinput" rows="5"></textarea>
+        <button id="hacomment-ok" class="hacommentmodal-ok-btn">OK</button>
+    </div>
+</div>
 </body>
+	#macro(escape $str)$!str.replaceAll("'", "\\'").replaceAll("\n", "<br>")#end
+<script>
+    /**
+     * @author hakiba
+     */
+    function ApiClient() {
+    }
+
+    ApiClient.prototype = {
+        /**
+         * Fetch hacomment virtual pickup.
+         * @param {function} successCallback
+         */
+        fetchHacomment: function(successCallback) {
+            var path = '/api/document/hacomment/' + HacommentUtil.getSchemaName() + '/pickup';
+            var method = 'GET';
+            var errorCallback = function() {
+                alert('Error!! cannot fetch diff comment.');
+            };
+            this.request(path, method, null, successCallback, errorCallback);
+        },
+
+        /**
+         * Request save hacomment
+         * @param {Object} params - Request parameters
+         * @param {function} successCallback
+         */
+        saveHacomment: function(params, successCallback) {
+            var path = '/api/document/hacomment/' + HacommentUtil.getSchemaName() + '/save';
+            var method = 'POST';
+            var errorCallback = function() {
+                alert('Error!! cannot save new column comment.');
+            };
+            this.request(path, method, params, successCallback, errorCallback);
+        },
+
+        /**
+         * Request to intro server
+         * @param {string} path
+         * @param {string} method
+         * @param {object} params
+         * @param {function} successCallback
+         * @param {function} errorCallback
+         */
+        request: function(path, method, params, successCallback, errorCallback) {
+            var http = new XMLHttpRequest();
+            http.withCredentials = true;
+            var url = HacommentUtil.getHostName() + path;
+            http.open(method, url, true);
+
+            http.onreadystatechange = function () {
+                if (http.readyState === 4) {
+                    if (http.status === 200) {
+                        successCallback(http.response)
+                    } else {
+                        errorCallback()
+                    }
+                }
+            };
+            if (params != null) {
+                http.send(JSON.stringify(params, null, "  "));
+            } else {
+                http.send();
+            }
+        }
+    };
+    /**
+     * @author hakiba
+     */
+    var HacommentUtil = new function(){
+        /**
+         * Get host name
+         * @returns {string} Host name
+         */
+        this.getHostName = function() {
+            return 'http://' + window.location.host;
+        },
+                /**
+                 * Get scheme name from url
+                 * @returns {string} Scheme name
+                 */
+                this.getSchemaName = function () {
+                    return "${database.projectName}";
+                },
+                /**
+                 * Escape inputed text
+                 * @param {String} string - text
+                 */
+                this.escapeInputText = function(string) {
+                    if(typeof string !== 'string') {
+                        return string;
+                    }
+                    return string.replace(/[&'`"<>]/g, function(match) {
+                        return {
+                            '&': '&amp;',
+                            "'": '&#x27;',
+                            '`': '&#x60;',
+                            '"': '&quot;',
+                            '<': '&lt;',
+                            '>': '&gt;'
+                        }[match]
+                    });
+                },
+                /**
+                 * Escape newline character of text
+                 * @param {String} string - text
+                 */
+                this.escapeNewlineCharacter = function (string) {
+                    return string.split('<br>').join('\n');
+                },
+                /**
+                 * Delete unnecessary whitespace
+                 * @param {String} string - text
+                 */
+                this.deleteUnnecessaryWhitespace = function(string) {
+                    var commentArray = string.split("\n");
+                    var result = "";
+                    for(var i = 0; i < commentArray.length; i++) {
+                        result += commentArray[i].replace(/\s+$/g,'');
+                        if (!(i === commentArray.length - 1)) {
+                            result += '\n';
+                        }
+                    }
+                    return result.trim();
+                },
+
+                /**
+                 * Unescape whitespace character of text
+                 * @param {String} string - text
+                 */
+                this.unescapeWhitespace = function (string) {
+                    return string.split('&nbsp;').join(' ');
+                }
+    };
+
+    function Hacomment() {
+        this.embeddedPickup = {
+            'diffList' : [
+#foreach($diff in $selector.hacoMapDiffList)
+                #if ($velocityCount > 1), #end{
+                    'diffCode' : '${diff.diffCode}',
+                    'diffDate' : '${diff.diffDate}',
+                    'properties' : [
+#foreach($property in $diff.propertyList)
+                        #if ($velocityCount > 1), #end{
+                            'hacomment' : '#escape($!{property.hacomment})',
+                            'authorList' : [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end],
+                            'pieceCode' : '$!{property.pieceCode}',
+                            'pieceDatetime' : '$!{property.pieceDatetime}',
+                            'previousPieces' : [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+                        }
+#end
+                    ]
+                }
+#end
+            ]
+        };
+        this.pickupStore = {
+#foreach($schemaDiff in $selector.schemaDiffList)
+            #if ($velocityCount > 1), #end'${schemaDiff.diffDateAsCode}' : {
+                'diffDate' : '${schemaDiff.diffDate}',
+                'diffComment' : '#escape($!{schemaDiff.comment})'
+            }
+#end
+        }
+    }
+    Hacomment.prototype = {
+
+        /**
+         * init
+         */
+        init: function () {
+            if (document.getElementById("intro_opening") !== null) {
+                var schemeName = HacommentUtil.getSchemaName();
+                this.fetchVirtualPickup(schemeName);
+                this.setupSaveDiff();
+                this.setupKeyDownEvent();
+            } else {
+                this.reflectEmbeddedPickup();
+            }
+        },
+
+        /**
+         * Fetch virtual pickup from server
+         */
+        fetchVirtualPickup: function () {
+            var that = this;
+            new ApiClient().fetchHacomment(function(response) {
+                var hacomment = JSON.parse(response);
+                that.reflectPickup(hacomment);
+            })
+        },
+
+        /**
+         * Reflect embedded pickup
+         */
+        reflectEmbeddedPickup: function () {
+            this.reflectPickup(this.embeddedPickup);
+        },
+
+        /**
+         * Reflect pickup
+         * @param {Object} pickupResult - Pickup object
+         */
+        reflectPickup: function (pickupResult) {
+            var that = this;
+            Array.prototype.forEach.call(pickupResult['diffList'], function (diff) {
+                var diffCode = diff['diffCode'];
+                var hacommentElement = that.extractHacommentElement(diffCode);
+                if (that.storePickup(diff)) {
+                    var newDiffComment = that.buildDisplayDiffCommentFromServer(that.getDiffMapFromStore(diffCode));
+                    var authors = that.getDiffMapFromStore(diffCode)['authors'];
+                    that.storePreviousWholeComment(diffCode, newDiffComment);
+                    that.updateDisplayHacommentToHtml(diffCode, hacommentElement, newDiffComment, authors);
+                }
+            });
+        },
+
+        /**
+         * Extract hacomment element
+         * @param {Object} diffCode - Diff code
+         * @returns {Object} Hacomment element
+         */
+        extractHacommentElement: function (diffCode) {
+            var idClassQuerySelector =".diffCode_" + diffCode;
+            var commentClassQuerySelector = ".diffcomment";
+            var hacommentQuerySelector = idClassQuerySelector + " " + commentClassQuerySelector;
+
+            return document.querySelector(hacommentQuerySelector);
+        },
+
+        /**
+         * Store diff comment properties
+         * @param {Object} diff - Diff object
+         * @retuns {Boolean} if properties saved
+         */
+        storePickup: function (diff) {
+            var diffCode = diff['diffCode'];
+            // verify stored diff
+            if (this.pickupStore[diffCode] === undefined) {
+                this.pickupStore[diffCode] = {};
+            }
+            var storedDiff = this.pickupStore[diffCode];
+
+            // verify stored properties
+            if (this.pickupStore[diffCode]['properties'] === undefined) {
+                this.pickupStore[diffCode]['properties'] = {};
+            }
+
+            // check existing property
+            var propertyList = diff['properties'];
+            if (propertyList.length === 0) {
+                return false;
+            }
+
+            // store properties
+            var hacomments = [];
+            var previousPieces = [];
+            var authors = [];
+            var commentVersion = 0;
+            Array.prototype.forEach.call(propertyList, function (property) {
+                // add hacomment
+                hacomments.push(property['hacomment']);
+                // add previous pieceCode
+                if (property['pieceCode'] != null) {
+                    previousPieces.push(property['pieceCode']);
+                }
+                // concat authors
+                authors = authors.concat(property['authorList']);
+                // update comment version
+                if (commentVersion < property['commentVersion']) {
+                    commentVersion = property['commentVersion'];
+                }
+            });
+            // delete duplicate authors
+            authors = authors.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            });
+
+            // add diff map property
+            var isConflict = propertyList.length > 1;
+            storedDiff['diffDate'] = diff['diffDate'];
+            storedDiff['isConflict'] = isConflict;
+            storedDiff['hacomments'] = hacomments;
+            storedDiff['previousPieces'] = previousPieces;
+            storedDiff['authors'] = authors;
+            storedDiff['commentVersion'] = commentVersion;
+
+            return true;
+        },
+
+        /**
+         * Build new diff comment from server response
+         * @param {Object} table - table object
+         * @returns {string} New diff comment
+         */
+        buildDisplayDiffCommentFromServer : function (diffMap) {
+            var result = "";
+            // add hacomments
+            result += diffMap['hacomments'].join('\n\n=======\n\n');
+
+            return result;
+        },
+
+        /**
+         * Store new comment properties
+         * @param {Object} diffCode - Diff code object
+         * @param {string} newComment - Comment from server
+         */
+        storePreviousWholeComment: function (diffCode, newComment) {
+            var storedPickup = this.pickupStore[diffCode];
+            storedPickup['previousWholeComment'] = newComment;
+        },
+
+        /**
+         * Update diff comment of html
+         * @param {string} diffCode - Diff Code
+         * @param {Object} diffCommentElement - Diff comment element
+         * @param {string} newComment - New scheme comment
+         * @param {Array} authors - Comment authoers
+         */
+        updateDisplayHacommentToHtml: function(diffCode, diffCommentElement, newComment, authors) {
+            var authorStrForHtml = authors.join(',');
+            var comment = newComment + "\n<span>@author(" + authorStrForHtml + ")</span>";
+            diffCommentElement.innerHTML = comment;
+
+            // reflect conflict
+            var storedDiff = this.pickupStore[diffCode];
+            if (storedDiff["isConflict"]) {
+                diffCommentElement.className += " commenterror"
+            }
+        },
+
+        /**
+         * Get diff map from store.
+         * @param {string} diffCode - Diff code
+         * @returns {Object} commentMap - Comment object of table or column
+         */
+        getDiffMapFromStore: function(diffCode) {
+            var storedDiff = this.pickupStore[diffCode];
+            if (storedDiff === undefined) {
+                return null;
+            }
+            return storedDiff;
+        },
+
+        /**
+         * Check the comment is conflict
+         * @param {Object} diffMap - Comment object of diff
+         * @returns {Boolean} comment is conflict
+         */
+        isCommentConflict: function(diffMap) {
+            if (diffMap === null) {
+                return false;
+            }
+            return diffMap['isConflict'] || false;
+        },
+
+        /**
+         * Setup save diff comment click event to html
+         */
+        setupSaveDiff: function() {
+            var diffCommentSections = this.getHacommentElements();
+            for (var i = 0; i < diffCommentSections.length; i++) {
+                var sectionElement = diffCommentSections[i];
+                // TODO hakiba change how to get diff code(e.g. create diff code list when generate hisotry html)
+                var diffCode = sectionElement.classList[1].split("diffCode_")[1];
+
+                // add click-event (open hacomment modal window, save function)
+                var diffMap = this.getDiffMapFromStore(diffCode);
+                // to Title Element
+                sectionElement.querySelector('h2').onclick = this.createSaveHacommentFunction(diffCode, diffMap);
+                // to Hacommet Element
+                sectionElement.querySelector('pre').onclick = this.createSaveHacommentFunction(diffCode, diffMap);
+
+            }
+        },
+
+        /**
+         * Get Hacomment Elements
+         * @return {Array} html elements
+         */
+        getHacommentElements: function() {
+            return document.getElementsByClassName('section');
+        },
+
+        /**
+         * Get Hacomment Element by DiffCode
+         * @return {Object} html elements
+         */
+        getHacommentElement: function (targetDiffCode) {
+            var hacommentElements = this.getHacommentElements();
+            var result = null;
+            Array.prototype.forEach.call(hacommentElements, function (element) {
+                var diffCode = element.classList[1].split("diffCode_")[1];
+                if (targetDiffCode === diffCode) {
+                    var target = element.querySelector('pre');
+                    result = target;
+                }
+            });
+            return result;
+        },
+
+        /**
+         * Create save hacomment function
+         * param {string} diffCode - Diff code
+         * param {Object} diffMap - Comment element of diff
+         * returns {function} Save hacomment function
+         */
+        createSaveHacommentFunction: function (diffCode, diffMap) {
+            var that = this;
+            return function () {
+                // get modal window element
+                var modalElement = document.getElementById("hacomment-modal");
+                modalElement.style.display = "block";
+
+                // build diff info
+                var isConflict = that.isCommentConflict(diffMap);
+                var diffDate = diffMap['diffDate'];
+                var diffInfo = isConflict ? diffDate + "... but now in CONFLICT!" : diffDate;
+                document.getElementById("hacomment-modal-column-info").innerText = diffInfo;
+
+                // set diff comment
+                var inputElement = document.getElementById("hacomment-input");
+                inputElement.value = that.getDisplayHtmlComment(diffCode);
+                inputElement.focus();
+
+                // set ok event
+                document.getElementById("hacomment-ok").onclick = function () {
+                    var hacomment = inputElement.value;
+                    if (that.isStillConflicting(hacomment)) {
+                      alert('Still conflicting. please resolve.')
+                      return;
+                    }
+                    if (!that.isCommentChanged(diffCode, hacomment)) {
+                        modalElement.style.display = "none";
+                        return;
+                    }
+                    var params = that.buildCommentRequestParams(diffCode, hacomment);
+                    new ApiClient().saveHacomment(params, function() {
+                        that.fetchVirtualPickup();
+                    });
+                    modalElement.style.display = "none";
+                };
+
+                // set close event
+                document.getElementById("hacomment-close").onclick = function () {
+                    modalElement.style.display = "none";
+                };
+            };
+        },
+
+        /**
+         * Check new hacomment and previous comment is different
+         * @param {string} diffCode - Diff name
+         * @param {string} hacomment - Hacomment
+         * @returns {Boolean} is changed
+         */
+        isCommentChanged: function (diffCode, hacomment) {
+            var diffMap = this.getDiffMapFromStore(diffCode);
+            if (diffMap !== null) {
+                var previousComment = diffMap['previousWholeComment'];
+                if (previousComment) {
+                    return previousComment.trim() !== hacomment.trim();
+                }
+            }
+            return hacomment.trim().length !== 0;
+        },
+
+        /**
+         * Build comment request body
+         * @param {string} diffCode - Diff code
+         * @param {string} hacomment - Inputted hacomment
+         * @return {Object} Request body
+         */
+        buildCommentRequestParams: function (diffCode, hacomment) {
+            var diffMap = this.getDiffMapFromStore(diffCode);
+
+            // TODO: refactoring mapping
+            var diffComment;
+            if (diffMap !== null) {
+                var diffDate = diffMap['diffDate'];
+                var authors = diffMap['authors'];
+                var previousPieces = diffMap['previousPieces'];
+                var commentVersion = diffMap['commentVersion'];
+                diffComment = diffMap['diffComment'];
+                if (diffComment) {
+                    diffComment = HacommentUtil.escapeNewlineCharacter(diffComment);
+                }
+            }
+
+            hacomment = HacommentUtil.escapeInputText(hacomment);
+            hacomment = HacommentUtil.deleteUnnecessaryWhitespace(hacomment);
+
+            return {
+                'diffDate': diffDate,
+                'hacomment': hacomment,
+                'diffComment': diffComment,
+                'commentVersion': commentVersion || 0,
+                'authors': authors || [],
+                'previousPieces': previousPieces || []
+            };
+        },
+
+        /**
+         * Get display html comment
+         * @return {string} display html comment
+         */
+        getDisplayHtmlComment: function(diffCode) {
+            var child = this.getHacommentElement(diffCode).childNodes[0];
+            if (child != null && child.nodeName === "#text") {
+                return child.nodeValue.trim();
+            }
+            return ""
+        },
+
+  /**
+   * Check still conflicting
+   * @param {string} hacomment - hacomment
+   * @returns {Boolean} is still conflicting
+   */
+  isStillConflicting: function(hacomment) {
+    return hacomment.includes('=======');
+  },
+
+  /**
+   * Setup key down event
+   */
+  setupKeyDownEvent : function() {
+    document.onkeydown = function (e) {
+      // ESC
+      if(e.keyCode === 27){
+        var modalElement = document.getElementById("hacomment-modal");
+        modalElement.style.display = "none";
+      }
+    }
+  }
+};
+
+    new Hacomment().init();
+</script>
 </html>

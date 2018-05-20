@@ -592,6 +592,10 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).needsStringClobHandling(propertyName);
     }
 
+    public boolean needsBytesBlobHandling(String className, String propertyName) {
+        return findPmbMetaData(className).needsBytesBlobHandling(propertyName);
+    }
+
     public boolean needsFixedLengthStringHandling(String className, String propertyName) {
         return findPmbMetaData(className).needsFixedLengthStringHandling(propertyName);
     }

@@ -37,8 +37,15 @@
       <include name="${logprop.dir}"/>
     </dirset>
 
+    <!-- Extension Libraries
+  	 should be before embedded to be preferred (so you can switch) -->
+    <fileset dir="${torque.lib.dir}">
+      <include name="extlib/*.jar"/>
+    </fileset>
+
     <!-- Embedded Libraries -->
     <fileset dir="${torque.lib.dir}">
+      <exclude name="extlib/*.jar"/> <!-- not to be duplicate -->
       <include name="**/*.jar"/>
     </fileset>
   </path>

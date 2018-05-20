@@ -28,13 +28,20 @@ import java.util.Set;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.diffmap.DfDiffMapFile;
+import org.dbflute.infra.doc.hacomment.DfHacoMapDiffPart;
+import org.dbflute.infra.doc.hacomment.DfHacoMapFile;
+import org.dbflute.infra.doc.hacomment.DfHacoMapPickup;
+import org.dbflute.infra.doc.hacomment.DfHacoMapPiece;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
+ * @author hakiba
  * @since 0.9.7.1 (2010/06/07 Monday)
  */
 public class DfSchemaHistory {
@@ -46,6 +53,11 @@ public class DfSchemaHistory {
     //                                        Basic Resource
     //                                        --------------
     protected final String _historyFile;
+
+    // -----------------------------------------------------
+    //                                             Hacomment
+    //                                             ---------
+    protected DfHacoMapPickup _hacoMapPickup; // loaded when call loadHacoMap
 
     // -----------------------------------------------------
     //                                          Load History
@@ -192,10 +204,35 @@ public class DfSchemaHistory {
     }
 
     // ===================================================================================
+    //                                                                        Load HacoMap
+    //                                                                        ============
+    public void loadHacoMap() {
+        String clientDirPath = ".";
+        DfHacoMapFile hacoMapFile = new DfHacoMapFile(() -> DBFluteSystem.currentLocalDateTime());
+        // done hakiba add exception handling  (2018/04/28)
+        try {
+            List<DfHacoMapPiece> pieceList = hacoMapFile.readPieceList(clientDirPath);
+            OptionalThing<DfHacoMapPickup> optPickup = hacoMapFile.readPickup(clientDirPath);
+            _hacoMapPickup = hacoMapFile.merge(optPickup, pieceList);
+        } catch (RuntimeException e) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to load haco-map.");
+            br.addItem("File Path");
+            br.addElement(clientDirPath);
+            final String msg = br.buildExceptionMessage();
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    // ===================================================================================
     //                                                                              Status
     //                                                                              ======
     public boolean existsHistory() {
         return _existsSchemaDiff && !_schemaDiffList.isEmpty();
+    }
+
+    public boolean existsHacoMapPickup() {
+        return _hacoMapPickup != null && !getHacoMapDiffList().isEmpty();
     }
 
     // ===================================================================================
@@ -214,5 +251,9 @@ public class DfSchemaHistory {
 
     public List<DfSchemaDiff> getSchemaDiffList() {
         return _schemaDiffList;
+    }
+
+    public List<DfHacoMapDiffPart> getHacoMapDiffList() {
+        return _hacoMapPickup.getDiffList();
     }
 }

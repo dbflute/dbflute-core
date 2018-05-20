@@ -121,6 +121,9 @@ public class TnPlainValueTypes {
         registerBasicValueType(Calendar.class, TIMESTAMP);
 
         // << Binary >>
+        // using binary for byte[] since old times so keep it until trouble by jflute (2018/05/11)
+        // for example, Oracle procedure large BLOB argument needs BLOB value-type
+        // but resolve it by procedure logic itself for small fix 
         registerBasicValueType(BYTE_ARRAY_CLASS, BINARY);
         registerBasicValueType(InputStream.class, BINARY_STREAM);
 
@@ -145,6 +148,7 @@ public class TnPlainValueTypes {
         // _/_/_/_/_/_/_/_/_/_/
         registerPluginValueType("uuidAsStringType", TnValueTypes.UUID_AS_STRING);
         registerPluginValueType("stringClobType", TnValueTypes.STRING_CLOB);
+        registerPluginValueType("bytesBlobType", TnValueTypes.BYTES_BLOB);
         registerPluginValueType("fixedLengthStringType", TnValueTypes.FIXED_LENGTH_STRING);
         registerPluginValueType("objectBindingBigDecimalType", TnValueTypes.OBJECT_BINDING_BIGDECIMAL);
         registerPluginValueType("postgreSqlByteaType", TnValueTypes.POSTGRESQL_BYTEA);

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -18,6 +18,7 @@ package org.dbflute.task.bs.assistant;
 import java.util.List;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.infra.doc.hacomment.DfHacoMapDiffPart;
 import org.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.dbflute.logic.doc.prophtml.DfPropHtmlManager;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -25,18 +26,22 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
+ * @author hakiba
  */
 public class DfDocumentSelector {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The logger instance for this class. (NotNull) */
+    /**
+     * The logger instance for this class. (NotNull)
+     */
     private static final Logger _log = LoggerFactory.getLogger(DfDocumentSelector.class);
 
     // ===================================================================================
@@ -226,7 +231,7 @@ public class DfDocumentSelector {
 
     protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {
         _log.info("...Loading schema history");
-        _schemaHistory = schemaHistory;
+        _schemaHistory = schemaHistory; // also loaded mark
         _schemaHistory.loadHistory();
         if (existsSchemaHistory()) {
             _log.info(" -> found history: count=" + getSchemaDiffList().size());
@@ -240,7 +245,29 @@ public class DfDocumentSelector {
     }
 
     public List<DfSchemaDiff> getSchemaDiffList() {
-        return _schemaHistory.getSchemaDiffList();
+        return _schemaHistory != null ? _schemaHistory.getSchemaDiffList() : DfCollectionUtil.emptyList();
+    }
+
+    public List<DfSchemaDiff> lazyLoadIfNeedsCoreSchemaDiffList() { // for e,g, SchemaPolicy, ConventionalTakeAssert
+        if (_schemaHistory == null) { // means not loaded yet
+            loadSchemaHistoryAsCore();
+        }
+        return getSchemaDiffList();
+    }
+
+    // -----------------------------------------------------
+    //                                             Hacomment
+    //                                             ---------
+    public void loadHacoMap() {
+        _schemaHistory.loadHacoMap();
+    }
+
+    public List<DfHacoMapDiffPart> getHacoMapDiffList() {
+        return _schemaHistory.getHacoMapDiffList();
+    }
+
+    public boolean existHacoMap() {
+        return _schemaHistory.existsHacoMapPickup();
     }
 
     // -----------------------------------------------------
@@ -268,6 +295,17 @@ public class DfDocumentSelector {
 
     public boolean isHistoryHtmlToPropertiesHtmlLink() {
         return !isSuppressHistoryHtmlToSisterLink() && isPropertiesHtml() && existsPropertiesHtmlRequest();
+    }
+
+    // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    public boolean isHistoryHtmlShowDiffAuthor() {
+        return !isSuppressHistoryHtmlDiffAuthor();
+    }
+
+    public boolean isHistoryHtmlShowDiffGitBranch() {
+        return !isSuppressHistoryHtmlDiffGitBranch();
     }
 
     // -----------------------------------------------------
@@ -312,6 +350,7 @@ public class DfDocumentSelector {
     // -----------------------------------------------------
     //                                         Basic Process
     //                                         -------------
+
     /**
      * Load requests for properties HTML. <br>
      * If no property, do nothing.
@@ -394,6 +433,14 @@ public class DfDocumentSelector {
 
     protected boolean isSuppressHistoryHtmlToSisterLink() {
         return getDocumentProperties().isSuppressHistoryHtmlToSisterLink();
+    }
+
+    protected boolean isSuppressHistoryHtmlDiffAuthor() {
+        return getDocumentProperties().isSuppressHistoryHtmlDiffAuthor();
+    }
+
+    protected boolean isSuppressHistoryHtmlDiffGitBranch() {
+        return getDocumentProperties().isSuppressHistoryHtmlDiffGitBranch();
     }
 
     protected boolean isSuppressPropertiesHtmlToSisterLink() {

@@ -39,14 +39,14 @@ public class BytesType extends TnAbstractValueType {
     public static final Trait STREAM_TRAIT = new StreamTrait();
     public static final Trait BLOB_TRAIT = new BlobTrait();
 
-    protected Trait trait;
+    protected final Trait trait;
 
-    public BytesType(final Trait trait) {
+    public BytesType(Trait trait) {
         super(trait.getSqlType());
         this.trait = trait;
     }
 
-    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else if (value instanceof byte[]) {
@@ -56,7 +56,7 @@ public class BytesType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else if (value instanceof byte[]) {
@@ -66,19 +66,19 @@ public class BytesType extends TnAbstractValueType {
         }
     }
 
-    public Object getValue(ResultSet rs, final int index) throws SQLException {
+    public Object getValue(ResultSet rs, int index) throws SQLException {
         return trait.get(rs, index);
     }
 
-    public Object getValue(ResultSet rs, final String columnName) throws SQLException {
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
         return trait.get(rs, columnName);
     }
 
-    public Object getValue(CallableStatement cs, final int index) throws SQLException {
+    public Object getValue(CallableStatement cs, int index) throws SQLException {
         return trait.get(cs, index);
     }
 
-    public Object getValue(CallableStatement cs, final String parameterName) throws SQLException {
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
         return trait.get(cs, parameterName);
     }
 
@@ -93,7 +93,7 @@ public class BytesType extends TnAbstractValueType {
         }
     }
 
-    public static byte[] toBytes(final Blob blob) throws SQLException {
+    public static byte[] toBytes(Blob blob) throws SQLException {
         if (blob == null) {
             return null;
         }
@@ -160,7 +160,6 @@ public class BytesType extends TnAbstractValueType {
         public byte[] get(final CallableStatement cs, final String columnName) throws SQLException {
             return cs.getBytes(columnName);
         }
-
     }
 
     /**
@@ -205,7 +204,6 @@ public class BytesType extends TnAbstractValueType {
         public byte[] get(final CallableStatement cs, final String columnName) throws SQLException {
             return cs.getBytes(columnName);
         }
-
     }
 
     /**

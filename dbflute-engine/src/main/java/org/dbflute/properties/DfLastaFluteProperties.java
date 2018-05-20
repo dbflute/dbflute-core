@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.properties.assistant.lastaflute.DfLastaDocContentsMap;
 import org.dbflute.properties.assistant.lastaflute.DfLastaFluteFreeGenReflector;
 import org.dbflute.properties.assistant.lastaflute.DfLastaFlutePropertiesHtmlReflector;
 import org.dbflute.util.DfCollectionUtil;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 1.1.0-sp3 (2015/04/26 Sunday)
  */
-public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
+public final class DfLastaFluteProperties extends DfAbstractDBFluteProperties {
 
     private static final String LASTADOC_HTML_PREFIX = "lastadoc-";
     private static final String LASTADOC_HTML_SUFFIX = ".html";
@@ -216,6 +217,9 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            LastaDoc
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                             File Info
+    //                                             ---------
     public String getLastaDocOutputDirectory() {
         return getDocumentProperties().getDocumentOutputDirectory();
     }
@@ -245,10 +249,9 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         return docList != null ? Arrays.asList(docList) : Collections.emptyList();
     }
 
-    public boolean isSuppressLastaDocSchemaHtmlLink() {
-        return isProperty("isSuppressLastaDocSchemaHtmlLink", false, getLastafluteMap());
-    }
-
+    // -----------------------------------------------------
+    //                                          Build Geared
+    //                                          ------------
     public boolean isLastaDocMavenGeared() {
         return isProperty("isLastaDocMavenGeared", false, getLastafluteMap());
     }
@@ -257,6 +260,43 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         return isProperty("isLastaDocGradleGeared", false, getLastafluteMap());
     }
 
+    // -----------------------------------------------------
+    //                                          Contents Map
+    //                                          ------------
+    // ; lastaDocContentsMap = map:{
+    //     ; headerMap = map:{
+    //         ; isSuppressSchemaHtmlLink = false
+    //     }
+    //     ; actionMap = map:{
+    //         ; isSuppressDescriptionInList = false
+    //         ; isSuppressAuthorInList = false
+    //     }
+    // }
+    protected DfLastaDocContentsMap _lastaDocContentsMap;
+
+    public DfLastaDocContentsMap getLastaDocContentsMap() { // @since 1.1.8
+        if (_lastaDocContentsMap != null) {
+            return _lastaDocContentsMap;
+        }
+        _lastaDocContentsMap = createLastaDocContentsMap();
+        return _lastaDocContentsMap;
+    }
+
+    protected DfLastaDocContentsMap createLastaDocContentsMap() {
+        return new DfLastaDocContentsMap(getLastafluteMap(), _propertyValueHandler);
+    }
+
+    public boolean isSuppressLastaDocSchemaHtmlLink() { // to merge old style
+        if (getLastaDocContentsMap().getHeaderMap().isSuppressSchemaHtmlLink()) {
+            return true;
+        } else {
+            return isProperty("isSuppressLastaDocSchemaHtmlLink", false, getLastafluteMap()); // for compatible
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                DfMark
+    //                                                ------
     public String getLastaDocHtmlMarkFreeGenDocNaviLink() {
         return "<!-- df:markFreeGenDocNaviLink -->";
     }

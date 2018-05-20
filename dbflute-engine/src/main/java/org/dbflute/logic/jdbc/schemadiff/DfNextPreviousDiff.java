@@ -134,7 +134,7 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
     }
 
     protected String escape(String value) {
-        return getDocumentProperties().resolveTextForSchemaHtml(value);
+        return getDocumentProperties().resolveSchemaHtmlContent(value);
     }
 
     protected DfDocumentProperties getDocumentProperties() {

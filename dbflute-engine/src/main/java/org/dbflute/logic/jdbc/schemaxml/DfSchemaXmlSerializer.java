@@ -156,7 +156,7 @@ public class DfSchemaXmlSerializer {
     //                                        --------------
     protected final DfSchemaSource _dataSource;
     protected final String _schemaXml;
-    protected final String _historyFile; // NullAllowed
+    protected final String _historyFile; // null allowed, only for JDBC task
     protected final DfSchemaDiff _schemaDiff;
 
     // -----------------------------------------------------

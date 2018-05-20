@@ -357,7 +357,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     }
 
     public String getTableName() {
-        return _tableName != null ? _tableName : "";
+        return _tableName != null ? _tableName : ""; // just in case?
     }
 
     public String getLowerTableName() {

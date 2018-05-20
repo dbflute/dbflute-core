@@ -68,6 +68,7 @@ public class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.getInstance().isSpecifyColumnRequired()) {
             enableSpecifyColumnRequired();
         }
+        xsetSpecifyColumnRequiredExceptDeterminer(${glDBFluteConfig}.getInstance().getSpecifyColumnRequiredExceptDeterminer());
         if (${glDBFluteConfig}.getInstance().isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
         }
@@ -529,7 +530,17 @@ public class ${myClassName} extends AbstractConditionBean {
          */
         public SpecifiedColumn column${col.javaName}() { return doColumn("${col.name}"); }
 #end
+#if ($table.isDeprecatedSpecifyBatchColumn())
+        /**
+         * @deprecated ${table.deprecatedSpecifyBatchColumnComment}
+         */
+#end
         public void everyColumn() { doEveryColumn(); }
+#if ($table.isDeprecatedSpecifyBatchColumn())
+        /**
+         * @deprecated ${table.deprecatedSpecifyBatchColumnComment}
+         */
+#end
         public void exceptRecordMetaColumn() { doExceptRecordMetaColumn(); }
         @Override
         protected void doSpecifyRequiredColumn() {

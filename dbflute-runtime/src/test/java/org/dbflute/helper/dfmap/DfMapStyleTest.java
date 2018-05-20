@@ -1,0 +1,524 @@
+/*
+ * Copyright 2014-2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+package org.dbflute.helper.dfmap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.dbflute.helper.dfmap.exception.DfMapDuplicateEntryException;
+import org.dbflute.helper.dfmap.exception.DfMapParseFailureException;
+import org.dbflute.unit.RuntimeTestCase;
+import org.dbflute.util.DfTraceViewUtil;
+
+/**
+ * @author jflute
+ * @since 1.1.8 (2018/05/05 Saturday)
+ */
+public class DfMapStyleTest extends RuntimeTestCase {
+
+    // ===================================================================================
+    //                                                                        to MapString
+    //                                                                        ============
+    public void test_toMapString_basic() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key3-1", "value3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key4-3-1", "value4-3-1");
+            valueMap.put("key4-3-2", "value4-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(map);
+
+        // ## Assert ##
+        log(ln() + mapString);
+        assertTrue(mapString.contains("; key1 = value1" + ln()));
+        assertTrue(mapString.contains("; key2 = value2" + ln()));
+        assertTrue(mapString.contains("; key3 = map:{" + ln()));
+        assertTrue(mapString.contains("    ; key3-1 = value3-1" + ln()));
+        Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
+    public void test_toMapString_escape() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("k=ey1", "val{ue1");
+        map.put("ke;y2", "va=lu}e2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("k}ey3-1", "va;lue3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key=4-3-1", "value4-3-1");
+            valueMap.put("key@4-3-2", "val{ue4=-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(map);
+
+        // ## Assert ##
+        log(ln() + mapString);
+        assertTrue(mapString.contains("; k\\=ey1 = val\\{ue1" + ln()));
+        assertTrue(mapString.contains("; ke\\;y2 = va\\=lu\\}e2" + ln()));
+        assertTrue(mapString.contains("; key3 = map:{" + ln()));
+        assertTrue(mapString.contains("; k\\}ey3-1 = va\\;lue3-1" + ln()));
+        assertTrue(mapString.contains("; key@4-3-2 = val\\{ue4\\=-3-2" + ln()));
+        Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
+    public void test_toMapString_printOneLiner() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().printOneLiner();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key3-1", "value3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key4-3-1", "value4-3-1");
+            valueMap.put("key4-3-2", "value4-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(map);
+
+        // ## Assert ##
+        log(ln() + mapString);
+        assertTrue(mapString.contains(" key1 = value1"));
+        assertTrue(mapString.contains("; key2 = value2"));
+        assertTrue(mapString.contains("; key3 = map:{"));
+        assertTrue(mapString.contains(" key3-1 = value3-1"));
+        assertFalse(mapString.contains(ln()));
+        Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
+    // ===================================================================================
+    //                                                                       to ListString
+    //                                                                       =============
+    public void test_toListString_basic() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().printOneLiner();
+        final List<String> list = newArrayList("sea", "land", "piari");
+
+        // ## Act ##
+        String listString = mapStyle.toListString(list);
+
+        // ## Assert ##
+        log(ln() + listString);
+        assertEquals("list:{ sea ; land ; piari }", listString);
+    }
+
+    // ===================================================================================
+    //                                                                      from MapString
+    //                                                                      ==============
+    public void test_fromMapString_contains_List() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1;key2=list:{value2-1;value2-2;value2-3};key3=value3}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value1", resultMap.get("key1"));
+        assertEquals(Arrays.asList(new String[] { "value2-1", "value2-2", "value2-3" }), resultMap.get("key2"));
+        assertEquals("value3", resultMap.get("key3"));
+    }
+
+    public void test_fromMapString_contains_EmptyString_and_Null() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1;key2=;key3=list:{null;value3-2;null;null};key4=null}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals(resultMap.get("key1"), "value1");
+        assertEquals(resultMap.get("key2"), null);
+        assertEquals(resultMap.get("key3"), Arrays.asList(new String[] { null, "value3-2", null, null }));
+        assertEquals(resultMap.get("key4"), null);
+    }
+
+    public void test_fromMapString_contains_LineSeparator() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1;key2=value2;key3=val\nue3;key4=value4}";
+
+        // ## Act ##
+        final Map<String, Object> generatedMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(generatedMap);
+        assertEquals("value1", generatedMap.get("key1"));
+        assertEquals("value2", generatedMap.get("key2"));
+        assertEquals("val\nue3", generatedMap.get("key3"));
+        assertEquals("value4", generatedMap.get("key4"));
+    }
+
+    public void test_fromMapString_contains_DoubleByte() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1;key2=　値２;キー３=このあと改行\nした;key4=あと全角セミコロン；とかね　}";
+
+        // ## Act ##
+        final Map<String, Object> generatedMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(generatedMap);
+    }
+
+    // ===================================================================================
+    //                                                                     from ListString
+    //                                                                     ===============
+    public void test_fromListString_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String listString = "list:{sea;land;map:{piari=bonvo}}";
+
+        // ## Act ##
+        List<Object> resultList = mapStyle.fromListString(listString);
+
+        // ## Assert ##
+        log(ln() + resultList);
+        assertEquals(3, resultList.size());
+        assertEquals("sea", resultList.get(0));
+        assertEquals("land", resultList.get(1));
+        assertEquals(newHashMap("piari", "bonvo"), resultList.get(2));
+    }
+
+    // ===================================================================================
+    //                                                                       Specification
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                             Duplicate
+    //                                             ---------
+    public void test_fromMapString_duplicate_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1;key2=value2;key1=value3}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value3", resultMap.get("key1"));
+        assertEquals("value2", resultMap.get("key2"));
+    }
+
+    public void test_fromMapString_duplicate_nested() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1;key1=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals(newHashMap("key1", "value2", "key2", "value4"), resultMap.get("key1"));
+        assertEquals("value3", resultMap.get("key3"));
+    }
+
+    public void test_fromMapString_duplicate_checked_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key2=map:{key1=value2;key2=value3;key2=value4};key1=value3}";
+
+        // ## Act ##
+        try {
+            mapStyle.fromMapString(mapString);
+            // ## Assert ##
+            fail();
+        } catch (DfMapDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_fromMapString_duplicate_checked_list() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key1=list:{a;b;c};key3=value3}";
+
+        // ## Act ##
+        try {
+            mapStyle.fromMapString(mapString);
+            // ## Assert ##
+            fail();
+        } catch (DfMapDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_fromMapString_duplicate_checked_map() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key1=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
+
+        // ## Act ##
+        try {
+            mapStyle.fromMapString(mapString);
+            // ## Assert ##
+            fail();
+        } catch (DfMapDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_fromMapString_duplicate_checked_nested() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key2=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
+
+        // ## Act ##
+        try {
+            mapStyle.fromMapString(mapString);
+            // ## Assert ##
+            fail();
+        } catch (DfMapDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                Escape
+    //                                                ------
+    public void test_fromMapString_escape_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{ke\\{y1\"=v\\;\\}al\\}u\\=e\\\\}1\\ }"; // needs space
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("v;}al}u=e\\}1\\", resultMap.get("ke{y1\""));
+    }
+
+    public void test_fromMapString_escape_border() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{\\{key1\\;=\\\\{v\\;al\\}u\\=e\\}1\\;\\}}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("\\{v;al}u=e}1;}", resultMap.get("{key1;"));
+    }
+
+    // -----------------------------------------------------
+    //                                                Quoted
+    //                                                ------
+    public void test_fromMapString_quoted_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=\"value1\"}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("\"value1\"", resultMap.get("key1")); // keep quoted
+    }
+
+    // -----------------------------------------------------
+    //                                               Trimmed
+    //                                               -------
+    public void test_fromMapString_trimmed_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "  map:{ key1    = value1  }      ";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value1", resultMap.get("key1"));
+    }
+
+    // -----------------------------------------------------
+    //                                              Surprise
+    //                                              --------
+    public void test_fromMapString_surprise_beginPrefixInValue() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1 map:value2 list:{ }";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value1 map:value2 list:{", resultMap.get("key1"));
+    }
+
+    public void test_fromMapString_surprise_two_equal() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1=value2}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value1=value2", resultMap.get("key1"));
+    }
+
+    // -----------------------------------------------------
+    //                                               Illegal
+    //                                               -------
+    public void test_fromMapString_parse_failure() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+
+        // ## Act ##
+        // ## Assert ##
+        try {
+            mapStyle.fromMapString("map:{ foo = bar");
+            fail();
+        } catch (DfMapParseFailureException e) {
+            log(e.getMessage());
+        }
+        // because quit brace-count check
+        //try {
+        //    maplist.fromMapString("map:{ foo = map:{ }");
+        //    fail();
+        //} catch (DfMapParseFailureException e) {
+        //    log(e.getMessage());
+        //}
+        try {
+            mapStyle.fromMapString("map:{ foo }");
+            fail();
+        } catch (DfMapParseFailureException e) {
+            log(e.getMessage());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           Performance
+    //                                           -----------
+    public void test_fromMapString_performance_check() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        String mapString;
+        {
+            // if i < 1000
+            //  mapString.length(): 182127
+            //  performance cost: 00m01s573ms, 00m01s487ms, 00m01s560ms, 00m01s705ms, 00m01s528ms
+            //  after tuning: 00m00s046ms, 00m00s036ms, 00m00s038ms
+            Map<String, Object> map = new LinkedHashMap<String, Object>();
+            for (int i = 0; i < 1000; i++) {
+                String baseKey = "key" + i;
+                String baseValue = "value" + i;
+                Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+                valueMap.put(baseKey + "-1", baseValue + "-1");
+                valueMap.put(baseKey + "-2", baseValue + "-2");
+                {
+                    List<Object> valueList = new ArrayList<Object>();
+                    valueList.add(baseValue + "-3-1");
+                    valueList.add(baseValue + "-3-2");
+                    valueMap.put(baseKey + "-3", valueList);
+                }
+                map.put(baseKey, valueMap);
+            }
+            mapString = mapStyle.toMapString(map);
+        }
+        log("mapString.length(): {}", mapString.length());
+
+        // ## Act ##
+        long before = System.currentTimeMillis();
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+        long after = System.currentTimeMillis();
+
+        // ## Assert ##
+        assertHasAnyElement(resultMap.keySet());
+        log("performance cost: {}", DfTraceViewUtil.convertToPerformanceView(after - before));
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected void showGeneratedMap(Map<String, Object> generatedMap) {
+        final String targetString = generatedMap.toString();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append(targetString);
+        log(sb);
+    }
+}

@@ -128,15 +128,19 @@ package org.apache.torque.task;
  */
 
 import org.apache.torque.engine.database.model.AppData;
+import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
+import org.dbflute.infra.doc.hacomment.DfHacoMapPickup;
 import org.dbflute.logic.doc.decomment.DfDecommentPickupProcess;
+import org.dbflute.logic.doc.hacomment.DfHacommentPickupProcess;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
+import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
@@ -152,6 +156,7 @@ import org.slf4j.LoggerFactory;
  * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and so on.
  * @author modified by jflute (originated in Apache Torque)
  * @author contributed by cabos at maihama sheraton hotel
+ * @author contributed by hakiba
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
@@ -167,6 +172,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected String _varyingArg;
     protected boolean _syncCheckGhastlyTragedy;
     protected DfDecoMapPickup _decoMapPickup;
+    protected DfHacoMapPickup _hacoMapPickup;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -256,11 +262,12 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*    Schema HTML    *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        _selector.selectSchemaHtml(); // regular
-        _selector.selectHistoryHtml(); // regular
-        _selector.selectPropertiesHtml(); // option
-        _selector.selectLastaDocHtml(); // option
+        _documentSelector.selectSchemaHtml(); // regular
+        _documentSelector.selectHistoryHtml(); // regular
+        _documentSelector.selectPropertiesHtml(); // option
+        _documentSelector.selectLastaDocHtml(); // option
         processDecommentPickup();
+        processHacommentPickup();
         fireVelocityProcess();
     }
 
@@ -276,6 +283,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     // -----------------------------------------------------
+    //                                       pickupHacomment
+    //                                       ---------------
+    protected void processHacommentPickup() {
+        _hacoMapPickup = createHacommentPickupProcess().pickupHacomment(".");
+    }
+
+    protected DfHacommentPickupProcess createHacommentPickupProcess() {
+        return new DfHacommentPickupProcess();
+    }
+
+    // -----------------------------------------------------
     //                                     SchemaPolicyCheck
     //                                     -----------------
     protected void processSchemaPolicyCheck() {
@@ -283,7 +301,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             throw new IllegalStateException("SchemaPolicyCheck should be before making SchemaHTML because of schema data.");
         }
         final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
-        final DfSPolicyChecker checker = prop.createChecker(() -> _schemaData.getDatabase().getTableList());
+        final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> _documentSelector.getSchemaDiffList());
         checker.checkPolicyIfNeeds();
     }
 
@@ -360,7 +378,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         try {
             checker.checkSync();
         } catch (DfSchemaSyncCheckGhastlyTragedyException e) {
-            _selector.selectSchemaSyncCheckResultHtml();
+            _documentSelector.selectSchemaSyncCheckResultHtml();
             fireVelocityProcess();
             throw e;
         }
@@ -391,7 +409,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
         } else { // normally here
             super.initializeSchemaData();
-            _schemaData.getDatabase().setEmbeddedPickup(_decoMapPickup);
+            final Database database = _schemaData.getDatabase();
+            database.setEmbeddedPickup(_decoMapPickup);
+            database.setFirstDateAgent(new DfFirstDateAgent(() -> _documentSelector.getSchemaDiffList()));
         }
     }
 
@@ -451,7 +471,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     public Context initControlContext() throws Exception {
         final Context context = super.initControlContext();
         context.put("escape", new Escape());
-        context.put("selector", _selector);
+        context.put("selector", _documentSelector);
         return context;
     }
 

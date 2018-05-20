@@ -154,6 +154,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlProcedure;
+import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
 import org.dbflute.logic.generate.exdirect.DfSerialVersionUIDResolver;
@@ -167,15 +168,16 @@ import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.dbflute.logic.sql2entity.pmbean.DfPmbGenerationHandler;
 import org.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.dbflute.properties.assistant.DfTableDeterminer;
-import org.dbflute.properties.assistant.DfTableFinder;
-import org.dbflute.properties.assistant.DfTableListProvider;
+import org.dbflute.properties.assistant.base.DfTableDeterminer;
+import org.dbflute.properties.assistant.base.DfTableFinder;
+import org.dbflute.properties.assistant.base.DfTableListProvider;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
@@ -254,7 +256,12 @@ public class Database {
     // -----------------------------------------------------
     //                                      Decomment Pickup
     //                                      ----------------
-    protected DfDecoMapPickup _embeddedPickup;
+    protected DfDecoMapPickup _embeddedPickup; // used by templates directly, null allowed: when doc only
+
+    // -----------------------------------------------------
+    //                                            First Date
+    //                                            ----------
+    protected DfFirstDateAgent _firstDateAgent; // null allowed, when doc only
 
     // -----------------------------------------------------
     //                                                 Other
@@ -772,6 +779,10 @@ public class Database {
         return getPmbBasicHandler().needsStringClobHandling(className, propertyName);
     }
 
+    public boolean needsPmbMetaDataProcedureParameterBytesBlobHandling(String className, String propertyName) {
+        return getPmbBasicHandler().needsBytesBlobHandling(className, propertyName);
+    }
+
     public boolean needsPmbMetaDataProcedureParameterFixedLengthStringHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsFixedLengthStringHandling(className, propertyName);
     }
@@ -964,6 +975,32 @@ public class Database {
 
     public String getPmbMetaDataPropertyRefSize(String className, String propertyName) {
         return getPmbBasicHandler().getPropertyRefSize(className, propertyName, _sql2entitySchemaData);
+    }
+
+    // ===================================================================================
+    //                                                                          First Date
+    //                                                                          ==========
+    protected Boolean _hasTableFirstDate; // cache
+
+    public boolean hasTableFirstDate() {
+        if (_hasTableFirstDate != null) {
+            return _hasTableFirstDate;
+        }
+        boolean hasTableFirstDate = false;
+        final List<Table> tableList = getTableList();
+        for (Table table : tableList) {
+            if (table.hasFirstDate()) {
+                hasTableFirstDate = true;
+            }
+        }
+        _hasTableFirstDate = hasTableFirstDate;
+        return _hasTableFirstDate;
+    }
+
+    public OptionalThing<DfFirstDateAgent> getFirstDateAgent() { // for Java
+        return OptionalThing.ofNullable(_firstDateAgent, () -> {
+            throw new IllegalStateException("Not found the first date agent.");
+        });
     }
 
     // ===================================================================================
@@ -2811,7 +2848,7 @@ public class Database {
     //                                                Escape
     //                                                ------
     public String htmlEscape(String text) { // for various purpose (however basically resolved by method)
-        return getProperties().getDocumentProperties().resolveTextForSchemaHtml(text);
+        return getProperties().getDocumentProperties().resolveSchemaHtmlContent(text);
     }
 
     // ===================================================================================
@@ -2949,5 +2986,9 @@ public class Database {
 
     public void setEmbeddedPickup(DfDecoMapPickup embeddedPickup) {
         this._embeddedPickup = embeddedPickup;
+    }
+
+    public void setFirstDateAgent(DfFirstDateAgent firstDateAgent) {
+        this._firstDateAgent = firstDateAgent;
     }
 }

@@ -115,6 +115,9 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.needsPmbMetaDataProcedureParameterStringClobHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "stringClobType";
 #end
+#if ($database.needsPmbMetaDataProcedureParameterBytesBlobHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "bytesBlobType";
+#end
 #if ($database.needsPmbMetaDataProcedureParameterFixedLengthStringHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "fixedLengthStringType";
 #end

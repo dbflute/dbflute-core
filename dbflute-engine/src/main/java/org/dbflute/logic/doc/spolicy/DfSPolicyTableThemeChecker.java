@@ -21,11 +21,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyLogicalSecretary;
 import org.dbflute.util.Srl;
 
 /**
@@ -42,14 +41,13 @@ public class DfSPolicyTableThemeChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSPolicyChecker _spolicyChecker;
-    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+    protected final DfSPolicyLogicalSecretary _logicalSecretary;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyTableThemeChecker(DfSPolicyChecker spolicyChecker) {
-        _spolicyChecker = spolicyChecker;
+    public DfSPolicyTableThemeChecker(DfSPolicyLogicalSecretary logicalSecretary) {
+        _logicalSecretary = logicalSecretary;
     }
 
     // ===================================================================================
@@ -98,14 +96,7 @@ public class DfSPolicyTableThemeChecker {
         define(themeMap, "lowerCaseBasis", table -> Srl.isUpperCaseAny(toComparingTableName(table)), table -> {
             return "The table name should be on lower case basis: " + toTableDisp(table);
         });
-        define(themeMap, "identityIfPureIDPK", table -> {
-            if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
-                final Column pk = table.getPrimaryKeyAsOne();
-                return !pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity();
-            } else {
-                return false;
-            }
-        }, table -> {
+        define(themeMap, "identityIfPureIDPK", table -> _logicalSecretary.isNotIdentityIfPureIDPK(table), table -> {
             return "The primary key should be identity: " + toTableDisp(table) + "." + table.getPrimaryKeyAsOne().getName();
         });
         define(themeMap, "hasCommonColumn", table -> !table.hasAllCommonColumn(), table -> {
@@ -132,17 +123,17 @@ public class DfSPolicyTableThemeChecker {
     //                                                                        Assist Logic
     //                                                                        ============
     protected String toComparingTableName(Table table) {
-        return _secretary.toComparingTableName(table);
+        return _logicalSecretary.toComparingTableName(table);
     }
 
     protected String toTableDisp(Table table) {
-        return _secretary.toTableDisp(table);
+        return _logicalSecretary.toTableDisp(table);
     }
 
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _logicalSecretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 }

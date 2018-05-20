@@ -26,8 +26,14 @@ import java.util.Map;
  */
 public class DfSPolicyResult {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final Map<String, List<DfSPolicyViolation>> _violationMap = new LinkedHashMap<String, List<DfSPolicyViolation>>();
 
+    // ===================================================================================
+    //                                                                           Violation
+    //                                                                           =========
     public static class DfSPolicyViolation {
 
         protected final String _policy;
@@ -60,6 +66,17 @@ public class DfSPolicyResult {
         violationList.add(new DfSPolicyViolation(policy, message));
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "result:{violations=" + _violationMap.size() + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public Map<String, List<DfSPolicyViolation>> getViolationMap() {
         return _violationMap;
     }

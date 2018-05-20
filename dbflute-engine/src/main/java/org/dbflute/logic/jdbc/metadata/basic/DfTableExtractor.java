@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;

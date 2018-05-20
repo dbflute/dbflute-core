@@ -177,7 +177,7 @@ public class DfClassificationElement {
 
     protected String filterSubItemForSchemaHtml(String str) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveTextForSchemaHtml(Srl.replace(str, "\\n", "\n"));
+        return prop.resolveSchemaHtmlContent(Srl.replace(str, "\\n", "\n"));
     }
 
     // ===================================================================================
@@ -227,12 +227,12 @@ public class DfClassificationElement {
     //                                                                         ===========
     protected String resolveTextForJavaDoc(String comment, String indent) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveTextForJavaDoc(comment, indent);
+        return prop.resolveJavaDocContent(comment, indent);
     }
 
     protected String resolveTextForSchemaHtml(String comment) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveTextForSchemaHtml(comment);
+        return prop.resolveSchemaHtmlContent(comment);
     }
 
     // ===================================================================================
@@ -285,12 +285,12 @@ public class DfClassificationElement {
     //                                                                     ===============
     public String buildClassificationApplicationCommentForJavaDoc() {
         final String comment = buildClassificationApplicationComment();
-        return getDocumentProperties().resolveTextForJavaDoc(comment, "    "); // basically indent is unused
+        return getDocumentProperties().resolveJavaDocContent(comment, "    "); // basically indent is unused
     }
 
     public String buildClassificationApplicationCommentForSchemaHtml() {
         final String comment = buildClassificationApplicationComment();
-        return getDocumentProperties().resolveTextForSchemaHtml(comment);
+        return getDocumentProperties().resolveSchemaHtmlContent(comment);
     }
 
     protected String buildClassificationApplicationComment() {

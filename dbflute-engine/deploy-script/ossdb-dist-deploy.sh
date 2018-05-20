@@ -46,6 +46,7 @@ rm ./log/*.log
 . nextdb-renewal.sh
 . slave-replace-schema.sh
 . manage.sh renewal
+. manage.sh load-data-reverse
 cd ../dbflute_resortlinedb
 rm ./log/*.log
 . manage.sh renewal

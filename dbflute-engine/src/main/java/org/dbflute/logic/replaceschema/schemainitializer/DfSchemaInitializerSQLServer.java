@@ -16,6 +16,8 @@
 package org.dbflute.logic.replaceschema.schemainitializer;
 
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * The schema initializer for SqlServer.
@@ -24,11 +26,28 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSchemaInitializerSQLServer(DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
+    }
+
+    // ===================================================================================
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
-        return removeSemicolonSuffixIfExists(super.buildProcedureSqlName(metaInfo));
+    protected String buildProcedureSqlName(DfProcedureMeta procedureMeta) {
+        final String sqlName = removeSemicolonSuffixIfExists(super.buildProcedureSqlName(procedureMeta));
+        if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
+            return filterLocalDBDropProcedureSqlName(procedureMeta, sqlName);
+        } else { // mainly here
+            return sqlName;
+        }
     }
 
     protected String removeSemicolonSuffixIfExists(String procedureSqlName) {
@@ -37,5 +56,47 @@ public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
             procedureSqlName = procedureSqlName.substring(0, semicolonIndex);
         }
         return procedureSqlName;
+    }
+
+    // -----------------------------------------------------
+    //                                               LocalDB
+    //                                               -------
+    protected String filterLocalDBDropProcedureSqlName(DfProcedureMeta procedureMeta, String sqlName) {
+        final String catalog = procedureMeta.getProcedureSchema().getPureCatalog();
+        if (catalog == null) {
+            return sqlName;
+        }
+        // "drop procedure xxx.dbo.yyy" occurred error at SqlLocalDB.
+        // but "drop procedure dbo.yyy" is no error.
+        return sqlName.replace(catalog + ".", ""); // thanks, udagawa-san
+    }
+
+    // ===================================================================================
+    //                                                                          Drop Table
+    //                                                                          ==========
+    @Override
+    protected String buildDropTableSqlName(DfTableMeta tableMeta) {
+        final String tableSqlName = tableMeta.getTableSqlName();
+        if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
+            return filterLocalDBDropTableSqlName(tableMeta, tableSqlName);
+        } else { // mainly here
+            return tableSqlName;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               LocalDB
+    //                                               -------
+    protected String filterLocalDBDropTableSqlName(DfTableMeta tableMeta, String sqlName) {
+        final String catalog = tableMeta.getUnifiedSchema().getPureCatalog();
+        if (catalog == null) {
+            return sqlName;
+        }
+        if (!tableMeta.isTableTypeView()) {
+            return sqlName;
+        }
+        // "drop view xxx.dbo.yyy" occured error at SqlLocalDB.
+        // but "drop view dbo.yyy" is no error.
+        return sqlName.replace(catalog + ".", ""); // thanks, udagawa-san
     }
 }

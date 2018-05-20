@@ -257,7 +257,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             columnMap.put("propertyKey", propertyKey);
             final String propertyValue = property.getPropertyValue();
             columnMap.put("propertyValue", propertyValue != null ? propertyValue : "");
-            final String valueHtmlEncoded = prop.resolveTextForSimpleLineHtml(propertyValue);
+            final String valueHtmlEncoded = prop.resolveSimpleLineHtmlContent(propertyValue);
             columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
             columnMap.put("propertyValueStringLiteral", preparePropertyValueStringLiteral(propertyValue));
             columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
@@ -283,7 +283,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
 
             final String comment = property.getComment();
             columnMap.put("comment", comment != null ? comment : "");
-            final String commentHtmlEncoded = prop.resolveTextForSimpleLineHtml(comment);
+            final String commentHtmlEncoded = prop.resolveSimpleLineHtmlContent(comment);
             columnMap.put("commentHtmlEncoded", commentHtmlEncoded != null ? commentHtmlEncoded : "");
             columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
             columnMap.put("isExtends", property.isExtends());
