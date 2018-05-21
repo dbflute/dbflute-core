@@ -373,22 +373,45 @@ public class DfSPolicyColumnStatementChecker {
     //                                                                     ===============
     protected String convertToColumnNameComparingValue(Column column, String yourValue) { // @since 1.1.8
         String comparingValue = yourValue;
-        final String tableName = toComparingTableName(column); // e.g. columnName is $$table$$_ID
-        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
-        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
-        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
+        {
+            final String tableName = toComparingTableName(column); // e.g. columnName is $$table$$_ID
+            comparingValue = replaceComparingValue(comparingValue, "$$table$$", tableName);
+        }
+        if (column.hasComment()) { // @since 1.1.9
+            final String comment = column.getComment(); // e.g. columnName is not $$comment$$ 
+            comparingValue = replaceComparingValue(comparingValue, "$$comment$$", comment);
+        }
         return comparingValue;
     }
 
     protected String convertToAliasComparingValue(Column column, String yourValue) { // @since 1.1.8
         String comparingValue = yourValue;
-        final Table table = column.getTable();
-        if (table.hasAlias()) {
-            final String tableAlias = table.getAlias(); // alias is $$tableAlias$$ID
-            comparingValue = Srl.replace(comparingValue, "$$tableAlias$$", tableAlias);
-            comparingValue = Srl.replace(comparingValue, "$$TableAlias$$", tableAlias);
+        {
+            final Table table = column.getTable();
+            if (table.hasAlias()) {
+                final String tableAlias = table.getAlias(); // alias is $$tableAlias$$ID
+                comparingValue = replaceComparingValue(comparingValue, "$$tableAlias$$", tableAlias, /*suppressUpper*/true);
+            }
+        }
+        if (column.hasComment()) { // @since 1.1.9
+            final String comment = column.getComment(); // e.g. alias is not $$comment$$
+            comparingValue = replaceComparingValue(comparingValue, "$$comment$$", comment);
         }
         return comparingValue;
+    }
+
+    protected String replaceComparingValue(String comparingValue, String variableName, String targetStr) {
+        return replaceComparingValue(comparingValue, variableName, targetStr, false);
+    }
+
+    protected String replaceComparingValue(String comparingValue, String variableName, String targetStr, boolean suppressUpper) {
+        String filtered = comparingValue;
+        filtered = Srl.replace(filtered, "$$" + variableName + "$$", targetStr); // e.g. $$table$$
+        filtered = Srl.replace(filtered, "$$" + Srl.initCap(variableName) + "$$", targetStr); // e.g. $$Table$$
+        if (!suppressUpper) {
+            filtered = Srl.replace(filtered, "$$" + variableName.toUpperCase() + "$$", targetStr); // e.g. $$TABLE$$
+        }
+        return filtered;
     }
 
     // ===================================================================================

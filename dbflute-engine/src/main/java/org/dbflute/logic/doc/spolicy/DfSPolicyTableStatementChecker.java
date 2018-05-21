@@ -89,9 +89,9 @@ public class DfSPolicyTableStatementChecker {
         final String ifValue = ifPart.getIfValue();
         final boolean notIfValue = ifPart.isNotIfValue();
         if (ifItem.equalsIgnoreCase("tableName")) { // if tableName is ...
-            return isHitExp(toComparingTableName(table), ifValue) == !notIfValue;
+            return isHitExp(toComparingTableName(table), toTableNameComparingIfValue(table, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
-            return isHitExp(table.getAlias(), ifValue) == !notIfValue;
+            return isHitExp(table.getAlias(), toAliasComparingIfValue(table, ifValue)) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
             return determineFirstDate(statement, ifValue, notIfValue, table);
         } else if (ifItem.equalsIgnoreCase("pk_dbType") || ifItem.equalsIgnoreCase("pkDbType")) { // for compatible
@@ -119,6 +119,14 @@ public class DfSPolicyTableStatementChecker {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
         }
         return false;
+    }
+
+    protected String toTableNameComparingIfValue(Table table, String ifValue) {
+        return convertToTableNameComparingValue(table, ifValue);
+    }
+
+    protected String toAliasComparingIfValue(Table table, String ifValue) {
+        return convertToAliasComparingValue(table, ifValue);
     }
 
     protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
@@ -208,12 +216,12 @@ public class DfSPolicyTableStatementChecker {
         final boolean notThenValue = thenPart.isNotThenValue();
         if (thenItem.equalsIgnoreCase("tableName")) { // e.g. tableName is prefix:CLS_
             final String tableName = toComparingTableName(table);
-            if (!isHitExp(tableName, thenValue) == !notThenValue) {
+            if (!isHitExp(tableName, toTableNameComparingThenValue(table, thenValue)) == !notThenValue) {
                 return violationCall.apply(tableName);
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:History
             final String alias = table.getAlias();
-            if (!isHitExp(alias, thenValue) == !notThenValue) {
+            if (!isHitExp(alias, toAliasComparingThenValue(table, thenValue)) == !notThenValue) {
                 return violationCall.apply(alias);
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
@@ -225,7 +233,7 @@ public class DfSPolicyTableStatementChecker {
             if (table.hasPrimaryKey()) {
                 final Column pk = table.getPrimaryKey().get(0); // same name if compound
                 final String pkName = pk.getPrimaryKeyName();
-                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
                 if (!isHitExp(pkName, comparingValue) == !notThenValue) {
                     final String disp = pkName + (pk.isAdditionalPrimaryKey() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
@@ -234,7 +242,7 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
             for (ForeignKey fk : table.getForeignKeyList()) {
                 final String fkName = fk.getName();
-                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
                 if (!isHitExp(fkName, comparingValue) == !notThenValue) {
                     final String disp = fkName + (fk.isAdditionalForeignKey() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
@@ -243,7 +251,7 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
             for (Unique uq : table.getUniqueList()) {
                 final String uqName = uq.getName();
-                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
                 if (!isHitExp(uqName, comparingValue)) {
                     final String disp = uqName + (uq.isAdditional() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
@@ -252,7 +260,7 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
             for (Index ix : table.getIndexList()) {
                 final String ixName = ix.getName();
-                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
                 if (!isHitExp(ixName, comparingValue) == !notThenValue) {
                     return violationCall.apply(ixName);
                 }
@@ -303,13 +311,16 @@ public class DfSPolicyTableStatementChecker {
         return null; // no violation
     }
 
-    protected String toConstraintComparingValue(Table table, String thenValue) {
-        final String tableName = toComparingTableName(table);
-        String comparingValue = thenValue;
-        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
-        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
-        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
-        return comparingValue;
+    protected String toTableNameComparingThenValue(Table table, String thenValue) {
+        return convertToTableNameComparingValue(table, thenValue);
+    }
+
+    protected String toAliasComparingThenValue(Table table, String thenValue) {
+        return convertToAliasComparingValue(table, thenValue);
+    }
+
+    protected String toConstraintNameComparingThenValue(Table table, String thenValue) {
+        return convertToConstraintNameComparingValue(table, thenValue);
     }
 
     protected String buildViolation(Table table, DfSPolicyThenPart thenPart, String actual) {
@@ -318,6 +329,48 @@ public class DfSPolicyTableStatementChecker {
         final String notOr = thenPart.isNotThenValue() ? "not " : "";
         final String columnDisp = toTableDisp(table);
         return "The " + thenItem + " should " + notOr + "be " + thenValue + " but " + actual + ": " + columnDisp;
+    }
+
+    // ===================================================================================
+    //                                                                     Comparing Value
+    //                                                                     ===============
+    protected String convertToTableNameComparingValue(Table table, String yourValue) { // @since 1.1.9
+        String comparingValue = yourValue;
+        if (table.hasComment()) { // @since 1.1.9
+            final String comment = table.getComment(); // e.g. columnName is not $$comment$$ 
+            comparingValue = replaceComparingValue(comparingValue, "$$comment$$", comment);
+        }
+        return comparingValue;
+    }
+
+    protected String convertToAliasComparingValue(Table table, String yourValue) { // @since 1.1.9
+        String comparingValue = yourValue;
+        if (table.hasComment()) { // @since 1.1.9
+            final String comment = table.getComment(); // e.g. alias is not $$comment$$
+            comparingValue = replaceComparingValue(comparingValue, "$$comment$$", comment);
+        }
+        return comparingValue;
+    }
+
+    protected String convertToConstraintNameComparingValue(Table table, String thenValue) {
+        final String tableName = toComparingTableName(table);
+        String comparingValue = thenValue;
+        comparingValue = replaceComparingValue(comparingValue, "$$table$$", tableName);
+        return comparingValue;
+    }
+
+    protected String replaceComparingValue(String comparingValue, String variableName, String targetStr) {
+        return replaceComparingValue(comparingValue, variableName, targetStr, false);
+    }
+
+    protected String replaceComparingValue(String comparingValue, String variableName, String targetStr, boolean suppressUpper) {
+        String filtered = comparingValue;
+        filtered = Srl.replace(filtered, "$$" + variableName + "$$", targetStr); // e.g. $$table$$
+        filtered = Srl.replace(filtered, "$$" + Srl.initCap(variableName) + "$$", targetStr); // e.g. $$Table$$
+        if (!suppressUpper) {
+            filtered = Srl.replace(filtered, "$$" + variableName.toUpperCase() + "$$", targetStr); // e.g. $$TABLE$$
+        }
+        return filtered;
     }
 
     // ===================================================================================
