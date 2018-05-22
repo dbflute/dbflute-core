@@ -234,7 +234,13 @@ public class DfSPolicyLogicalSecretary {
     //                                                              Conversion for Display
     //                                                              ======================
     public String toTableDisp(Table table) {
-        return table.getAliasExpression() + table.getTableDispName();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(table.getAliasExpression());
+        sb.append(table.getTableDispName());
+        if (table.hasComment()) {
+            sb.append(" // ").append(Srl.cut(table.getComment(), 10, "..."));
+        }
+        return sb.toString();
     }
 
     public String toColumnDisp(Column column) { // e.g. (Sea.Sea Name)SEA.SEA_NAME VARCHAR(100) (NotNull) 
@@ -256,6 +262,9 @@ public class DfSPolicyLogicalSecretary {
             sb.append("(").append(column.getColumnSize()).append(")");
         }
         sb.append(" ").append(column.isNotNull() ? "(NotNull)" : "(NullAllowed)");
+        if (column.hasComment()) {
+            sb.append(" // ").append(Srl.cut(column.getComment(), 10, "..."));
+        }
         return sb.toString();
     }
 
