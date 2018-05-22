@@ -346,7 +346,7 @@ public class DfSPolicyTableStatementChecker {
     protected String convertToAliasComparingValue(Table table, String yourValue) { // @since 1.1.9
         String comparingValue = yourValue;
         final String tableName = toComparingTableName(table);
-        comparingValue = replaceComparingValue(comparingValue, "tableName", tableName); // @since 1.1.9
+        comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
         comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since 1.1.9
         if (table.hasComment()) { // @since 1.1.9
             final String comment = table.getComment(); // e.g. alias is not $$comment$$
@@ -358,7 +358,7 @@ public class DfSPolicyTableStatementChecker {
     protected String convertToConstraintNameComparingValue(Table table, String thenValue) {
         final String tableName = toComparingTableName(table);
         String comparingValue = thenValue;
-        comparingValue = replaceComparingValue(comparingValue, "tableName", tableName); // @since 1.1.9
+        comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
         comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since first
         return comparingValue;
     }
