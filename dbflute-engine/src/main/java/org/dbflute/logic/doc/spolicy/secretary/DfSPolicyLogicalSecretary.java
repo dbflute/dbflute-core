@@ -238,7 +238,7 @@ public class DfSPolicyLogicalSecretary {
             br.addElement("    columnName is $$dstore$$");
             br.addItem("Statement");
             br.addElement(statement.getNativeExp());
-            br.addItem("Schema Data");
+            br.addItem("Current Data");
             br.addElement(name);
             br.addItem("Unresolved Keyword");
             br.addElement(hint);
