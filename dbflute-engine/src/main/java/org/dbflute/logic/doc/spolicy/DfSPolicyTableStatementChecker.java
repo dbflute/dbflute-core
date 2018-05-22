@@ -336,11 +336,12 @@ public class DfSPolicyTableStatementChecker {
     // ===================================================================================
     //                                                                     Comparing Value
     //                                                                     ===============
+    // *The "(df:emptyXxx)" is dummy value for $$variable$$ of no-value not to hit unrelated value
     protected String convertToTableNameComparingValue(Table table, String yourValue) { // @since 1.1.9
         String comparingValue = yourValue;
-        if (table.hasComment()) { // @since 1.1.9
-            final String comment = table.getComment(); // e.g. columnName is not $$comment$$ 
-            comparingValue = replaceComparingValue(comparingValue, "comment", comment);
+        {
+            final String comment = table.hasComment() ? table.getComment() : "(df:emptyComment)";
+            comparingValue = replaceComparingValue(comparingValue, "comment", comment); // @since 1.1.9
         }
         return comparingValue;
     }
@@ -348,11 +349,13 @@ public class DfSPolicyTableStatementChecker {
     protected String convertToAliasComparingValue(Table table, String yourValue) { // @since 1.1.9
         String comparingValue = yourValue;
         final String tableName = toComparingTableName(table);
-        comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
-        comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since 1.1.9
-        if (table.hasComment()) { // @since 1.1.9
-            final String comment = table.getComment(); // e.g. alias is not $$comment$$
-            comparingValue = replaceComparingValue(comparingValue, "comment", comment);
+        {
+            comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
+            comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since 1.1.9
+        }
+        {
+            final String comment = table.hasComment() ? table.getComment() : "(df:emptyComment)";
+            comparingValue = replaceComparingValue(comparingValue, "comment", comment); // @since 1.1.9
         }
         return comparingValue;
     }

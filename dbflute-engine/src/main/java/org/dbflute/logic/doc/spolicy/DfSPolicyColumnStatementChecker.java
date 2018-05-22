@@ -380,6 +380,7 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                     Comparing Value
     //                                                                     ===============
+    // *The "(df:emptyXxx)" is dummy value for $$variable$$ of no-value not to hit unrelated value
     protected String convertToColumnNameComparingValue(Column column, String yourValue) { // @since 1.1.8
         String comparingValue = yourValue;
         {
@@ -387,8 +388,8 @@ public class DfSPolicyColumnStatementChecker {
             comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
             comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since 1.1.8
         }
-        if (column.hasComment()) {
-            final String comment = column.getComment(); // e.g. columnName is not $$comment$$ 
+        {
+            final String comment = column.hasComment() ? column.getComment() : "(df:emptyComment)";
             comparingValue = replaceComparingValue(comparingValue, "comment", comment); // @since 1.1.9
         }
         return comparingValue;
@@ -396,17 +397,17 @@ public class DfSPolicyColumnStatementChecker {
 
     protected String convertToAliasComparingValue(Column column, String yourValue) {
         String comparingValue = yourValue;
-        final String columnDbName = column.getName();
-        comparingValue = replaceComparingValue(comparingValue, "columnName", columnDbName, /*suppressUpper*/true); // @since 1.1.9
+        {
+            final String columnDbName = column.getName();
+            comparingValue = replaceComparingValue(comparingValue, "columnName", columnDbName, /*suppressUpper*/true); // @since 1.1.9
+        }
         {
             final Table table = column.getTable();
-            if (table.hasAlias()) {
-                final String tableAlias = table.getAlias(); // alias is $$tableAlias$$ID
-                comparingValue = replaceComparingValue(comparingValue, "tableAlias", tableAlias, /*suppressUpper*/true); // @since 1.1.9
-            }
+            final String tableAlias = table.hasAlias() ? table.getAlias() : "(df:emptyTableAlias)";
+            comparingValue = replaceComparingValue(comparingValue, "tableAlias", tableAlias, /*suppressUpper*/true); // @since 1.1.9
         }
-        if (column.hasComment()) {
-            final String comment = column.getComment(); // e.g. alias is not $$comment$$
+        {
+            final String comment = column.hasComment() ? column.getComment() : "(df:emptyComment)";
             comparingValue = replaceComparingValue(comparingValue, "comment", comment); // @since 1.1.9
         }
         return comparingValue;
