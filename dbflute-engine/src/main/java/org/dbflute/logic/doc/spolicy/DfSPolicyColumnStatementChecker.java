@@ -361,11 +361,13 @@ public class DfSPolicyColumnStatementChecker {
     }
 
     protected String buildViolation(Column column, DfSPolicyThenPart thenPart, String actual) {
-        final String thenItem = thenPart.getThenItem();
-        final String thenValue = thenPart.getThenValue();
-        final String notOr = thenPart.isNotThenValue() ? "not " : "";
+        // change message to be simple, because it can be debugged by only statement display by jflute (2018/05/22)
+        //final String thenItem = thenPart.getThenItem();
+        //final String thenValue = thenPart.getThenValue();
+        //final String notOr = thenPart.isNotThenValue() ? "not " : "";
         final String columnDisp = toColumnDisp(column);
-        return "The " + thenItem + " should " + notOr + "be " + thenValue + " but " + actual + ": " + columnDisp;
+        return "but " + actual + ": " + columnDisp;
+        //return "The " + thenItem + " should " + notOr + "be " + thenValue + " but " + actual + ": " + columnDisp;
     }
 
     // ===================================================================================
