@@ -221,7 +221,8 @@ public class DfSPolicyLogicalSecretary {
             ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Unknown variable in the SchemaPolicyCheck statement.");
             br.addItem("Advice");
-            br.addElement("Confirm your statement and see the official document.");
+            br.addElement("Confirm your statement in schemaPolicyMap.dfprop");
+            br.addElement("and see the official document.");
             br.addElement("You can use only reserved variables.");
             br.addElement("For example:");
             br.addElement("  (o):");
