@@ -375,12 +375,12 @@ public class DfSPolicyColumnStatementChecker {
         String comparingValue = yourValue;
         {
             final String tableName = toComparingTableName(column); // e.g. columnName is $$table$$_ID
-            comparingValue = replaceComparingValue(comparingValue, "$$tableName$$", tableName); // @since 1.1.9
-            comparingValue = replaceComparingValue(comparingValue, "$$table$$", tableName); // old style, @since 1.1.8
+            comparingValue = replaceComparingValue(comparingValue, "tableName", tableName); // @since 1.1.9
+            comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since 1.1.8
         }
         if (column.hasComment()) {
             final String comment = column.getComment(); // e.g. columnName is not $$comment$$ 
-            comparingValue = replaceComparingValue(comparingValue, "$$comment$$", comment); // @since 1.1.9
+            comparingValue = replaceComparingValue(comparingValue, "comment", comment); // @since 1.1.9
         }
         return comparingValue;
     }
@@ -388,17 +388,17 @@ public class DfSPolicyColumnStatementChecker {
     protected String convertToAliasComparingValue(Column column, String yourValue) {
         String comparingValue = yourValue;
         final String columnDbName = column.getName();
-        comparingValue = replaceComparingValue(comparingValue, "$$columnName$$", columnDbName); // @since 1.1.9
+        comparingValue = replaceComparingValue(comparingValue, "columnName", columnDbName); // @since 1.1.9
         {
             final Table table = column.getTable();
             if (table.hasAlias()) {
                 final String tableAlias = table.getAlias(); // alias is $$tableAlias$$ID
-                comparingValue = replaceComparingValue(comparingValue, "$$tableAlias$$", tableAlias, /*suppressUpper*/true); // @since 1.1.9
+                comparingValue = replaceComparingValue(comparingValue, "tableAlias", tableAlias, /*suppressUpper*/true); // @since 1.1.9
             }
         }
         if (column.hasComment()) {
             final String comment = column.getComment(); // e.g. alias is not $$comment$$
-            comparingValue = replaceComparingValue(comparingValue, "$$comment$$", comment); // @since 1.1.9
+            comparingValue = replaceComparingValue(comparingValue, "comment", comment); // @since 1.1.9
         }
         return comparingValue;
     }
