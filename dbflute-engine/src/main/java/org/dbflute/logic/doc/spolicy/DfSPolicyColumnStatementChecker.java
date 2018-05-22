@@ -86,7 +86,8 @@ public class DfSPolicyColumnStatementChecker {
         final String ifValue = ifPart.getIfValue();
         final boolean notIfValue = ifPart.isNotIfValue();
         if (ifItem.equalsIgnoreCase("tableName")) { // if tableName is ...
-            return isHitExp(toComparingTableName(column), ifValue) == !notIfValue;
+            final String comparingTableName = toComparingTableName(column);
+            return isHitExp(statement, comparingTableName, ifValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("column")) { // if column is ...
             if ("notNull".equalsIgnoreCase(ifValue)) {
                 return column.isNotNull() == !notIfValue;
@@ -108,23 +109,28 @@ public class DfSPolicyColumnStatementChecker {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
         } else if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
-            return isHitExp(toComparingColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
+            final String comparingColumnName = toComparingColumnName(column);
+            final String comparingIfValue = toColumnNameComparingIfValue(column, ifValue);
+            return isHitExp(statement, comparingColumnName, comparingIfValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("tableColumnName")) { // if tableColumnName is ...
-            return isHitExp(toComparingTableColumnName(column), toColumnNameComparingIfValue(column, ifValue)) == !notIfValue;
+            final String comparingTableColumnName = toComparingTableColumnName(column);
+            final String comparingIfValue = toColumnNameComparingIfValue(column, ifValue);
+            return isHitExp(statement, comparingTableColumnName, comparingIfValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
-            return isHitExp(column.getAlias(), toAliasComparingIfValue(column, ifValue)) == !notIfValue;
+            final String comparingIfValue = toAliasComparingIfValue(column, ifValue);
+            return isHitExp(statement, column.getAlias(), comparingIfValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("dbType")) { // if dbType is ...
             if (column.hasDbType()) { // just in case
-                return isHitExp(column.getDbType(), ifValue) == !notIfValue;
+                return isHitExp(statement, column.getDbType(), ifValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("size")) { // if size is ...
             if (column.hasColumnSize()) { // just in case
-                return isHitExp(column.getColumnSize(), ifValue) == !notIfValue;
+                return isHitExp(statement, column.getColumnSize(), ifValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("dbType_with_size")) { // e.g. if dbType_with_size is char(3)
             if (column.hasDbType() && column.hasColumnSize()) { // just in case
                 final String exp = toComparingDbTypeWithSize(column);
-                return isHitExp(exp, ifValue) == !notIfValue;
+                return isHitExp(statement, exp, ifValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
             return determineFirstDate(statement, ifValue, notIfValue, column);
@@ -270,9 +276,9 @@ public class DfSPolicyColumnStatementChecker {
         final String thenValue = thenPart.getThenValue();
         final boolean notThenValue = thenPart.isNotThenValue();
         if (thenItem.equalsIgnoreCase("tableName")) { // e.g. tableName is prefix:CLS_
-            final String tableName = toComparingTableName(column);
-            if (!isHitExp(tableName, thenValue) == !notThenValue) {
-                return violationCall.apply(tableName);
+            final String comparingTableName = toComparingTableName(column);
+            if (!isHitExp(statement, comparingTableName, thenValue) == !notThenValue) {
+                return violationCall.apply(comparingTableName);
             }
         } else if (thenItem.equalsIgnoreCase("column")) { // e.g. column is notNull
             if ("notNull".equalsIgnoreCase(thenValue)) {
@@ -319,38 +325,41 @@ public class DfSPolicyColumnStatementChecker {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-value: " + thenValue);
             }
         } else if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
-            final String columnName = toComparingColumnName(column);
-            if (!isHitExp(columnName, toColumnNameComparingThenValue(column, thenValue)) == !notThenValue) {
-                return violationCall.apply(columnName);
+            final String comparingColumnName = toComparingColumnName(column);
+            final String comparingThenValue = toColumnNameComparingThenValue(column, thenValue);
+            if (!isHitExp(statement, comparingColumnName, comparingThenValue) == !notThenValue) {
+                return violationCall.apply(comparingColumnName);
             }
         } else if (thenItem.equalsIgnoreCase("tableColumnName")) { // e.g. tableColumnName is contain:R.M
-            final String tableColumnName = toComparingTableColumnName(column);
-            if (!isHitExp(tableColumnName, toColumnNameComparingThenValue(column, thenValue)) == !notThenValue) {
-                return violationCall.apply(tableColumnName);
+            final String comparingTableColumnName = toComparingTableColumnName(column);
+            final String comparingThenValue = toColumnNameComparingThenValue(column, thenValue);
+            if (!isHitExp(statement, comparingTableColumnName, comparingThenValue) == !notThenValue) {
+                return violationCall.apply(comparingTableColumnName);
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             final String alias = column.getAlias();
-            if (!isHitExp(alias, toAliasComparingThenValue(column, thenValue)) == !notThenValue) {
+            final String comparingThenValue = toAliasComparingThenValue(column, thenValue);
+            if (!isHitExp(statement, alias, comparingThenValue) == !notThenValue) {
                 return violationCall.apply(alias);
             }
         } else if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
             final String dbType = column.getDbType();
-            if (!isHitExp(dbType, thenValue) == !notThenValue) {
+            if (!isHitExp(statement, dbType, thenValue) == !notThenValue) {
                 return violationCall.apply(dbType);
             }
         } else if (thenItem.equalsIgnoreCase("size")) { // e.g. size is 200
             final String size = column.getColumnSize(); // String expression #for_now
-            if (!isHitExp(size, thenValue) == !notThenValue) {
+            if (!isHitExp(statement, size, thenValue) == !notThenValue) {
                 return violationCall.apply(size);
             }
         } else if (thenItem.equalsIgnoreCase("dbType_with_size")) { // e.g. dbType_with_size is char(3)
             final String dbTypeWithSize = toComparingDbTypeWithSize(column);
-            if (!isHitExp(dbTypeWithSize, thenValue) == !notThenValue) {
+            if (!isHitExp(statement, dbTypeWithSize, thenValue) == !notThenValue) {
                 return violationCall.apply(dbTypeWithSize);
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             final String comment = column.getComment();
-            if (!isHitExp(comment, thenValue) == !notThenValue) {
+            if (!isHitExp(statement, comment, thenValue) == !notThenValue) {
                 return violationCall.apply(comment);
             }
         } else {
@@ -430,8 +439,8 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    protected boolean isHitExp(String exp, String hint) {
-        return _logicalSecretary.isHitExp(exp, hint);
+    protected boolean isHitExp(DfSPolicyStatement statement, String exp, String hint) {
+        return _logicalSecretary.isHitExp(statement, exp, hint);
     }
 
     protected String toComparingTableName(Column column) {

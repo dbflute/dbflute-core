@@ -139,9 +139,9 @@ public class DfSPolicyStatement {
 
         protected final String _thenTheme; // null allowed
         protected final boolean _notThenTheme;
-        protected final List<DfSPolicyThenPart> _thenPartList; // at least one element if non-theme
+        protected final List<DfSPolicyThenPart> _thenPartList; // not null, at least one element if non-theme
         protected final boolean _connectedByOr;
-        protected final String _supplement;
+        protected final String _supplement; // for "=> {}", null allowed
 
         public DfSPolicyThenClause(String thenTheme, boolean notThenTheme, List<DfSPolicyThenPart> thenPartList, boolean connectedByOr,
                 String supplement) {

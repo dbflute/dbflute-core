@@ -89,30 +89,33 @@ public class DfSPolicyTableStatementChecker {
         final String ifValue = ifPart.getIfValue();
         final boolean notIfValue = ifPart.isNotIfValue();
         if (ifItem.equalsIgnoreCase("tableName")) { // if tableName is ...
-            return isHitExp(toComparingTableName(table), toTableNameComparingIfValue(table, ifValue)) == !notIfValue;
+            final String comparingTableName = toComparingTableName(table);
+            final String comparingIfValue = toTableNameComparingIfValue(table, ifValue);
+            return isHitExp(statement, comparingTableName, comparingIfValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
-            return isHitExp(table.getAlias(), toAliasComparingIfValue(table, ifValue)) == !notIfValue;
+            final String comparingIfValue = toAliasComparingIfValue(table, ifValue);
+            return isHitExp(statement, table.getAlias(), comparingIfValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
             return determineFirstDate(statement, ifValue, notIfValue, table);
         } else if (ifItem.equalsIgnoreCase("pk_dbType") || ifItem.equalsIgnoreCase("pkDbType")) { // for compatible
             if (table.hasPrimaryKey()) {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) { // required here (for PK's something)
-                    return isHitExp(pk.getDbType(), ifValue) == !notIfValue;
+                    return isHitExp(statement, pk.getDbType(), ifValue) == !notIfValue;
                 }
             }
         } else if (ifItem.equalsIgnoreCase("pk_size")) {
             if (table.hasPrimaryKey()) {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) { // required here (for PK's something)
-                    return isHitExp(pk.getColumnSize(), ifValue) == !notIfValue;
+                    return isHitExp(statement, pk.getColumnSize(), ifValue) == !notIfValue;
                 }
             }
         } else if (ifItem.equalsIgnoreCase("pk_dbType_with_size")) {
             if (table.hasPrimaryKey()) {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) { // required here (for PK's something)
-                    return isHitExp(toComparingDbTypeWithSize(pk), ifValue) == !notIfValue;
+                    return isHitExp(statement, toComparingDbTypeWithSize(pk), ifValue) == !notIfValue;
                 }
             }
         } else {
@@ -216,25 +219,25 @@ public class DfSPolicyTableStatementChecker {
         final boolean notThenValue = thenPart.isNotThenValue();
         if (thenItem.equalsIgnoreCase("tableName")) { // e.g. tableName is prefix:CLS_
             final String tableName = toComparingTableName(table);
-            if (!isHitExp(tableName, toTableNameComparingThenValue(table, thenValue)) == !notThenValue) {
+            if (!isHitExp(statement, tableName, toTableNameComparingThenValue(table, thenValue)) == !notThenValue) {
                 return violationCall.apply(tableName);
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:History
             final String alias = table.getAlias();
-            if (!isHitExp(alias, toAliasComparingThenValue(table, thenValue)) == !notThenValue) {
+            if (!isHitExp(statement, alias, toAliasComparingThenValue(table, thenValue)) == !notThenValue) {
                 return violationCall.apply(alias);
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             final String comment = table.getComment();
-            if (!isHitExp(comment, thenValue) == !notThenValue) {
+            if (!isHitExp(statement, comment, thenValue) == !notThenValue) {
                 return violationCall.apply(comment);
             }
         } else if (thenItem.equalsIgnoreCase("pkName")) { // e.g. pkName is prefix:PK_
             if (table.hasPrimaryKey()) {
                 final Column pk = table.getPrimaryKey().get(0); // same name if compound
                 final String pkName = pk.getPrimaryKeyName();
-                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
-                if (!isHitExp(pkName, comparingValue) == !notThenValue) {
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                if (!isHitExp(statement, pkName, comparingThenValue) == !notThenValue) {
                     final String disp = pkName + (pk.isAdditionalPrimaryKey() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
                 }
@@ -242,8 +245,8 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
             for (ForeignKey fk : table.getForeignKeyList()) {
                 final String fkName = fk.getName();
-                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
-                if (!isHitExp(fkName, comparingValue) == !notThenValue) {
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                if (!isHitExp(statement, fkName, comparingThenValue) == !notThenValue) {
                     final String disp = fkName + (fk.isAdditionalForeignKey() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
                 }
@@ -251,8 +254,8 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
             for (Unique uq : table.getUniqueList()) {
                 final String uqName = uq.getName();
-                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
-                if (!isHitExp(uqName, comparingValue)) {
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                if (!isHitExp(statement, uqName, comparingThenValue)) {
                     final String disp = uqName + (uq.isAdditional() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
                 }
@@ -260,8 +263,8 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
             for (Index ix : table.getIndexList()) {
                 final String ixName = ix.getName();
-                final String comparingValue = toConstraintNameComparingThenValue(table, thenValue);
-                if (!isHitExp(ixName, comparingValue) == !notThenValue) {
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                if (!isHitExp(statement, ixName, comparingThenValue) == !notThenValue) {
                     return violationCall.apply(ixName);
                 }
             }
@@ -270,7 +273,7 @@ public class DfSPolicyTableStatementChecker {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) {
                     final String columnName = pk.getName();
-                    if (!isHitExp(columnName, thenValue) == !notThenValue) {
+                    if (!isHitExp(statement, columnName, thenValue) == !notThenValue) {
                         return violationCall.apply(columnName);
                     }
                 }
@@ -280,7 +283,7 @@ public class DfSPolicyTableStatementChecker {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) {
                     final String dbType = pk.getDbType();
-                    if (!isHitExp(dbType, thenValue) == !notThenValue) {
+                    if (!isHitExp(statement, dbType, thenValue) == !notThenValue) {
                         return violationCall.apply(dbType);
                     }
                 }
@@ -290,7 +293,7 @@ public class DfSPolicyTableStatementChecker {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) {
                     final String size = pk.getColumnSize();
-                    if (!isHitExp(size, thenValue) == !notThenValue) {
+                    if (!isHitExp(statement, size, thenValue) == !notThenValue) {
                         return violationCall.apply(size);
                     }
                 }
@@ -300,7 +303,7 @@ public class DfSPolicyTableStatementChecker {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) {
                     final String dbTypeWithSize = toComparingDbTypeWithSize(pk);
-                    if (!isHitExp(dbTypeWithSize, thenValue) == !notThenValue) {
+                    if (!isHitExp(statement, dbTypeWithSize, thenValue) == !notThenValue) {
                         return violationCall.apply(dbTypeWithSize);
                     }
                 }
@@ -385,8 +388,8 @@ public class DfSPolicyTableStatementChecker {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    protected boolean isHitExp(String exp, String hint) {
-        return _logicalSecretary.isHitExp(exp, hint);
+    protected boolean isHitExp(DfSPolicyStatement statement, String exp, String hint) {
+        return _logicalSecretary.isHitExp(statement, exp, hint);
     }
 
     protected String toComparingTableName(Table table) {
