@@ -94,6 +94,8 @@ public class DfSPolicyColumnStatementChecker {
                 return column.isAutoIncrement() == !notIfValue;
             } else if ("pk".equalsIgnoreCase(ifValue)) {
                 return column.isPrimaryKey() == !notIfValue;
+            } else if ("singlePK".equalsIgnoreCase(ifValue)) {
+                return (column.isPrimaryKey() && !column.isTwoOrMoreColumnPrimaryKey()) == !notIfValue;
             } else if ("fk".equalsIgnoreCase(ifValue)) {
                 return column.isForeignKey() == !notIfValue;
             } else if ("unique".equalsIgnoreCase(ifValue)) {
@@ -285,6 +287,11 @@ public class DfSPolicyColumnStatementChecker {
                 }
             } else if ("pk".equalsIgnoreCase(thenValue)) {
                 final boolean determination = column.isPrimaryKey();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("singlePK".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.isPrimaryKey() && !column.isTwoOrMoreColumnPrimaryKey();
                 if (!determination == !notThenValue) {
                     return violationCall.apply(String.valueOf(determination));
                 }
