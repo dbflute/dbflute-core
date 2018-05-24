@@ -54,8 +54,8 @@ public HtmlResponse ${method}(Integer ${object}Id, ${form}Form form) {
 }</template>
 <template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: Execute Method as JSON response with ID and Body" enabled="true" name="_laexjson">${:import(org.lastaflute.web.Execute
     , org.lastaflute.web.response.JsonResponse)}@Execute
-public JsonResponse&lt;${bean}&gt; ${method}(Integer ${object}Id, ${body}Body body) {
-    return asJson(bean);
+public JsonResponse&lt;${result}&gt; ${method}(Integer ${object}Id, ${body}Body body) {
+    return asJson(result);
 }</template>
 <template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: Public Property simply" enabled="true" name="_laprop">public ${objectType} ${objectName};</template>
 <template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: Public Property as Valid Class" enabled="true" name="_lapvalidclass">${:import(org.lastaflute.web.validation.Required,javax.validation.Valid)}@Valid
