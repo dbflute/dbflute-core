@@ -468,6 +468,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         if (isSqlLineCommentOnly(sql)) {
             return;
         }
+        if (isSqlBlockCommentOnly(sql)) {
+            return;
+        }
         sqlList.add(removeCR(sql));
     }
 
@@ -486,6 +489,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         _log.info("The SQL has line comments only so skip it:" + ln() + sql);
         return true;
+    }
+
+    protected boolean isSqlBlockCommentOnly(String sql) {
+        sql = sql.trim();
+        if (sql.startsWith("/*") && sql.endsWith("*/")) {
+            _log.info("The SQL has line comments only so skip it:" + ln() + sql);
+            return true;
+        }
+        return false;
     }
 
     protected boolean isDbCommentLine(String line) {
