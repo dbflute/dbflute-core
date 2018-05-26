@@ -31,7 +31,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.tools.ant.BuildException;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
@@ -77,6 +76,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _dataSource = dataSource;
     }
 
+    @Override
     public void prepare(File sqlFile) {
         _sqlFile = sqlFile;
         _runnerResult = new DfSqlFileRunnerResult(sqlFile);
@@ -85,6 +85,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     // ===================================================================================
     //                                                                     Run Transaction
     //                                                                     ===============
+    @Override
     public DfSqlFileRunnerResult runTransaction() {
         _goodSqlCount = 0;
         _totalSqlCount = 0;
@@ -107,7 +108,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             for (String sql : sqlList) {
                 ++sqlNumber;
                 currentSql = sql;
-                if (sqlNumber == 1 && !isTargetFile(sql)) { // first SQL only 
+                if (sqlNumber == 1 && !isTargetFile(sql)) { // first SQL only
                     skippedFile = true;
                     break;
                 }
@@ -181,9 +182,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             final String encoding = _runInfo.isEncodingNull() ? "UTF-8" : _runInfo.getEncoding();
             return new InputStreamReader(new FileInputStream(_sqlFile), encoding);
         } catch (FileNotFoundException e) {
-            throw new BuildException("The file does not exist: " + _sqlFile, e);
+            throw new IllegalStateException("The file does not exist: " + _sqlFile, e);
         } catch (UnsupportedEncodingException e) {
-            throw new BuildException("The encoding is unsupported: " + _runInfo.getEncoding(), e);
+            throw new IllegalStateException("The encoding is unsupported: " + _runInfo.getEncoding(), e);
         }
     }
 
@@ -638,6 +639,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         public static final String CHANGE_COMMAND = "set term ";
         public static final int CHANGE_COMMAND_LENGTH = CHANGE_COMMAND.length();
 
+        @Override
         public boolean isDelimiterChanger(String sql) {
             sql = sql.trim();
             if (sql.length() > CHANGE_COMMAND_LENGTH) {
@@ -648,6 +650,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             return false;
         }
 
+        @Override
         public String getNewDelimiter(String sql, String preDelimiter) {
             String tmp = sql.substring(CHANGE_COMMAND.length());
             if (tmp.indexOf(" ") >= 0) {
@@ -661,6 +664,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         public static final String CHANGE_COMMAND = "delimiter ";
         public static final int CHANGE_COMMAND_LENGTH = CHANGE_COMMAND.length();
 
+        @Override
         public boolean isDelimiterChanger(String sql) {
             sql = sql.trim();
             if (sql.length() > CHANGE_COMMAND_LENGTH) {
@@ -671,6 +675,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             return false;
         }
 
+        @Override
         public String getNewDelimiter(String sql, String preDelimiter) {
             String tmp = sql.substring(CHANGE_COMMAND.length());
             if (tmp.indexOf(" ") >= 0) {
@@ -682,10 +687,12 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     protected static class DelimiterChanger_null implements DelimiterChanger {
 
+        @Override
         public boolean isDelimiterChanger(String sql) {
             return false;
         }
 
+        @Override
         public String getNewDelimiter(String sql, String preDelimiter) {
             return preDelimiter;
         }

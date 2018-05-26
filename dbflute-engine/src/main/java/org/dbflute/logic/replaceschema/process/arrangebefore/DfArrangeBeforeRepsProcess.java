@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -18,11 +18,12 @@ package org.dbflute.logic.replaceschema.process.arrangebefore;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.process.ProcessResult;
 import org.dbflute.helper.process.SystemScript;
@@ -175,6 +176,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     protected List<String> extractElementList(String ext, File baseDir) {
         final String extSuffix = "." + ext;
         final String[] elementList = baseDir.list(new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return Srl.endsWith(name, extSuffix);
             }
@@ -189,6 +191,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     protected void deleteFile(String ext, File baseDir) {
         final String extSuffix = "." + ext;
         final File[] elementList = baseDir.listFiles(new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return Srl.endsWith(name, extSuffix);
             }
@@ -207,7 +210,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
             dest.delete();
         }
         try {
-            FileUtils.getFileUtils().copyFile(src, dest);
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException e) {
             String msg = "Failed to copy file: " + src + " to " + dest;
             throw new IllegalStateException(msg, e);

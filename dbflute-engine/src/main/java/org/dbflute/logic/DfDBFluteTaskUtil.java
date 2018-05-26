@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfDBFluteTaskCancelledException;
@@ -91,13 +90,13 @@ public final class DfDBFluteTaskUtil {
                         if (ins == null) {
                             String msg = "Context properties file " + source;
                             msg = msg + " could not be found in the file system or on the classpath!";
-                            throw new BuildException(msg, e);
+                            throw new IllegalStateException(msg, e);
                         }
                         currentProp.load(ins);
                     } catch (IOException ignored) {
                         String msg = "Failed to load contextProperties:";
                         msg = msg + " file=" + source + " project=" + project;
-                        throw new BuildException(msg, e);
+                        throw new IllegalStateException(msg, e);
                     } finally {
                         if (ins != null) {
                             try {
@@ -127,7 +126,7 @@ public final class DfDBFluteTaskUtil {
             br.addItem("Project");
             br.addElement(project);
             final String msg = br.buildExceptionMessage();
-            throw new BuildException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
         return prop;
     }

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -32,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
 import org.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.dbflute.exception.DfAlterCheckDifferenceFoundException;
@@ -228,6 +229,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         _log.info("...Compressing the previous resources to zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         archiver.compress(new File(getMigrationPreviousDir()), new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 final String name = file.getName();
                 final boolean result;
@@ -259,6 +261,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
     protected List<File> findPreviousZipList() {
         final File previousDir = new File(getMigrationPreviousDir());
         final File[] zipFiles = previousDir.listFiles(new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return isPreviousZip(file);
             }
@@ -383,6 +386,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         final Set<String> traceSet = new HashSet<String>();
         archiver.extract(new File(getMigrationPreviousDir()), new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 final String path = resolvePath(file);
                 traceSet.add(path);
@@ -720,6 +724,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         _log.info("...Restoring the latest checked-alter: " + resolvePath(checkedAlterZip));
         final DfZipArchiver archiver = new DfZipArchiver(checkedAlterZip);
         archiver.extract(new File(getMigrationAlterDirectory()), new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 _log.info("  " + resolvePath(file));
                 return true;
@@ -750,6 +755,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
         final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, _dataSource);
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
+            @Override
             public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
@@ -1044,6 +1050,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         final DfZipArchiver archiver = new DfZipArchiver(new File(checkedAlterZipPath));
         archiver.suppressCompressSubDir();
         archiver.compress(new File(getMigrationAlterDirectory()), new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 _log.info("  " + resolvePath(file));
                 return true;
@@ -1081,6 +1088,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         }
         final String checkedAlterZipName = buildCheckedAlterZipName(previousDate);
         final File[] listFiles = secondLevelDir.listFiles(new FilenameFilter() {
+            @Override
             public boolean accept(File file, String name) {
                 return name.equals(checkedAlterZipName);
             }
@@ -1126,6 +1134,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
             return DfCollectionUtil.newArrayList();
         }
         final File[] firstLevelDirList = historyDir.listFiles(new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory();
             }
@@ -1141,6 +1150,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
             return DfCollectionUtil.newArrayList();
         }
         final File[] secondLevelDirList = firstLevelDir.listFiles(new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory();
             }
@@ -1229,6 +1239,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
             return; // e.g. .svn
         }
         final File[] listFiles = baseDir.listFiles(new FileFilter() {
+            @Override
             public boolean accept(File subFile) {
                 if (subFile.isDirectory()) {
                     doFindHierarchyFileList(fileList, subFile);
@@ -1263,7 +1274,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
 
     protected void copyFile(File src, File dest) {
         try {
-            FileUtils.getFileUtils().copyFile(src, dest);
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException e) {
             String msg = "Failed to copy file: " + src + " to " + dest;
             throw new IllegalStateException(msg, e);
