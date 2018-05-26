@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -18,6 +18,7 @@ package org.dbflute.task.manage;
 import java.io.File;
 import java.io.FileFilter;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.filesystem.FileTextLineFilter;
 import org.dbflute.helper.io.compress.DfZipArchiver;
@@ -144,6 +145,7 @@ public class DfUpgradeTask extends DfAbstractTask {
         final String baseDir = getMyDBFluteDir() + "/dbflute-" + upgradeVersion;
         _log.info("...Extracting zip archive to " + baseDir);
         archiver.extract(new File(baseDir), new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return true;
             }
@@ -165,11 +167,11 @@ public class DfUpgradeTask extends DfAbstractTask {
     }
 
     protected void doReplaceProjectBat(final String upgradeVersion, FileTextIO textIO) {
-        doReplaceVersionScript(upgradeVersion, textIO, "./_project.bat", "\\dbflute-");
+        doReplaceVersionScript(upgradeVersion, textIO, DfEngineWorkDir.toPath("_project.bat"), "\\dbflute-");
     }
 
     protected void doReplaceProjectSh(final String upgradeVersion, final FileTextIO textIO) {
-        doReplaceVersionScript(upgradeVersion, textIO, "./_project.sh", "/dbflute-");
+        doReplaceVersionScript(upgradeVersion, textIO, DfEngineWorkDir.toPath("_project.sh"), "/dbflute-");
     }
 
     protected void doReplaceVersionScript(final String upgradeVersion, FileTextIO textIO, String scriptPath, final String versionKeyword) {
@@ -177,6 +179,7 @@ public class DfUpgradeTask extends DfAbstractTask {
         if (versionScript.exists()) { // basically true (just in case)
             _log.info("...Replacing version script: " + scriptPath);
             textIO.rewriteFilteringLine(scriptPath, new FileTextLineFilter() {
+                @Override
                 public String filter(String line) {
                     return filterVersionLine(upgradeVersion, line, versionKeyword);
                 }

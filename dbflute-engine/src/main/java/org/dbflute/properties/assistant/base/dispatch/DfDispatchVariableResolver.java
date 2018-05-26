@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
@@ -45,6 +46,7 @@ public class DfDispatchVariableResolver {
     //                                                                   =================
     public String resolveDispatchVariable(String propTitle, String plainValue) {
         return doResolveDispatchVariable(propTitle, plainValue, new DfDispatchVariableCallback() {
+            @Override
             public void throwNotFoundException(String propTitle, String plainValue, File dispatchFile) {
                 throwDispatchFileNotFoundException(propTitle, plainValue, dispatchFile);
             }
@@ -72,6 +74,7 @@ public class DfDispatchVariableResolver {
     //                                                                   =================
     public String resolvePasswordVariable(final String propTitle, final String user, String password) {
         final String resolved = doResolveDispatchVariable(propTitle, password, new DfDispatchVariableCallback() {
+            @Override
             public void throwNotFoundException(String propTitle, String plainValue, File dispatchFile) {
                 throwDatabaseUserPasswordFileNotFoundException(propTitle, user, plainValue, dispatchFile);
             }
@@ -206,7 +209,7 @@ public class DfDispatchVariableResolver {
                 outsideValue = null;
             }
         }
-        final File dispatchFile = new File("./dfprop/" + fileName);
+        final File dispatchFile = new File(DfEngineWorkDir.toPath("dfprop/" + fileName));
         final DfOutsideFileVariableInfo variableInfo = new DfOutsideFileVariableInfo();
         variableInfo.setDispatchFile(dispatchFile);
         variableInfo.setOutsideValue(outsideValue);

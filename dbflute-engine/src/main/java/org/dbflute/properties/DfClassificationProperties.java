@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -32,6 +32,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfClassificationIllegalPropertyTypeException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -658,7 +659,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
 
     protected Set<String> extractExceptCodeSet(DfClassificationTop classificationTop, final Map<?, ?> elementMap) {
         final Set<String> exceptCodeSet;
-        final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
+        final Object exceptCodeObj = elementMap.get("exceptCodeList");
         if (exceptCodeObj != null) {
             if (!(exceptCodeObj instanceof List<?>)) {
                 String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
@@ -1038,7 +1039,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
             final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
             for (Object columnNameObj : tmpMapKeySet) {
                 final String columnName = (String) columnNameObj;
-                final String classificationName = (String) tmpMap.get(columnName);
+                final String classificationName = tmpMap.get(columnName);
                 if (_documentOnlyClassificationSet.contains(classificationName)) {
                     continue;
                 }
@@ -1227,7 +1228,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
      * @return The map of all column classification. (NullAllowed: If the mark would be not found)
      */
     public Map<String, String> getAllColumnClassificationMap() {
-        return (Map<String, String>) getClassificationDeploymentMap().get(MARK_allColumnClassification);
+        return getClassificationDeploymentMap().get(MARK_allColumnClassification);
     }
 
     /**
@@ -1294,7 +1295,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
 
     protected List<DfClassificationTop> extractClassificationResource() {
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
-        final String dirBaseName = "./dfprop";
+        final String dirBaseName = DfEngineWorkDir.toPath("dfprop");
         final String resource = NAME_CLASSIFICATION_RESOURCE;
         final String extension = "dfprop";
         if (isSpecifiedEnvironmentType()) {

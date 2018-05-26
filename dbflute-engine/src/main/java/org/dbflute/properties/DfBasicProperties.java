@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -377,8 +378,8 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
     protected String buildDefaultSchemaXMLFilePath() {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
-        sb.append("./schema/project-schema-").append(projectName).append(".xml");
-        return sb.toString();
+        sb.append("schema/project-schema-").append(projectName).append(".xml");
+        return DfEngineWorkDir.toPath(sb.toString());
     }
 
     public String getProejctSchemaXMLEncoding() { // closet
@@ -392,8 +393,8 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
     protected String buildDefaultSchemaHistoryFilePath() {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
-        sb.append("./schema/project-history-").append(projectName).append(".diffmap");
-        return sb.toString();
+        sb.append("schema/project-history-").append(projectName).append(".diffmap");
+        return DfEngineWorkDir.toPath(sb.toString());
     }
 
     // ===================================================================================

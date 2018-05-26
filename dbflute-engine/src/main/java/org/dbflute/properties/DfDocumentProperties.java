@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -54,11 +55,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
     protected static final String JAVA_SCRIPT_EMBEDDED_MARK = "$";
 
-    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "./schema/project-sync-schema.xml";
-    protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "./schema/project-sync-check.diffmap";
+    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "schema/project-sync-schema.xml";
+    protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "schema/project-sync-check.diffmap";
     protected static final String SCHEMA_SYNC_CHECK_RESULT_FILE_NAME = "sync-check-result.html";
 
-    protected static final String BASIC_CRAFT_DIFF_DIR = "./schema/craftdiff";
+    protected static final String BASIC_CRAFT_DIFF_DIR = "schema/craftdiff";
     protected static final String CORE_CRAFT_META_DIR = BASIC_CRAFT_DIFF_DIR; // same as basic
 
     // ===================================================================================
@@ -96,7 +97,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                                                    Output Directory
     //                                                                    ================
     public String getDocumentOutputDirectory() {
-        final String defaultValue = "./output/doc";
+        final String defaultValue = DfEngineWorkDir.toPath("output/doc");
         return getProperty("documentOutputDirectory", defaultValue, getDocumentMap());
     }
 
@@ -532,14 +533,14 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        return getProperty("basicCraftSqlDir", BASIC_CRAFT_DIFF_DIR, getDocumentMap());
+        return getProperty("basicCraftSqlDir", DfEngineWorkDir.toPath(BASIC_CRAFT_DIFF_DIR), getDocumentMap());
     }
 
     public String getCoreCraftMetaDir() {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        final String defaultDir = CORE_CRAFT_META_DIR;
+        final String defaultDir = DfEngineWorkDir.toPath(CORE_CRAFT_META_DIR);
         final String property = getProperty("coreCraftMetaDirPath", defaultDir, getDocumentMap());
         return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
@@ -736,7 +737,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public String getLoadDataReverseSchemaXml() {
         final String projectName = getBasicProperties().getProjectName();
-        return "./schema/lreverse-schema-" + projectName + ".xml";
+        return DfEngineWorkDir.toPath("schema/lreverse-schema-" + projectName + ".xml");
     }
 
     // -----------------------------------------------------
@@ -869,6 +870,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isTargetByHint(name, targetList, getLoadDataReverseTableExceptList());
     }
 
+    @Override
     public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
@@ -939,11 +941,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     public String getSchemaSyncCheckSchemaXml() {
-        return SCHEMA_SYNC_CHECK_SCHEMA_XML;
+        return DfEngineWorkDir.toPath(SCHEMA_SYNC_CHECK_SCHEMA_XML);
     }
 
     public String getSchemaSyncCheckDiffMapFile() {
-        return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
+        return DfEngineWorkDir.toPath(SCHEMA_SYNC_CHECK_DIFF_MAP_FILE);
     }
 
     public boolean isSchemaSyncCheckSuppressCraftDiff() { // closet
@@ -1013,6 +1015,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                                              ======================
     public Comparator<Table> getTableDisplayOrderBy() {
         return new Comparator<Table>() {
+            @Override
             public int compare(Table table1, Table table2) {
                 // = = = =
                 // Schema

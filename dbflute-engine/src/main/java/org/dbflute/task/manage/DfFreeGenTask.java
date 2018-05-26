@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -196,7 +197,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                 Application FreeGen
     //                                                                 ===================
     protected void processApplicationFreeGen() {
-        final String freeSpace = "./freegen";
+        final String freeSpace = DfEngineWorkDir.toPath("freegen");
         try {
             final File freeGenDir = new File(freeSpace);
             if (!freeGenDir.exists()) {

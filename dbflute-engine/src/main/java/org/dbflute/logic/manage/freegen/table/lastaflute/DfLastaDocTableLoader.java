@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
@@ -141,10 +142,12 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         final DfLastaFlutePhysicalHolder physicalHolder = new DfLastaFlutePhysicalHolder();
         final FileHierarchyTracer tracer = new FileHierarchyTracer();
         tracer.trace(rootDir, new FileHierarchyTracingHandler() {
+            @Override
             public boolean isTargetFileOrDir(File currentFile) {
                 return true;
             }
 
+            @Override
             public void handleFile(File currentFile) throws IOException {
                 final String path = toPath(currentFile);
                 if (path.contains("/app/web/") && path.endsWith("Action.java")) {
@@ -317,7 +320,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         candidateList.add(Paths.get(path, "build/lastadoc/analyzed-lastadoc.json"));
         candidateList.add(Paths.get(path, "target/lastadoc/lastadoc.json")); // for compatible
         candidateList.add(Paths.get(path, "build/lastadoc/lastadoc.json")); // for compatible
-        final Path lastaDocFile = Paths.get(String.format("./schema/project-lastadoc-%s.json", tableMap.get("appName")));
+        final Path lastaDocFile = Paths.get(String.format(DfEngineWorkDir.toPath("schema/project-lastadoc-%s.json"), tableMap.get("appName")));
         candidateList.forEach(candidate -> {
             if (!Files.exists(candidate)) {
                 return;
@@ -358,7 +361,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
             final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
             hasSchemaHtml = schemaHtmlFile.exists();
-            schemaHtmlPath = "./" + schemaHtmlFileName; // current directory only supported
+            schemaHtmlPath = DfEngineWorkDir.toPath(schemaHtmlFileName); // current directory only supported
         }
         optionMap.put("hasSchemaHtml", hasSchemaHtml);
         if (hasSchemaHtml) {

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -69,6 +69,9 @@ public final class DfBuildProperties {
 
     /** The version of DBFlute. */
     private Integer _version;
+
+    /** The work dir of DBFlute Engine. */
+    private String _workDir;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -332,5 +335,13 @@ public final class DfBuildProperties {
 
     public void setVersion(Integer version) {
         this._version = version;
+    }
+
+    public String getWorkDir() {
+        return _workDir == null ? "./" : _workDir;
+    }
+
+    public void setWorkDir(String workDir) {
+        this._workDir = workDir;
     }
 }

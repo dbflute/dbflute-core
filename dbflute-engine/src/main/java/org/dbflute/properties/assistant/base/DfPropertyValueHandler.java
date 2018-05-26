@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.infra.core.DfEnvironmentType;
 import org.dbflute.properties.propreader.DfOutsideListPropReader;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
@@ -247,7 +248,7 @@ public class DfPropertyValueHandler {
     public String getOutsideStringProp(String key) {
         final DfOutsideStringPropReader reader = createOutsideStringPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = "./dfprop/" + propName + ".dfprop";
+        final String path = DfEngineWorkDir.toPath("dfprop/" + propName + ".dfprop");
         return reader.readString(path, getEnvironmentType());
     }
 
@@ -258,7 +259,7 @@ public class DfPropertyValueHandler {
     public Map<String, Object> getOutsideMapProp(String key) { // used by outer
         final DfOutsideMapPropReader reader = createOutsideMapPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = "./dfprop/" + propName + ".dfprop";
+        final String path = DfEngineWorkDir.toPath("dfprop/" + propName + ".dfprop");
         return reader.readMap(path, getEnvironmentType());
     }
 
@@ -269,7 +270,7 @@ public class DfPropertyValueHandler {
     public List<Object> getOutsideListProp(String key) {
         final DfOutsideListPropReader reader = createOutsideListPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = "./dfprop/" + propName + ".dfprop";
+        final String path = DfEngineWorkDir.toPath("dfprop/" + propName + ".dfprop");
         return reader.readList(path, getEnvironmentType());
     }
 
