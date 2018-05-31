@@ -70,7 +70,12 @@ public final class DfBuildProperties {
     /** The version of DBFlute. */
     private Integer _version;
 
-    /** The work dir of DBFlute Engine. */
+    /**
+     * The work dir of DBFlute Engine. <br>
+     * Basically unused in official DBFlute process. <br>
+     * This is for caller of DBFlute Engine, e.g. outer tools. <br>
+     * (NullAllowed: default value is provided by getter)
+     */
     private String _workDir;
 
     // ===================================================================================
@@ -338,6 +343,8 @@ public final class DfBuildProperties {
     }
 
     public String getWorkDir() {
+        // default value is current directory of Java execution,
+        // and it is basically DBFlute client directory (in official DBFlute process)
         return _workDir == null ? "./" : _workDir;
     }
 

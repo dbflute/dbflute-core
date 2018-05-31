@@ -23,8 +23,8 @@ public class DfEngineWorkDir {
 
     /**
      * Resolve the path.
-     * @param path path
-     * @return resolved path.
+     * @param path The relative path from work directory of DBFlute Engine, e.g. "output/doc". (NotNull)
+     * @return The resolved path that can be used in File and Path. (NotNull)
      */
     public static String toPath(String path) {
         String workDir = DfBuildProperties.getInstance().getWorkDir();
