@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -145,7 +145,6 @@ public class DfUpgradeTask extends DfAbstractTask {
         final String baseDir = getMyDBFluteDir() + "/dbflute-" + upgradeVersion;
         _log.info("...Extracting zip archive to " + baseDir);
         archiver.extract(new File(baseDir), new FileFilter() {
-            @Override
             public boolean accept(File file) {
                 return true;
             }
@@ -179,7 +178,6 @@ public class DfUpgradeTask extends DfAbstractTask {
         if (versionScript.exists()) { // basically true (just in case)
             _log.info("...Replacing version script: " + scriptPath);
             textIO.rewriteFilteringLine(scriptPath, new FileTextLineFilter() {
-                @Override
                 public String filter(String line) {
                     return filterVersionLine(upgradeVersion, line, versionKeyword);
                 }

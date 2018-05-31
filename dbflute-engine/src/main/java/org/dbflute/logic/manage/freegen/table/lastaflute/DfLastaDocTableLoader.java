@@ -142,12 +142,10 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         final DfLastaFlutePhysicalHolder physicalHolder = new DfLastaFlutePhysicalHolder();
         final FileHierarchyTracer tracer = new FileHierarchyTracer();
         tracer.trace(rootDir, new FileHierarchyTracingHandler() {
-            @Override
             public boolean isTargetFileOrDir(File currentFile) {
                 return true;
             }
 
-            @Override
             public void handleFile(File currentFile) throws IOException {
                 final String path = toPath(currentFile);
                 if (path.contains("/app/web/") && path.endsWith("Action.java")) {

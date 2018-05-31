@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -870,7 +870,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isTargetByHint(name, targetList, getLoadDataReverseTableExceptList());
     }
 
-    @Override
     public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
@@ -1015,7 +1014,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                                              ======================
     public Comparator<Table> getTableDisplayOrderBy() {
         return new Comparator<Table>() {
-            @Override
             public int compare(Table table1, Table table2) {
                 // = = = =
                 // Schema

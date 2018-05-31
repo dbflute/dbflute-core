@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -249,7 +249,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
             return; // e.g. .svn
         }
         final File[] listFiles = baseDir.listFiles(new FileFilter() {
-            @Override
             public boolean accept(File subFile) {
                 if (subFile.isDirectory()) {
                     doFindHierarchyFileList(fileList, subFile);
@@ -468,7 +467,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     //                                                             =======================
     protected List<String> _objectTypeTargetList;
 
-    public List<String> getObjectTypeTargetList() { // overrides the property of databaseInfoMap
+    public List<String> getObjectTypeTargetList() { // overrides the property of databaseInfoMap 
         final Object obj = getReplaceSchemaMap().get("objectTypeTargetList");
         if (obj != null && !(obj instanceof List<?>)) {
             String msg = "The type of the property 'objectTypeTargetList' should be List: " + obj;
@@ -695,7 +694,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         _log.info("...Creating a connection for additional drop");
         try {
             return createConnection(driver, url, getAdditionalDropSchema(additionalDropMap), info);
-        } catch (RuntimeException e) { // contains connection info
+        } catch (RuntimeException e) { // contains connection info 
             String msg = "Failed to connect the schema as additional drop: " + additionalDropMap;
             throw new SQLException(msg, e);
         }

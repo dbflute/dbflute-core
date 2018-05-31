@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -659,7 +659,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
 
     protected Set<String> extractExceptCodeSet(DfClassificationTop classificationTop, final Map<?, ?> elementMap) {
         final Set<String> exceptCodeSet;
-        final Object exceptCodeObj = elementMap.get("exceptCodeList");
+        final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
         if (exceptCodeObj != null) {
             if (!(exceptCodeObj instanceof List<?>)) {
                 String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
@@ -1039,7 +1039,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
             final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
             for (Object columnNameObj : tmpMapKeySet) {
                 final String columnName = (String) columnNameObj;
-                final String classificationName = tmpMap.get(columnName);
+                final String classificationName = (String) tmpMap.get(columnName);
                 if (_documentOnlyClassificationSet.contains(classificationName)) {
                     continue;
                 }
@@ -1228,7 +1228,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
      * @return The map of all column classification. (NullAllowed: If the mark would be not found)
      */
     public Map<String, String> getAllColumnClassificationMap() {
-        return getClassificationDeploymentMap().get(MARK_allColumnClassification);
+        return (Map<String, String>) getClassificationDeploymentMap().get(MARK_allColumnClassification);
     }
 
     /**
