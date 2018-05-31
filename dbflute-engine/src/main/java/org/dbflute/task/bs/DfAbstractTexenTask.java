@@ -92,57 +92,46 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected DfTaskControlCallback createTaskControlCallback() {
         return new DfTaskControlCallback() {
 
-            @Override
             public boolean callBegin() {
                 return begin();
             }
 
-            @Override
             public void callInitializeDatabaseInfo() {
                 initializeDatabaseInfo();
             }
 
-            @Override
             public void callInitializeVariousEnvironment() {
                 initializeVariousEnvironment();
             }
 
-            @Override
             public boolean callUseDataSource() {
                 return isUseDataSource();
             }
 
-            @Override
             public void callSetupDataSource() throws SQLException {
                 setupDataSource();
             }
 
-            @Override
             public void callCommitDataSource() throws SQLException {
                 commitDataSource();
             }
 
-            @Override
             public void callDestroyDataSource() throws SQLException {
                 destroyDataSource();
             }
 
-            @Override
             public DfConnectionMetaInfo callGetConnectionMetaInfo() {
                 return getConnectionMetaInfo();
             }
 
-            @Override
             public void callActualExecute() {
                 doExecute();
             }
 
-            @Override
             public void callShowFinalMessage(long before, long after, boolean abort) {
                 showFinalMessage(before, after, abort);
             }
 
-            @Override
             public String callGetTaskName() {
                 return getTaskName();
             }

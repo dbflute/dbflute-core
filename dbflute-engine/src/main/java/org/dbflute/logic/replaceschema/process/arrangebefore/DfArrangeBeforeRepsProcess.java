@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -176,7 +176,6 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     protected List<String> extractElementList(String ext, File baseDir) {
         final String extSuffix = "." + ext;
         final String[] elementList = baseDir.list(new FilenameFilter() {
-            @Override
             public boolean accept(File dir, String name) {
                 return Srl.endsWith(name, extSuffix);
             }
@@ -191,7 +190,6 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     protected void deleteFile(String ext, File baseDir) {
         final String extSuffix = "." + ext;
         final File[] elementList = baseDir.listFiles(new FilenameFilter() {
-            @Override
             public boolean accept(File dir, String name) {
                 return Srl.endsWith(name, extSuffix);
             }

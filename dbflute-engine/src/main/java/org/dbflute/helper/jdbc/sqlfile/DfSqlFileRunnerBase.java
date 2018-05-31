@@ -76,7 +76,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _dataSource = dataSource;
     }
 
-    @Override
     public void prepare(File sqlFile) {
         _sqlFile = sqlFile;
         _runnerResult = new DfSqlFileRunnerResult(sqlFile);
@@ -85,7 +84,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     // ===================================================================================
     //                                                                     Run Transaction
     //                                                                     ===============
-    @Override
     public DfSqlFileRunnerResult runTransaction() {
         _goodSqlCount = 0;
         _totalSqlCount = 0;
@@ -108,7 +106,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             for (String sql : sqlList) {
                 ++sqlNumber;
                 currentSql = sql;
-                if (sqlNumber == 1 && !isTargetFile(sql)) { // first SQL only
+                if (sqlNumber == 1 && !isTargetFile(sql)) { // first SQL only 
                     skippedFile = true;
                     break;
                 }
@@ -639,7 +637,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         public static final String CHANGE_COMMAND = "set term ";
         public static final int CHANGE_COMMAND_LENGTH = CHANGE_COMMAND.length();
 
-        @Override
         public boolean isDelimiterChanger(String sql) {
             sql = sql.trim();
             if (sql.length() > CHANGE_COMMAND_LENGTH) {
@@ -650,7 +647,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             return false;
         }
 
-        @Override
         public String getNewDelimiter(String sql, String preDelimiter) {
             String tmp = sql.substring(CHANGE_COMMAND.length());
             if (tmp.indexOf(" ") >= 0) {
@@ -664,7 +660,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         public static final String CHANGE_COMMAND = "delimiter ";
         public static final int CHANGE_COMMAND_LENGTH = CHANGE_COMMAND.length();
 
-        @Override
         public boolean isDelimiterChanger(String sql) {
             sql = sql.trim();
             if (sql.length() > CHANGE_COMMAND_LENGTH) {
@@ -675,7 +670,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             return false;
         }
 
-        @Override
         public String getNewDelimiter(String sql, String preDelimiter) {
             String tmp = sql.substring(CHANGE_COMMAND.length());
             if (tmp.indexOf(" ") >= 0) {
@@ -687,12 +681,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     protected static class DelimiterChanger_null implements DelimiterChanger {
 
-        @Override
         public boolean isDelimiterChanger(String sql) {
             return false;
         }
 
-        @Override
         public String getNewDelimiter(String sql, String preDelimiter) {
             return preDelimiter;
         }
