@@ -37,9 +37,9 @@ mvn -e compile
 cd ../dbflute-test-active-hangar/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
-. manage.sh load-data-reverse
 . manage.sh freegen
 . diffworld-test.sh
+. lrevworld-test.sh
 . syncworld-test.sh
 cd ..
 mvn -e compile
