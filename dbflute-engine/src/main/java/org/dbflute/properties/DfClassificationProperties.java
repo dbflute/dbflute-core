@@ -1295,7 +1295,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
 
     protected List<DfClassificationTop> extractClassificationResource() {
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
-        final String dirBaseName = DfEngineWorkDir.toPath("dfprop");
+        final String dirBaseName = DfEngineWorkDir.toPath("./dfprop");
         final String resource = NAME_CLASSIFICATION_RESOURCE;
         final String extension = "dfprop";
         if (isSpecifiedEnvironmentType()) {

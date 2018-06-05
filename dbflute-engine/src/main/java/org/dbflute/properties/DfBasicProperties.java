@@ -378,7 +378,7 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
     protected String buildDefaultSchemaXMLFilePath() {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
-        sb.append("schema/project-schema-").append(projectName).append(".xml");
+        sb.append("./schema/project-schema-").append(projectName).append(".xml");
         return DfEngineWorkDir.toPath(sb.toString());
     }
 
@@ -393,7 +393,7 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
     protected String buildDefaultSchemaHistoryFilePath() {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
-        sb.append("schema/project-history-").append(projectName).append(".diffmap");
+        sb.append("./schema/project-history-").append(projectName).append(".diffmap");
         return DfEngineWorkDir.toPath(sb.toString());
     }
 

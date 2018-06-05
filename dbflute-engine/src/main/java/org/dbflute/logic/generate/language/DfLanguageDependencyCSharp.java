@@ -17,6 +17,7 @@ package org.dbflute.logic.generate.language;
 
 import java.io.File;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.logic.generate.language.framework.DfLanguageFrameworkCSharp;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -119,11 +120,11 @@ public class DfLanguageDependencyCSharp implements DfLanguageDependency {
     }
 
     public String getGenerateOutputDirectory() {
-        return "../" + getMainProgramDirectory();
+        return DfEngineWorkDir.toPath("../" + getMainProgramDirectory());
     }
 
     public String getResourceOutputDirectory() {
-        return "../source/${topNamespace}/Resources"; // basically unused
+        return DfEngineWorkDir.toPath("../source/${topNamespace}/Resources"); // basically unused
     }
 
     public String getOutsideSqlDirectory() {

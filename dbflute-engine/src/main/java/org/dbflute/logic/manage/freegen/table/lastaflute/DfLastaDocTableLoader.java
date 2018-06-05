@@ -318,7 +318,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         candidateList.add(Paths.get(path, "build/lastadoc/analyzed-lastadoc.json"));
         candidateList.add(Paths.get(path, "target/lastadoc/lastadoc.json")); // for compatible
         candidateList.add(Paths.get(path, "build/lastadoc/lastadoc.json")); // for compatible
-        final Path lastaDocFile = Paths.get(String.format(DfEngineWorkDir.toPath("schema/project-lastadoc-%s.json"), tableMap.get("appName")));
+        final Path lastaDocFile = Paths.get(String.format(DfEngineWorkDir.toPath("./schema/project-lastadoc-%s.json"), tableMap.get("appName")));
         candidateList.forEach(candidate -> {
             if (!Files.exists(candidate)) {
                 return;
@@ -359,7 +359,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
             final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
             hasSchemaHtml = schemaHtmlFile.exists();
-            schemaHtmlPath = DfEngineWorkDir.toPath(schemaHtmlFileName); // current directory only supported
+            schemaHtmlPath = DfEngineWorkDir.toPath("./" + schemaHtmlFileName); // current directory only supported
         }
         optionMap.put("hasSchemaHtml", hasSchemaHtml);
         if (hasSchemaHtml) {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.infra.dfprop.DfPublicProperties;
 import org.dbflute.properties.DfInfraProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
@@ -92,7 +93,7 @@ public class DfIntroTask extends DfAbstractTask {
 
     protected String findLocationPath() {
         final String specified = getInfraProperties().getDBFluteIntroLocationPath();
-        return specified != null ? specified : DEFAULT_LOCATION_PATH;
+        return specified != null ? specified : DfEngineWorkDir.toPath(DEFAULT_LOCATION_PATH);
     }
 
     protected boolean determineExistingIntroLatestVersion(File jarFile, DfPublicProperties dfprop) {

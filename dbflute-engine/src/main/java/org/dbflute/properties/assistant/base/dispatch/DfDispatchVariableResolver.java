@@ -207,7 +207,7 @@ public class DfDispatchVariableResolver {
                 outsideValue = null;
             }
         }
-        final File dispatchFile = new File(DfEngineWorkDir.toPath("dfprop/" + fileName));
+        final File dispatchFile = new File(DfEngineWorkDir.toPath("./dfprop/" + fileName));
         final DfOutsideFileVariableInfo variableInfo = new DfOutsideFileVariableInfo();
         variableInfo.setDispatchFile(dispatchFile);
         variableInfo.setOutsideValue(outsideValue);

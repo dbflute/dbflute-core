@@ -40,7 +40,6 @@ public class DfUpgradeTask extends DfAbstractTask {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfUpgradeTask.class);
-    protected static final String DEFAULT_LOCATION_PATH = "../mydbflute/";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -166,11 +165,11 @@ public class DfUpgradeTask extends DfAbstractTask {
     }
 
     protected void doReplaceProjectBat(final String upgradeVersion, FileTextIO textIO) {
-        doReplaceVersionScript(upgradeVersion, textIO, DfEngineWorkDir.toPath("_project.bat"), "\\dbflute-");
+        doReplaceVersionScript(upgradeVersion, textIO, DfEngineWorkDir.toPath("./_project.bat"), "\\dbflute-");
     }
 
     protected void doReplaceProjectSh(final String upgradeVersion, final FileTextIO textIO) {
-        doReplaceVersionScript(upgradeVersion, textIO, DfEngineWorkDir.toPath("_project.sh"), "/dbflute-");
+        doReplaceVersionScript(upgradeVersion, textIO, DfEngineWorkDir.toPath("./_project.sh"), "/dbflute-");
     }
 
     protected void doReplaceVersionScript(final String upgradeVersion, FileTextIO textIO, String scriptPath, final String versionKeyword) {

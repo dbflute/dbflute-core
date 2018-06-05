@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.filesystem.FileTextLineFilter;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
@@ -118,7 +119,7 @@ public class DfRefreshMan {
         //   |-mydbflute
         //   |-...
         //   |-.project
-        final File projectFile = new File("../.project");
+        final File projectFile = new File(DfEngineWorkDir.toPath("../.project"));
         if (!projectFile.exists()) {
             return null;
         }

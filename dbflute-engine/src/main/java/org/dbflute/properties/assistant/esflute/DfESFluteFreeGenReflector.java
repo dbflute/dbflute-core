@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.manage.freegen.DfFreeGenResourceType;
 import org.dbflute.util.Srl;
@@ -155,7 +156,7 @@ public final class DfESFluteFreeGenReflector {
         final Map<String, Object> mappingMap = new LinkedHashMap<String, Object>();
         tableMap.put("mappingMap", mappingMap);
         mappingMap.put("type", prepareTypeMap());
-        tableMap.put("resourcesDir", "../resources");
+        tableMap.put("resourcesDir", DfEngineWorkDir.toPath("../resources"));
         tableMap.put("namespace", buildIndexSmartName(indexName));
         tableMap.put("exbhvPackage", buildIndexPackage(indexPackage) + ".exbhv");
         tableMap.put("indexName", indexName);

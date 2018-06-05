@@ -248,7 +248,7 @@ public class DfPropertyValueHandler {
     public String getOutsideStringProp(String key) {
         final DfOutsideStringPropReader reader = createOutsideStringPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = DfEngineWorkDir.toPath("dfprop/" + propName + ".dfprop");
+        final String path = DfEngineWorkDir.toPath("./dfprop/" + propName + ".dfprop");
         return reader.readString(path, getEnvironmentType());
     }
 
@@ -259,7 +259,7 @@ public class DfPropertyValueHandler {
     public Map<String, Object> getOutsideMapProp(String key) { // used by outer
         final DfOutsideMapPropReader reader = createOutsideMapPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = DfEngineWorkDir.toPath("dfprop/" + propName + ".dfprop");
+        final String path = DfEngineWorkDir.toPath("./dfprop/" + propName + ".dfprop");
         return reader.readMap(path, getEnvironmentType());
     }
 
@@ -270,7 +270,7 @@ public class DfPropertyValueHandler {
     public List<Object> getOutsideListProp(String key) {
         final DfOutsideListPropReader reader = createOutsideListPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = DfEngineWorkDir.toPath("dfprop/" + propName + ".dfprop");
+        final String path = DfEngineWorkDir.toPath("./dfprop/" + propName + ".dfprop");
         return reader.readList(path, getEnvironmentType());
     }
 

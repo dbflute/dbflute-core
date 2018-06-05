@@ -17,6 +17,7 @@ package org.dbflute.logic.generate.language;
 
 import java.io.File;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.logic.generate.language.framework.DfLanguageFrameworkPhp;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -127,7 +128,7 @@ public class DfLanguageDependencyPhp implements DfLanguageDependency {
     }
 
     public String getGenerateOutputDirectory() {
-        return "../" + getMainProgramDirectory();
+        return DfEngineWorkDir.toPath("../" + getMainProgramDirectory());
     }
 
     public String getResourceOutputDirectory() {

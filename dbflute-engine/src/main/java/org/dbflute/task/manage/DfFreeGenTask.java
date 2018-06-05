@@ -197,7 +197,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                 Application FreeGen
     //                                                                 ===================
     protected void processApplicationFreeGen() {
-        final String freeSpace = DfEngineWorkDir.toPath("freegen");
+        final String freeSpace = DfEngineWorkDir.toPath("./freegen");
         try {
             final File freeGenDir = new File(freeSpace);
             if (!freeGenDir.exists()) {

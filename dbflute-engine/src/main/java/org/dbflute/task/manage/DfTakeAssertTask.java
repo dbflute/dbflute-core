@@ -82,7 +82,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final String sqlRootDir = Srl.is_NotNull_and_NotTrimmedEmpty(_sqlRootDir) ? _sqlRootDir : DfEngineWorkDir.toPath("playsql");
+        final String sqlRootDir = Srl.is_NotNull_and_NotTrimmedEmpty(_sqlRootDir) ? _sqlRootDir : DfEngineWorkDir.toPath("./playsql");
         final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsTakeAssert(sqlRootDir, getDataSource());
         _finalInfo = process.execute();
         final SQLFailureException breakCause = _finalInfo.getBreakCause();
@@ -127,7 +127,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
     }
 
     protected void dumpAssertionFailure(List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
-        final File dumpFile = new File(DfEngineWorkDir.toPath("log/take-assert.log"));
+        final File dumpFile = new File(DfEngineWorkDir.toPath("./log/take-assert.log"));
         if (dumpFile.exists()) {
             dumpFile.delete();
         }

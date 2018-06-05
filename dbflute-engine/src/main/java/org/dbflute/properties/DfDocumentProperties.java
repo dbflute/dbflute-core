@@ -55,11 +55,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
     protected static final String JAVA_SCRIPT_EMBEDDED_MARK = "$";
 
-    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "schema/project-sync-schema.xml";
-    protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "schema/project-sync-check.diffmap";
+    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "./schema/project-sync-schema.xml";
+    protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "./schema/project-sync-check.diffmap";
     protected static final String SCHEMA_SYNC_CHECK_RESULT_FILE_NAME = "sync-check-result.html";
 
-    protected static final String BASIC_CRAFT_DIFF_DIR = "schema/craftdiff";
+    protected static final String BASIC_CRAFT_DIFF_DIR = "./schema/craftdiff";
     protected static final String CORE_CRAFT_META_DIR = BASIC_CRAFT_DIFF_DIR; // same as basic
 
     // ===================================================================================
@@ -97,7 +97,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                                                    Output Directory
     //                                                                    ================
     public String getDocumentOutputDirectory() {
-        final String defaultValue = DfEngineWorkDir.toPath("output/doc");
+        final String defaultValue = DfEngineWorkDir.toPath("./output/doc");
         return getProperty("documentOutputDirectory", defaultValue, getDocumentMap());
     }
 
@@ -737,7 +737,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public String getLoadDataReverseSchemaXml() {
         final String projectName = getBasicProperties().getProjectName();
-        return DfEngineWorkDir.toPath("schema/lreverse-schema-" + projectName + ".xml");
+        return DfEngineWorkDir.toPath("./schema/lreverse-schema-" + projectName + ".xml");
     }
 
     // -----------------------------------------------------

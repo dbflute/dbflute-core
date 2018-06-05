@@ -42,7 +42,7 @@ public class DfFlutistLog4JLogSystem extends Log4JLogChute {
     //                                                                 ===================
     @Override
     public void init(RuntimeServices rs) {
-        final String logfile = DfEngineWorkDir.toPath("log/velocity.log");
+        final String logfile = DfEngineWorkDir.toPath("./log/velocity.log");
         try {
             logger = Logger.getLogger(getClass().getName());
             logger.setAdditivity(false);

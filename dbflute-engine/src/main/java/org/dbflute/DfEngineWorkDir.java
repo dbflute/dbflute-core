@@ -15,6 +15,9 @@
  */
 package org.dbflute;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * The work dir of DBFlute Engine.
  * @author p1us2er0
@@ -28,6 +31,11 @@ public class DfEngineWorkDir {
      */
     public static String toPath(String path) {
         String workDir = DfBuildProperties.getInstance().getWorkDir();
-        return workDir + path;
+        try {
+            return new File(workDir, path).getCanonicalPath();
+        } catch (IOException e) {
+            String msg = "Failed to derived path. workDir=" + workDir + ", path=" + path;
+            throw new IllegalStateException(msg, e);
+        }
     }
 }

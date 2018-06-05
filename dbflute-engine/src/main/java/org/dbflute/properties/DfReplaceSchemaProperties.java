@@ -56,7 +56,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfReplaceSchemaProperties.class);
-    protected static final String SCHEMA_POLICY_CHECK_SCHEMA_XML = "schema/project-spolicy-schema.xml";
+    protected static final String SCHEMA_POLICY_CHECK_SCHEMA_XML = "./schema/project-spolicy-schema.xml";
 
     // ===================================================================================
     //                                                                         Constructor

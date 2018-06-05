@@ -157,7 +157,7 @@ public final class DfSimpleDtoProperties extends DfAbstractDBFluteProperties {
         final String baseDir = getBasicProperties().getGenerateOutputDirectory();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
             if (value.startsWith("~/")) {
-                return DfEngineWorkDir.toPath(Srl.substringFirstRear(value, "~/"));
+                return DfEngineWorkDir.toPath("./" + Srl.substringFirstRear(value, "~/"));
             } else {
                 return baseDir + "/" + value;
             }
