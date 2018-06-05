@@ -344,7 +344,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected Document createDocument() {
-        Document doc = createDOMImplementation().createDocument("", "database", createDocumentType());
+        Document doc = createDOMImplementation().createDocument(null, "database", createDocumentType());
         doc.setXmlStandalone(true);
         return doc;
     }
