@@ -31,6 +31,9 @@ public class DfEngineWorkDir {
      */
     public static String toPath(String path) {
         String workDir = DfBuildProperties.getInstance().getWorkDir();
+        if (workDir == null || new File(path).isAbsolute()) { // workDir is not set or path is Absolute path
+            return path;
+        }
         try {
             return new File(workDir, path).getCanonicalPath();
         } catch (IOException e) {

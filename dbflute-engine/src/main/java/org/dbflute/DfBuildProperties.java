@@ -343,9 +343,7 @@ public final class DfBuildProperties {
     }
 
     public String getWorkDir() {
-        // default value is current directory of Java execution,
-        // and it is basically DBFlute client directory (in official DBFlute process)
-        return _workDir == null ? "./" : _workDir;
+        return _workDir; // null allowed
     }
 
     public void setWorkDir(String workDir) {
