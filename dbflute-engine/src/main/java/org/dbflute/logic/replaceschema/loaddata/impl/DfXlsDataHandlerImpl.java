@@ -386,7 +386,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         br.addItem("Data Directory");
         br.addElement(dataDirectory);
         br.addItem("Xls File");
-        br.addElement(file);
+        br.addElement(file.getName());
         br.addItem("Table");
         br.addElement(tableDbName);
         br.addItem("SQLException");
