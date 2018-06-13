@@ -96,30 +96,32 @@ public class DfSPolicyTableStatementChecker {
             final String comparingIfValue = toAliasComparingIfValue(table, ifValue);
             return isHitExp(statement, table.getAlias(), comparingIfValue) == !notIfValue;
         } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
-            return determineFirstDate(statement, ifValue, notIfValue, table);
+            return determineFirstDateIfValue(statement, ifValue, notIfValue, table);
+        } else if (ifItem.equalsIgnoreCase("pk_columnName")) {
+            return determinePkSomethingIfValue(statement, table, ifValue, notIfValue, pk -> toComparingColumnName(pk));
         } else if (ifItem.equalsIgnoreCase("pk_dbType") || ifItem.equalsIgnoreCase("pkDbType")) { // for compatible
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) { // required here (for PK's something)
-                    return isHitExp(statement, pk.getDbType(), ifValue) == !notIfValue;
-                }
-            }
+            return determinePkSomethingIfValue(statement, table, ifValue, notIfValue, pk -> pk.getDbType());
         } else if (ifItem.equalsIgnoreCase("pk_size")) {
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) { // required here (for PK's something)
-                    return isHitExp(statement, pk.getColumnSize(), ifValue) == !notIfValue;
-                }
-            }
+            return determinePkSomethingIfValue(statement, table, ifValue, notIfValue, pk -> pk.getColumnSize());
         } else if (ifItem.equalsIgnoreCase("pk_dbType_with_size")) {
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) { // required here (for PK's something)
-                    return isHitExp(statement, toComparingDbTypeWithSize(pk), ifValue) == !notIfValue;
-                }
-            }
+            return determinePkSomethingIfValue(statement, table, ifValue, notIfValue, pk -> toComparingDbTypeWithSize(pk));
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
+        }
+        return false;
+    }
+
+    protected boolean determineFirstDateIfValue(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
+        return _firstDateSecretary.determineTableFirstDate(statement, ifValue, notIfValue, table);
+    }
+
+    protected boolean determinePkSomethingIfValue(DfSPolicyStatement statement, Table table, String ifValue, boolean notIfValue,
+            Function<Column, String> valueProvider) {
+        if (table.hasPrimaryKey()) {
+            final List<Column> pkList = table.getPrimaryKey();
+            for (Column pk : pkList) { // required here (for PK's something)
+                return isHitExp(statement, valueProvider.apply(pk), ifValue) == !notIfValue;
+            }
         }
         return false;
     }
@@ -130,10 +132,6 @@ public class DfSPolicyTableStatementChecker {
 
     protected String toAliasComparingIfValue(Table table, String ifValue) {
         return convertToAliasComparingValue(table, ifValue);
-    }
-
-    protected boolean determineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
-        return _firstDateSecretary.determineTableFirstDate(statement, ifValue, notIfValue, table);
     }
 
     // ===================================================================================
@@ -273,49 +271,32 @@ public class DfSPolicyTableStatementChecker {
                 }
             }
         } else if (thenItem.equalsIgnoreCase("pk_columnName")) {
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) {
-                    final String columnName = pk.getName();
-                    if (!isHitExp(statement, columnName, thenValue) == !notThenValue) {
-                        return violationCall.apply(columnName);
-                    }
-                }
-            }
+            return determinePkSomethingThenValue(statement, table, violationCall, thenValue, notThenValue, pk -> toComparingColumnName(pk));
         } else if (thenItem.equalsIgnoreCase("pk_dbType") || thenItem.equalsIgnoreCase("pkDbType")) { // for compatible
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) {
-                    final String dbType = pk.getDbType();
-                    if (!isHitExp(statement, dbType, thenValue) == !notThenValue) {
-                        return violationCall.apply(dbType);
-                    }
-                }
-            }
+            return determinePkSomethingThenValue(statement, table, violationCall, thenValue, notThenValue, pk -> pk.getDbType());
         } else if (thenItem.equalsIgnoreCase("pk_size")) {
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) {
-                    final String size = pk.getColumnSize();
-                    if (!isHitExp(statement, size, thenValue) == !notThenValue) {
-                        return violationCall.apply(size);
-                    }
-                }
-            }
+            return determinePkSomethingThenValue(statement, table, violationCall, thenValue, notThenValue, pk -> pk.getColumnSize());
         } else if (thenItem.equalsIgnoreCase("pk_dbType_with_size")) { // e.g. char(3)
-            if (table.hasPrimaryKey()) {
-                final List<Column> pkList = table.getPrimaryKey();
-                for (Column pk : pkList) {
-                    final String dbTypeWithSize = toComparingDbTypeWithSize(pk);
-                    if (!isHitExp(statement, dbTypeWithSize, thenValue) == !notThenValue) {
-                        return violationCall.apply(dbTypeWithSize);
-                    }
-                }
-            }
+            return determinePkSomethingThenValue(statement, table, violationCall, thenValue, notThenValue,
+                    pk -> toComparingDbTypeWithSize(pk));
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-item: " + thenItem);
         }
         return null; // no violation
+    }
+
+    protected String determinePkSomethingThenValue(DfSPolicyStatement statement, Table table, Function<String, String> violationCall,
+            String thenValue, boolean notThenValue, Function<Column, String> valueProvider) {
+        if (table.hasPrimaryKey()) {
+            final List<Column> pkList = table.getPrimaryKey();
+            for (Column pk : pkList) {
+                final String comparingValue = valueProvider.apply(pk);
+                if (!isHitExp(statement, comparingValue, thenValue) == !notThenValue) {
+                    return violationCall.apply(comparingValue);
+                }
+            }
+        }
+        return null;
     }
 
     protected String toTableNameComparingThenValue(Table table, String thenValue) {
@@ -397,7 +378,11 @@ public class DfSPolicyTableStatementChecker {
     }
 
     protected String toComparingTableName(Table table) {
-        return _logicalSecretary.toComparingTableName(table);
+        return _logicalSecretary.toComparingTableName(table); // e.g. MEMBER
+    }
+
+    protected String toComparingColumnName(Column column) {
+        return _logicalSecretary.toComparingColumnName(column); // e.g. MEMBER_NAME
     }
 
     protected String toComparingDbTypeWithSize(Column column) {
