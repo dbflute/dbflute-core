@@ -409,6 +409,7 @@ public class DfSPolicyColumnStatementChecker {
         {
             final String columnDbName = column.getName();
             comparingValue = replaceComparingValue(comparingValue, "columnName", columnDbName, /*suppressUpper*/true); // @since 1.1.9
+            comparingValue = replaceComparingValue(comparingValue, "column", columnDbName); // facade style, @since 1.1.9
         }
         {
             final Table table = column.getTable();

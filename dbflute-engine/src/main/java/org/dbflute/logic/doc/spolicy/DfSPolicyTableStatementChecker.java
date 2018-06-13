@@ -339,7 +339,7 @@ public class DfSPolicyTableStatementChecker {
         final String tableName = toComparingTableName(table);
         {
             comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
-            comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since 1.1.9
+            comparingValue = replaceComparingValue(comparingValue, "table", tableName); // facade style, @since 1.1.9
         }
         {
             final String comment = table.hasComment() ? table.getComment() : "(df:emptyComment)";
@@ -352,7 +352,7 @@ public class DfSPolicyTableStatementChecker {
         final String tableName = toComparingTableName(table);
         String comparingValue = thenValue;
         comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
-        comparingValue = replaceComparingValue(comparingValue, "table", tableName); // old style, @since first
+        comparingValue = replaceComparingValue(comparingValue, "table", tableName); // facade style, @since first
         return comparingValue;
     }
 
