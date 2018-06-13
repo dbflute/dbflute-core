@@ -308,7 +308,7 @@ public class DfSPolicyLogicalSecretary {
     public boolean isNotIdentityIfPureIDPK(Table table) {
         if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
             final Column pk = table.getPrimaryKeyAsOne();
-            return !pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity();
+            return !pk.isForeignKey() && Srl.endsWithIgnoreCase(pk.getName(), "ID") && !pk.isIdentity();
         } else {
             return false;
         }
