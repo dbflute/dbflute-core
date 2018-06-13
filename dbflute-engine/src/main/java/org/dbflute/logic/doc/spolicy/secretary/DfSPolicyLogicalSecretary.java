@@ -314,6 +314,15 @@ public class DfSPolicyLogicalSecretary {
         }
     }
 
+    public boolean isNotSequenceIfPureIDPK(Table table) {
+        if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
+            final Column pk = table.getPrimaryKeyAsOne();
+            return !pk.isForeignKey() && Srl.endsWithIgnoreCase(pk.getName(), "ID") && !pk.isSequence();
+        } else {
+            return false;
+        }
+    }
+
     // ===================================================================================
     //                                                                 Violation Exception
     //                                                                 ===================

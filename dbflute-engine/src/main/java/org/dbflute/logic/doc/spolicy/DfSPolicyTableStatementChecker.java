@@ -178,6 +178,10 @@ public class DfSPolicyTableStatementChecker {
             if (_logicalSecretary.isNotIdentityIfPureIDPK(table) == !notThenClause) {
                 result.violate(policy, "The primary key should " + notOr + "be identity: " + toTableDisp(table));
             }
+        } else if (thenTheme.contains("sequenceIfPureIDPK")) {
+            if (_logicalSecretary.isNotSequenceIfPureIDPK(table) == !notThenClause) {
+                result.violate(policy, "The primary key should " + notOr + "be sequence: " + toTableDisp(table));
+            }
         } else if (thenTheme.contains("hasCommonColumn")) {
             if (!table.hasAllCommonColumn() == !notThenClause) {
                 result.violate(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
