@@ -1867,7 +1867,7 @@ Decomment.prototype = {
 	 * Reflect embedded pick
 	 */
 	reflectEmbeddedPickup: function () {
-		this.reflectPickup(this.embeddedPickup);
+		this.reflectPickup(this.storeClient.embeddedPickup);
 	},
 
 	/**
