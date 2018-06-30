@@ -373,6 +373,10 @@ dl.procedurelist dd.column pre {
 .decommentmodal-close-btn:hover {
 	background-color: #eed;
 }
+.decomment-user-name {
+	display: none;
+	padding: 5px;
+}
 	</style>
 #end
 #if ($database.isSchemaHtmlJavaScriptEmbedded())
@@ -717,6 +721,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
 		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
 		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
+		<input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/>
 		<button id="decomment-ok" class="decommentmodal-ok-btn">OK</button>
 	</div>
 </div>
@@ -1225,6 +1230,12 @@ var DecommentUtil = new function(){
 	 */
 	this.unescapeWhitespace = function (string) {
 		return string.split('&nbsp;').join(' ');
+	},
+	/**
+	 * Check is opening with server mode.
+	 */
+	this.isDecommentServer = function() {
+		return document.getElementById("decomment_server") != null;
 	}
 }
 
@@ -1509,6 +1520,7 @@ StoreClient.prototype = {
 ##                                                                     ===============
 function PickupTableProperty(tableDbName, json) {
 	this.tableDbName = tableDbName;
+	this.inputAuthor = null; // use when decomment server mode.
 	if (json) {
 		this.databaseComment = json.databaseComment;
 		this.isDatabaseCommentConflict = json.isDatabaseCommentConflict;
@@ -1647,6 +1659,7 @@ PickupTableProperty.prototype = {
 			'decomment': (this.decomments[0] || {}).body,
 			'databaseComment': DecommentUtil.escapeNewlineCharacter(this.databaseComment),
 			'commentVersion': this.commentVersion || 0,
+			'inputAuthor': this.inputAuthor,
 			'authors': this.authors || [],
 			'previousPieces': this.previousPieces || []
 		};
@@ -1659,6 +1672,7 @@ PickupTableProperty.prototype = {
 function PickupColumnProperty(tableDbName, columnName, json) {
 	this.tableDbName = tableDbName;
 	this.columnName = columnName;
+	this.inputAuthor = null; // use when decomment server mode.
 	if (json) {
 		this.databaseComment = json['databaseComment'];
 		this.isDatabaseCommentConflict = json['isDatabaseCommentConflict'];
@@ -1792,6 +1806,7 @@ PickupColumnProperty.prototype = {
 			'decomment': (this.decomments[0] || {}).body,
 			'databaseComment': DecommentUtil.escapeNewlineCharacter(this.databaseComment),
 			'commentVersion': this.commentVersion || 0,
+			'inputAuthor': this.inputAuthor,
 			'authors': this.authors || [],
 			'previousPieces': this.previousPieces || []
 		};
@@ -1817,6 +1832,7 @@ Decomment.prototype = {
 		if (document.getElementById("intro_opening") !== null) {
 			this.fetchVirtualPickup();
 			this.setupKeyDownEvent();
+			this.showUserNameInputIfNeed();
 		} else {
 			this.reflectEmbeddedPickup();
 		}
@@ -1832,6 +1848,19 @@ Decomment.prototype = {
 			that.reflectPickup(decomment);
 			that.setupSaveDecomment();
 		})
+	},
+
+	/**
+	 * Show user name input when decomment server mode.
+	 */
+	showUserNameInputIfNeed: function() {
+		if (DecommentUtil.isDecommentServer() && this.isUserNameEmpty()) {
+			document.querySelector('#decomment-user-name').style.display = 'block';
+		}
+	},
+
+	hideUserNameInput: function() {
+		document.querySelector('#decomment-user-name').style.display = 'none';
 	},
 
 	/**
@@ -1945,8 +1974,12 @@ Decomment.prototype = {
 
 			document.getElementById("decomment-ok").onclick = function () {
 				var decomment = inputElement.value;
+				if (DecommentUtil.isDecommentServer() && that.isUserNameEmpty()) {
+					alert('Input your user name.');
+					return;
+				}
 				if (that.isStillConflicting(decomment)) {
-					alert('Still conflicting. please resolve.');
+					alert('Still conflicting. please resolve.')
 					return;
 				}
 				if (!that.isCommentChanged(previousWholeComment, decomment)) {
@@ -1956,9 +1989,11 @@ Decomment.prototype = {
 				decomment = DecommentUtil.escapeInputText(decomment);
 				decomment = DecommentUtil.deleteUnnecessaryWhitespace(decomment);
 				commentProperty.decomments = [{'body': decomment}]
+				commentProperty.inputAuthor = that.getUserName();
 				var params = commentProperty.toRequestParams()
 				new ApiClient().saveDecomment(params, function () {
-					that.fetchVirtualPickup()
+					that.fetchVirtualPickup();
+					that.hideUserNameInput();
 				});
 				modalElement.style.display = "none";
 			};
@@ -1969,6 +2004,42 @@ Decomment.prototype = {
 				}
 			};
 		};
+	},
+
+	/**
+	 * Get user name. and save to cookie if not saved.
+	 */
+	getUserName : function() {
+		var savedUserName = this.getCookie('decomment-user-name');
+		if (savedUserName) {
+			return savedUserName;
+		}
+		var inputUserName = document.querySelector('#decomment-user-name').value;
+		if (inputUserName && inputUserName.length > 0) {
+			document.cookie = "decomment-user-name=" + inputUserName + ";expires=2147483647";
+		}
+		return inputUserName;
+	},
+
+	/**
+	 * Check user name is inputed.
+	 */
+	isUserNameEmpty : function() {
+		return this.getCookie('decomment-user-name') === null && this.getUserName().length === 0;
+	},
+
+	/**
+	 * Get cookie from key
+	 */
+	getCookie: function (key){
+		var cookies = document.cookie.split('; ');
+		for (var i = 0; i < cookies.length; i++){
+			var c = cookies[i].split('=');
+			if(c[0] === key){
+				return c[1];
+			}
+		}
+		return null;
 	},
 
 	/**
