@@ -56,7 +56,7 @@ public class ${glDBFluteBeansJavaConfig} {
     protected ApplicationContext _container;
 
     @Autowired
-    @Qualifier(name="${database.DBFluteBeansDataSourceName}")
+    @Qualifier("${database.DBFluteBeansDataSourceName}")
     protected DataSource _dataSource; // name basis here for multiple DB
 
     // ===================================================================================
