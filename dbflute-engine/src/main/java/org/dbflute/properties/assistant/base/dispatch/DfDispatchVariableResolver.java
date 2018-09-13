@@ -121,27 +121,43 @@ public class DfDispatchVariableResolver {
     protected DfEnvironmentVariableInfo handleEnvironmentVariable(String propTitle, String plainValue) {
         final String prefix = "$$env:";
         final String suffix = "$$";
-        if (plainValue != null && plainValue.startsWith(prefix) && plainValue.endsWith(suffix)) {
-            final ScopeInfo scopeInfo = Srl.extractScopeWide(plainValue, prefix, suffix);
-            final ProcessBuilder pb = new ProcessBuilder();
-            final Map<String, String> map = pb.environment();
-            if (map != null) { // might be no way, just in case
-                final String key = scopeInfo.getContent().trim();
-                final String realValue = map.get(key);
-                if (realValue != null) {
-                    final DfEnvironmentVariableInfo info = new DfEnvironmentVariableInfo();
-                    info.setEnvName(key);
-                    info.setEnvValue(realValue);
-                    return info;
-                } else {
-                    throwNotFoundEnvironmentVariableException(propTitle, plainValue, key, map);
-                }
+        if (!existsEnvironmentVariable(propTitle, plainValue, prefix, suffix)) {
+            return null;
+        }
+        // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$
+        final Map<String, String> envMap = extractEnvironmentMap();
+        final ScopeInfo scopeInfo = Srl.extractScopeFirst(plainValue, prefix, suffix);
+        final String envKey = scopeInfo.getContent().trim(); // e.g. DBFLUTE_MAIHAMADB_JDBC_URL
+        String realValue = envMap.get(envKey);
+        if (realValue == null) {
+            final String interspaceToNext = scopeInfo.substringInterspaceToNext().trim();
+            if (interspaceToNext.startsWith("|")) {
+                // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$ | jdbc:mysql://localhost:3306/maihamadb
+                realValue = Srl.substringFirstRear(interspaceToNext, "|").trim();
+            }
+            if (realValue == null) {
+                throwNotFoundEnvironmentVariableException(propTitle, plainValue, envKey, envMap);
             }
         }
-        return null;
+        final DfEnvironmentVariableInfo info = new DfEnvironmentVariableInfo();
+        info.setEnvName(envKey);
+        info.setEnvValue(realValue);
+        return info;
     }
 
-    protected void throwNotFoundEnvironmentVariableException(String propTitle, String definedValue, String key, Map<String, String> map) {
+    protected boolean existsEnvironmentVariable(String propTitle, String plainValue, String prefix, String suffix) {
+        // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$
+        //   or $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$ | jdbc:mysql://localhost:3306/maihamadb
+        return plainValue != null && plainValue.contains(prefix) && Srl.substringFirstRear(plainValue, prefix).contains(suffix);
+    }
+
+    protected Map<String, String> extractEnvironmentMap() {
+        final ProcessBuilder pb = new ProcessBuilder();
+        return pb.environment(); // not null (see source code)
+    }
+
+    protected void throwNotFoundEnvironmentVariableException(String propTitle, String definedValue, String envKey,
+            Map<String, String> envMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the environment variable for the key");
         br.addItem("Property Title");
@@ -149,9 +165,9 @@ public class DfDispatchVariableResolver {
         br.addItem("Defined in dfprop");
         br.addElement(definedValue);
         br.addItem("NotFound Key");
-        br.addElement(key);
+        br.addElement(envKey);
         br.addItem("Existing Variable");
-        br.addElement(map.keySet());
+        br.addElement(envMap.keySet());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
