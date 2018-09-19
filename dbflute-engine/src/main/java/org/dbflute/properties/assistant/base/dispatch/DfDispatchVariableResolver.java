@@ -70,7 +70,7 @@ public class DfDispatchVariableResolver {
     // ===================================================================================
     //                                                                   Password Variable
     //                                                                   =================
-    public String resolvePasswordVariable(final String propTitle, final String user, String password) {
+    public String resolvePasswordVariable(String propTitle, String user, String password) {
         final String resolved = doResolveDispatchVariable(propTitle, password, new DfDispatchVariableCallback() {
             public void throwNotFoundException(String propTitle, String plainValue, File dispatchFile) {
                 throwDatabaseUserPasswordFileNotFoundException(propTitle, user, plainValue, dispatchFile);
@@ -108,11 +108,11 @@ public class DfDispatchVariableResolver {
         if (Srl.is_Null_or_TrimmedEmpty(plainValue)) {
             return plainValue;
         }
+        // first: resolve $$env:
+        // second: resolve outside-file (contains env-resolved)
         final DfEnvironmentVariableInfo envInfo = handleEnvironmentVariable(propTitle, plainValue);
-        if (envInfo != null) {
-            return envInfo.getEnvValue();
-        }
-        return handleOutsideFileVariable(propTitle, plainValue, callback);
+        final String envResolvedValue = envInfo != null ? envInfo.getEnvValue() : plainValue;
+        return handleOutsideFileVariable(propTitle, envResolvedValue, callback);
     }
 
     // -----------------------------------------------------
@@ -181,27 +181,14 @@ public class DfDispatchVariableResolver {
             return plainValue;
         }
         final File dispatchFile = outsideFileInfo.getDispatchFile();
-        final String resolved = outsideFileInfo.getOutsideValue();
-        if (!dispatchFile.exists()) {
-            if (resolved == null) {
+        final String defaultValue = outsideFileInfo.getNofileDefaultValue(); // means default value
+        if (existsOutsideFile(dispatchFile)) {
+            return readOutsideFileFirstLine(dispatchFile, defaultValue);
+        } else {
+            if (defaultValue == null) {
                 callback.throwNotFoundException(propTitle, plainValue, dispatchFile);
             }
-            return resolved; // no dispatch file
-        }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(dispatchFile), "UTF-8"));
-            final String line = br.readLine();
-            return line; // first line in the dispatch file is value
-        } catch (Exception continued) {
-            _log.info("Failed to read the dispatch file: " + dispatchFile);
-            return resolved; // e.g. no password
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {}
-            }
+            return defaultValue; // no dispatch file
         }
     }
 
@@ -211,21 +198,43 @@ public class DfDispatchVariableResolver {
             return null;
         }
         final String fileName;
-        final String outsideValue;
+        final String defaultValue;
         {
             final String content = Srl.substringFirstRear(plainValue, prefix);
             if (content.contains("|")) {
-                fileName = Srl.substringFirstFront(content, "|");
-                outsideValue = Srl.substringFirstRear(content, "|");
+                fileName = Srl.substringFirstFront(content, "|").trim();
+                defaultValue = Srl.substringFirstRear(content, "|").trim();
             } else {
                 fileName = content;
-                outsideValue = null;
+                defaultValue = null;
             }
         }
         final File dispatchFile = new File("./dfprop/" + fileName);
         final DfOutsideFileVariableInfo variableInfo = new DfOutsideFileVariableInfo();
         variableInfo.setDispatchFile(dispatchFile);
-        variableInfo.setOutsideValue(outsideValue);
+        variableInfo.setNofileDefaultValue(defaultValue);
         return variableInfo;
+    }
+
+    protected boolean existsOutsideFile(File dispatchFile) {
+        return dispatchFile.exists();
+    }
+
+    protected String readOutsideFileFirstLine(File dispatchFile, String defaultValue) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(dispatchFile), "UTF-8"));
+            final String line = br.readLine();
+            return line; // first line in the dispatch file is value
+        } catch (Exception continued) {
+            _log.info("Failed to read the dispatch file: " + dispatchFile);
+            return defaultValue; // e.g. no password
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {}
+            }
+        }
     }
 }

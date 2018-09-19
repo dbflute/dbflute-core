@@ -565,7 +565,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
             final String password = propertyMap.get("password");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
                 final DfOutsideFileVariableInfo pwdInfo = analyzeOutsideFileVariable(password);
-                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getOutsideValue() == null) { // both not found
+                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getNofileDefaultValue() == null) { // both not found
                     result = true;
                 }
             }
