@@ -1922,6 +1922,14 @@ public class Column {
         return isForceClassificationSetting();
     }
 
+    public String getPropertySettingModifierOfNativeInScope() { // for compatible
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isCompatibleNativeInScopePublicForcedly()) {
+            return getLanguageDependency().getLanguageGrammar().getPublicModifier();
+        }
+        return getPropertySettingModifier();
+    }
+
     // ===================================================================================
     //                                                               Sql2Entity Definition
     //                                                               =====================

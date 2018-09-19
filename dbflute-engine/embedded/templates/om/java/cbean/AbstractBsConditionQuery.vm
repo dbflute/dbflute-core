@@ -245,7 +245,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    ${col.propertySettingModifierOfNativeInScope} void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -291,7 +291,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    ${col.propertySettingModifierOfNativeInScope} void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -723,7 +723,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    ${col.propertySettingModifierOfNativeInScope} void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -769,7 +769,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    ${col.propertySettingModifierOfNativeInScope} void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
