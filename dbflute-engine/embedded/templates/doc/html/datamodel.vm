@@ -336,11 +336,12 @@ dl.procedurelist dd.column pre {
 	margin: 0 auto;
 	border: 1px solid #999999;
 	padding: 15px;
-	background-color: #ffffff;
+	background-color: #ffeeee;
 	border-radius: 4px;
 }
 .decommentmodalcontent p {
 	font-size: 14px;
+	color: #552222;
 }
 .decommentinput {
 	display: block;
@@ -348,10 +349,26 @@ dl.procedurelist dd.column pre {
 	margin-top: 10px;
 	font-size: 12px;
 }
+.decommentmodal-ok-area {
+	text-align: right;
+	margin: 0em 1em 0em 0em
+}
 .decommentmodal-ok-btn {
-	margin: 10px 5px 0 0;
-	padding: 5px 10px;
-	border-radius: 4px;
+	display: inline-block;
+	margin: 0.5em 0em;
+	padding: 0.5em 1.5em 0.5em 1.5em;
+	text-decoration: none;
+	border-radius: 3px;
+	font-weight: bold;
+	color: #FFF;
+	text-align: right;
+	background-image: -webkit-linear-gradient(45deg, #709dff 0%, #b0c9ff 100%);
+	background-image: linear-gradient(45deg, #709dff 0%, #b0c9ff 100%);
+	transition: .4s;
+}
+.decommentmodal-ok-btn:hover{
+	background-image: -webkit-linear-gradient(45deg, #709dff 50%, #b0c9ff 100%);
+	background-image: linear-gradient(45deg, #709dff 50%, #b0c9ff 100%);
 }
 .decommentmodal-close-btn {
 	position: absolute;
@@ -722,7 +739,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
 		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
 		<input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/>
-		<button id="decomment-ok" class="decommentmodal-ok-btn">OK</button>
+		<div class="decommentmodal-ok-area"><button id="decomment-ok" class="decommentmodal-ok-btn">OK</button></div>
 	</div>
 </div>
 <script>
