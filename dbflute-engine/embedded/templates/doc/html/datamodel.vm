@@ -336,12 +336,12 @@ dl.procedurelist dd.column pre {
 	margin: 0 auto;
 	border: 1px solid #999999;
 	padding: 15px;
-	background-color: #ffeeee;
+	background-color: #fff8f8;
 	border-radius: 4px;
 }
 .decommentmodalcontent p {
 	font-size: 14px;
-	color: #552222;
+	color: #222277;
 }
 .decommentinput {
 	display: block;
@@ -390,9 +390,17 @@ dl.procedurelist dd.column pre {
 .decommentmodal-close-btn:hover {
 	background-color: #eed;
 }
-.decomment-user-name {
+.decomment-user-input {
 	display: none;
+}
+.decomment-user-name {
+	margin-top: 0.5em;
 	padding: 5px;
+	border: thin solid #aa3344;
+}
+.decomment-user-name-desc {
+	margin-left: 0.5em;
+	color: #222277;
 }
 	</style>
 #end
@@ -738,7 +746,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
 		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
 		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
-		<input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/>
+		<div id="decomment-user-input" class="decomment-user-input"><input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/><span class="decomment-user-name-desc">*required (saved in cookie)</span></div>
 		<div class="decommentmodal-ok-area"><button id="decomment-ok" class="decommentmodal-ok-btn">OK</button></div>
 	</div>
 </div>
@@ -1872,12 +1880,12 @@ Decomment.prototype = {
 	 */
 	showUserNameInputIfNeed: function() {
 		if (DecommentUtil.isDecommentServer() && this.isUserNameEmpty()) {
-			document.querySelector('#decomment-user-name').style.display = 'block';
+			document.querySelector('#decomment-user-input').style.display = 'block';
 		}
 	},
 
 	hideUserNameInput: function() {
-		document.querySelector('#decomment-user-name').style.display = 'none';
+		document.querySelector('#decomment-user-input').style.display = 'none';
 	},
 
 	/**
