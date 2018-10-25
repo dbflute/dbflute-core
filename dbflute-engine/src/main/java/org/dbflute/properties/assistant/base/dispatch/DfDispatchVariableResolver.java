@@ -128,15 +128,20 @@ public class DfDispatchVariableResolver {
         final Map<String, String> envMap = extractEnvironmentMap();
         final ScopeInfo scopeInfo = Srl.extractScopeFirst(plainValue, prefix, suffix);
         final String envKey = scopeInfo.getContent().trim(); // e.g. DBFLUTE_MAIHAMADB_JDBC_URL
-        String realValue = envMap.get(envKey);
-        if (realValue == null) {
+        final String envValue = envMap.get(envKey);
+        final String realValue;
+        if (envValue != null) { // switch variable to value
+            final String front = Srl.ltrim(scopeInfo.substringInterspaceToPrevious());
+            final String rear = Srl.rtrim(Srl.substringFirstFront(scopeInfo.substringInterspaceToNext(), "|"));
+            realValue = front + envValue + rear;
+        } else { // no environment
             final String interspaceToNext = scopeInfo.substringInterspaceToNext().trim();
-            if (interspaceToNext.startsWith("|")) {
+            if (interspaceToNext.contains("|")) {
                 // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$ | jdbc:mysql://localhost:3306/maihamadb
                 realValue = Srl.substringFirstRear(interspaceToNext, "|").trim();
-            }
-            if (realValue == null) {
+            } else {
                 throwNotFoundEnvironmentVariableException(propTitle, plainValue, envKey, envMap);
+                return null; // unreachable
             }
         }
         final DfEnvironmentVariableInfo info = new DfEnvironmentVariableInfo();

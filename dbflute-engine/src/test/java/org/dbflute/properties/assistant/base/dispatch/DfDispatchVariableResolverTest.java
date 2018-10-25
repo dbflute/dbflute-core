@@ -15,9 +15,9 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
     // ===================================================================================
     //                                                           resolveDispatchVariable()
     //                                                           =========================
-    public void test_resolveDispatchVariable_basic() {
+    public void test_resolveDispatchVariable_default_basic() {
         // ## Arrange ##
-        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver();
+        DfDispatchVariableResolver resolver = createBasicResolver();
 
         // ## Act ##
         // ## Assert ##
@@ -26,6 +26,44 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
         assertException(IllegalStateException.class, () -> {
             resolver.resolveDispatchVariable("url", "$$env:DBFLUTE_UT_TMP$$ | df:dfprop/sea.dfprop");
         });
+    }
+
+    public void test_resolveDispatchVariable_default_part() {
+        // ## Arrange ##
+        DfDispatchVariableResolver resolver = createBasicResolver();
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals("sea", resolver.resolveDispatchVariable("url", "mystic$$env:DBFLUTE_UT_TMP$$oneman | sea"));
+        assertEquals("land", resolver.resolveDispatchVariable("url", "mytic$$env:DBFLUTE_UT_TMP$$oneman | df:dfprop/sea.dfprop | land"));
+        assertException(IllegalStateException.class, () -> {
+            resolver.resolveDispatchVariable("url", "mystic$$env:DBFLUTE_UT_TMP$$over | df:dfprop/sea.dfprop");
+        });
+    }
+
+    public void test_resolveDispatchVariable_env_basic() {
+        // ## Arrange ##
+        DfDispatchVariableResolver resolver = createEnvResolver("maihama");
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals("maihama", resolver.resolveDispatchVariable("url", "$$env:DBFLUTE_UT_TMP$$ | sea"));
+        assertEquals("maihama", resolver.resolveDispatchVariable("url", "$$env:DBFLUTE_UT_TMP$$ | df:dfprop/sea.dfprop | land"));
+        assertEquals("maihama", resolver.resolveDispatchVariable("url", "$$env:DBFLUTE_UT_TMP$$ | df:dfprop/sea.dfprop"));
+    }
+
+    public void test_resolveDispatchVariable_env_part() {
+        // ## Arrange ##
+        DfDispatchVariableResolver resolver = createEnvResolver("maihama");
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals("mysticmaihamaoneman", resolver.resolveDispatchVariable("url", "mystic$$env:DBFLUTE_UT_TMP$$oneman | sea"));
+        assertEquals("mystic maihama oneman", resolver.resolveDispatchVariable("url", "mystic $$env:DBFLUTE_UT_TMP$$ oneman | sea"));
+        assertEquals("mysticmaihamaoneman",
+                resolver.resolveDispatchVariable("url", "mystic$$env:DBFLUTE_UT_TMP$$oneman | df:dfprop/sea.dfprop | land"));
+        assertEquals("mysticmaihamaoneman",
+                resolver.resolveDispatchVariable("url", "mystic$$env:DBFLUTE_UT_TMP$$oneman | df:dfprop/sea.dfprop"));
     }
 
     public void test_resolveDispatchVariable_outsideFile() {
@@ -53,7 +91,7 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
     //                                                         ===========================
     public void test_handleEnvironmentVariable_basic() {
         // ## Arrange ##
-        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver();
+        DfDispatchVariableResolver resolver = createBasicResolver();
 
         // ## Act ##
         // ## Assert ##
@@ -62,12 +100,7 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
 
     public void test_handleEnvironmentVariable_env_basic() {
         // ## Arrange ##
-        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver() {
-            @Override
-            protected Map<String, String> extractEnvironmentMap() {
-                return DfCollectionUtil.newHashMap("DBFLUTE_UT_TMP", "sea");
-            }
-        };
+        DfDispatchVariableResolver resolver = createEnvResolver("sea");
 
         // ## Act ##
         DfEnvironmentVariableInfo info = resolver.handleEnvironmentVariable("url", "$$env:DBFLUTE_UT_TMP$$");
@@ -78,7 +111,7 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
 
     public void test_handleEnvironmentVariable_env_default() {
         // ## Arrange ##
-        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver();
+        DfDispatchVariableResolver resolver = createBasicResolver();
 
         // ## Act ##
         DfEnvironmentVariableInfo info = resolver.handleEnvironmentVariable("url", "$$env:DBFLUTE_UT_TMP$$ | sea");
@@ -89,16 +122,32 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
 
     public void test_handleEnvironmentVariable_env_notFound() {
         // ## Arrange ##
-        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver();
+        DfDispatchVariableResolver resolver = createBasicResolver();
 
         // ## Act ##
         // ## Assert ##
         assertException(DfIllegalPropertySettingException.class, () -> resolver.handleEnvironmentVariable("url", "$$env:DBFLUTE_UT_TMP$$"));
     }
 
+    public void test_handleEnvironmentVariable_env_part() {
+        // ## Arrange ##
+        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver() {
+            @Override
+            protected Map<String, String> extractEnvironmentMap() {
+                return DfCollectionUtil.newHashMap("DBFLUTE_UT_TMP", "sea");
+            }
+        };
+
+        // ## Act ##
+        DfEnvironmentVariableInfo info = resolver.handleEnvironmentVariable("url", "mystic$$env:DBFLUTE_UT_TMP$$oneman");
+
+        // ## Assert ##
+        assertEquals("mysticseaoneman", info.getEnvValue());
+    }
+
     public void test_handleEnvironmentVariable_env_with_outsideFile_default() {
         // ## Arrange ##
-        DfDispatchVariableResolver resolver = new DfDispatchVariableResolver();
+        DfDispatchVariableResolver resolver = createBasicResolver();
 
         // ## Act ##
         String plainValue = "$$env:DBFLUTE_UT_TMP$$ | df:dfprop/sea.dfprop | land";
@@ -106,5 +155,21 @@ public class DfDispatchVariableResolverTest extends EngineTestCase {
 
         // ## Assert ##
         assertEquals("df:dfprop/sea.dfprop | land", info.getEnvValue());
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    private DfDispatchVariableResolver createBasicResolver() {
+        return new DfDispatchVariableResolver();
+    }
+
+    private DfDispatchVariableResolver createEnvResolver(String envValue) {
+        return new DfDispatchVariableResolver() {
+            @Override
+            protected Map<String, String> extractEnvironmentMap() {
+                return DfCollectionUtil.newHashMap("DBFLUTE_UT_TMP", envValue);
+            }
+        };
     }
 }
