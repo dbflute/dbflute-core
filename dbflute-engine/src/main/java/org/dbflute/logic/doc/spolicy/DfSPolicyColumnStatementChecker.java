@@ -18,6 +18,8 @@ package org.dbflute.logic.doc.spolicy;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
@@ -196,6 +198,17 @@ public class DfSPolicyColumnStatementChecker {
         } else if (thenTheme.equalsIgnoreCase("classification")) {
             if (!column.hasClassification() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.matches("classification\\((.*?)\\)")) {
+            Matcher matcher = Pattern.compile("classification\\((.*?)\\)").matcher(thenTheme);
+            if (matcher.find()) {       // surely enter if statement
+                String policyClsName = matcher.group(1);
+                String clsName = column.getClassificationName();
+                if ((clsName == null && !notThenClause) || (clsName != null
+                        && !clsName.equalsIgnoreCase(policyClsName) == !notThenClause)) {
+                    result.violate(policy,
+                            "The column should " + notOr + "be classification of " + policyClsName + ": " + toColumnDisp(column));
+                }
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
