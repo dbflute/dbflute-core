@@ -1774,6 +1774,14 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().isDBFluteBeansJavaConfigLazy();
     }
 
+    public boolean hasDBFluteBeansTransactionalDataSourcePackage() {
+        return getProperties().getDependencyInjectionProperties().hasDBFluteBeansTransactionalDataSourcePackage();
+    }
+
+    public String getDBFluteBeansTransactionalDataSourcePackage() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteBeansTransactionalDataSourcePackage();
+    }
+
     // -----------------------------------------------------
     //                                                 Guice
     //                                                 -----
