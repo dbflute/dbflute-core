@@ -23,10 +23,7 @@ import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
-import org.dbflute.exception.DfSchemaPolicyCheckIllegalIfThenStatementException;
-import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
-import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
-import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
+import org.dbflute.exception.*;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfClause;
@@ -389,5 +386,19 @@ public class DfSPolicyLogicalSecretary {
         br.addElement(nativeStatement);
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaPolicyCheckIllegalIfThenStatementException(msg);
+    }
+
+    public void throwSchemaPolicyCheckIllegalThenNotThemeException(String nativeStatement, String theme) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Illegal then-not theme for SchemaPolicyCheck.");
+        br.addItem("Advice");
+        br.addElement("Make sure your schemaPolicyMap.dfprop.");
+        br.addElement("then-not is prohibited with the specified theme");
+        br.addItem("Theme");
+        br.addElement(theme);
+        br.addItem("Statement");
+        br.addElement(nativeStatement);
+        final String msg = br.buildExceptionMessage();
+        throw new DfSchemaPolicyCheckIllegalThenNotThemeException(msg);
     }
 }

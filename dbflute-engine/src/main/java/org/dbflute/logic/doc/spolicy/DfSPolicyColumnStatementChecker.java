@@ -170,8 +170,8 @@ public class DfSPolicyColumnStatementChecker {
         final boolean notThenClause = thenClause.isNotThenTheme();
         final String notOr = notThenClause ? "not " : "";
         final Matcher clsMatcher = Pattern.compile("classification\\((.*?)\\)").matcher(thenTheme);
-        if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
-            result.violate(policy, "The column is no good: " + toColumnDisp(column));
+        if (thenTheme.equalsIgnoreCase("bad") && notThenClause) {
+            throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "bad");
         } else if (thenTheme.equalsIgnoreCase("notNull")) {
             if (!column.isNotNull() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be not-null: " + toColumnDisp(column));
@@ -204,8 +204,7 @@ public class DfSPolicyColumnStatementChecker {
             String policyClsName = clsMatcher.group(1);
             String clsName = column.getClassificationName();
             if (notThenClause) {
-                throwSchemaPolicyCheckIllegalIfThenStatementException(statement,
-                        "statement \"classification(...)\" is prohibited with \"then not\"");
+                throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
             } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
                 result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
             }
@@ -449,5 +448,9 @@ public class DfSPolicyColumnStatementChecker {
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
         _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+    }
+
+    protected void throwSchemaPolicyCheckIllegalThenNotThemeException(DfSPolicyStatement statement, String theme) {
+        _logicalSecretary.throwSchemaPolicyCheckIllegalThenNotThemeException(statement.getNativeExp(), theme);
     }
 }
