@@ -23,7 +23,11 @@ import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
-import org.dbflute.exception.*;
+import org.dbflute.exception.DfSchemaPolicyCheckIllegalIfThenStatementException;
+import org.dbflute.exception.DfSchemaPolicyCheckIllegalThenNotThemeException;
+import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
+import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
+import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfClause;
@@ -38,6 +42,7 @@ import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
+ * @author subaru
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
 public class DfSPolicyLogicalSecretary {
