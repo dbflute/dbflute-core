@@ -80,10 +80,10 @@ public class DfArrangeQueryDocSetupper {
                 final String cbeanPath = prepareConditionBeanPath(table);
                 final List<DfArrangeQueryMethod> beanMethodList = searchArrangeQueryMethodList(tableDbName, cbeanPath);
                 if (!beanMethodList.isEmpty()) {
-                    _log.info("[{}]", arrangeQueryTable.getBeanClassName());
+                    _log.info(" [{}]", arrangeQueryTable.getBeanClassName());
                 }
                 for (DfArrangeQueryMethod method : beanMethodList) {
-                    _log.info(" o {}() // {}", method.getMethodName(), method.getTitle());
+                    _log.info("  o {}() // {}", method.getMethodName(), method.getTitle());
                     arrangeQueryTable.addBeanMethod(method);
                 }
             }
@@ -91,16 +91,19 @@ public class DfArrangeQueryDocSetupper {
                 final String queryPath = prepareConditionQueryPath(table);
                 final List<DfArrangeQueryMethod> queryMethodList = searchArrangeQueryMethodList(tableDbName, queryPath);
                 if (!queryMethodList.isEmpty()) {
-                    _log.info("[{}]", arrangeQueryTable.getQueryClassName());
+                    _log.info(" [{}]", arrangeQueryTable.getQueryClassName());
                 }
                 for (DfArrangeQueryMethod method : queryMethodList) {
-                    _log.info(" o {}() // {}", method.getMethodName(), method.getTitle());
+                    _log.info("  o {}() // {}", method.getMethodName(), method.getTitle());
                     arrangeQueryTable.addQueryMethod(method);
                 }
             }
             if (!arrangeQueryTable.getBeanMethodList().isEmpty() || !arrangeQueryTable.getQueryMethodList().isEmpty()) {
                 resultMap.put(tableDbName, arrangeQueryTable);
             }
+        }
+        if (resultMap.isEmpty()) {
+            _log.info(" -> no arrange query");
         }
         return resultMap;
     }

@@ -48,7 +48,7 @@ public class DfSchemaHtmlDataArrangeQuery {
             return _arrangeQueryTableMap;
         }
         _log.info(" ");
-        _log.info("...Setting up arrange queries for documents");
+        _log.info("...Setting up arrange queries for documents (ArrangeQueryDoc)");
         _arrangeQueryTableMap = new DfArrangeQueryDocSetupper().extractArrangeQuery(tableList);
         return _arrangeQueryTableMap;
     }
