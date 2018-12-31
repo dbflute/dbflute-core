@@ -57,7 +57,7 @@ public class DfArrangeQueryDocSetupper {
     //                                                                              Set up 
     //                                                                              ======
     public Map<String, DfArrangeQueryTable> extractArrangeQuery(List<Table> tableList) {
-        if (getDocumentProperties().isSuppressSchemaHtmlArrangeQuery()) {
+        if (getDocumentProperties().isSuppressSchemaHtmlArrangeQuery()) { // already checked so just in case
             _log.info("*ArrangeQuery Doc is suppressed!");
             return Collections.emptyMap();
         }
