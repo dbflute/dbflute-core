@@ -15,6 +15,7 @@
  */
 package org.dbflute.logic.doc.arrqy;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -140,12 +141,11 @@ public class DfArrangeQueryDocSetupper {
     // ===================================================================================
     //                                                                      Analyze Method
     //                                                                      ==============
-    protected boolean isArrangeQueryMethodFirstLine(String line) {
-        return Srl.ltrim(line).startsWith("public ") && Srl.containsAll(line, METHOD_PREFIX, "(");
-    }
-
     protected List<DfArrangeQueryMethod> searchArrangeQueryMethodList(String tableDbName, String classFilePath) {
         final FileTextIO textIO = prepareSourceFileTextIO();
+        if (!new File(classFilePath).exists()) { // e.g. generate-only of table-except
+            return Collections.emptyList();
+        }
         final String cqText = textIO.read(classFilePath);
         final List<String> lineList = Srl.splitList(cqText, "\n");
         return analyzeArrangeQueryLineList(tableDbName, lineList);
@@ -157,23 +157,24 @@ public class DfArrangeQueryDocSetupper {
         String javadocTitle = null;
         boolean inJavaDoc = false;
         for (String line : lineList) {
-            if (Srl.equalsPlain(Srl.trim(line), "/**")) {
+            final String trimmedLine = Srl.trim(line);
+            if (Srl.equalsPlain(trimmedLine, "/**")) {
                 inJavaDoc = true;
                 javadocTitle = null;
-            } else if (Srl.contains(line, "*/")) {
+            } else if (Srl.contains(trimmedLine, "*/")) {
                 inJavaDoc = false;
-            } else if (inJavaDoc && Srl.startsWith(Srl.ltrim(line), "*")) {
+            } else if (inJavaDoc && Srl.startsWith(trimmedLine, "*")) {
                 if (javadocTitle == null) { // to use first line
                     javadocTitle = Srl.substringFirstRear(line, "*").trim();
                 }
-            } else if (Srl.trim(line).isEmpty()) { // empty line
+            } else if (trimmedLine.isEmpty()) { // empty line
                 javadocTitle = null; // may be different
-            } else if (Srl.ltrim(line).startsWith("//")) { // line comment line
+            } else if (trimmedLine.startsWith("//")) { // line comment line
                 javadocTitle = null; // may be different
             } else if (Srl.containsAny(line, "public", "protected", "private") && !Srl.contains(line, METHOD_PREFIX)) { // other field or method
                 javadocTitle = null;
             }
-            if (isArrangeQueryMethodFirstLine(line)) {
+            if (isArrangeQueryMethodFirstLine(line, trimmedLine)) {
                 final ScopeInfo scopeFirst = Srl.extractScopeFirst(line, METHOD_PREFIX, "(");
                 if (scopeFirst == null) { // basically no way, but just in case
                     continue;
@@ -191,6 +192,10 @@ public class DfArrangeQueryDocSetupper {
             }
         }
         return methodList;
+    }
+
+    protected boolean isArrangeQueryMethodFirstLine(String line, String trimmedLine) {
+        return trimmedLine.startsWith("public ") && Srl.containsAll(trimmedLine, METHOD_PREFIX, "(");
     }
 
     // ===================================================================================

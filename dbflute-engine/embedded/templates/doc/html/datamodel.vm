@@ -248,7 +248,7 @@ span.arrqycount {
 }
 dl.arrqylist {
 	margin-top: 0.7em;
-	padding-left: 2em;
+	padding-left: 3em;
 }
 dl.arrqylist dt {
 	display: list-item;
