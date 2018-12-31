@@ -78,6 +78,10 @@ public class DfLanguageClassPackageJava implements DfLanguageClassPackage {
         return "cbean";
     }
 
+    public String getConditionQueryPackage() {
+        return getConditionBeanPackage() + ".cq";
+    }
+
     public String getExtendedBehaviorPackage() {
         return "exbhv";
     }

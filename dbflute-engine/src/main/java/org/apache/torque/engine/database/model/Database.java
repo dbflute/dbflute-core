@@ -153,7 +153,9 @@ import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
-import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlProcedure;
+import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
+import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataArrangeQuery;
+import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataProcedure;
 import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
@@ -2394,6 +2396,13 @@ public class Database {
     // -----------------------------------------------------
     //                                            SchemaHtml
     //                                            ----------
+    public boolean isSchemaHtmlArrangeQueryValid() {
+        if (getProperties().getDocumentProperties().isSuppressSchemaHtmlArrangeQuery()) {
+            return false;
+        }
+        return hasArrangeQueryTableMap();
+    }
+
     public boolean isSchemaHtmlOutsideSqlValid() {
         if (getProperties().getDocumentProperties().isSuppressSchemaHtmlOutsideSql()) {
             return false;
@@ -2891,7 +2900,7 @@ public class Database {
     // ===================================================================================
     //                                                                  Procedure Document
     //                                                                  ==================
-    protected final DfSchemaHtmlProcedure _schemaHtmlProcedure = new DfSchemaHtmlProcedure(); // contains cache
+    protected final DfSchemaHtmlDataProcedure _schemaHtmlProcedure = new DfSchemaHtmlDataProcedure(); // contains cache
 
     public boolean hasSeveralProcedureSchema() throws SQLException {
         return getAvailableSchemaProcedureMap().size() >= 2;
@@ -2903,6 +2912,19 @@ public class Database {
 
     public Map<String, List<DfProcedureMeta>> getAvailableSchemaProcedureMap() throws SQLException {
         return _schemaHtmlProcedure.getAvailableSchemaProcedureMap(() -> getDataSource());
+    }
+
+    // ===================================================================================
+    //                                                               ArrangeQuery Document
+    //                                                               =====================
+    protected final DfSchemaHtmlDataArrangeQuery _schemaHtmlArrangeQuery = new DfSchemaHtmlDataArrangeQuery(); // contains cache
+
+    public boolean hasArrangeQueryTableMap() { // basically called by Java
+        return !getArrangeQueryTableMap().isEmpty();
+    }
+
+    public Map<String, DfArrangeQueryTable> getArrangeQueryTableMap() { // basically called by Java
+        return _schemaHtmlArrangeQuery.getArrangeQueryTableMap(getTableList());
     }
 
     // ===================================================================================
