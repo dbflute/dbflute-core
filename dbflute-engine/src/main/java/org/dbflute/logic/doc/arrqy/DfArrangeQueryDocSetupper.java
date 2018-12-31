@@ -39,24 +39,13 @@ import org.slf4j.LoggerFactory;
  */
 public class DfArrangeQueryDocSetupper {
 
-    protected static final String METHOD_PREFIX = "arrange";
-
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfArrangeQueryDocSetupper.class);
 
-    public static final String KEY_PATH = "path";
-    public static final String KEY_SUB_DIRECTORY_PATH = "subDirectoryPath";
-    public static final String KEY_ENTITY_NAME = "entityName";
-    public static final String KEY_BEHAVIOR_NAME = "behaviorName";
-    public static final String KEY_BEHAVIOR_QUERY_PATH = "behaviorQueryPath";
-    public static final String KEY_SQLAP = "sqlAp";
-    public static final String KEY_SQLAP_PROJECT_NAME = "sqlApProjectName";
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_DESCRIPTION = "description";
-    public static final String KEY_SQL = "sql";
+    public static final String METHOD_PREFIX = "arrange";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -86,23 +75,31 @@ public class DfArrangeQueryDocSetupper {
             final String tableDbName = table.getTableDbName();
             String beanClassName = table.getExtendedConditionBeanClassName();
             String queryClassName = table.getExtendedConditionQueryClassName();
-            final DfArrangeQueryTable queryTable = new DfArrangeQueryTable(tableDbName, beanClassName, queryClassName);
+            final DfArrangeQueryTable arrangeQueryTable = new DfArrangeQueryTable(tableDbName, beanClassName, queryClassName);
             {
                 final String cbeanPath = prepareConditionBeanPath(table);
-                final List<DfArrangeQueryMethod> cbeanMethodList = searchArrangeQueryMethodList(tableDbName, cbeanPath);
-                for (DfArrangeQueryMethod method : cbeanMethodList) {
-                    queryTable.addBeanMethod(method);
+                final List<DfArrangeQueryMethod> beanMethodList = searchArrangeQueryMethodList(tableDbName, cbeanPath);
+                if (!beanMethodList.isEmpty()) {
+                    _log.info("[{}]", arrangeQueryTable.getBeanClassName());
+                }
+                for (DfArrangeQueryMethod method : beanMethodList) {
+                    _log.info(" o {}() // {}", method.getMethodName(), method.getTitle());
+                    arrangeQueryTable.addBeanMethod(method);
                 }
             }
             {
-                final String cqueryPath = prepareConditionQueryPath(table);
-                final List<DfArrangeQueryMethod> cqueryMethodList = searchArrangeQueryMethodList(tableDbName, cqueryPath);
-                for (DfArrangeQueryMethod method : cqueryMethodList) {
-                    queryTable.addQueryMethod(method);
+                final String queryPath = prepareConditionQueryPath(table);
+                final List<DfArrangeQueryMethod> queryMethodList = searchArrangeQueryMethodList(tableDbName, queryPath);
+                if (!queryMethodList.isEmpty()) {
+                    _log.info("[{}]", arrangeQueryTable.getQueryClassName());
+                }
+                for (DfArrangeQueryMethod method : queryMethodList) {
+                    _log.info(" o {}() // {}", method.getMethodName(), method.getTitle());
+                    arrangeQueryTable.addQueryMethod(method);
                 }
             }
-            if (!queryTable.getBeanMethodList().isEmpty() || !queryTable.getQueryMethodList().isEmpty()) {
-                resultMap.put(tableDbName, queryTable);
+            if (!arrangeQueryTable.getBeanMethodList().isEmpty() || !arrangeQueryTable.getQueryMethodList().isEmpty()) {
+                resultMap.put(tableDbName, arrangeQueryTable);
             }
         }
         return resultMap;
