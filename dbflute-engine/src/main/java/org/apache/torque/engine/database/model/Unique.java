@@ -128,6 +128,7 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -164,9 +165,10 @@ public class Unique extends Index {
         StringBuffer result = new StringBuffer();
         result.append(" <unique name=\"").append(getName()).append("\">\n");
 
-        final Set<Integer> ordinalPositionKeySet = getIndexColumnMap().keySet();
+        final Map<Integer, String> indexColumnMap = getIndexColumnMap();
+        final Set<Integer> ordinalPositionKeySet = indexColumnMap.keySet();
         for (final Integer ordinalPosition : ordinalPositionKeySet) {
-            final String columnName = getIndexColumnMap().get(ordinalPositionKeySet);
+            final String columnName = indexColumnMap.get(ordinalPosition);
             result.append("  <unique-column name=\"").append(columnName).append("\"");
             result.append(" position=\"").append(ordinalPosition).append("\"/>\n");
         }

@@ -52,12 +52,13 @@ public class DfSchemaHistory {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
-    protected final String _historyFile;
+    protected final String _historyFile; // not null
 
     // -----------------------------------------------------
     //                                             Hacomment
     //                                             ---------
-    protected DfHacoMapPickup _hacoMapPickup; // loaded when call loadHacoMap
+    // basically used by only HistoryHTML (keep null if SchemaSyncCheck)
+    protected DfHacoMapPickup _hacoMapPickup; // loaded when call loadHacoMap, null allowed
 
     // -----------------------------------------------------
     //                                          Load History
@@ -253,7 +254,8 @@ public class DfSchemaHistory {
         return _schemaDiffList;
     }
 
-    public List<DfHacoMapDiffPart> getHacoMapDiffList() {
-        return _hacoMapPickup.getDiffList();
+    public List<DfHacoMapDiffPart> getHacoMapDiffList() { // if loaded
+        // should be empty list if null, for e.g. SchemaSyncCheck (unrelated to hacomment)
+        return _hacoMapPickup != null ? _hacoMapPickup.getDiffList() : DfCollectionUtil.emptyList();
     }
 }

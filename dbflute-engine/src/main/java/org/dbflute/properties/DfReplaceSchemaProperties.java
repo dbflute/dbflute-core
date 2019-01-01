@@ -338,10 +338,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
 
     protected void setupDefaultFilterVariables(Map<String, String> filterVariablesMap) {
         final DfDatabaseProperties prop = getDatabaseProperties();
+        final String databaseUser = prop.getDatabaseUser();
+
+        // basic
         filterVariablesMap.put("dfprop.mainCatalog", prop.getDatabaseCatalog());
         filterVariablesMap.put("dfprop.mainSchema", prop.getDatabaseSchema().getPureSchema());
-        filterVariablesMap.put("dfprop.mainUser", prop.getDatabaseUser());
+        filterVariablesMap.put("dfprop.mainUser", databaseUser);
         filterVariablesMap.put("dfprop.mainPassword", prop.getDatabasePassword());
+
+        // special expression
+        filterVariablesMap.put("dfprop.mainUserNoAtServer", Srl.substringFirstFront(databaseUser, "@")); // for e.g. Azure
 
         try {
             // absolute path of DBFlute client
@@ -559,7 +565,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
             final String password = propertyMap.get("password");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
                 final DfOutsideFileVariableInfo pwdInfo = analyzeOutsideFileVariable(password);
-                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getOutsideValue() == null) { // both not found
+                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getNofileDefaultValue() == null) { // both not found
                     result = true;
                 }
             }

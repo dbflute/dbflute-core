@@ -24,7 +24,7 @@ import java.io.File;
 public class DfOutsideFileVariableInfo {
 
     protected File _dispatchFile;
-    protected String _outsideValue;
+    protected String _nofileDefaultValue;
 
     public File getDispatchFile() {
         return _dispatchFile;
@@ -34,11 +34,11 @@ public class DfOutsideFileVariableInfo {
         _dispatchFile = dispatchFile;
     }
 
-    public String getOutsideValue() {
-        return _outsideValue;
+    public String getNofileDefaultValue() {
+        return _nofileDefaultValue;
     }
 
-    public void setOutsideValue(String outsideValue) {
-        _outsideValue = outsideValue;
+    public void setNofileDefaultValue(String nofileDefaultValue) {
+        _nofileDefaultValue = nofileDefaultValue;
     }
 }

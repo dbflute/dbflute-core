@@ -142,7 +142,7 @@ public class DfLReverseProcess {
     }
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, null);
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, /*historyFile*/null);
     }
 
     protected DfSchemaXmlReader createSchemaXmlReader(String schemaXml) {

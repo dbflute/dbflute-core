@@ -34,12 +34,12 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 1.1.3 (2017/03/19 Sunday)
  */
-public class DfSchemaHtmlProcedure {
+public class DfSchemaHtmlDataProcedure {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfSchemaHtmlProcedure.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaHtmlDataProcedure.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -15,10 +15,10 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 #if ($database.needsDBFluteBeansHybritScanConfig())
 import org.springframework.context.annotation.ComponentScan;
@@ -55,7 +55,8 @@ public class ${glDBFluteBeansJavaConfig} {
     @Autowired
     protected ApplicationContext _container;
 
-    @Resource(name="${database.DBFluteBeansDataSourceName}")
+    @Autowired
+    @Qualifier("${database.DBFluteBeansDataSourceName}")
     protected DataSource _dataSource; // name basis here for multiple DB
 
     // ===================================================================================

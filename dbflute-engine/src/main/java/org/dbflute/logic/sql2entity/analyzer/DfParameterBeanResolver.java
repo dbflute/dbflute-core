@@ -158,6 +158,7 @@ public class DfParameterBeanResolver {
                 || Srl.equalsIgnoreCase(superExp, "SPB")) { // an old style for compatibility before 0.9.7.5
             final String superClassName = SimplePagingBean.class.getSimpleName();
             pmbMetaData.setSuperClassName(superClassName);
+            // #hope use superExp instead of superClassName and you can use manual-paging forcedly by jflute (2018/06/12)
             if (Srl.equalsIgnoreCase(superClassName, "Paging", "SqlSkipPaging", "ManualPaging")) {
                 pmbMetaData.setPagingType(DfPagingType.MANUAL);
             } else if (Srl.equalsIgnoreCase(superClassName, "CursorSkipPaging", "AutoPaging")) {

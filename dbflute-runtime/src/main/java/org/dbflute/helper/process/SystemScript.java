@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.dbflute.helper.process.exception.SystemScriptFailureException;
 import org.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
@@ -31,7 +33,7 @@ import org.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.8.3 (2011/05/03 Tuesday)
  */
-public class SystemScript {
+public class SystemScript { // basically memorable code...
 
     // ===================================================================================
     //                                                                          Definition
@@ -53,13 +55,40 @@ public class SystemScript {
     //                                                                           Attribute
     //                                                                           =========
     protected String _consoleEncoding;
+    protected Consumer<String> _consoleLiner;
     protected Map<String, String> _environmentMap;
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public SystemScript consoleEncoding(String encoding) {
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+        _consoleEncoding = encoding;
+        return this;
+    }
+
+    public SystemScript consoleLiner(Consumer<String> liner) {
+        assertObjectNotNull("liner", liner);
+        _consoleLiner = liner;
+        return this;
+    }
+
+    public SystemScript env(String key, String value) {
+        assertStringNotNullAndNotTrimmedEmpty("key", key);
+        assertObjectNotNull("value", value); // empty allowed: possible? e.g. "SEA="
+        if (_environmentMap == null) {
+            _environmentMap = new LinkedHashMap<String, String>();
+        }
+        _environmentMap.put(key, value);
+        return this;
+    }
 
     // ===================================================================================
     //                                                                      Execute Script
     //                                                                      ==============
     public ProcessResult execute(File baseDir, String scriptName, String... args) {
-        final ProcessResult result = new ProcessResult(scriptName);
+        assertObjectNotNull("baseDir", baseDir);
+        assertStringNotNullAndNotTrimmedEmpty("scriptName", scriptName);
         final List<String> cmdList = prepareCommandList(scriptName, args);
         if (cmdList.isEmpty()) {
             String msg = "Unsupported script: " + scriptName;
@@ -67,7 +96,7 @@ public class SystemScript {
         }
         final ProcessBuilder builder = prepareProcessBuilder(baseDir, cmdList);
         final Process process = startProcess(scriptName, builder);
-        return handleProcessResult(scriptName, result, process);
+        return handleProcessResult(scriptName, process);
     }
 
     protected List<String> prepareCommandList(String scriptName, String... args) {
@@ -124,26 +153,55 @@ public class SystemScript {
         return process;
     }
 
-    protected ProcessConsoleReader createProcessConsoleReader(InputStream stdin, final String encoding) {
-        return new ProcessConsoleReader(stdin, encoding);
-    }
-
-    protected ProcessResult handleProcessResult(String scriptName, final ProcessResult result, final Process process) {
-        InputStream stdin = null;
+    protected ProcessResult handleProcessResult(String scriptName, final Process process) {
+        InputStream stdin = null; // closed in reader
         try {
             stdin = process.getInputStream();
-            final String encoding = _consoleEncoding != null ? _consoleEncoding : "UTF-8";
-            final ProcessConsoleReader reader = createProcessConsoleReader(stdin, encoding);
+            final ProcessConsoleReader reader = createProcessConsoleReader(stdin);
             reader.start();
             final int exitCode = process.waitFor();
-            reader.join();
             final String console = reader.read();
-            result.setConsole(console);
-            result.setExitCode(exitCode);
-            return result;
+            return new ProcessResult(scriptName, console, exitCode);
         } catch (InterruptedException e) {
             String msg = "The execution was interrupted: " + scriptName;
             throw new SystemScriptFailureException(msg, e);
+        }
+    }
+
+    protected ProcessConsoleReader createProcessConsoleReader(InputStream stdin) {
+        return newProcessConsoleReader(stdin, _consoleEncoding != null ? _consoleEncoding : "UTF-8", _consoleLiner);
+    }
+
+    protected ProcessConsoleReader newProcessConsoleReader(InputStream stdin, String encoding, Consumer<String> liner) {
+        return new ProcessConsoleReader(stdin, encoding, liner);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull(variableName, value);
+        if (value.trim().length() == 0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
         }
     }
 
@@ -154,7 +212,8 @@ public class SystemScript {
         return _consoleEncoding;
     }
 
-    public void setConsoleEncoding(String consoleEncoding) {
+    @Deprecated
+    public void setConsoleEncoding(String consoleEncoding) { // old style
         this._consoleEncoding = consoleEncoding;
     }
 
@@ -162,7 +221,8 @@ public class SystemScript {
         return _environmentMap;
     }
 
-    public void setEnvironmentMap(Map<String, String> environmentMap) {
+    @Deprecated
+    public void setEnvironmentMap(Map<String, String> environmentMap) { // old style
         this._environmentMap = environmentMap;
     }
 }

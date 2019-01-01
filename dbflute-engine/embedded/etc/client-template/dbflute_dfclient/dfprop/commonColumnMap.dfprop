@@ -6,7 +6,7 @@
 # the user who updated the record and so on...
 # The column names are treated as case insensitive.
 #
-# The variable '$$AccessContext$$' means allcommon.AccessContext.
+# The variable '$$AccessContext$$' means AccessContext class of DBFlute.
 #
 # Example:
 # map:{

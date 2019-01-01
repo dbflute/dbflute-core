@@ -610,7 +610,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 final String constraintName = rs.getString("CONSTRAINT_NAME");
                 final String columnName = rs.getString("COLUMN_NAME");
                 final Integer position = rs.getInt("POSITION");
-                Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueMap);
+                Map<Integer, String> uniqueElementMap = uniqueMap.get(constraintName);
                 if (uniqueElementMap == null) {
                     uniqueElementMap = new LinkedHashMap<Integer, String>();
                     uniqueMap.put(constraintName, uniqueElementMap);

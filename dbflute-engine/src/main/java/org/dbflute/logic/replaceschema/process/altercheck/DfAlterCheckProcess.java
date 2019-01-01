@@ -877,7 +877,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsAlterCheck(previousXml, nextXml);
         schemaDiff.enableCraftDiff(getMigrationAlterCheckCraftMetaDir());
         schemaDiff.loadPreviousSchema();
-        schemaDiff.loadNextSchema();
+        schemaDiff.loadNextSchema(); // always can read here so no check
         schemaDiff.analyzeDiff();
         return schemaDiff;
     }
