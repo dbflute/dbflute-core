@@ -1914,7 +1914,7 @@ Decomment.prototype = {
 
 				var commentElement = column.querySelector('.commentcell');
 				var tableName = that.getTableNameFromElement(table);
-				var columnName = column.querySelector('.columnnamecell').innerText;
+				var columnName = column.querySelector('.columnnamecell').innerText.trim();
 				var columnProperty = that.storeClient.getColumnPickup(tableName, columnName) || new PickupTableProperty(tableName, columnName)
 				commentElement.onclick = that.createSaveDecommentFunction(columnProperty);
 			});
