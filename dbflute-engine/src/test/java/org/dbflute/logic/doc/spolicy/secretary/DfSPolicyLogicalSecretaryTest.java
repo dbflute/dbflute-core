@@ -17,13 +17,57 @@ package org.dbflute.logic.doc.spolicy.secretary;
 
 import java.util.List;
 
+import org.dbflute.exception.DfSchemaPolicyCheckUnknownVariableException;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfClause;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
 import org.dbflute.unit.EngineTestCase;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 1.1.2 (2017/1/3 Tuesday)
  */
-public class DfSPolicyMiscSecretaryTest extends EngineTestCase {
+public class DfSPolicyLogicalSecretaryTest extends EngineTestCase {
+
+    // ===================================================================================
+    //                                                                          isHitExp()
+    //                                                                          ==========
+    public void test_isHitExp_basic() {
+        // ## Arrange ##
+        DfSPolicyLogicalSecretary secretary = new DfSPolicyLogicalSecretary();
+        DfSPolicyStatement statement = createMockStatement();
+
+        // ## Act ##
+        // ## Assert ##
+        assertTrue(secretary.isHitExp(statement, "SEA_MEMBER", "prefix:SEA_"));
+        assertFalse(secretary.isHitExp(statement, "SEA_MEMBER", "prefix:LAND_"));
+        assertTrue(secretary.isHitExp(statement, "SEA_MEMBER", "prefix:SEA_ and suffix:_MEMBER"));
+        assertTrue(secretary.isHitExp(statement, "SEA_MEMBER", "prefix:SEA_ or prefix:LAND_"));
+        assertTrue(secretary.isHitExp(statement, "LAND_MEMBER", "prefix:SEA_ or prefix:LAND_"));
+        assertFalse(secretary.isHitExp(statement, "PIARI_MEMBER", "prefix:SEA_ or prefix:LAND_"));
+        assertTrue(secretary.isHitExp(statement, "SEA_MEMBER", "$$ALL$$"));
+        try {
+            assertTrue(secretary.isHitExp(statement, "SEA_MEMBER", "$$sea$$_ID"));
+            fail();
+        } catch (DfSchemaPolicyCheckUnknownVariableException e) {
+            log(e.getMessage());
+        }
+        try {
+            assertTrue(secretary.isHitExp(statement, "SEA_MEMBER", "sea-mystic$$land-oneman$$piari-plaza"));
+            fail();
+        } catch (DfSchemaPolicyCheckUnknownVariableException e) {
+            log(e.getMessage());
+        }
+    }
+
+    protected DfSPolicyStatement createMockStatement() {
+        List<DfSPolicyIfPart> ifPartList = newArrayList(new DfSPolicyIfPart("columnName", "$$ALL$$", false));
+        DfSPolicyIfClause ifClause = new DfSPolicyIfClause(ifPartList, false);
+        DfSPolicyThenClause thenClause = new DfSPolicyThenClause("bad", false, DfCollectionUtil.emptyList(), false, null);
+        return new DfSPolicyStatement("if columnName is $$ALL$$ then bad", ifClause, thenClause);
+    }
 
     // ===================================================================================
     //                                                            splitClauseByConnector()

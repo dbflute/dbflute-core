@@ -21,6 +21,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
@@ -97,7 +98,10 @@ public class DfSPolicyTableThemeChecker {
             return "The table name should be on lower case basis: " + toTableDisp(table);
         });
         define(themeMap, "identityIfPureIDPK", table -> _logicalSecretary.isNotIdentityIfPureIDPK(table), table -> {
-            return "The primary key should be identity: " + toTableDisp(table) + "." + table.getPrimaryKeyAsOne().getName();
+            return "The primary key should be identity: " + toColumnDisp(table.getPrimaryKeyAsOne());
+        });
+        define(themeMap, "sequenceIfPureIDPK", table -> _logicalSecretary.isNotSequenceIfPureIDPK(table), table -> {
+            return "The primary key should be sequence: " + toColumnDisp(table.getPrimaryKeyAsOne());
         });
         define(themeMap, "hasCommonColumn", table -> !table.hasAllCommonColumn(), table -> {
             return "The table should have common columns: " + toTableDisp(table);
@@ -128,6 +132,10 @@ public class DfSPolicyTableThemeChecker {
 
     protected String toTableDisp(Table table) {
         return _logicalSecretary.toTableDisp(table);
+    }
+
+    protected String toColumnDisp(Column column) {
+        return _logicalSecretary.toColumnDisp(column);
     }
 
     // ===================================================================================

@@ -21,6 +21,9 @@ ${table.aliasExpression}${table.tableDispName}
 #if ($table.hasFirstDate())
 &nbsp;<span class="tablefirstdatetitle">since ${table.firstDateSimpleExp}</span>
 #end
+#if ($database.isSchemaHtmlArrangeQueryValid() && $table.hasArrangeQuery())
+&nbsp;<span class="arrqycount"><a href="${database.sharp}${table.tableIdForSchemaHtml}_arrqy">(arrangeQuery=${table.arrangeQuerySize})</a></span>
+#end
 #if ($database.isSchemaHtmlOutsideSqlValid() && $table.hasBehaviorQueryPath())
 &nbsp;<span class="bqpcount"><a href="${database.sharp}${table.tableIdForSchemaHtml}_sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
 #end

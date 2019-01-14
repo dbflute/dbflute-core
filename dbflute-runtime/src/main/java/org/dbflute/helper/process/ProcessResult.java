@@ -21,12 +21,14 @@ package org.dbflute.helper.process;
  */
 public class ProcessResult {
 
-    protected final String _processName;
-    protected String _console;
-    protected int _exitCode;
+    protected final String _processName; // not null
+    protected final String _console; // not null, empty allowed
+    protected final int _exitCode;
 
-    public ProcessResult(String processName) {
+    public ProcessResult(String processName, String console, int exitCode) {
         _processName = processName;
+        _console = console;
+        _exitCode = exitCode;
     }
 
     public String getProcessName() {
@@ -37,15 +39,7 @@ public class ProcessResult {
         return _console;
     }
 
-    public void setConsole(String console) {
-        this._console = console;
-    }
-
     public int getExitCode() {
         return _exitCode;
-    }
-
-    public void setExitCode(int exitCode) {
-        this._exitCode = exitCode;
     }
 }

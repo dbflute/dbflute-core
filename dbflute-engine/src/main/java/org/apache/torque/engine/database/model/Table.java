@@ -152,6 +152,7 @@ import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -4306,6 +4307,23 @@ public class Table {
     // This method is not necessary because sql2entity cannot use this.
     //public List<String> getBehaviorQueryPathDefinitionList() {
     //}
+
+    // ===================================================================================
+    //                                                                       Arrange Query
+    //                                                                       =============
+    public boolean hasArrangeQuery() {
+        return getArrangeQueryTable() != null;
+    }
+
+    public int getArrangeQuerySize() {
+        final DfArrangeQueryTable table = getArrangeQueryTable();
+        return table != null ? table.getBeanMethodList().size() + table.getQueryMethodList().size() : 0;
+    }
+
+    public DfArrangeQueryTable getArrangeQueryTable() {
+        final Map<String, DfArrangeQueryTable> arrangeQueryTableMap = getDatabase().getArrangeQueryTableMap();
+        return arrangeQueryTableMap.get(getTableDbName());
+    }
 
     // ===================================================================================
     //                                                                      Basic Override

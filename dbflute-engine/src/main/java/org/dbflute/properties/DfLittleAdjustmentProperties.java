@@ -1652,6 +1652,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isCompatibleUserMessagesVariableNotOrdered", false);
     }
 
+    public boolean isCompatibleNativeInScopePublicForcedly() { // closet
+        return isProperty("isCompatibleNativeInScopePublicForcedly", false);
+    }
+
     // -----------------------------------------------------
     //                                      Java8 Compatible
     //                                      ----------------

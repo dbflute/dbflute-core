@@ -89,7 +89,9 @@ public class DfDocumentAuthorLogic { // from DBFlute Intro
 
     public OptionalThing<String> getGitBranch() {
         try {
-            return OptionalThing.of(_gitBranchSupplier.get());
+            return OptionalThing.ofNullable(_gitBranchSupplier.get(), () -> {
+                throw new IllegalStateException("Cannot get branch name.");
+            });
         } catch (IllegalStateException e) {
             return OptionalThing.ofNullable(null, () -> {
                 throw e;

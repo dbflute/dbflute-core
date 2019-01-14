@@ -129,32 +129,25 @@ package org.apache.torque.engine.database.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.DfBuildProperties;
-import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
-import org.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
-import org.dbflute.exception.DfFixedConditionOptionConstraintFailureException;
 import org.dbflute.exception.DfTableNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
-import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.generate.foreignkey.DfFixedConditionDynamicAnalyzer;
+import org.dbflute.logic.generate.foreignkey.DfFixedConditionOptionChecker;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
-import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfMultipleFKPropertyProperties;
-import org.dbflute.properties.assistant.classification.DfClassificationElement;
-import org.dbflute.properties.assistant.classification.DfClassificationGroup;
-import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -1065,47 +1058,9 @@ public class ForeignKey implements Constraint {
     }
 
     protected void checkOptionConstraints() {
-        if (_fixedInline) {
-            final String localAliasMark = HpFixedConditionQueryResolver.LOCAL_ALIAS_MARK;
-            if (_fixedCondition != null && _fixedCondition.contains(localAliasMark)) {
-                String msg = "fixedInline with " + localAliasMark + " is not available.";
-                throwFixedConditionOptionConstraintFailureException(msg);
-            }
-        }
-        if (_fixedReferrer) {
-            if (_fixedInline) {
-                String msg = "fixedReferrer with fixedInline is not available.";
-                throwFixedConditionOptionConstraintFailureException(msg);
-            }
-            if (!_dynamicFixedConditionMap.isEmpty()) {
-                String msg = "fixedReferrer with bind variables is not available.";
-                throwFixedConditionOptionConstraintFailureException(msg);
-            }
-            final String foreignAliasMark = HpFixedConditionQueryResolver.FOREIGN_ALIAS_MARK;
-            if (_fixedCondition != null && _fixedCondition.contains(foreignAliasMark)) {
-                String msg = "fixedReferrer with " + foreignAliasMark + " is not available.";
-                throwFixedConditionOptionConstraintFailureException(msg);
-            }
-        }
-    }
-
-    protected void throwFixedConditionOptionConstraintFailureException(String notice) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice(notice);
-        br.addItem("DBFlute Property");
-        br.addElement("additionalForeignKeyMap.dfprop");
-        br.addItem("FK Name");
-        br.addElement(_name);
-        br.addItem("fixedCondition");
-        br.addElement(_fixedCondition);
-        br.addItem("fixedSuffix");
-        br.addElement(_fixedSuffix);
-        br.addItem("fixedInline");
-        br.addElement(_fixedInline);
-        br.addItem("fixedReferrer");
-        br.addElement(_fixedReferrer);
-        final String msg = br.buildExceptionMessage();
-        throw new DfFixedConditionOptionConstraintFailureException(msg);
+        final DfFixedConditionOptionChecker checker =
+                new DfFixedConditionOptionChecker(this, _fixedCondition, _dynamicFixedConditionMap, _fixedInline, _fixedReferrer);
+        checker.checkOptionConstraints();
     }
 
     public boolean hasFixedCondition() {
@@ -1234,197 +1189,12 @@ public class ForeignKey implements Constraint {
     }
 
     protected void analyzeDynamicFixedConditionIfNeeds() { // lazy called
-        if (!_dynamicFixedConditionMap.isEmpty()) {
-            return; // already initialized
-        }
-        if (_fixedCondition == null || _fixedCondition.trim().length() == 0) {
-            return; // no fixed condition
-        }
-        if (!_fixedCondition.contains("/*") || !_fixedCondition.contains("*/")) {
-            return; //  no dynamic (no bind variable) fixed condition
-        }
-        final Map<String, String> fixedConditionReplacementMap = new LinkedHashMap<String, String>();
-        String currentString = _fixedCondition;
-        while (true) {
-            if (currentString == null || currentString.trim().length() == 0) {
-                break;
-            }
-            final int startIndex = currentString.indexOf("/*");
-            if (startIndex < 0) {
-                break;
-            }
-            final int endIndex = currentString.indexOf("*/");
-            if (endIndex < 0) {
-                break;
-            }
-            if (startIndex >= endIndex) {
-                break;
-            }
-            // e.g.
-            //  /*targetDate(Date)*/ -> targetDate(Date)
-            //  /*$cls(MemberStatus.Formalized)*/ -> $cls(MemberStatus.Formalized)
-            final String peace = currentString.substring(startIndex + "/*".length(), endIndex);
-
-            // Modify the variable 'currentString' for next loop!
-            currentString = currentString.substring(endIndex + "*/".length());
-
-            final int typeStartIndex = peace.indexOf("(");
-            if (typeStartIndex < 0) {
-                continue;
-            }
-            final int typeEndIndex = peace.indexOf(")");
-            if (typeEndIndex < 0) {
-                continue;
-            }
-            if (typeStartIndex >= typeEndIndex) {
-                continue;
-            }
-
-            // e.g.
-            //  /*targetDate(Date)*/ -> Date
-            //  /*$cls(MemberStatus.Formalized)*/ -> MemberStatus.Formalized
-            String parameterType = peace.substring(typeStartIndex + "(".length(), typeEndIndex);
-            if (peace.startsWith("$cls")) { // embedded classification
-                // Not Dynamic (Embedded)
-                // e.g. $$localAlias$$.MEMBER_STATUS_CODE = /*$cls(MemberStatus.Formalized)*/null
-                final String code = extractFixedConditionEmbeddedCommentClassification(peace, parameterType);
-                final String expression = "/*" + peace + "*/";
-
-                // Remove test value because of hard code.
-                fixedConditionReplacementMap.put(expression + "null", expression);
-                fixedConditionReplacementMap.put(expression + "Null", expression);
-                fixedConditionReplacementMap.put(expression + "NULL", expression);
-
-                fixedConditionReplacementMap.put(expression, code);
-            } else { // dynamic binding
-                parameterType = filterDynamicFixedConditionParameterType(parameterType);
-                final String parameterName = peace.substring(0, typeStartIndex);
-                _dynamicFixedConditionMap.put(parameterName, parameterType);
-                final String parameterMapName = "parameterMap" + getForeignPropertyNameInitCap();
-                final String parameterBase = "$$locationBase$$." + parameterMapName;
-                final String bindVariableExp = "/*" + parameterBase + "." + parameterName + "*/";
-                fixedConditionReplacementMap.put("/*" + peace + "*/", bindVariableExp);
-
-                // e.g. /*IF $$parameterBase$$.foo != null*/
-                final String parameterBaseKey = "$$parameterBase$$";
-                if (!fixedConditionReplacementMap.containsKey(parameterBaseKey)) {
-                    fixedConditionReplacementMap.put(parameterBaseKey, parameterBase);
-                }
-            }
-        }
-        if (fixedConditionReplacementMap.isEmpty()) {
-            return;
-        }
-        for (Entry<String, String> entry : fixedConditionReplacementMap.entrySet()) {
+        final DfFixedConditionDynamicAnalyzer analyzer =
+                new DfFixedConditionDynamicAnalyzer(this, _fixedCondition, _dynamicFixedConditionMap);
+        final Map<String, String> replacementMap = analyzer.analyzeToReplacementMap();
+        for (Entry<String, String> entry : replacementMap.entrySet()) {
             _fixedCondition = replace(_fixedCondition, entry.getKey(), entry.getValue());
         }
-    }
-
-    protected String filterDynamicFixedConditionParameterType(String parameterType) {
-        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        final DfLanguagePropertyPackageResolver resolver = lang.getLanguagePropertyPackageResolver();
-        return resolver.resolvePackageName(parameterType);
-    }
-
-    // -----------------------------------------------------
-    //                        EmbeddedComment Classification
-    //                        ------------------------------
-    protected String extractFixedConditionEmbeddedCommentClassification(String peace, String parameterType) {
-        // peace is e.g. $cls(MemberStatus.Formalized)
-        // parameterType is e.g. MemberStatus.Formalized
-        if (!parameterType.contains(".")) {
-            String msg = "The classification expression should be 'classificationName.elementName':";
-            msg = msg + " expression=" + parameterType + " embeddedComment=" + peace;
-            throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
-        }
-        final String classificationName = parameterType.substring(0, parameterType.indexOf(".")); // e.g. MemberStatus
-        final String elementName = parameterType.substring(parameterType.indexOf(".") + ".".length()); // e.g. Formalized
-        final Map<String, DfClassificationTop> topMap = getClassificationProperties().getClassificationTopMap();
-        final DfClassificationTop classificationTop = topMap.get(classificationName);
-        if (classificationTop == null) {
-            throwFixedConditionEmbeddedCommentClassificationNotFoundException(classificationName);
-        }
-        String code = doExtractFixedConditionEmbeddedCommentClassificationNormalCode(classificationTop, elementName);
-        if (code != null) {
-            return code;
-        }
-        // may be group here
-        code = doExtractFixedConditionEmbeddedCommentClassificationGroupCode(classificationTop, elementName);
-        if (code != null) {
-            return code;
-        }
-        throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(classificationTop, elementName);
-        return null; // unreachable
-    }
-
-    protected String doExtractFixedConditionEmbeddedCommentClassificationNormalCode(DfClassificationTop classificationTop,
-            String elementName) {
-        final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
-        String code = null;
-        for (final DfClassificationElement element : elementList) {
-            final String name = element.getName();
-            if (elementName.equals(name)) {
-                code = quoteClassifiationElementIfNeeds(classificationTop, element.getCode());
-                break;
-            }
-        }
-        return code;
-    }
-
-    protected String doExtractFixedConditionEmbeddedCommentClassificationGroupCode(DfClassificationTop classificationTop, String elementName) {
-        String code = null;
-        final List<DfClassificationGroup> groupList = classificationTop.getGroupList();
-        for (DfClassificationGroup group : groupList) {
-            final String groupName = group.getGroupName();
-            if (elementName.equals(groupName)) {
-                final List<DfClassificationElement> groupElementList = group.getElementList();
-                StringBuilder sb = new StringBuilder();
-                for (DfClassificationElement groupelement : groupElementList) {
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append(quoteClassifiationElementIfNeeds(classificationTop, groupelement.getCode()));
-                }
-                sb.insert(0, "(").append(")");
-                code = sb.toString();
-                break;
-            }
-        }
-        return code;
-    }
-
-    protected String quoteClassifiationElementIfNeeds(DfClassificationTop classificationTop, String code) {
-        return classificationTop.isCodeTypeNeedsQuoted() ? Srl.quoteSingle(code) : code;
-    }
-
-    protected void throwFixedConditionEmbeddedCommentClassificationNotFoundException(String classificationName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the classification in fixed condition.");
-        br.addItem("Foreign Key");
-        br.addElement(_name);
-        br.addItem("NotFound Classification");
-        br.addElement(classificationName);
-        final String msg = br.buildExceptionMessage();
-        throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
-    }
-
-    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(DfClassificationTop classificationTop,
-            String elementName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the classification element in fixed condition.");
-        br.addItem("Foreign Key");
-        br.addElement(_name);
-        br.addItem("Classification Name");
-        br.addElement(classificationTop.getClassificationName());
-        br.addItem("NotFound Element");
-        br.addElement(elementName);
-        br.addItem("Defined Element");
-        final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
-        for (DfClassificationElement element : elementList) {
-            br.addElement(element);
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
     }
 
     // ===================================================================================

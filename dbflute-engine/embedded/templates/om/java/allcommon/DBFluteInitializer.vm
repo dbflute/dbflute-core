@@ -145,6 +145,9 @@ public class ${glDBFluteInitializer} {
         return dataSourceFqcn.startsWith("org.apache.commons.dbcp.")
             || dataSourceFqcn.startsWith("org.apache.commons.dbcp2.")
             || dataSourceFqcn.startsWith("org.apache.tomcat.jdbc.pool.")
+#if ($database.hasDBFluteBeansTransactionalDataSourcePackage())
+            || dataSourceFqcn.startsWith("${database.DBFluteBeansTransactionalDataSourcePackage}.") // your data source
+#end
             || dataSourceFqcn.startsWith("com.zaxxer.hikari.");
     }
 

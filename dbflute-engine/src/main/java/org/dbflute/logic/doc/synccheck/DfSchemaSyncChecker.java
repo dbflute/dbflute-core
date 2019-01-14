@@ -112,7 +112,7 @@ public class DfSchemaSyncChecker {
         _log.info("*    Target Schema (previous)   *");
         _log.info("*                               *");
         _log.info("* * * * * * * * * * * * * * * * *");
-        serializeTargetSchema();
+        serializeTargetSchema(); // should be before main schema, making only schemaXml
 
         _log.info("");
         _log.info("* * * * * * * * * * * * * * * * *");
@@ -120,10 +120,10 @@ public class DfSchemaSyncChecker {
         _log.info("*       Main Schema (next)      *");
         _log.info("*                               *");
         _log.info("* * * * * * * * * * * * * * * * *");
-        return serializeMainSchema();
+        return serializeMainSchema(); // with diff process
     }
 
-    protected DfSchemaXmlSerializer serializeTargetSchema() {
+    protected DfSchemaXmlSerializer serializeTargetSchema() { // as previous
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
         targetSerializer.suppressSchemaDiff(); // same reason as main schema
@@ -131,7 +131,7 @@ public class DfSchemaSyncChecker {
         return targetSerializer;
     }
 
-    protected DfSchemaXmlSerializer serializeMainSchema() {
+    protected DfSchemaXmlSerializer serializeMainSchema() { // as next
         final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
         mainSerializer.suppressSchemaDiff(); // because of comparison with other schema
         mainSerializer.serialize();
@@ -177,19 +177,20 @@ public class DfSchemaSyncChecker {
     // ===================================================================================
     //                                                                          Serializer
     //                                                                          ==========
-    protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) {
+    protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) { // as previous
         final UnifiedSchema targetSchema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
         _log.info("schema: " + targetSchema);
-        return doCreateSerializer(new DfSchemaSource(targetDs, targetSchema));
+        final String historyFile = /*historyFile*/null; // to make only schemaXml as target (previous)
+        return doCreateSerializer(new DfSchemaSource(targetDs, targetSchema), historyFile);
     }
 
-    protected DfSchemaXmlSerializer createMainSerializer() {
+    protected DfSchemaXmlSerializer createMainSerializer() { // as next
         _log.info("schema: " + _mainSource.getSchema());
-        return doCreateSerializer(_mainSource);
+        final String historyFile = getDiffMapFile(); // needs to make for comparing with target (previous)
+        return doCreateSerializer(_mainSource, historyFile);
     }
 
-    protected DfSchemaXmlSerializer doCreateSerializer(DfSchemaSource dataSource) {
-        final String historyFile = getDiffMapFile();
+    protected DfSchemaXmlSerializer doCreateSerializer(DfSchemaSource dataSource, String historyFile) {
         final String schemaXml = getSchemaXml();
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, schemaXml, historyFile);
         final String craftMetaDir = getSchemaSyncCheckCraftMetaDir();

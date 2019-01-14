@@ -368,6 +368,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
         final DfSchemaXmlReader reader = _previousReader;
         if (!reader.exists()) {
             _firstTime = true;
+
+            // to make history of the first time @since 1.1.9
+            _previousDb = new Database(); // dummy database (has no object, can return empty)
+            _previousTableCount = 0; // fixedly no table
             return;
         }
         try {
@@ -380,11 +384,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     public void loadNextSchema() { // after loading previous schema
-        if (isFirstTime()) {
-            String msg = "You should not call this because of first time.";
-            throw new IllegalStateException(msg);
-        }
-        if (_previousDb == null) {
+        // to make history of the first time @since 1.1.9
+        //if (isFirstTime()) {
+        //    String msg = "You should not call this because of first time.";
+        //    throw new IllegalStateException(msg);
+        //}
+        if (_previousDb == null) { // always exists after loadPreviousSchema() even if first time
             String msg = "You should not call this because of previous not loaded.";
             throw new IllegalStateException(msg);
         }
@@ -392,6 +397,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         try {
             _nextDb = reader.read().getDatabase();
         } catch (RuntimeException e) {
+            _loadingFailure = true;
             handleReadingException(e, reader);
         }
         _diffDate = DBFluteSystem.currentDate();
@@ -688,7 +694,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     /**
      * Find the table from next schema by table object. <br>
-     * This method can be used after {@link #loadNextSchema()}.
+     * This method can be used after loadNextSchema().
      *
      * @param table The object of target table that has table name. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
@@ -699,7 +705,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     /**
      * Find the table from previous schema by table object. <br>
-     * This method can be used after {@link #loadPreviousSchema()}.
+     * This method can be used after loadPreviousSchema().
      *
      * @param table The object of target table that has table name. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
@@ -710,7 +716,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     /**
      * Find the table from previous schema by table name. <br>
-     * This method can be used after {@link #loadPreviousSchema()}.
+     * This method can be used after loadPreviousSchema().
      *
      * @param tableDbName The DB name of target table. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
@@ -1552,13 +1558,15 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     public boolean canReadNext() {
-        return !isFirstTime() && !isLoadingFailure();
+        // can read even if first time, to make history of first time @since 1.1.9
+        //return !isFirstTime() && !isLoadingFailure();
+        return !isLoadingFailure();
     }
 
     /**
      * Is the first time to read the schema? <br>
      * It also means previous schema info was not found. <br>
-     * This determination is set after {@link #loadPreviousSchema()}.
+     * This determination is set after loadPreviousSchema().
      *
      * @return The determination, true or false.
      */

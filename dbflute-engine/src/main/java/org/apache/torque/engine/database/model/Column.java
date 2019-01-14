@@ -1922,6 +1922,14 @@ public class Column {
         return isForceClassificationSetting();
     }
 
+    public String getPropertySettingModifierOfNativeInScope() { // for compatible
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isCompatibleNativeInScopePublicForcedly()) {
+            return getLanguageDependency().getLanguageGrammar().getPublicModifier();
+        }
+        return getPropertySettingModifier();
+    }
+
     // ===================================================================================
     //                                                               Sql2Entity Definition
     //                                                               =====================
@@ -2667,12 +2675,15 @@ public class Column {
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
+    public boolean isSequence() {
+        return isPrimaryKey() && getTable().hasSinglePrimaryKey() && getTable().isUseSequence();
+    }
+
     public boolean isIdentityOrSequence() { // for Schema HTML
         if (isIdentity()) {
             return true;
         }
-        final Table table = getTable();
-        if (isPrimaryKey() && table.hasSinglePrimaryKey() && table.isUseSequence()) {
+        if (isSequence()) {
             return true;
         }
         return false;

@@ -70,7 +70,7 @@ public class DfDispatchVariableResolver {
     // ===================================================================================
     //                                                                   Password Variable
     //                                                                   =================
-    public String resolvePasswordVariable(final String propTitle, final String user, String password) {
+    public String resolvePasswordVariable(String propTitle, String user, String password) {
         final String resolved = doResolveDispatchVariable(propTitle, password, new DfDispatchVariableCallback() {
             public void throwNotFoundException(String propTitle, String plainValue, File dispatchFile) {
                 throwDatabaseUserPasswordFileNotFoundException(propTitle, user, plainValue, dispatchFile);
@@ -108,11 +108,11 @@ public class DfDispatchVariableResolver {
         if (Srl.is_Null_or_TrimmedEmpty(plainValue)) {
             return plainValue;
         }
+        // first: resolve $$env:
+        // second: resolve outside-file (contains env-resolved)
         final DfEnvironmentVariableInfo envInfo = handleEnvironmentVariable(propTitle, plainValue);
-        if (envInfo != null) {
-            return envInfo.getEnvValue();
-        }
-        return handleOutsideFileVariable(propTitle, plainValue, callback);
+        final String envResolvedValue = envInfo != null ? envInfo.getEnvValue() : plainValue;
+        return handleOutsideFileVariable(propTitle, envResolvedValue, callback);
     }
 
     // -----------------------------------------------------
@@ -121,27 +121,48 @@ public class DfDispatchVariableResolver {
     protected DfEnvironmentVariableInfo handleEnvironmentVariable(String propTitle, String plainValue) {
         final String prefix = "$$env:";
         final String suffix = "$$";
-        if (plainValue != null && plainValue.startsWith(prefix) && plainValue.endsWith(suffix)) {
-            final ScopeInfo scopeInfo = Srl.extractScopeWide(plainValue, prefix, suffix);
-            final ProcessBuilder pb = new ProcessBuilder();
-            final Map<String, String> map = pb.environment();
-            if (map != null) { // might be no way, just in case
-                final String key = scopeInfo.getContent().trim();
-                final String realValue = map.get(key);
-                if (realValue != null) {
-                    final DfEnvironmentVariableInfo info = new DfEnvironmentVariableInfo();
-                    info.setEnvName(key);
-                    info.setEnvValue(realValue);
-                    return info;
-                } else {
-                    throwNotFoundEnvironmentVariableException(propTitle, plainValue, key, map);
-                }
+        if (!existsEnvironmentVariable(propTitle, plainValue, prefix, suffix)) {
+            return null;
+        }
+        // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$
+        final Map<String, String> envMap = extractEnvironmentMap();
+        final ScopeInfo scopeInfo = Srl.extractScopeFirst(plainValue, prefix, suffix);
+        final String envKey = scopeInfo.getContent().trim(); // e.g. DBFLUTE_MAIHAMADB_JDBC_URL
+        final String envValue = envMap.get(envKey);
+        final String realValue;
+        if (envValue != null) { // switch variable to value
+            final String front = Srl.ltrim(scopeInfo.substringInterspaceToPrevious());
+            final String rear = Srl.rtrim(Srl.substringFirstFront(scopeInfo.substringInterspaceToNext(), "|"));
+            realValue = front + envValue + rear;
+        } else { // no environment
+            final String interspaceToNext = scopeInfo.substringInterspaceToNext().trim();
+            if (interspaceToNext.contains("|")) {
+                // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$ | jdbc:mysql://localhost:3306/maihamadb
+                realValue = Srl.substringFirstRear(interspaceToNext, "|").trim();
+            } else {
+                throwNotFoundEnvironmentVariableException(propTitle, plainValue, envKey, envMap);
+                return null; // unreachable
             }
         }
-        return null;
+        final DfEnvironmentVariableInfo info = new DfEnvironmentVariableInfo();
+        info.setEnvName(envKey);
+        info.setEnvValue(realValue);
+        return info;
     }
 
-    protected void throwNotFoundEnvironmentVariableException(String propTitle, String definedValue, String key, Map<String, String> map) {
+    protected boolean existsEnvironmentVariable(String propTitle, String plainValue, String prefix, String suffix) {
+        // e.g. $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$
+        //   or $$env:DBFLUTE_MAIHAMADB_JDBC_URL$$ | jdbc:mysql://localhost:3306/maihamadb
+        return plainValue != null && plainValue.contains(prefix) && Srl.substringFirstRear(plainValue, prefix).contains(suffix);
+    }
+
+    protected Map<String, String> extractEnvironmentMap() {
+        final ProcessBuilder pb = new ProcessBuilder();
+        return pb.environment(); // not null (see source code)
+    }
+
+    protected void throwNotFoundEnvironmentVariableException(String propTitle, String definedValue, String envKey,
+            Map<String, String> envMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the environment variable for the key");
         br.addItem("Property Title");
@@ -149,9 +170,9 @@ public class DfDispatchVariableResolver {
         br.addItem("Defined in dfprop");
         br.addElement(definedValue);
         br.addItem("NotFound Key");
-        br.addElement(key);
+        br.addElement(envKey);
         br.addItem("Existing Variable");
-        br.addElement(map.keySet());
+        br.addElement(envMap.keySet());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
@@ -165,27 +186,14 @@ public class DfDispatchVariableResolver {
             return plainValue;
         }
         final File dispatchFile = outsideFileInfo.getDispatchFile();
-        final String resolved = outsideFileInfo.getOutsideValue();
-        if (!dispatchFile.exists()) {
-            if (resolved == null) {
+        final String defaultValue = outsideFileInfo.getNofileDefaultValue(); // means default value
+        if (existsOutsideFile(dispatchFile)) {
+            return readOutsideFileFirstLine(dispatchFile, defaultValue);
+        } else {
+            if (defaultValue == null) {
                 callback.throwNotFoundException(propTitle, plainValue, dispatchFile);
             }
-            return resolved; // no dispatch file
-        }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(dispatchFile), "UTF-8"));
-            final String line = br.readLine();
-            return line; // first line in the dispatch file is value
-        } catch (Exception continued) {
-            _log.info("Failed to read the dispatch file: " + dispatchFile);
-            return resolved; // e.g. no password
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {}
-            }
+            return defaultValue; // no dispatch file
         }
     }
 
@@ -195,21 +203,43 @@ public class DfDispatchVariableResolver {
             return null;
         }
         final String fileName;
-        final String outsideValue;
+        final String defaultValue;
         {
             final String content = Srl.substringFirstRear(plainValue, prefix);
             if (content.contains("|")) {
-                fileName = Srl.substringFirstFront(content, "|");
-                outsideValue = Srl.substringFirstRear(content, "|");
+                fileName = Srl.substringFirstFront(content, "|").trim();
+                defaultValue = Srl.substringFirstRear(content, "|").trim();
             } else {
                 fileName = content;
-                outsideValue = null;
+                defaultValue = null;
             }
         }
         final File dispatchFile = new File("./dfprop/" + fileName);
         final DfOutsideFileVariableInfo variableInfo = new DfOutsideFileVariableInfo();
         variableInfo.setDispatchFile(dispatchFile);
-        variableInfo.setOutsideValue(outsideValue);
+        variableInfo.setNofileDefaultValue(defaultValue);
         return variableInfo;
+    }
+
+    protected boolean existsOutsideFile(File dispatchFile) {
+        return dispatchFile.exists();
+    }
+
+    protected String readOutsideFileFirstLine(File dispatchFile, String defaultValue) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(dispatchFile), "UTF-8"));
+            final String line = br.readLine();
+            return line; // first line in the dispatch file is value
+        } catch (Exception continued) {
+            _log.info("Failed to read the dispatch file: " + dispatchFile);
+            return defaultValue; // e.g. no password
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {}
+            }
+        }
     }
 }

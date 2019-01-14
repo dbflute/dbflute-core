@@ -27,6 +27,7 @@ import org.dbflute.exception.DfSchemaPolicyCheckIllegalIfThenStatementException;
 import org.dbflute.exception.DfSchemaPolicyCheckIllegalThenNotThemeException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
+import org.dbflute.exception.DfSchemaPolicyCheckUnknownVariableException;
 import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
@@ -184,17 +185,19 @@ public class DfSPolicyLogicalSecretary {
     // ===================================================================================
     //                                                                           Hit Logic
     //                                                                           =========
-    public boolean isHitExp(String exp, String hint) {
-        return determineHitBy(exp, hint);
+    public boolean isHitExp(DfSPolicyStatement statement, String exp, String hint) {
+        return determineHitBy(statement, exp, hint);
     }
 
-    protected boolean determineHitBy(String name, String hint) { // hint is e.g. prefix:MEMBER
+    protected boolean determineHitBy(DfSPolicyStatement statement, String name, String hint) { // hint is e.g. prefix:MEMBER
         if (name == null) {
             return false;
         }
         if ("$$ALL$$".equalsIgnoreCase(hint)) { // e.g. tableName is $$ALL$$
             return true;
-        } else if (hint.contains(" and ")) { // e.g. tableName is prefix:MEMBER and suffix:_HISTORY
+        }
+        checkUnknownVariable(statement, name, hint); // should be after $$ALL$$ process
+        if (hint.contains(" and ")) { // e.g. tableName is prefix:MEMBER and suffix:_HISTORY
             final List<String> elementHintList = Srl.splitListTrimmed(hint, " and ");
             for (String elementHint : elementHintList) {
                 if (!DfNameHintUtil.isHitByTheHint(name, elementHint)) {
@@ -212,6 +215,37 @@ public class DfSPolicyLogicalSecretary {
             return false;
         } else {
             return DfNameHintUtil.isHitByTheHint(name, hint);
+        }
+    }
+
+    protected void checkUnknownVariable(DfSPolicyStatement statement, String name, String hint) {
+        if (Srl.count(hint, "$$") >= 2) {
+            ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Unknown variable in the SchemaPolicyCheck statement.");
+            br.addItem("Advice");
+            br.addElement("Confirm your statement in schemaPolicyMap.dfprop");
+            br.addElement("and see the official document.");
+            br.addElement("You can use only reserved variables.");
+            br.addElement("For example:");
+            br.addElement("  (o):");
+            br.addElement("    columnName is $$ALL$$");
+            br.addElement("    fkName is prefix:FK_$$table$$");
+            br.addElement("    alias is not $$columnName$$");
+            br.addElement("    alias is not $$comment$$");
+            br.addElement("  (x):");
+            br.addElement("    columnName is $$sea$$");
+            br.addElement("    columnName is $$land$$");
+            br.addElement("    columnName is $$piari$$");
+            br.addElement("    columnName is $$bonvo$$");
+            br.addElement("    columnName is $$dstore$$");
+            br.addItem("Statement");
+            br.addElement(statement.getNativeExp());
+            br.addItem("Current Data");
+            br.addElement(name);
+            br.addItem("Unresolved Keyword");
+            br.addElement(hint);
+            final String msg = br.buildExceptionMessage();
+            throw new DfSchemaPolicyCheckUnknownVariableException(msg);
         }
     }
 
@@ -236,7 +270,13 @@ public class DfSPolicyLogicalSecretary {
     //                                                              Conversion for Display
     //                                                              ======================
     public String toTableDisp(Table table) {
-        return table.getAliasExpression() + table.getTableDispName();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(table.getAliasExpression());
+        sb.append(table.getTableDispName());
+        if (table.hasComment()) {
+            sb.append(" // ").append(Srl.cut(table.getComment(), 10, "..."));
+        }
+        return sb.toString();
     }
 
     public String toColumnDisp(Column column) { // e.g. (Sea.Sea Name)SEA.SEA_NAME VARCHAR(100) (NotNull) 
@@ -258,6 +298,9 @@ public class DfSPolicyLogicalSecretary {
             sb.append("(").append(column.getColumnSize()).append(")");
         }
         sb.append(" ").append(column.isNotNull() ? "(NotNull)" : "(NullAllowed)");
+        if (column.hasComment()) {
+            sb.append(" // ").append(Srl.cut(column.getComment(), 10, "..."));
+        }
         return sb.toString();
     }
 
@@ -267,7 +310,16 @@ public class DfSPolicyLogicalSecretary {
     public boolean isNotIdentityIfPureIDPK(Table table) {
         if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
             final Column pk = table.getPrimaryKeyAsOne();
-            return !pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity();
+            return !pk.isForeignKey() && Srl.endsWithIgnoreCase(pk.getName(), "ID") && !pk.isIdentity();
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isNotSequenceIfPureIDPK(Table table) {
+        if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
+            final Column pk = table.getPrimaryKeyAsOne();
+            return !pk.isForeignKey() && Srl.endsWithIgnoreCase(pk.getName(), "ID") && !pk.isSequence();
         } else {
             return false;
         }

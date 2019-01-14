@@ -462,6 +462,112 @@ public abstract class EngineTestCase extends TestCase { // similar to PlainTestC
     }
 
     // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
+    /**
+     * Assert that the callback throws the exception.
+     * <pre>
+     * String <span style="color: #553000">str</span> = <span style="color: #70226C">null</span>;
+     * <span style="color: #CC4747">assertException</span>(NullPointerException.<span style="color: #70226C">class</span>, () <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">str</span>.toString());
+     * 
+     * <span style="color: #CC4747">assertException</span>(NullPointerException.<span style="color: #70226C">class</span>, () <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">str</span>.toString()).<span style="color: #994747">handle</span>(<span style="color: #553000">cause</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     assertContains(<span style="color: #553000">cause</span>.getMessage(), ...);
+     * });
+     * </pre>
+     * @param <CAUSE> The type of expected cause exception. 
+     * @param exceptionType The expected exception type. (NotNull)
+     * @param noArgInLambda The callback for calling methods that should throw the exception. (NotNull)
+     * @return The after object that has handler of expected cause for chain call. (NotNull) 
+     */
+    protected <CAUSE extends Throwable> ExceptionExpectationAfter<CAUSE> assertException(Class<CAUSE> exceptionType,
+            ExceptionExaminer noArgInLambda) {
+        assertNotNull(exceptionType);
+        final String expected = exceptionType.getSimpleName();
+        Throwable cause = null;
+        try {
+            noArgInLambda.examine();
+        } catch (Throwable e) {
+            cause = e;
+            final Class<? extends Throwable> causeClass = cause.getClass();
+            final String exp = buildExceptionSimpleExp(cause);
+            if (!exceptionType.isAssignableFrom(causeClass)) {
+                final String actual = causeClass.getSimpleName();
+                log("*Different exception, expected: {} but...", exceptionType.getName(), cause);
+                fail("*Different exception, expected: " + expected + " but: " + actual + " => " + exp);
+            } else {
+                log("expected: " + exp);
+            }
+        }
+        if (cause == null) {
+            fail("*No exception, expected: " + expected);
+        }
+        @SuppressWarnings("unchecked")
+        final CAUSE castCause = (CAUSE) cause;
+        return new ExceptionExpectationAfter<CAUSE>(castCause);
+    }
+
+    private String buildExceptionSimpleExp(Throwable cause) {
+        final StringBuilder sb = new StringBuilder();
+        final String firstMsg = cause.getMessage();
+        boolean line = firstMsg != null && firstMsg.contains(ln());
+        sb.append("(").append(cause.getClass().getSimpleName()).append(")").append(firstMsg);
+        final Throwable secondCause = cause.getCause();
+        if (secondCause != null) {
+            final String secondMsg = secondCause.getMessage();
+            line = line || secondMsg != null && secondMsg.contains(ln());
+            sb.append(line ? ln() : " / ");
+            sb.append("(").append(secondCause.getClass().getSimpleName()).append(")").append(secondMsg);
+            final Throwable thirdCause = secondCause.getCause();
+            if (thirdCause != null) {
+                final String thirdMsg = thirdCause.getMessage();
+                line = line || thirdMsg != null && thirdMsg.contains(ln());
+                sb.append(line ? ln() : " / ");
+                sb.append("(").append(thirdCause.getClass().getSimpleName()).append(")").append(thirdMsg);
+            }
+        }
+        final String whole = sb.toString();
+        return (whole.contains(ln()) ? ln() : "") + whole;
+    }
+
+    @FunctionalInterface
+    public interface ExceptionExaminer {
+
+        /**
+         * Examine the process, should throw the specified exception.
+         */
+        void examine();
+    }
+
+    public class ExceptionExpectationAfter<CAUSE extends Throwable> {
+
+        protected final CAUSE cause; // not null
+
+        /**
+         * @param cause The expected cause. (NotNull)
+         */
+        public ExceptionExpectationAfter(CAUSE cause) {
+            this.cause = cause;
+        }
+
+        /**
+         * Handle the expected cause to assert.
+         * @param oneArgLambda The callback for handling of expected cause. (NotNull)
+         */
+        public void handle(ExceptionExpectationCall<CAUSE> oneArgLambda) {
+            oneArgLambda.callback(cause);
+        }
+    }
+
+    @FunctionalInterface
+    public interface ExceptionExpectationCall<CAUSE extends Throwable> {
+
+        /**
+         * @param cause The expected cause. (NotNull)
+         */
+        void callback(CAUSE cause);
+    }
+
+    // -----------------------------------------------------
     //                                             Mark Here
     //                                             ---------
     /**

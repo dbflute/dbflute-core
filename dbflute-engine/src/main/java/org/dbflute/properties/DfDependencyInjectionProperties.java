@@ -265,6 +265,15 @@ public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProp
         return getProperty("dbfluteBeansRuntimeComponentPrefix", null);
     }
 
+    public boolean hasDBFluteBeansTransactionalDataSourcePackage() { // Java Only
+        return getDBFluteBeansTransactionalDataSourcePackage() != null;
+    }
+
+    public String getDBFluteBeansTransactionalDataSourcePackage() { // Java Only
+        // you can add needsSpringTransactionalDataSource() determination for e.g. AbstractRoutingDataSource
+        return getProperty("dbfluteBeansTransactionalDataSourcePackage", null);
+    }
+
     // ===================================================================================
     //                                                                            Lasta Di
     //                                                                            ========

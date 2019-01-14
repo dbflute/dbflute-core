@@ -20,26 +20,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.function.Consumer;
 
 /**
  * @author jflute
  * @since 0.9.8.3 (2011/05/03 Tuesday)
  */
-public class ProcessConsoleReader extends Thread {
+public class ProcessConsoleReader extends Thread { // basically memorable code...
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final BufferedReader _reader;
-    protected final StringBuilder _consoleSb = new StringBuilder();
+    protected final BufferedReader _reader; // not null
+    protected final Consumer<String> _liner; // null allowed
+    protected final StringBuilder _consoleSb = new StringBuilder(); // not null
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ProcessConsoleReader(InputStream ins, String encoding) {
-        encoding = encoding != null ? encoding : "UTF-8";
+    public ProcessConsoleReader(InputStream ins, String encoding, Consumer<String> liner) {
+        assertObjectNotNull("ins", ins);
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
         try {
             _reader = new BufferedReader(new InputStreamReader(ins, encoding));
+            _liner = liner;
         } catch (UnsupportedEncodingException e) {
             String msg = "Failed to create a reader by the encoding: " + encoding;
             throw new IllegalStateException(msg);
@@ -50,6 +54,12 @@ public class ProcessConsoleReader extends Thread {
     //                                                                                Read
     //                                                                                ====
     public String read() {
+        try {
+            join(); // needs to use non-thread-safe StringBuilder
+        } catch (InterruptedException e) {
+            String msg = "The join() was interrupted.";
+            throw new IllegalStateException(msg, e);
+        }
         return _consoleSb.toString();
     }
 
@@ -65,10 +75,7 @@ public class ProcessConsoleReader extends Thread {
                 if (line == null) {
                     break;
                 }
-                if (sb.length() > 0) {
-                    sb.append("\n");
-                }
-                sb.append(line);
+                handleLine(sb, line);
             }
         } catch (IOException e) {
             String msg = "Failed to read the stream: " + _reader;
@@ -79,4 +86,44 @@ public class ProcessConsoleReader extends Thread {
             } catch (IOException ignored) {}
         }
     }
+
+    protected void handleLine(StringBuilder sb, String line) {
+        if (_liner != null) {
+            _liner.accept(line);
+        }
+        if (sb.length() > 0) {
+            sb.append("\n");
+        }
+        sb.append(line);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull(variableName, value);
+        if (value.trim().length() == 0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
 }

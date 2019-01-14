@@ -247,6 +247,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return getProperty("schemaHtmlFileName", defaultName, getDocumentMap());
     }
 
+    public boolean isSuppressSchemaHtmlArrangeQuery() {
+        return isProperty("isSuppressSchemaHtmlArrangeQuery", false, getDocumentMap());
+    }
+
     public boolean isSuppressSchemaHtmlOutsideSql() {
         return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentMap());
     }
