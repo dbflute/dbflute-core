@@ -66,9 +66,9 @@ h3 {
 h4 {
 	padding: 0 0 0 10px;
 	margin: 1em 10% 0 1em;
-	border-top: solid 1px #af0000;
-	border-bottom: solid 1px #af0000;
-	font-size: 1.4em;
+	border-top: none;
+	border-bottom: solid 1px #663333;
+	font-size: 1.3em;
 	color: #333333;
 }
 
@@ -238,6 +238,46 @@ span.tableschematitle {
 span.tablefirstdatetitle {
 	font-size: 0.5em;
 	color: #888888;
+}
+
+/* -------------------------------------------------
+                                    Arrange Query
+------------------------------------------------- */
+span.arrqycount {
+	font-size: 0.5em;
+}
+dl.arrqylist {
+	margin-top: 0.7em;
+	padding-left: 3em;
+}
+dl.arrqylist dt {
+	display: list-item;
+	list-style-type: circle;
+	font-size: 1.3em;
+	margin-top: 0.3em;
+}
+dl.arrqylist dd {
+	padding-left: 1em;
+}
+dl.arrqylist dd pre {
+	font-size: 1.1em;
+}
+dl.arrqylist dd.subinfo {
+	padding-left: 2em;
+}
+dl.arrqylist dd.subinfo span.sqlap {
+	font-style: italic;
+	color: #002266;
+}
+dl.arrqylist dd.subinfo span.file {
+	font-style: italic;
+	color: #002266;
+}
+dl.arrqylist dd.subinfo span.ctet {
+	color: green;
+}
+dl.arrqylist dd.subinfo span.pmb {
+	color: green;
 }
 
 /* -------------------------------------------------
@@ -419,11 +459,15 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
 #end
 <div class="navilinkarea">
-#if ($database.hasClassificationDefinition() || $database.isSchemaHtmlOutsideSqlValid() || $database.isSchemaHtmlProcedureValid())
+#if ($database.hasClassificationDefinition() || $database.isSchemaHtmlArrangeQueryValid() || $database.isSchemaHtmlOutsideSqlValid() || $database.isSchemaHtmlProcedureValid())
 #set ($linkDelimiter = "")
 <p class="sublink">
 #if ($database.hasClassificationDefinition())
 ${linkDelimiter} <a href="#cdef">Classification Definition</a>
+#set ($linkDelimiter = "|")
+#end
+#if ($database.isSchemaHtmlArrangeQueryValid())
+${linkDelimiter} <a href="#arrangequery">ArrangeQuery List</a>
 #set ($linkDelimiter = "|")
 #end
 #if ($database.isSchemaHtmlOutsideSqlValid())
@@ -650,6 +694,34 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 </table>
 #end
 
+#if ($database.isSchemaHtmlArrangeQueryValid())
+<h2 id="arrangequery">ArrangeQuery List</h2>
+#foreach ($table in $database.tableDisplaySortedList)
+#if ($table.hasArrangeQuery())
+<h3 id="${table.tableIdForSchemaHtml}_arrqy"><a href="#${table.tableIdForSchemaHtml}">${table.tableDispName}</a></h3>
+#set ($beanMethodList = $table.arrangeQueryTable.beanMethodList)
+#if (!$beanMethodList.isEmpty())
+<h4 id="${table.tableIdForSchemaHtml}_arrqy_bean">${table.arrangeQueryTable.beanClassName}</h4>
+<dl class="arrqylist">
+#foreach ($beanMethod in $beanMethodList)
+	<dt>$beanMethod.buildTitleExpForSchemaHtml()</dt>
+	<dd>$beanMethod.buildDescriptionExpForSchemaHtml()</dd>
+#end
+</dl>
+#end
+#set ($queryMethodList = $table.arrangeQueryTable.queryMethodList)
+#if (!$queryMethodList.isEmpty())
+<h4 id="${table.tableIdForSchemaHtml}_arrqy_query">${table.arrangeQueryTable.queryClassName}</h4>
+<dl class="arrqylist">
+#foreach ($queryMethod in $queryMethodList)
+	<dt>$queryMethod.buildTitleExpForSchemaHtml()</dt>
+	<dd>$queryMethod.buildDescriptionExpForSchemaHtml()</dd>
+#end
+</dl>
+#end
+#end
+#end
+#end
 #if ($database.isSchemaHtmlOutsideSqlValid())
 <h2 id="outsidesql">OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)

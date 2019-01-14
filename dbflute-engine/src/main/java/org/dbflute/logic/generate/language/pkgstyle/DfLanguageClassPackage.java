@@ -48,6 +48,8 @@ public interface DfLanguageClassPackage {
 
     String getConditionBeanPackage();
 
+    String getConditionQueryPackage();
+
     String getExtendedBehaviorPackage();
 
     String getExtendedDaoPackage();

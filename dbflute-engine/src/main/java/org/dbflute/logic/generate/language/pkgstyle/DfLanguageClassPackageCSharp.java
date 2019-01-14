@@ -78,6 +78,10 @@ public class DfLanguageClassPackageCSharp implements DfLanguageClassPackage {
         return "CBean";
     }
 
+    public String getConditionQueryPackage() {
+        return getConditionBeanPackage() + ".Cq";
+    }
+
     public String getExtendedBehaviorPackage() {
         return "ExBhv";
     }
