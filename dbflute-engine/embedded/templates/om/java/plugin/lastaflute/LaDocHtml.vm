@@ -92,7 +92,7 @@ h4 {
 }
 
 /* -------------------------------------------------
-                              LastaFlute Contents
+                                   Document Basic
 ------------------------------------------------- */
 .doctitle {
     font-size: 1.2em;
@@ -117,6 +117,10 @@ p.docsubitem {
     color: #666666;
 }
 
+/* -------------------------------------------------
+                                     Table Layout
+------------------------------------------------- */
+/* table basic */
 table {
     border-collapse:collapse;
     margin: 0.3em 0 1em 0;
@@ -143,14 +147,8 @@ td {
     padding:0.5em 0 0.1em 1em;
     margin-bottom: 1em;
 }
-.fieldcomment {
-    font-size: 0.9em;
-    color: #3F7E5E;
-}
-.fieldannotations {
-    font-size: 0.9em;
-    color: #666666;
-}
+
+/* row and cell */
 .rowcell {
     white-space: nowrap;
 }
@@ -175,6 +173,18 @@ table.child, table.child td, table.child th {
     border-left: none;
     border-bottom: 1px solid #aaa;
     border-right: 1px solid #aaa;
+}
+
+/* -------------------------------------------------
+                                      Field Items
+------------------------------------------------- */
+.fieldcomment {
+    font-size: 0.9em;
+    color: #3F7E5E;
+}
+.fieldannotations {
+    font-size: 0.9em;
+    color: #666666;
 }
 .clsgroup {
     font-size: 1.2em;
