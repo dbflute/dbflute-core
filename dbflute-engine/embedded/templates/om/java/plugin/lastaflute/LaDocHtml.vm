@@ -186,6 +186,13 @@ table.child, table.child td, table.child th {
     font-size: 0.9em;
     color: #666666;
 }
+.fieldpublicname {
+    color: #331100;
+}
+.fieldpropertyname {
+    font-size: 0.8em;
+    color: #444466;
+}
 .clsgroup {
     font-size: 1.2em;
     padding-left: 4px;

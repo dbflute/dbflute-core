@@ -18,14 +18,27 @@
     #set($typeDocMetaList = $typeDocMeta.parameterTypeDocMetaList)
 #end
 #if (!$typeDocMetaList.isEmpty())
+#set($showPublicName = false)
+#foreach ($nestTypeDocMeta in $typeDocMetaList)
+#if (!$showPublicName && $nestTypeDocMeta.name != $nestTypeDocMeta.publicName)
+#set($showPublicName = true)
+#end
+#end
 <table>
     <thead>
     <tr>
         <th class="rownumhead">No.</th>
+#if ($showPublicName)
+        <th>public name</th>
+#else
         <th>name</th>
+#end
         <th>type</th>
         <th>comment</th>
         <th>annotations</th>
+#if ($showPublicName)
+        <th>property name</th>
+#end
     </tr>
     </thead>
 #foreach ($nestTypeDocMeta in $typeDocMetaList)
@@ -35,7 +48,11 @@
 #end
     <tr>
         <td class="rowcellnum" rowspan="$rowspan">${foreach.count}</td>
+#if ($showPublicName)
+        <td class="fieldpublicname">${nestTypeDocMeta.publicName}</td>
+#else
         <td>${nestTypeDocMeta.name}</td>
+#end
         <td><p title="$manager.htmlEscape($nestTypeDocMeta.typeName)">$manager.htmlEscape($nestTypeDocMeta.simpleTypeName)</p></td>
         <td class="fieldcomment">
             <p title="$!manager.htmlEscape($nestTypeDocMeta.comment)">$!manager.htmlEscape($nestTypeDocMeta.description)</p>
@@ -49,6 +66,9 @@
 #end
 #end
         </td>
+#if ($showPublicName)
+        <td class="fieldpropertyname">${nestTypeDocMeta.name}</td>
+#end
     </tr>
 #if (!$nestTypeDocMeta.nestTypeDocMetaList.isEmpty())
     <tr>
