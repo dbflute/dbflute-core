@@ -72,7 +72,11 @@
     </tr>
 #if (!$nestTypeDocMeta.nestTypeDocMetaList.isEmpty())
     <tr>
-        <td colspan="4">
+#set ($nestcolspan = 4)
+#if ($showPublicName)
+#set ($nestcolspan = 5)
+#end
+        <td colspan="$nestcolspan">
             <div class="nestedbean">
 $generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
             </div>
