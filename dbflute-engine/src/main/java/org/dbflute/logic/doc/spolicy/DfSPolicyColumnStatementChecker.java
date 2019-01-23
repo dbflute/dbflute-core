@@ -18,6 +18,8 @@ package org.dbflute.logic.doc.spolicy;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
@@ -33,6 +35,7 @@ import org.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @author subaru
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
 public class DfSPolicyColumnStatementChecker {
@@ -175,8 +178,9 @@ public class DfSPolicyColumnStatementChecker {
         final String thenTheme = thenClause.getThenTheme(); // already not null here
         final boolean notThenClause = thenClause.isNotThenTheme();
         final String notOr = notThenClause ? "not " : "";
-        if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
-            result.violate(policy, "The column is no good: " + toColumnDisp(column));
+        final Matcher clsMatcher = Pattern.compile("classification\\((.*?)\\)").matcher(thenTheme);
+        if (thenTheme.equalsIgnoreCase("bad") && notThenClause) {
+            throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "bad");
         } else if (thenTheme.equalsIgnoreCase("notNull")) {
             if (!column.isNotNull() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be not-null: " + toColumnDisp(column));
@@ -204,6 +208,14 @@ public class DfSPolicyColumnStatementChecker {
         } else if (thenTheme.equalsIgnoreCase("classification")) {
             if (!column.hasClassification() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
+            }
+        } else if (clsMatcher.find()) {
+            String policyClsName = clsMatcher.group(1);
+            String clsName = column.getClassificationName();
+            if (notThenClause) {
+                throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
+            } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
+                result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
@@ -483,5 +495,9 @@ public class DfSPolicyColumnStatementChecker {
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
         _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+    }
+
+    protected void throwSchemaPolicyCheckIllegalThenNotThemeException(DfSPolicyStatement statement, String theme) {
+        _logicalSecretary.throwSchemaPolicyCheckIllegalThenNotThemeException(statement.getNativeExp(), theme);
     }
 }
