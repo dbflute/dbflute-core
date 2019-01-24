@@ -183,8 +183,12 @@ public class DfSPolicyColumnStatementChecker {
         final String thenTheme = thenClause.getThenTheme(); // already not null here
         final boolean notThenClause = thenClause.isNotThenTheme();
         final String notOr = notThenClause ? "not " : "";
-        if (thenTheme.equalsIgnoreCase("bad") && notThenClause) {
-            throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "bad");
+        if (thenTheme.equalsIgnoreCase("bad")) {
+            if (notThenClause) {
+                throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "bad");
+            } else {
+                result.violate(policy, "The column is no good: " + toColumnDisp(column));
+            }
         } else if (thenTheme.equalsIgnoreCase("notNull")) {
             if (!column.isNotNull() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be not-null: " + toColumnDisp(column));
