@@ -41,6 +41,11 @@ import org.dbflute.util.Srl;
 public class DfSPolicyColumnStatementChecker {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Pattern clsPattern = Pattern.compile("classification\\((.*?)\\)");
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyCrossSecretary _crossDeterminer;
@@ -178,7 +183,6 @@ public class DfSPolicyColumnStatementChecker {
         final String thenTheme = thenClause.getThenTheme(); // already not null here
         final boolean notThenClause = thenClause.isNotThenTheme();
         final String notOr = notThenClause ? "not " : "";
-        final Matcher clsMatcher = Pattern.compile("classification\\((.*?)\\)").matcher(thenTheme);
         if (thenTheme.equalsIgnoreCase("bad") && notThenClause) {
             throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "bad");
         } else if (thenTheme.equalsIgnoreCase("notNull")) {
@@ -209,13 +213,16 @@ public class DfSPolicyColumnStatementChecker {
             if (!column.hasClassification() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
             }
-        } else if (clsMatcher.find()) {
-            String policyClsName = clsMatcher.group(1);
-            String clsName = column.getClassificationName();
-            if (notThenClause) {
-                throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
-            } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
-                result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
+        } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) {
+            Matcher matcher = clsPattern.matcher(thenTheme);
+            if (matcher.find()) {   // surely go into if statement
+                String policyClsName = matcher.group(1);
+                String clsName = column.getClassificationName();
+                if (notThenClause) {
+                    throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
+                } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
+                    result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
+                }
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
