@@ -217,9 +217,9 @@ public class DfSPolicyColumnStatementChecker {
             if (!column.hasClassification() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
             }
-        } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) {
+        } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) {     // e.g. classification(MemberStatus)
             Matcher matcher = clsPattern.matcher(thenTheme);
-            if (matcher.find()) {   // surely go into if statement
+            if (matcher.find()) {
                 String policyClsName = matcher.group(1);
                 String clsName = column.getClassificationName();
                 if (notThenClause) {
@@ -227,6 +227,8 @@ public class DfSPolicyColumnStatementChecker {
                 } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
                     result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
                 }
+            } else {
+                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
