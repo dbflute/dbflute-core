@@ -114,16 +114,12 @@ public class DfSPolicyColumnStatementChecker {
             } else if ("classification".equalsIgnoreCase(ifValue)) {
                 return column.hasClassification() == !notIfValue;
             } else if (Srl.startsWithIgnoreCase(ifValue, "classification")) {
-                final String policyClsName = extractClsName(ifValue);
+                final String policyClsName = analyzeSpecifiedClsName(ifValue, statement);
                 final String clsName = column.getClassificationName(); // null allowed if not related to classification
-                if (policyClsName != null) {
-                    if (notIfValue) { // unsupported "is not classification(MemberStatus)" because of unnecessary
-                        throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
-                    }
-                    return clsName != null && clsName.equalsIgnoreCase(policyClsName);
-                } else { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
-                    throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + ifValue);
+                if (notIfValue) { // unsupported "is not classification(MemberStatus)" because of unnecessary
+                    throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
                 }
+                return clsName != null && clsName.equalsIgnoreCase(policyClsName);
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
@@ -229,16 +225,12 @@ public class DfSPolicyColumnStatementChecker {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
             }
         } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) { // e.g. classification(MemberStatus)
-            final String policyClsName = extractClsName(thenTheme);
+            final String policyClsName = analyzeSpecifiedClsName(thenTheme, statement);
             final String clsName = column.getClassificationName(); // null allowed if not related to classification
-            if (policyClsName != null) {
-                if (notThenClause) { // unsupported "not classification(MemberStatus)" because of unnecessary
-                    throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
-                } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
-                    result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
-                }
-            } else { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
-                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + thenClause);
+            if (notThenClause) { // unsupported "not classification(MemberStatus)" because of unnecessary
+                throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
+            } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
+                result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
@@ -357,16 +349,12 @@ public class DfSPolicyColumnStatementChecker {
                     return violationCall.apply(String.valueOf(determination));
                 }
             } else if (Srl.startsWithIgnoreCase(thenValue, "classification")) {
-                final String policyClsName = extractClsName(thenValue);
+                final String policyClsName = analyzeSpecifiedClsName(thenValue, statement);
                 final String clsName = column.getClassificationName(); // null allowed if not related to classification
-                if (policyClsName != null) {
-                    if (notThenValue) { // unsupported "is not classification(MemberStatus)" because of unnecessary
-                        throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
-                    } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
-                        return violationCall.apply(String.valueOf(false));
-                    }
-                } else { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
-                    throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + thenValue);
+                if (notThenValue) { // unsupported "is not classification(MemberStatus)" because of unnecessary
+                    throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
+                } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
+                    return violationCall.apply(String.valueOf(false));
                 }
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-value: " + thenValue);
@@ -517,9 +505,12 @@ public class DfSPolicyColumnStatementChecker {
         return "column.statement: " + statement.getNativeExp();
     }
 
-    protected String extractClsName(String thenTheme) {
-        final Matcher matcher = clsPattern.matcher(thenTheme);
-        return matcher.find() ? matcher.group(1) : null;
+    protected String analyzeSpecifiedClsName(String clsPart, DfSPolicyStatement statement) {
+        final Matcher matcher = clsPattern.matcher(clsPart);
+        if (!matcher.find()) { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
+            throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + clsPart);
+        }
+        return matcher.group(1);
     }
 
     // ===================================================================================
