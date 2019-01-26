@@ -141,14 +141,15 @@ public class DfUpgradeTask extends DfAbstractTask {
     //                                                                      ==============
     protected void extractEngine(String upgradeVersion, String archivePath) {
         final DfZipArchiver archiver = new DfZipArchiver(new File(archivePath));
+        final String mydbfluteDir = getMyDBFluteDir();
         final String baseDir;
         if (determineSameVersionUpgrading(upgradeVersion)) { // patch
             // cannot override engine myself in execution so extract to temporary directory 
             // the current engine will be switched to this patched engine after the task
             // in shell or windows script e.g. _df-upgrade.sh
-            baseDir = getMyDBFluteDir() + "/working_patched_dbflute"; // synchronized with script
+            baseDir = mydbfluteDir + "/working_patched_dbflute"; // synchronized with script
         } else { // upgrade, normally here
-            baseDir = getMyDBFluteDir() + "/dbflute-" + upgradeVersion;
+            baseDir = mydbfluteDir + "/dbflute-" + upgradeVersion;
         }
         _log.info("...Extracting zip archive to " + baseDir);
         archiver.extract(new File(baseDir), new FileFilter() {
