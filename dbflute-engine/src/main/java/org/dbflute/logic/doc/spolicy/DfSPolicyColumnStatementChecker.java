@@ -217,18 +217,18 @@ public class DfSPolicyColumnStatementChecker {
             if (!column.hasClassification() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
             }
-        } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) {     // e.g. classification(MemberStatus)
-            Matcher matcher = clsPattern.matcher(thenTheme);
+        } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) { // e.g. classification(MemberStatus)
+            final Matcher matcher = clsPattern.matcher(thenTheme);
             if (matcher.find()) {
-                String policyClsName = matcher.group(1);
-                String clsName = column.getClassificationName();
-                if (notThenClause) {
+                final String policyClsName = matcher.group(1);
+                final String clsName = column.getClassificationName(); // null allowed if not related to classification
+                if (notThenClause) { // unsupported "not classification(MemberStatus)" because of unnecessary
                     throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
                 } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
                     result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
                 }
-            } else {
-                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+            } else { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
+                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + thenClause);
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
