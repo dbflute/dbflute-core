@@ -113,6 +113,17 @@ public class DfSPolicyColumnStatementChecker {
                 return column.hasIndex() == !notIfValue;
             } else if ("classification".equalsIgnoreCase(ifValue)) {
                 return column.hasClassification() == !notIfValue;
+            } else if (Srl.startsWithIgnoreCase(ifValue, "classification")) {
+                final String policyClsName = extractClsName(ifValue);
+                final String clsName = column.getClassificationName(); // null allowed if not related to classification
+                if (policyClsName != null) {
+                    if (notIfValue) { // unsupported "is not classification(MemberStatus)" because of unnecessary
+                        throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
+                    }
+                    return clsName != null && clsName.equalsIgnoreCase(policyClsName);
+                } else { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
+                    throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + ifValue);
+                }
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
