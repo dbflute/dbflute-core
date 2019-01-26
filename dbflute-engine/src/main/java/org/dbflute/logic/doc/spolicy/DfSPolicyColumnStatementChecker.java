@@ -43,7 +43,7 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Pattern clsPattern = Pattern.compile("classification\\((.*?)\\)");
+    protected static final Pattern clsPattern = Pattern.compile("classification\\((.*?)\\)");
 
     // ===================================================================================
     //                                                                           Attribute
@@ -218,10 +218,9 @@ public class DfSPolicyColumnStatementChecker {
                 result.violate(policy, "The column should " + notOr + "be classification: " + toColumnDisp(column));
             }
         } else if (Srl.startsWithIgnoreCase(thenTheme, "classification")) { // e.g. classification(MemberStatus)
-            final Matcher matcher = clsPattern.matcher(thenTheme);
-            if (matcher.find()) {
-                final String policyClsName = matcher.group(1);
-                final String clsName = column.getClassificationName(); // null allowed if not related to classification
+            final String policyClsName = extractClsName(thenTheme);
+            final String clsName = column.getClassificationName(); // null allowed if not related to classification
+            if (policyClsName != null) {
                 if (notThenClause) { // unsupported "not classification(MemberStatus)" because of unnecessary
                     throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
                 } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
@@ -493,6 +492,11 @@ public class DfSPolicyColumnStatementChecker {
 
     protected String toPolicy(DfSPolicyStatement statement) {
         return "column.statement: " + statement.getNativeExp();
+    }
+
+    protected String extractClsName(String thenTheme) {
+        final Matcher matcher = clsPattern.matcher(thenTheme);
+        return matcher.find() ? matcher.group(1) : null;
     }
 
     // ===================================================================================
