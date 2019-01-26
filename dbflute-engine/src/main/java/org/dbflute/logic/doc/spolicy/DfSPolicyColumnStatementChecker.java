@@ -345,6 +345,18 @@ public class DfSPolicyColumnStatementChecker {
                 if (!determination == !notThenValue) {
                     return violationCall.apply(String.valueOf(determination));
                 }
+            } else if (Srl.startsWithIgnoreCase(thenValue, "classification")) {
+                final String policyClsName = extractClsName(thenValue);
+                final String clsName = column.getClassificationName(); // null allowed if not related to classification
+                if (policyClsName != null) {
+                    if (notThenValue) { // unsupported "is not classification(MemberStatus)" because of unnecessary
+                        throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
+                    } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
+                        return violationCall.apply(String.valueOf(false));
+                    }
+                } else { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
+                    throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + thenValue);
+                }
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-value: " + thenValue);
             }
