@@ -335,8 +335,9 @@ public class DfSPolicyLogicalSecretary {
         br.addElement("Make sure your violating schema (ERD and DDL).");
         br.addElement("And after that, execute renewal (or regenerate) again.");
         br.addElement("(tips: The schema policy is on schemaPolicyMap.dfprop)");
-        br.addItem("Schema Policy");
-        br.addElement(buildPolicyExp(policyMap));
+        // unneeded because of too big, already info, also violation with definition by jflute (2019/01/27)
+        //br.addItem("Schema Policy");
+        //br.addElement(buildPolicyExp(policyMap));
         br.addItem("Violation");
         final Map<String, List<DfSPolicyViolation>> violationMap = result.getViolationMap();
         int policyIndex = 0;
