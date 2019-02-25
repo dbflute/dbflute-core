@@ -2560,6 +2560,10 @@ public class Database {
         return getProperties().getSimpleDtoProperties().getSimpleCDefPackage();
     }
 
+    public boolean isSimpleCDefAsDBFluteClassifiation() {
+        return getProperties().getSimpleDtoProperties().isSimpleCDefAsDBFluteClassifiation();
+    }
+
     public boolean isSimpleCDefTarget(String classificationName) {
         return getProperties().getSimpleDtoProperties().isSimpleCDefTarget(classificationName);
     }

@@ -252,6 +252,10 @@ public final class DfSimpleDtoProperties extends DfAbstractDBFluteProperties {
         return getPropertyRequired("simpleCDefPackage");
     }
 
+    public boolean isSimpleCDefAsDBFluteClassifiation() {
+        return isProperty("isSimpleCDefAsDBFluteClassifiation", false);
+    }
+
     protected Set<String> _simpleCDefTargetSet;
 
     protected Set<String> getSimpleCDefTargetSet() {
