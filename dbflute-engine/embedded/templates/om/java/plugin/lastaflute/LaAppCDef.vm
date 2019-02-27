@@ -165,7 +165,6 @@ public interface ${glCDef} extends Classification {
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
-         * @deprecated use of()
          */
         public static ${classificationName} codeOf(Object code) {
             if (code == null) { return null; }
