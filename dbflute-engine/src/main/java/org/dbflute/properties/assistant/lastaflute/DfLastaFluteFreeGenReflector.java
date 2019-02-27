@@ -536,8 +536,11 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     // ===================================================================================
-    //                                                                              AppCls
-    //                                                                              ======
+    //                                                                      Classification
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                                AppCls
+    //                                                ------
     // cannot use in common, application project only: use named classification instead if you need
     protected void setupAppClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
@@ -558,11 +561,12 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("tableMap", tableMap);
         tableMap.put("clsDomain", "app");
         tableMap.put("clsTitle", "application"); // same as old javadoc
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, "appcls", tableMap);
     }
 
-    // ===================================================================================
-    //                                                                              WebCls
-    //                                                                              ======
+    // -----------------------------------------------------
+    //                                                WebCls
+    //                                                ------
     // cannot use in common, application project only: use named classification instead if you need
     protected void setupWebClsGen(String appName, String path, Map<String, Object> lastafluteMap) { // cannot use in common
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
@@ -584,11 +588,12 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("tableMap", tableMap);
         tableMap.put("clsDomain", "web");
         tableMap.put("clsTitle", "web");
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, "webcls", tableMap);
     }
 
-    // ===================================================================================
-    //                                                                            NamedCls
-    //                                                                            ========
+    // -----------------------------------------------------
+    //                                              NamedCls
+    //                                              --------
     // can be used in both common and application freely
     protected void setupNamedClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
         final String baseDir = path + "/src/main";
@@ -628,7 +633,7 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("outputDirectory", filterOverridden("$$baseDir$$/java", lastafluteMap, appName, clsTheme, "outputDirectory"));
         outputMap.put("package", filterOverridden(_mylastaPackage + ".namedcls", lastafluteMap, appName, clsTheme, "package"));
         outputMap.put("templateFile", "LaAppCDef.vm"); // borrow application classification's template
         outputMap.put("className", filterOverridden(initCap(clsDomain) + "CDef", lastafluteMap, appName, clsTheme, "className"));
@@ -636,6 +641,17 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("tableMap", tableMap);
         tableMap.put("clsDomain", clsDomain);
         tableMap.put("clsTitle", clsDomain); // same as domain
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, tableMap);
+    }
+
+    // -----------------------------------------------------
+    //                                   DBCls Collaboration
+    //                                   -------------------
+    protected void doSetupSuppressDBClsCollaboration(Map<String, Object> lastafluteMap, String appName, String clsTheme,
+            Map<String, Object> tableMap) {
+        final String key = "isSuppressDBClsCollaboration";
+        final boolean overriddenValue = false; // used in template so you can use boolean directly
+        tableMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
     }
 
     // ===================================================================================
@@ -699,6 +715,7 @@ public final class DfLastaFluteFreeGenReflector {
     protected String getTrueLiteral() {
         // for DfPropTableLoader@isProperty(), so not use this if direct use by jflute (2017/06/21)
         // can fix it? later I will think...
+        // (while, you can use boolean if it's used in template directly)
         return "true";
     }
 

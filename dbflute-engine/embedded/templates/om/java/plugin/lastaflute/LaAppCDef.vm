@@ -24,7 +24,7 @@ import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
-#if ($tableMap.hasRefCls)
+#if ($tableMap.hasRefCls && !$tableMap.isSuppressDBClsCollaboration)
 import ${tableMap.allcommonPackage}.*;
 #end
 
@@ -242,6 +242,7 @@ public interface ${glCDef} extends Classification {
 #end
             return new ArrayList<${classificationName}>(4);
         }
+#if (!$tableMap.isSuppressDBClsCollaboration)
 #foreach ($refClsElement in $classificationTop.refClsElementList)
 
         /**
@@ -264,6 +265,7 @@ public interface ${glCDef} extends Classification {
                 throw new IllegalStateException("Cannot convert ${classificationName} to ${refClsElement.classificationName} by the app code: " + appCode);
             });
         }
+#end
 #end
 
         @Override public String toString() { return code(); }
