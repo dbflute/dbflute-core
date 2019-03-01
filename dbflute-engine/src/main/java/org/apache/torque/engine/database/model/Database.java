@@ -2706,7 +2706,8 @@ public class Database {
         try {
             return TypeMap.findJavaNativeByJdbcType(jdbcType, null, null);
         } catch (RuntimeException e) {
-            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
+            // memory of poor exception handling in template at old days
+            //_log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
             throw e;
         }
     }

@@ -132,13 +132,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -186,8 +185,6 @@ public class TypeMap {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(TypeMap.class);
     public static final String AUTO_MAPPING_MARK = "$$AutoMapping$$";
 
     // ===================================================================================
@@ -548,12 +545,29 @@ public class TypeMap {
     protected static String doFindJavaNativeByJdbcType(String jdbcType) {
         initializeIfNeeds();
         if (!_jdbcTypeToJavaNativeMap.containsKey(jdbcType)) {
-            String msg = "_jdbcTypeToJavaNativeMap doesn't contain the type as key: ";
-            msg = msg + "key=" + jdbcType + " map=" + _jdbcTypeToJavaNativeMap;
-            _log.warn(msg);
-            throw new IllegalStateException(msg);
+            throwJdbcTypeToJavaNativeMapNotFoundException(jdbcType);
         }
         return _jdbcTypeToJavaNativeMap.get(jdbcType);
+    }
+
+    protected static void throwJdbcTypeToJavaNativeMapNotFoundException(String jdbcType) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("TypeMap@_jdbcTypeToJavaNativeMap doesn't contain the type as key.");
+        br.addItem("Advice");
+        br.addElement("Undefined JDBC type was specified.");
+        br.addElement("Confirm your JDBC type settings in DBFlute property (dfprop file).");
+        br.addElement(" e.g. commonColumnMap.dfprop, databaseInfoMap.dfprop, ...");
+        br.addItem("NotFound JDBC Type");
+        br.addElement(jdbcType);
+        br.addItem("_jdbcTypeToJavaNativeMap");
+        br.addElement("defined types: " + _jdbcTypeToJavaNativeMap.size());
+        for (Entry<String, String> entry : _jdbcTypeToJavaNativeMap.entrySet()) {
+            br.addElement(entry.getKey() + " = " + entry.getValue());
+        }
+        final String msg = br.buildExceptionMessage();
+        // memory of poor exception handling in template at old days
+        //_log.warn(msg);
+        throw new IllegalStateException(msg);
     }
 
     protected static boolean needsAutoMappingNumber(String jdbcType, final String javaType) {
@@ -576,7 +590,8 @@ public class TypeMap {
         if (!_javaNativeToFlexNativeMap.containsKey(javaNative)) {
             String msg = "_javaNativeToFlexNativeMap doesn't contain the type as key: ";
             msg = msg + "key=" + javaNative + " map=" + _javaNativeToFlexNativeMap;
-            _log.warn(msg);
+            // memory of poor exception handling in template at old days
+            //_log.warn(msg);
             throw new IllegalStateException(msg);
         }
         return _javaNativeToFlexNativeMap.get(javaNative);
