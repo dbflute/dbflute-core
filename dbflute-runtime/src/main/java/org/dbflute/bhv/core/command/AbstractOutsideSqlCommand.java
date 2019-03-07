@@ -15,6 +15,9 @@
  */
 package org.dbflute.bhv.core.command;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
@@ -107,6 +110,10 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractAllBehav
 
     public Entity getEntity() {
         return null;
+    }
+
+    public List<Entity> getEntityList() {
+        return Collections.emptyList();
     }
 
     public String getOutsideSqlPath() {

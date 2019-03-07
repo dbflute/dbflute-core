@@ -16,6 +16,7 @@
 package org.dbflute.bhv.core.command;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.dbflute.Entity;
@@ -132,6 +133,10 @@ public abstract class AbstractCountableUpdateCommand extends AbstractAllBehavior
 
     public Entity getEntity() {
         return _entity; // but null when query delete
+    }
+
+    public List<Entity> getEntityList() {
+        return Collections.emptyList();
     }
 
     public String getOutsideSqlPath() {

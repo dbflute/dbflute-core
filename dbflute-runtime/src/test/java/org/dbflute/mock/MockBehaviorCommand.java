@@ -15,6 +15,9 @@
  */
 package org.dbflute.mock;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.SqlExecutionCreator;
@@ -63,6 +66,10 @@ public class MockBehaviorCommand implements BehaviorCommand<Object> {
 
     public Entity getEntity() {
         throw new UnsupportedOperationException();
+    }
+
+    public List<Entity> getEntityList() {
+        return Collections.emptyList();
     }
 
     public OutsideSqlOption getOutsideSqlOption() {

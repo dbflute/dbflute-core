@@ -16,6 +16,7 @@
 package org.dbflute.bhv.core.command;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.dbflute.Entity;
@@ -38,7 +39,7 @@ public abstract class AbstractBatchUpdateCommand extends AbstractAllBehaviorComm
     /** The type of entity. (Required) */
     protected Class<? extends Entity> _entityType;
 
-    /** The instance of condition-bean. (Required) */
+    /** The instance of entity list. (Required) */
     protected List<? extends Entity> _entityList;
 
     // ===================================================================================
@@ -143,6 +144,10 @@ public abstract class AbstractBatchUpdateCommand extends AbstractAllBehaviorComm
 
     public Entity getEntity() {
         return null; // because of non one entity here
+    }
+
+    public List<Entity> getEntityList() {
+        return Collections.unmodifiableList(_entityList);
     }
 
     public String getOutsideSqlPath() {

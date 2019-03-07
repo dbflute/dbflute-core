@@ -15,6 +15,8 @@
  */
 package org.dbflute.bhv.core.command;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.dbflute.Entity;
@@ -235,6 +237,10 @@ public class SelectNextValCommand<RESULT> extends AbstractAllBehaviorCommand<RES
 
     public Entity getEntity() {
         return null;
+    }
+
+    public List<Entity> getEntityList() {
+        return Collections.emptyList();
     }
 
     public String getOutsideSqlPath() {
