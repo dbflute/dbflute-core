@@ -231,7 +231,7 @@ public class FunCustodial {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was set to the entity.");
         br.addItem("Advice");
-        br.addElement("Confirm the value of the classication column on your database,");
+        br.addElement("Confirm the value of the classification column on your database,");
         br.addElement("or setting value to your entity.");
         br.addElement("The code is NOT one of classification code defined on DBFlute.");
         br.addElement("");
