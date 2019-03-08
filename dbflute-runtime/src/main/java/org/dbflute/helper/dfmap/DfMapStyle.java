@@ -240,15 +240,21 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
                 if (value instanceof Map<?, ?>) {
                     @SuppressWarnings("unchecked")
                     final Map<String, Object> valueMap = (Map<String, Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
+                    final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
                     doBuildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
                 } else if (value instanceof List<?>) {
                     @SuppressWarnings("unchecked")
                     final List<Object> valueList = (List<Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
+                    final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
                     doBuildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
                 } else {
-                    sb.append(escapeControlMark(value));
+                    final Map<String, Object> resolvedMap = resolvePotentialMapOfBuildingMapString(value);
+                    if (resolvedMap != null) {
+                        final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+                        doBuildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
+                    } else {
+                        sb.append(escapeControlMark(value));
+                    }
                 }
                 ++index;
             }
@@ -296,15 +302,21 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
                 if (value instanceof Map<?, ?>) {
                     @SuppressWarnings("unchecked")
                     final Map<String, Object> valueMap = (Map<String, Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
+                    final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
                     doBuildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
                 } else if (value instanceof List<?>) {
                     @SuppressWarnings("unchecked")
                     final List<Object> valueList = (List<Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
+                    final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
                     doBuildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
                 } else {
-                    sb.append(escapeControlMark(value));
+                    final Map<String, Object> resolvedMap = resolvePotentialMapOfBuildingMapString(value);
+                    if (resolvedMap != null) {
+                        final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+                        doBuildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
+                    } else {
+                        sb.append(escapeControlMark(value));
+                    }
                 }
                 ++index;
             }
@@ -315,6 +327,24 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
             }
         }
         sb.append(_endBrace);
+    }
+
+    // -----------------------------------------------------
+    //                                          Assist Logic
+    //                                          ------------
+    protected String deriveNextIndentOfBuildingMapString(boolean printOneLiner, String previousIndent, String currentIndent) {
+        return printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
+    }
+
+    protected Map<String, Object> resolvePotentialMapOfBuildingMapString(Object value) { // value may be null
+        // you can override for your bean that can be map like this:
+        // e.g.
+        //  if (value instanceof Something) {
+        //      return ((Something) value).toMap();
+        //  } else {
+        //      return super.resolvePotentialMapOfBuildingMapString(value);
+        //  }
+        return null; // returning null means non-map value
     }
 
     // ===================================================================================
