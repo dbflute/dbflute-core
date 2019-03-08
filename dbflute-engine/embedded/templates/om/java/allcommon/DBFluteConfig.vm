@@ -96,6 +96,7 @@ public class ${glDBFluteConfig} {
     protected boolean _nonSpecifiedColumnAccessAllowed = ${database.isNonSpecifiedColumnAccessAllowed()};
     protected boolean _specifyColumnRequired = ${database.isSpecifyColumnRequired()};
     protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
+    protected boolean _specifyColumnRequiredWarningOnly = false;
     protected boolean _columnNullObjectAllowed = ${database.isColumnNullObjectAllowed()};
     protected boolean _columnNullObjectGearedToSpecify = ${database.isColumnNullObjectGearedToSpecify()};
     protected boolean _datetimePrecisionTruncationOfCondition = ${database.isDatetimePrecisionTruncationOfCondition()};
@@ -375,6 +376,18 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting specifyColumnRequiredExceptDeterminer: " + specifyColumnRequiredExceptDeterminer);
         }
         _specifyColumnRequiredExceptDeterminer = specifyColumnRequiredExceptDeterminer;
+    }
+
+    public boolean isSpecifyColumnRequiredWarningOnly() {
+        return _specifyColumnRequiredWarningOnly;
+    }
+
+    public void setSpecifyColumnRequiredWarningOnly(boolean specifyColumnRequiredWarningOnly) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting specifyColumnRequiredWarningOnly: " + specifyColumnRequiredWarningOnly);
+        }
+        _specifyColumnRequiredWarningOnly = specifyColumnRequiredWarningOnly;
     }
 
     // ===================================================================================

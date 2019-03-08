@@ -69,6 +69,9 @@ public class ${myClassName} extends AbstractConditionBean {
             enableSpecifyColumnRequired();
         }
         xsetSpecifyColumnRequiredExceptDeterminer(${glDBFluteConfig}.getInstance().getSpecifyColumnRequiredExceptDeterminer());
+        if (${glDBFluteConfig}.getInstance().isSpecifyColumnRequiredWarningOnly()) {
+            xenableSpecifyColumnRequiredWarningOnly();
+        }
         if (${glDBFluteConfig}.getInstance().isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
         }
