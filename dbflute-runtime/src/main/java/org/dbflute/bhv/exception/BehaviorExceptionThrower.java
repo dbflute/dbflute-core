@@ -439,9 +439,9 @@ public class BehaviorExceptionThrower implements Serializable {
         br.addElement("  (x):");
         br.addElement("    memberBhv.queryDelete(cb -> {});");
         br.addElement("  (o): (exists query)");
-        br.addElement("    memberBhv.queryDelete(cb -> cb.query().setBirthdate_LessThan(...)); // OK");
+        br.addElement("    memberBhv.queryDelete(cb -> cb.query().setBirthdate_LessThan(...)); // Good");
         br.addElement("  (o): (non query)");
-        br.addElement("    memberBhv.varyingQueryDelete(cb -> {}, op -> op.allowNonQueryDelete()); // *OK");
+        br.addElement("    memberBhv.varyingQueryDelete(cb -> {}, op -> op.allowNonQueryDelete()); // Good");
         setupOptionElement(br, option);
         setupInvalidQueryElement(br, cb);
         final String msg = br.buildExceptionMessage();
