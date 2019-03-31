@@ -502,4 +502,4 @@ $database.info(" ")
 ## ===================================================================================
 ##                                                                            Flex Dto
 ##                                                                            ========
-#parse("om/java/plugin/flexdto/ControlPluginFlexDto.vm")
+#parse("om/java/plugin/flexdto/ControlPluginFlexDtoGenerate.vm")

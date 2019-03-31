@@ -308,38 +308,4 @@ $database.backToSql2EntityOutputDirectory()
 ## ===================================================================================
 ##                                                                            Flex Dto
 ##                                                                            ========
-#if ($database.hasFlexDtoDefinition())
-  $database.enableFlexDtoOutputDirectory()
-  $database.info("parseFlexDto() {")
-  #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
-  #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
-
-  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #foreach ($table in $database.tableList)
-    #if (!$table.isSql2EntityTypeSafeCursor())
-    #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
-    #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
-    #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.customize.${myExtendedObjectClassName}")
-
-    $database.info("    parse('${myExtendedObjectClassName}');")
-
-    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
-    $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-
-    #if (!$database.isStopGenerateExtendedEntity())
-      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
-    #end
-    #end
-  #end
-  $database.info("}")
-  $database.backToSql2EntityOutputDirectory()
-#end
+#parse("om/java/plugin/flexdto/ControlPluginFlexDtoSql2Entity.vm")
