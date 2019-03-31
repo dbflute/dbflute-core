@@ -393,6 +393,7 @@ public class TypeMap {
         _javaNativeToFlexNativeMap.put("Number", initializeFlexNative("Number", "Number"));
         _javaNativeToFlexNativeMap.put("Boolean", initializeFlexNative("Boolean", "Boolean"));
         _javaNativeToFlexNativeMap.put("java.math.BigDecimal", initializeFlexNative("java.math.BigDecimal", "Number"));
+        _javaNativeToFlexNativeMap.put("java.math.BigInteger", initializeFlexNative("java.math.BigInteger", "Number"));
         _javaNativeToFlexNativeMap.put("java.time.LocalDate", initializeFlexNative("java.time.LocalDate", "Date"));
         _javaNativeToFlexNativeMap.put("java.time.LocalDateTime", initializeFlexNative("java.time.LocalDateTime", "Date"));
         _javaNativeToFlexNativeMap.put("java.time.LocalTime", initializeFlexNative("java.time.LocalDate", "Date"));
