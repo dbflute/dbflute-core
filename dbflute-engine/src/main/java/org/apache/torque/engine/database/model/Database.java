@@ -2611,6 +2611,10 @@ public class Database {
         return getProperties().getFlexDtoProperties().getExtendedDtoSuffix();
     }
 
+    public String getFlexDtoFileExtension() {
+        return getProperties().getFlexDtoProperties().getFileExtension();
+    }
+
     // ===================================================================================
     //                                                                Hibernate Properties
     //                                                                ====================

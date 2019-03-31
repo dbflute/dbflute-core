@@ -502,37 +502,4 @@ $database.info(" ")
 ## ===================================================================================
 ##                                                                            Flex Dto
 ##                                                                            ========
-#if ($database.hasFlexDtoDefinition())
-  $database.enableFlexDtoOutputDirectory()
-  $database.info("parseFlexDto() {")
-  #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}")
-  #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}")
-
-  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #foreach ($table in $database.tableList)
-  #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
-  #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
-  #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.${myExtendedObjectClassName}")
-
-  $database.info("    parse('${myExtendedObjectClassName}');")
-
-  #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
-  $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-
-  #if (!$database.isStopGenerateExtendedEntity())
-    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-    #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-    #end
-    $database.reflectAllExCopyright($path)
-  #end
-  #end
-  $database.info("}")
-  $database.backToGenerateOutputDirectory()
-#end
-
+#parse("om/java/plugin/flexdto/ControlPluginFlexDto.vm")
