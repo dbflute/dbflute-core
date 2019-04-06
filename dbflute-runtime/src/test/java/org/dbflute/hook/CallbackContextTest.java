@@ -18,6 +18,7 @@ package org.dbflute.hook;
 import org.dbflute.bhv.core.BehaviorCommandHook;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
 import org.dbflute.hook.CallbackContext.CallbackContextHolder;
+import org.dbflute.hook.CallbackContext.InheritableBehaviorCommandHook;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -26,10 +27,149 @@ import org.dbflute.unit.RuntimeTestCase;
  */
 public class CallbackContextTest extends RuntimeTestCase {
 
+    @Override
+    protected void markHere(String mark) {
+        super.markHere(mark);
+        log("...Marking {}", mark); // for visual check
+    }
+
     // ===================================================================================
     //                                                                 BehaviorCommandHook
     //                                                                 ===================
-    public void test_BehaviorCommandHook_twiceSet_noInherits() throws Exception {
+    // -----------------------------------------------------
+    //                                               Two Set
+    //                                               -------
+    public void test_BehaviorCommandHook_twoSet_inherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getBehaviorCommandHook());
+
+        // ## Act ##
+        setupTwoBehaviorCommandHook(context);
+
+        // ## Assert ##
+        BehaviorCommandHook hook = context.getBehaviorCommandHook();
+        assertTrue(hook.inheritsExistingHook());
+        hook.hookBefore(null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+        assertMarked("firstFinally");
+        context.terminateLastBehaviorCommandHook();
+        assertNotNull(context.getBehaviorCommandHook());
+        context.terminateLastBehaviorCommandHook();
+        assertNull(context.getBehaviorCommandHook());
+    }
+
+    public void test_BehaviorCommandHook_twoSet_terminateLast() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getBehaviorCommandHook());
+        setupTwoBehaviorCommandHook(context);
+        assertNotNull(context.getBehaviorCommandHook());
+        assertTrue(context.getBehaviorCommandHook() instanceof InheritableBehaviorCommandHook);
+        assertEquals(2, ((InheritableBehaviorCommandHook) context.getBehaviorCommandHook()).countManagedHook());
+
+        // ## Act ##
+        context.terminateLastBehaviorCommandHook();
+
+        // ## Assert ##
+        BehaviorCommandHook hook = context.getBehaviorCommandHook();
+        assertNotNull(hook);
+        hook.hookBefore(null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("firstFinally");
+        assertFalse(context.getBehaviorCommandHook() instanceof InheritableBehaviorCommandHook);
+    }
+
+    // -----------------------------------------------------
+    //                                             Three Set
+    //                                             ---------
+    public void test_BehaviorCommandHook_threeSet_inherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getBehaviorCommandHook());
+
+        // ## Act ##
+        setupThreeBehaviorCommandHook(context);
+
+        // ## Assert ##
+        BehaviorCommandHook hook = context.getBehaviorCommandHook();
+        assertTrue(hook.inheritsExistingHook());
+        hook.hookBefore(null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("secondBefore");
+        assertMarked("thirdBefore");
+        assertMarked("thirdFinally");
+        assertMarked("secondFinally");
+        assertMarked("firstFinally");
+    }
+
+    public void test_BehaviorCommandHook_threeSet_terminateLast() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getBehaviorCommandHook());
+        setupThreeBehaviorCommandHook(context);
+        assertNotNull(context.getBehaviorCommandHook());
+        assertTrue(context.getBehaviorCommandHook() instanceof InheritableBehaviorCommandHook);
+        assertEquals(3, ((InheritableBehaviorCommandHook) context.getBehaviorCommandHook()).countManagedHook());
+
+        // ## Act ##
+        context.terminateLastBehaviorCommandHook();
+
+        // ## Assert ##
+        BehaviorCommandHook hook = context.getBehaviorCommandHook();
+        assertNotNull(hook);
+        hook.hookBefore(null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+        assertMarked("firstFinally");
+        assertTrue(context.getBehaviorCommandHook() instanceof InheritableBehaviorCommandHook);
+    }
+
+    private void setupTwoBehaviorCommandHook(CallbackContext context) {
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                markHere("firstBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                markHere("firstFinally");
+            }
+        });
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                markHere("secondBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                markHere("secondFinally");
+            }
+        });
+    }
+
+    private void setupThreeBehaviorCommandHook(CallbackContext context) {
+        setupTwoBehaviorCommandHook(context);
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                markHere("thirdBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                markHere("thirdFinally");
+            }
+        });
+    }
+
+    // -----------------------------------------------------
+    //                                           No Inherits
+    //                                           -----------
+    public void test_BehaviorCommandHook_twoSet_noInherits() throws Exception {
         // ## Arrange ##
         CallbackContext context = new CallbackContext();
         assertNull(context.getBehaviorCommandHook());
@@ -46,12 +186,10 @@ public class CallbackContextTest extends RuntimeTestCase {
         });
         context.setBehaviorCommandHook(new BehaviorCommandHook() {
             public void hookBefore(BehaviorCommandMeta meta) {
-                log("2");
                 markHere("secondBefore");
             }
 
             public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
-                log("3");
                 markHere("secondFinally");
             }
 
@@ -68,57 +206,52 @@ public class CallbackContextTest extends RuntimeTestCase {
         hook.hookFinally(null, null);
         assertMarked("secondBefore");
         assertMarked("secondFinally");
-    }
-
-    public void test_BehaviorCommandHook_twiceSet_inherits() throws Exception {
-        // ## Arrange ##
-        CallbackContext context = new CallbackContext();
-        assertNull(context.getBehaviorCommandHook());
-
-        // ## Act ##
-        context.setBehaviorCommandHook(new BehaviorCommandHook() {
-            public void hookBefore(BehaviorCommandMeta meta) {
-                log("1");
-                markHere("firstBefore");
-            }
-
-            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
-                log("4");
-                markHere("firstFinally");
-            }
-        });
-        context.setBehaviorCommandHook(new BehaviorCommandHook() {
-            public void hookBefore(BehaviorCommandMeta meta) {
-                log("2");
-                markHere("secondBefore");
-            }
-
-            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
-                log("3");
-                markHere("secondFinally");
-            }
-
-            @Override
-            public boolean inheritsExistingHook() {
-                return true;
-            }
-        });
-
-        // ## Assert ##
-        BehaviorCommandHook hook = context.getBehaviorCommandHook();
-        assertTrue(hook.inheritsExistingHook());
-        hook.hookBefore(null);
-        hook.hookFinally(null, null);
-        assertMarked("firstBefore");
-        assertMarked("secondBefore");
-        assertMarked("secondFinally");
-        assertMarked("firstFinally");
     }
 
     // ===================================================================================
     //                                                                         SqlFireHook
     //                                                                         ===========
-    public void test_SqlFireHook_twiceSet_noInherits() throws Exception {
+    public void test_SqlFireHook_twoSet_inherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getSqlFireHook());
+
+        // ## Act ##
+        context.setSqlFireHook(new SqlFireHook() {
+            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+                markHere("firstBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+                markHere("firstFinally");
+            }
+        });
+        context.setSqlFireHook(new SqlFireHook() {
+            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+                markHere("secondBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+                markHere("secondFinally");
+            }
+        });
+
+        // ## Assert ##
+        SqlFireHook hook = context.getSqlFireHook();
+        assertTrue(hook.inheritsExistingHook());
+        hook.hookBefore(null, null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+        assertMarked("firstFinally");
+        context.terminateLastSqlFireHook();
+        assertNotNull(context.getSqlFireHook());
+        context.terminateLastSqlFireHook();
+        assertNull(context.getSqlFireHook());
+    }
+
+    public void test_SqlFireHook_twoSet_noInherits() throws Exception {
         // ## Arrange ##
         CallbackContext context = new CallbackContext();
         assertNull(context.getSqlFireHook());
@@ -135,12 +268,10 @@ public class CallbackContextTest extends RuntimeTestCase {
         });
         context.setSqlFireHook(new SqlFireHook() {
             public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
-                log("2");
                 markHere("secondBefore");
             }
 
             public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-                log("3");
                 markHere("secondFinally");
             }
 
@@ -159,55 +290,74 @@ public class CallbackContextTest extends RuntimeTestCase {
         assertMarked("secondFinally");
     }
 
-    public void test_SqlFireHook_twiceSet_inherits() throws Exception {
+    // ===================================================================================
+    //                                                                       SqlLogHandler
+    //                                                                       =============
+    public void test_SqlLogHandler_twoSet_noInherits() throws Exception {
         // ## Arrange ##
         CallbackContext context = new CallbackContext();
-        assertNull(context.getSqlFireHook());
+        assertNull(context.getSqlLogHandler());
 
         // ## Act ##
-        context.setSqlFireHook(new SqlFireHook() {
-            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
-                log("1");
-                markHere("firstBefore");
-            }
-
-            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-                log("4");
-                markHere("firstFinally");
+        context.setSqlLogHandler(new SqlLogHandler() {
+            public void handle(SqlLogInfo info) {
+                markHere("first");
             }
         });
-        context.setSqlFireHook(new SqlFireHook() {
-            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
-                log("2");
-                markHere("secondBefore");
-            }
-
-            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-                log("3");
-                markHere("secondFinally");
-            }
-
-            @Override
-            public boolean inheritsExistingHook() {
-                return true;
+        context.setSqlLogHandler(new SqlLogHandler() {
+            public void handle(SqlLogInfo info) {
+                markHere("second");
             }
         });
 
         // ## Assert ##
-        SqlFireHook hook = context.getSqlFireHook();
-        assertTrue(hook.inheritsExistingHook());
-        hook.hookBefore(null, null);
-        hook.hookFinally(null, null);
-        assertMarked("firstBefore");
-        assertMarked("secondBefore");
-        assertMarked("secondFinally");
-        assertMarked("firstFinally");
+        SqlLogHandler handler = context.getSqlLogHandler();
+        assertTrue(handler.inheritsExistingHandler());
+        handler.handle(null);
+        assertMarked("first");
+        assertMarked("second");
+        context.terminateLastSqlLogHandler();
+        assertNotNull(context.getSqlLogHandler());
+        context.terminateLastSqlLogHandler();
+        assertNull(context.getSqlLogHandler());
+    }
+
+    // ===================================================================================
+    //                                                                    SqlResultHandler
+    //                                                                    ================
+    public void test_SqlResultHandler_twoSet_noInherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getSqlResultHandler());
+
+        // ## Act ##
+        context.setSqlResultHandler(new SqlResultHandler() {
+            public void handle(SqlResultInfo info) {
+                markHere("first");
+            }
+        });
+        context.setSqlResultHandler(new SqlResultHandler() {
+            public void handle(SqlResultInfo info) {
+                markHere("second");
+            }
+        });
+
+        // ## Assert ##
+        SqlResultHandler handler = context.getSqlResultHandler();
+        assertTrue(handler.inheritsExistingHandler());
+        handler.handle(null);
+        assertMarked("first");
+        assertMarked("second");
+        context.terminateLastSqlResultHandler();
+        assertNotNull(context.getSqlResultHandler());
+        context.terminateLastSqlResultHandler();
+        assertNull(context.getSqlResultHandler());
     }
 
     // ===================================================================================
     //                                                                     SqlStringFilter
     //                                                                     ===============
-    public void test_SqlStringFilter_twiceSet_inherits() throws Exception {
+    public void test_SqlStringFilter_twoSet_inherits() throws Exception {
         // ## Arrange ##
         CallbackContext context = new CallbackContext();
         assertNull(context.getSqlFireHook());
@@ -241,6 +391,10 @@ public class CallbackContextTest extends RuntimeTestCase {
         assertEquals("base:second", context.getSqlStringFilter().filterQueryUpdate(null, "base"));
         assertEquals("base", context.getSqlStringFilter().filterOutsideSql(null, "base"));
         assertNull(context.getSqlStringFilter().filterOutsideSql(null, null));
+        context.terminateLastSqlStringFilter();
+        assertNotNull(context.getSqlStringFilter());
+        context.terminateLastSqlStringFilter();
+        assertNull(context.getSqlStringFilter());
     }
 
     // ===================================================================================

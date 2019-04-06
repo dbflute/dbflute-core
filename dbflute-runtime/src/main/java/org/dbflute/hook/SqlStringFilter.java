@@ -86,8 +86,7 @@ public interface SqlStringFilter {
     }
 
     /**
-     * Does it inherit the existing filter? <br>
-     * Completely overriding as default but you can inherit it by this determination.
+     * Does it inherit the existing filter?
      * @return The determination, true or false.
      */
     default boolean inheritsExistingFilter() {

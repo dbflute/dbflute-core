@@ -15,6 +15,9 @@
  */
 package org.dbflute.hook;
 
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
 import org.dbflute.bhv.core.BehaviorCommandHook;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
 import org.dbflute.util.DfTypeUtil;
@@ -194,12 +197,11 @@ public class CallbackContext {
     //                                   BehaviorCommandHook
     //                                   -------------------
     /**
-     * Set the hook interface of behavior commands. <br>
-     * This hook interface is called back before executing behavior commands and finally. <br> 
-     * The hook methods may be called by nested process
-     * so you should pay attention to it when you implements this.
+     * Set the hook interface of behavior commands. (inheriting existing hooks as default) <br>
+     * This hook interface is called-back before executing behavior commands and finally. <br> 
+     * The hook methods may be called by nested process so you should pay attention to it when you implements this. <br>
      * <pre>
-     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
+     * CallbackContext.setBehaviorCommandHook(new BehaviorCommandHook() {
      *     public void hookBefore(BehaviorCommandMeta meta) {
      *         // You can implement your favorite callback here.
      *     }
@@ -207,8 +209,13 @@ public class CallbackContext {
      *         // You can implement your favorite callback here.
      *     }
      * });
+     * try {
+     *     ...
+     * } finally {
+     *     CallbackContext.terminateLastBehaviorCommandHookOnThread();
+     * }
      * </pre>
-     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed)
+     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed: completely clear, Inheritable)
      */
     public static void setBehaviorCommandHookOnThread(BehaviorCommandHook behaviorCommandHook) {
         final CallbackContext context = getOrCreateContext();
@@ -219,27 +226,34 @@ public class CallbackContext {
      * Is existing the hook interface of behavior commands on thread?
      * @return The determination, true or false.
      */
-    public static boolean isExistBehaviorCommandHookOnThread() {
+    public static boolean isExistBehaviorCommandHookOnThread() { // memorable code: wants to rename to exists...()
         return isExistCallbackContextOnThread() && getCallbackContextOnThread().getBehaviorCommandHook() != null;
     }
 
     /**
+     * Terminate the last hook interface of behavior commands from callback context on thread. <br>
+     * If the callback context does not have other interfaces, the context is removed from thread.
+     */
+    public static void terminateLastBehaviorCommandHookOnThread() {
+        endCallback(context -> context.terminateLastBehaviorCommandHook());
+    }
+
+    /**
+     * <span style="color: #AD4747; font-size: 120%">
+     * (removes all existing hooks completely so use terminateLast...() basically) <br>
+     * </span>
      * Clear the hook interface of behavior commands from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearBehaviorCommandHookOnThread() {
-        if (isExistCallbackContextOnThread()) {
-            final CallbackContext context = getCallbackContextOnThread();
-            context.setBehaviorCommandHook(null);
-            clearIfNoInterface(context);
-        }
+        endCallback(context -> context.setBehaviorCommandHook(null));
     }
 
     // -----------------------------------------------------
     //                                           SqlFireHook
     //                                           -----------
     /**
-     * Set the hook interface of SQL fires. <br>
+     * Set the hook interface of SQL fires. (inheriting existing hooks as default) <br>
      * This hook interface is called back before firing SQL and finally. <br> 
      * The hook methods may be called by nested process
      * so you should pay attention to it when you implements this.
@@ -253,7 +267,7 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlFireHook The hook interface of behavior commands. (NullAllowed)
+     * @param sqlFireHook The hook interface of SQL fires. (NullAllowed: completely clear, Inheritable)
      */
     public static void setSqlFireHookOnThread(SqlFireHook sqlFireHook) {
         final CallbackContext context = getOrCreateContext();
@@ -269,22 +283,29 @@ public class CallbackContext {
     }
 
     /**
+     * Terminate the last hook interface of SQL fires from callback context on thread. <br>
+     * If the callback context does not have other interfaces, the context is removed from thread.
+     */
+    public static void terminateLastSqlFireHookOnThread() {
+        endCallback(context -> context.terminateLastSqlFireHook());
+    }
+
+    /**
+     * <span style="color: #AD4747; font-size: 120%">
+     * (removes all existing hooks completely so use terminateLast...() basically) <br>
+     * </span>
      * Clear the hook interface of behavior commands from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlFireHookOnThread() {
-        if (isExistCallbackContextOnThread()) {
-            final CallbackContext context = getCallbackContextOnThread();
-            context.setSqlFireHook(null);
-            clearIfNoInterface(context);
-        }
+        endCallback(context -> context.setSqlFireHook(null));
     }
 
     // -----------------------------------------------------
     //                                         SqlLogHandler
     //                                         -------------
     /**
-     * Set the handler of SQL log. <br>
+     * Set the handler of SQL log. (inheriting existing handlers as default) <br>
      * This handler is called back before executing the SQL.
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
@@ -293,7 +314,7 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlLogHandler The handler of SQL log. (NullAllowed)
+     * @param sqlLogHandler The handler of SQL log. (NullAllowed: completely clear, Inheritable)
      */
     public static void setSqlLogHandlerOnThread(SqlLogHandler sqlLogHandler) {
         final CallbackContext context = getOrCreateContext();
@@ -309,22 +330,29 @@ public class CallbackContext {
     }
 
     /**
+     * Terminate the last handler interface of SQL logs from callback context on thread. <br>
+     * If the callback context does not have other interfaces, the context is removed from thread.
+     */
+    public static void terminateLastSqlLogHandlerOnThread() {
+        endCallback(context -> context.terminateLastSqlLogHandler());
+    }
+
+    /**
+     * <span style="color: #AD4747; font-size: 120%">
+     * (removes all existing handlers completely so use terminateLast...() basically) <br>
+     * </span>
      * Clear the handler of SQL log from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlLogHandlerOnThread() {
-        if (isExistCallbackContextOnThread()) {
-            final CallbackContext context = getCallbackContextOnThread();
-            context.setSqlLogHandler(null);
-            clearIfNoInterface(context);
-        }
+        endCallback(context -> context.setSqlLogHandler(null));
     }
 
     // -----------------------------------------------------
     //                                      SqlResultHandler
     //                                      ----------------
     /**
-     * Set the handler of SQL result. <br>
+     * Set the handler of SQL result. (inheriting existing handlers as default) <br>
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlResultHandler(new SqlResultHandler() {
@@ -333,7 +361,7 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlResultHandler The handler of SQL result. (NullAllowed)
+     * @param sqlResultHandler The handler of SQL result. (NullAllowed: completely clear, Inheritable)
      */
     public static void setSqlResultHandlerOnThread(SqlResultHandler sqlResultHandler) {
         final CallbackContext context = getOrCreateContext();
@@ -349,22 +377,29 @@ public class CallbackContext {
     }
 
     /**
+     * Terminate the last handler interface of SQL results from callback context on thread. <br>
+     * If the callback context does not have other interfaces, the context is removed from thread.
+     */
+    public static void terminateLastSqlResultHandlerOnThread() {
+        endCallback(context -> context.terminateLastSqlResultHandler());
+    }
+
+    /**
+     * <span style="color: #AD4747; font-size: 120%">
+     * (removes all existing handlers completely so use terminateLast...() basically) <br>
+     * </span>
      * Clear the handler of SQL result from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlResultHandlerOnThread() {
-        if (isExistCallbackContextOnThread()) {
-            final CallbackContext context = getCallbackContextOnThread();
-            context.setSqlResultHandler(null);
-            clearIfNoInterface(context);
-        }
+        endCallback(context -> context.setSqlResultHandler(null));
     }
 
     // -----------------------------------------------------
     //                                       SqlStringFilter
     //                                       ---------------
     /**
-     * Set the filter of SQL string. <br>
+     * Set the filter of SQL string. (inheriting existing filters as default) <br>
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlStringFilter(new SqlStringFilter() {
@@ -373,7 +408,7 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlStringFilter The filter of SQL string. (NullAllowed)
+     * @param sqlStringFilter The filter of SQL string. (NullAllowed: completely clear, Inheritable)
      */
     public static void setSqlStringFilterOnThread(SqlStringFilter sqlStringFilter) {
         final CallbackContext context = getOrCreateContext();
@@ -389,15 +424,22 @@ public class CallbackContext {
     }
 
     /**
+     * Terminate the last filter interface of SQL strings from callback context on thread. <br>
+     * If the callback context does not have other interfaces, the context is removed from thread.
+     */
+    public static void terminateLastSqlStringFilterOnThread() {
+        endCallback(context -> context.terminateLastSqlStringFilter());
+    }
+
+    /**
+     * <span style="color: #AD4747; font-size: 120%">
+     * (removes all existing filters completely so use terminateLast...() basically) <br>
+     * </span>
      * Clear the filter of SQL string from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlStringFilterOnThread() {
-        if (isExistCallbackContextOnThread()) {
-            final CallbackContext context = getCallbackContextOnThread();
-            context.setSqlStringFilter(null);
-            clearIfNoInterface(context);
-        }
+        endCallback(context -> context.setSqlStringFilter(null));
     }
 
     // -----------------------------------------------------
@@ -413,7 +455,15 @@ public class CallbackContext {
         }
     }
 
-    protected static void clearIfNoInterface(final CallbackContext context) {
+    protected static void endCallback(Consumer<CallbackContext> oneArgLambda) {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            oneArgLambda.accept(context);
+            clearContextIfNoInterface(context);
+        }
+    }
+
+    protected static void clearContextIfNoInterface(final CallbackContext context) {
         if (!context.hasAnyInterface()) {
             clearCallbackContextOnThread();
         }
@@ -435,6 +485,415 @@ public class CallbackContext {
         return _behaviorCommandHook != null || _sqlFireHook != null // hook
                 || _sqlLogHandler != null || _sqlResultHandler != null // handler
                 || _sqlStringFilter != null; // filter
+    }
+
+    // ===================================================================================
+    //                                                                        Registration
+    //                                                                        ============
+    // -----------------------------------------------------
+    //                                   BehaviorCommandHook
+    //                                   -------------------
+    /**
+     * Set the hook interface of behavior commands. (inheriting existing hooks as default) <br>
+     * This hook interface is called back before executing behavior commands and finally. <br> 
+     * The hook methods may be called by nested process so you should pay attention to it when you implements this.
+     * <pre>
+     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta) {
+     *         // You can implement your favorite callback here.
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+     *         // You can implement your favorite callback here.
+     *     }
+     * });
+     * </pre>
+     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed: completely clear, Inheritable)
+     */
+    public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
+        if (_behaviorCommandHook != null && behaviorCommandHook != null && behaviorCommandHook.inheritsExistingHook()) {
+            _behaviorCommandHook = newInheritableBehaviorCommandHook(_behaviorCommandHook, behaviorCommandHook);
+        } else {
+            _behaviorCommandHook = behaviorCommandHook;
+        }
+    }
+
+    /**
+     * Terminate the last behavior command hook. <br>
+     * If the only one hook is registered, completely remove the instance from variable.
+     */
+    public void terminateLastBehaviorCommandHook() {
+        if (_behaviorCommandHook instanceof InheritableBehaviorCommandHook) {
+            _behaviorCommandHook = ((InheritableBehaviorCommandHook) _behaviorCommandHook).getOriginally();
+        } else {
+            _behaviorCommandHook = null;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           SqlFireHook
+    //                                           -----------
+    /**
+     * Set the hook interface of SQL fires. (inheriting existing hooks as default) <br>
+     * This hook interface is called back before firing SQL and finally. <br>
+     * The hook methods may be called by nested process so you should pay attention to it when you implements this.
+     * <pre>
+     * context.setSqlFireHook(new SqlFireHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+     *         // You can implement your favorite callback here.
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+     *         // You can implement your favorite callback here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlFireHook The hook interface of SQL fires. (NullAllowed: completely clear, Inheritable)
+     */
+    public void setSqlFireHook(SqlFireHook sqlFireHook) {
+        if (_sqlFireHook != null && sqlFireHook != null && sqlFireHook.inheritsExistingHook()) {
+            _sqlFireHook = newInheritableSqlFireHook(_sqlFireHook, sqlFireHook);
+        } else {
+            _sqlFireHook = sqlFireHook;
+        }
+    }
+
+    /**
+     * Terminate the last SQL fire hook. <br>
+     * If the only one hook is registered, completely remove the instance from variable.
+     */
+    public void terminateLastSqlFireHook() {
+        if (_sqlFireHook instanceof InheritableSqlFireHook) {
+            _sqlFireHook = ((InheritableSqlFireHook) _sqlFireHook).getOriginally();
+        } else {
+            _sqlFireHook = null;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         SqlLogHandler
+    //                                         -------------
+    /**
+     * Set the handler of SQL log. (inheriting existing hooks as default) <br>
+     * This handler is called back before executing the SQL.
+     * <pre>
+     * context.setSqlLogHandler(new SqlLogHandler() {
+     *     public void handle(String executedSql, String displaySql
+     *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
+     *         // You can get your SQL string here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlLogHandler The handler of SQL log. (NullAllowed: completely clear, Inheritable)
+     */
+    public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
+        if (_sqlLogHandler != null && sqlLogHandler != null && sqlLogHandler.inheritsExistingHandler()) {
+            _sqlLogHandler = newInheritableSqlLogHandler(_sqlLogHandler, sqlLogHandler);
+        } else {
+            _sqlLogHandler = sqlLogHandler;
+        }
+    }
+
+    /**
+     * Terminate the last SQL log handler. <br>
+     * If the only one handler is registered, completely remove the instance from variable.
+     */
+    public void terminateLastSqlLogHandler() {
+        if (_sqlLogHandler instanceof InheritableSqlLogHandler) {
+            _sqlLogHandler = ((InheritableSqlLogHandler) _sqlLogHandler).getOriginally();
+        } else {
+            _sqlLogHandler = null;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      SqlResultHandler
+    //                                      ----------------
+    /**
+     * Set the handler of SQL result. (inheriting existing hooks as default) <br>
+     * This handler is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlResultHandler(new SqlResultHandler() {
+     *     public void handle(SqlResultInfo info) {
+     *         // You can get your SQL result information here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlResultHandler The handler of SQL result. (NullAllowed: completely clear, Inheritable)
+     */
+    public void setSqlResultHandler(SqlResultHandler sqlResultHandler) {
+        if (_sqlResultHandler != null && sqlResultHandler != null && sqlResultHandler.inheritsExistingHandler()) {
+            _sqlResultHandler = newInheritableSqlResultHandler(_sqlResultHandler, sqlResultHandler);
+        } else {
+            _sqlResultHandler = sqlResultHandler;
+        }
+    }
+
+    /**
+     * Terminate the last SQL log handler. <br>
+     * If the only one handler is registered, completely remove the instance from variable.
+     */
+    public void terminateLastSqlResultHandler() {
+        if (_sqlResultHandler instanceof InheritableSqlResultHandler) {
+            _sqlResultHandler = ((InheritableSqlResultHandler) _sqlResultHandler).getOriginally();
+        } else {
+            _sqlResultHandler = null;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                       SqlStringFilter
+    //                                       ---------------
+    /**
+     * Set the filter of SQL string. (inheriting existing hooks as default) <br>
+     * This filter is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlStringFilter(new SqlStringFilter() {
+     *     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+     *         // You can filter your SQL string here.
+     *     }
+     *     ...
+     * });
+     * </pre>
+     * @param sqlStringFilter The filter of SQL string. (NullAllowed: completely clear, Inheritable)
+     */
+    public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
+        if (_sqlStringFilter != null && sqlStringFilter != null && sqlStringFilter.inheritsExistingFilter()) {
+            _sqlStringFilter = newInheritableSqlStringFilter(_sqlStringFilter, sqlStringFilter);
+        } else {
+            _sqlStringFilter = sqlStringFilter;
+        }
+    }
+
+    /**
+     * Terminate the last SQL string filter. <br>
+     * If the only one filter is registered, completely remove the instance from variable.
+     */
+    public void terminateLastSqlStringFilter() {
+        if (_sqlStringFilter instanceof InheritableSqlStringFilter) {
+            _sqlStringFilter = ((InheritableSqlStringFilter) _sqlStringFilter).getOriginally();
+        } else {
+            _sqlStringFilter = null;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                         Inheritable
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                   BehaviorCommandHook
+    //                                   -------------------
+    protected InheritableBehaviorCommandHook newInheritableBehaviorCommandHook(BehaviorCommandHook originally,
+            BehaviorCommandHook yourHook) {
+        return new InheritableBehaviorCommandHook(originally, yourHook);
+    }
+
+    protected static class InheritableBehaviorCommandHook implements BehaviorCommandHook, InheritableCallback<BehaviorCommandHook> {
+
+        protected final BehaviorCommandHook _originally; // may be inheritable, not null
+        protected final BehaviorCommandHook _yourHook; // is not inheritable, always real hook, not null
+
+        public InheritableBehaviorCommandHook(BehaviorCommandHook originally, BehaviorCommandHook yourHook) {
+            _originally = originally;
+            _yourHook = yourHook;
+        }
+
+        public void hookBefore(BehaviorCommandMeta meta) {
+            _originally.hookBefore(meta);
+            _yourHook.hookBefore(meta); // your is inside
+        }
+
+        public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+            _yourHook.hookFinally(meta, cause); // your is inside
+            _originally.hookFinally(meta, cause);
+        }
+
+        public BehaviorCommandHook getOriginally() {
+            return _originally;
+        }
+
+        public BehaviorCommandHook getYourHook() {
+            return _yourHook;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           SqlFireHook
+    //                                           -----------
+    protected InheritableSqlFireHook newInheritableSqlFireHook(SqlFireHook originally, SqlFireHook yourHook) {
+        return new InheritableSqlFireHook(originally, yourHook);
+    }
+
+    protected static class InheritableSqlFireHook implements SqlFireHook, InheritableCallback<SqlFireHook> {
+
+        protected final SqlFireHook _originally; // may be inheritable, not null
+        protected final SqlFireHook _yourHook; // is not inheritable, always real hook, not null
+
+        public InheritableSqlFireHook(SqlFireHook originally, SqlFireHook yourHook) {
+            _originally = originally;
+            _yourHook = yourHook;
+        }
+
+        public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+            _originally.hookBefore(meta, fireReadyInfo);
+            _yourHook.hookBefore(meta, fireReadyInfo); // your is inside
+        }
+
+        public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+            _yourHook.hookFinally(meta, fireResultInfo); // your is inside
+            _originally.hookFinally(meta, fireResultInfo);
+        }
+
+        public SqlFireHook getOriginally() {
+            return _originally;
+        }
+
+        public SqlFireHook getYourHook() {
+            return _yourHook;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         SqlLogHandler
+    //                                         -------------
+    protected InheritableSqlLogHandler newInheritableSqlLogHandler(SqlLogHandler originally, SqlLogHandler yourHandler) {
+        return new InheritableSqlLogHandler(originally, yourHandler);
+    }
+
+    protected static class InheritableSqlLogHandler implements SqlLogHandler, InheritableCallback<SqlLogHandler> {
+
+        protected final SqlLogHandler _originally; // may be inheritable, not null
+        protected final SqlLogHandler _yourHandler; // is not inheritable, always real handler, not null
+
+        public InheritableSqlLogHandler(SqlLogHandler originally, SqlLogHandler yourHandler) {
+            _originally = originally;
+            _yourHandler = yourHandler;
+        }
+
+        public void handle(SqlLogInfo info) {
+            _originally.handle(info);
+            _yourHandler.handle(info);
+        }
+
+        public SqlLogHandler getOriginally() {
+            return _originally;
+        }
+
+        public SqlLogHandler getYourHandler() {
+            return _yourHandler;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      SqlResultHandler
+    //                                      ----------------
+    protected InheritableSqlResultHandler newInheritableSqlResultHandler(SqlResultHandler originally, SqlResultHandler yourHandler) {
+        return new InheritableSqlResultHandler(originally, yourHandler);
+    }
+
+    protected static class InheritableSqlResultHandler implements SqlResultHandler, InheritableCallback<SqlResultHandler> {
+
+        protected final SqlResultHandler _originally; // may be inheritable, not null
+        protected final SqlResultHandler _yourHandler; // is not inheritable, always real handler, not null
+
+        public InheritableSqlResultHandler(SqlResultHandler originally, SqlResultHandler yourHandler) {
+            _originally = originally;
+            _yourHandler = yourHandler;
+        }
+
+        public void handle(SqlResultInfo info) {
+            _originally.handle(info);
+            _yourHandler.handle(info);
+        }
+
+        @Override
+        public SqlResultHandler getOriginally() {
+            return _originally;
+        }
+
+        public SqlResultHandler getYourHandler() {
+            return _yourHandler;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                       SqlStringFilter
+    //                                       ---------------
+    protected InheritableSqlStringFilter newInheritableSqlStringFilter(SqlStringFilter originally, SqlStringFilter yourFilter) {
+        return new InheritableSqlStringFilter(originally, yourFilter);
+    }
+
+    protected static class InheritableSqlStringFilter implements SqlStringFilter, InheritableCallback<SqlStringFilter> {
+
+        protected final SqlStringFilter _originally; // might be null e.g. when first one
+        protected final SqlStringFilter _yourFilter; // is not inheritable, always real filter, not null
+
+        public InheritableSqlStringFilter(SqlStringFilter originally, SqlStringFilter yourFilter) {
+            _originally = originally;
+            _yourFilter = yourFilter;
+        }
+
+        @Override
+        public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+            return doFilter(executedSql, (filter, sql) -> filter.filterSelectCB(meta, sql));
+        }
+
+        @Override
+        public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
+            return doFilter(executedSql, (filter, sql) -> filter.filterEntityUpdate(meta, sql));
+        }
+
+        @Override
+        public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
+            return doFilter(executedSql, (filter, sql) -> filter.filterQueryUpdate(meta, sql));
+        }
+
+        @Override
+        public String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
+            return doFilter(executedSql, (filter, sql) -> filter.filterOutsideSql(meta, sql));
+        }
+
+        @Override
+        public String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
+            return doFilter(executedSql, (filter, sql) -> filter.filterProcedure(meta, sql));
+        }
+
+        protected String doFilter(String executedSql, BiFunction<SqlStringFilter, String, String> call) {
+            final String originallyFiltered = actuallyFilter(_originally, executedSql, call);
+            return actuallyFilter(_yourFilter, originallyFiltered, call);
+
+        }
+
+        protected String actuallyFilter(SqlStringFilter filter, String executedSql, BiFunction<SqlStringFilter, String, String> call) {
+            final String filtered = call.apply(filter, executedSql);
+            return filtered != null ? filtered : executedSql;
+        }
+
+        @Override
+        public SqlStringFilter getOriginally() {
+            return _originally;
+        }
+
+        public SqlStringFilter getYourFilter() {
+            return _yourFilter;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                          Small Helper
+    //                                          ------------
+    protected static interface InheritableCallback<CALL> {
+
+        default int countManagedHook() { // contains myself
+            final CALL originally = getOriginally();
+            final int nestHookCount;
+            if (originally instanceof InheritableBehaviorCommandHook) { // e.g. three or more hooks registered
+                nestHookCount = ((InheritableBehaviorCommandHook) originally).countManagedHook();
+            } else { // termination
+                nestHookCount = 1; // add nested one (the 1 is for originally that is real hook)
+            }
+            return nestHookCount + 1; // add myself (the 1 is for yourHook)
+        }
+
+        CALL getOriginally();
     }
 
     // ===================================================================================
@@ -464,145 +923,11 @@ public class CallbackContext {
         return _behaviorCommandHook;
     }
 
-    /**
-     * Set the hook interface of behavior commands. (overriding existing hook as default) <br>
-     * This hook interface is called back before executing behavior commands and finally. <br> 
-     * <pre>
-     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
-     *     public void hookBefore(BehaviorCommandMeta meta) {
-     *         // You can implement your favorite callback here.
-     *     }
-     *     public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
-     *         // You can implement your favorite callback here.
-     *     }
-     * });
-     * </pre>
-     * <p>The hook methods may be called by nested process so you should pay attention to it when you implements this.</p>
-     * <p>Also you can inherit the existing hook with your hook by overriding inheritsExistingHook().</p>
-     * <pre>
-     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
-     *     public void hookBefore(BehaviorCommandMeta meta) {
-     *         ...
-     *     }
-     *     public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
-     *         ...
-     *     }
-     *     public boolean inheritsExistingHook() {
-     *         return true; // also existing hooks will be executed, 
-     *     }
-     * });
-     * </pre>
-     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed, Inheritable)
-     */
-    public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
-        if (_behaviorCommandHook != null && behaviorCommandHook != null && behaviorCommandHook.inheritsExistingHook()) {
-            _behaviorCommandHook = createInheritableBehaviorCommandHook(behaviorCommandHook);
-        } else {
-            _behaviorCommandHook = behaviorCommandHook;
-        }
-    }
-
-    protected InheritableBehaviorCommandHook createInheritableBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
-        return new InheritableBehaviorCommandHook(_behaviorCommandHook, behaviorCommandHook);
-    }
-
-    protected static class InheritableBehaviorCommandHook implements BehaviorCommandHook {
-
-        protected final BehaviorCommandHook _originally; // might be null e.g. when first one
-        protected final BehaviorCommandHook _yourHook;
-
-        public InheritableBehaviorCommandHook(BehaviorCommandHook originally, BehaviorCommandHook yourHook) {
-            _originally = originally;
-            _yourHook = yourHook;
-        }
-
-        public void hookBefore(BehaviorCommandMeta meta) {
-            if (_originally != null) {
-                _originally.hookBefore(meta);
-            }
-            _yourHook.hookBefore(meta);
-        }
-
-        public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
-            _yourHook.hookFinally(meta, cause);
-            if (_originally != null) {
-                _originally.hookFinally(meta, cause);
-            }
-        }
-    }
-
     // -----------------------------------------------------
     //                                           SqlFireHook
     //                                           -----------
     public SqlFireHook getSqlFireHook() {
         return _sqlFireHook;
-    }
-
-    /**
-     * Set the hook interface of SQL fires. (overriding existing hook as default) <br>
-     * This hook interface is called back before firing SQL and finally. 
-     * <pre>
-     * context.setSqlFireHook(new SqlFireHook() {
-     *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
-     *         // You can implement your favorite callback here.
-     *     }
-     *     public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-     *         // You can implement your favorite callback here.
-     *     }
-     * });
-     * </pre>
-     * <p>The hook methods may be called by nested process so you should pay attention to it when you implements this.</p>
-     * <p>Also you can inherit the existing hook with your hook by overriding inheritsExistingHook().</p>
-     * <pre>
-     * context.setSqlFireHook(new SqlFireHook() {
-     *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
-     *         ...
-     *     }
-     *     public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-     *         ...
-     *     }
-     *     public boolean inheritsExistingHook() {
-     *         return true; // also existing hooks will be executed, 
-     *     }
-     * });
-     * </pre>
-     * @param sqlFireHook The hook interface of SQL fires. (NullAllowed, Inheritable)
-     */
-    public void setSqlFireHook(SqlFireHook sqlFireHook) {
-        if (_sqlFireHook != null && sqlFireHook != null && sqlFireHook.inheritsExistingHook()) {
-            _sqlFireHook = createInheritableSqlFireHook(sqlFireHook);
-        } else {
-            _sqlFireHook = sqlFireHook;
-        }
-    }
-
-    protected InheritableSqlFireHook createInheritableSqlFireHook(SqlFireHook sqlFireHook) {
-        return new InheritableSqlFireHook(_sqlFireHook, sqlFireHook);
-    }
-
-    protected static class InheritableSqlFireHook implements SqlFireHook {
-
-        protected final SqlFireHook _originally; // might be null e.g. when first one
-        protected final SqlFireHook _yourHook;
-
-        public InheritableSqlFireHook(SqlFireHook originally, SqlFireHook yourHook) {
-            _originally = originally;
-            _yourHook = yourHook;
-        }
-
-        public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
-            if (_originally != null) {
-                _originally.hookBefore(meta, fireReadyInfo);
-            }
-            _yourHook.hookBefore(meta, fireReadyInfo);
-        }
-
-        public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-            _yourHook.hookFinally(meta, fireResultInfo);
-            if (_originally != null) {
-                _originally.hookFinally(meta, fireResultInfo);
-            }
-        }
     }
 
     // -----------------------------------------------------
@@ -612,49 +937,6 @@ public class CallbackContext {
         return _sqlLogHandler;
     }
 
-    /**
-     * Set the handler of SQL log. <br>
-     * This handler is called back before executing the SQL.
-     * <pre>
-     * context.setSqlLogHandler(new SqlLogHandler() {
-     *     public void handle(String executedSql, String displaySql
-     *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
-     *         // You can get your SQL string here.
-     *     }
-     * });
-     * </pre>
-     * @param sqlLogHandler The handler of SQL log. (NullAllowed, Inheritable)
-     */
-    public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
-        if (_sqlLogHandler != null && sqlLogHandler != null && sqlLogHandler.inheritsExistingHandler()) {
-            _sqlLogHandler = createInheritableSqlLogHandler(sqlLogHandler);
-        } else {
-            _sqlLogHandler = sqlLogHandler;
-        }
-    }
-
-    protected InheritableSqlLogHandler createInheritableSqlLogHandler(SqlLogHandler sqlLogHandler) {
-        return new InheritableSqlLogHandler(_sqlLogHandler, sqlLogHandler);
-    }
-
-    protected static class InheritableSqlLogHandler implements SqlLogHandler {
-
-        protected final SqlLogHandler _originally; // might be null e.g. when first one
-        protected final SqlLogHandler _yourHandler;
-
-        public InheritableSqlLogHandler(SqlLogHandler originally, SqlLogHandler yourHandler) {
-            _originally = originally;
-            _yourHandler = yourHandler;
-        }
-
-        public void handle(SqlLogInfo info) {
-            if (_originally != null) {
-                _originally.handle(info);
-            }
-            _yourHandler.handle(info);
-        }
-    }
-
     // -----------------------------------------------------
     //                                      SqlResultHandler
     //                                      ----------------
@@ -662,153 +944,10 @@ public class CallbackContext {
         return _sqlResultHandler;
     }
 
-    /**
-     * Set the handler of SQL result. <br>
-     * This handler is called back before executing the SQL. 
-     * <pre>
-     * context.setSqlResultHandler(new SqlResultHandler() {
-     *     public void handle(SqlResultInfo info) {
-     *         // You can get your SQL result information here.
-     *     }
-     * });
-     * </pre>
-     * @param sqlResultHandler The handler of SQL result. (NullAllowed, Inheritable)
-     */
-    public void setSqlResultHandler(SqlResultHandler sqlResultHandler) {
-        if (_sqlResultHandler != null && sqlResultHandler != null && sqlResultHandler.inheritsExistingHandler()) {
-            _sqlResultHandler = createInheritableSqlResultHandler(sqlResultHandler);
-        } else {
-            _sqlResultHandler = sqlResultHandler;
-        }
-    }
-
-    protected InheritableSqlResultHandler createInheritableSqlResultHandler(SqlResultHandler sqlResultHandler) {
-        return new InheritableSqlResultHandler(_sqlResultHandler, sqlResultHandler);
-    }
-
-    protected static class InheritableSqlResultHandler implements SqlResultHandler {
-
-        protected final SqlResultHandler _originally; // might be null e.g. when first one
-        protected final SqlResultHandler _yourHandler;
-
-        public InheritableSqlResultHandler(SqlResultHandler originally, SqlResultHandler yourHandler) {
-            _originally = originally;
-            _yourHandler = yourHandler;
-        }
-
-        public void handle(SqlResultInfo info) {
-            if (_originally != null) {
-                _originally.handle(info);
-            }
-            _yourHandler.handle(info);
-        }
-    }
-
     // -----------------------------------------------------
     //                                       SqlStringFilter
     //                                       ---------------
     public SqlStringFilter getSqlStringFilter() {
         return _sqlStringFilter;
-    }
-
-    /**
-     * Set the filter of SQL string. <br>
-     * This filter is called back before executing the SQL. 
-     * <pre>
-     * context.setSqlStringFilter(new SqlStringFilter() {
-     *     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
-     *         // You can filter your SQL string here.
-     *     }
-     *     ...
-     * });
-     * </pre>
-     * @param sqlStringFilter The filter of SQL string. (NullAllowed, Inheritable)
-     */
-    public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
-        if (_sqlStringFilter != null && sqlStringFilter != null && sqlStringFilter.inheritsExistingFilter()) {
-            _sqlStringFilter = createInheritableSqlStringFilter(sqlStringFilter);
-        } else {
-            _sqlStringFilter = sqlStringFilter;
-        }
-    }
-
-    protected InheritableSqlStringFilter createInheritableSqlStringFilter(SqlStringFilter sqlStringFilter) {
-        return new InheritableSqlStringFilter(_sqlStringFilter, sqlStringFilter);
-    }
-
-    protected static class InheritableSqlStringFilter implements SqlStringFilter {
-
-        protected final SqlStringFilter _originally; // might be null e.g. when first one
-        protected final SqlStringFilter _yourHandler;
-
-        public InheritableSqlStringFilter(SqlStringFilter originally, SqlStringFilter yourHandler) {
-            _originally = originally;
-            _yourHandler = yourHandler;
-        }
-
-        @Override
-        public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
-            final String first;
-            if (_originally != null) {
-                final String filtered = _originally.filterSelectCB(meta, executedSql);
-                first = filtered != null ? filtered : executedSql;
-            } else {
-                first = executedSql;
-            }
-            final String second = _yourHandler.filterSelectCB(meta, first);
-            return second != null ? second : first;
-        }
-
-        @Override
-        public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
-            final String first;
-            if (_originally != null) {
-                final String filtered = _originally.filterEntityUpdate(meta, executedSql);
-                first = filtered != null ? filtered : executedSql;
-            } else {
-                first = executedSql;
-            }
-            final String second = _yourHandler.filterEntityUpdate(meta, first);
-            return second != null ? second : first;
-        }
-
-        @Override
-        public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
-            final String first;
-            if (_originally != null) {
-                final String filtered = _originally.filterQueryUpdate(meta, executedSql);
-                first = filtered != null ? filtered : executedSql;
-            } else {
-                first = executedSql;
-            }
-            final String second = _yourHandler.filterQueryUpdate(meta, first);
-            return second != null ? second : first;
-        }
-
-        @Override
-        public String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
-            final String first;
-            if (_originally != null) {
-                final String filtered = _originally.filterOutsideSql(meta, executedSql);
-                first = filtered != null ? filtered : executedSql;
-            } else {
-                first = executedSql;
-            }
-            final String second = _yourHandler.filterOutsideSql(meta, first);
-            return second != null ? second : first;
-        }
-
-        @Override
-        public String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
-            final String first;
-            if (_originally != null) {
-                final String filtered = _originally.filterProcedure(meta, executedSql);
-                first = filtered != null ? filtered : executedSql;
-            } else {
-                first = executedSql;
-            }
-            final String second = _yourHandler.filterProcedure(meta, first);
-            return second != null ? second : first;
-        }
     }
 }

@@ -45,8 +45,7 @@ public interface SqlResultHandler {
     void handle(SqlResultInfo info);
 
     /**
-     * Does it inherit the existing handler? <br>
-     * Completely overriding as default but you can inherit it by this determination.
+     * Does it inherit the existing handler?
      * @return The determination, true or false.
      */
     default boolean inheritsExistingHandler() {

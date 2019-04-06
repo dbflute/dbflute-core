@@ -38,8 +38,7 @@ public interface BehaviorCommandHook {
     void hookFinally(BehaviorCommandMeta meta, RuntimeException cause);
 
     /**
-     * Does it inherit the existing hook? <br>
-     * Completely overriding as default but you can inherit it by this determination.
+     * Does it inherit the existing hook?
      * @return The determination, true or false.
      */
     default boolean inheritsExistingHook() {
