@@ -199,7 +199,8 @@ public class CallbackContext {
     /**
      * Set the hook interface of behavior commands. (inheriting existing hooks as default) <br>
      * This hook interface is called-back before executing behavior commands and finally. <br> 
-     * The hook methods may be called by nested process so you should pay attention to it when you implements this. <br>
+     * The hook methods may be called by nested process so pay attention to it. <br>
+     * And don't forget to terminate the last hook in finally scope.
      * <pre>
      * CallbackContext.setBehaviorCommandHook(new BehaviorCommandHook() {
      *     public void hookBefore(BehaviorCommandMeta meta) {
@@ -210,7 +211,7 @@ public class CallbackContext {
      *     }
      * });
      * try {
-     *     ...
+     *     ...(DB access)
      * } finally {
      *     CallbackContext.terminateLastBehaviorCommandHookOnThread();
      * }
@@ -255,8 +256,8 @@ public class CallbackContext {
     /**
      * Set the hook interface of SQL fires. (inheriting existing hooks as default) <br>
      * This hook interface is called back before firing SQL and finally. <br> 
-     * The hook methods may be called by nested process
-     * so you should pay attention to it when you implements this.
+     * The hook methods may be called by nested process so pay attention to it. <br>
+     * And don't forget to terminate the last hook in finally scope.
      * <pre>
      * context.setSqlFireHook(new SqlFireHook() {
      *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
@@ -266,6 +267,11 @@ public class CallbackContext {
      *         // You can implement your favorite callback here.
      *     }
      * });
+     * try {
+     *     ...(DB access)
+     * } finally {
+     *     CallbackContext.terminateLastSqlFireHookOnThread();
+     * }
      * </pre>
      * @param sqlFireHook The hook interface of SQL fires. (NullAllowed: completely clear, Inheritable)
      */
@@ -306,13 +312,20 @@ public class CallbackContext {
     //                                         -------------
     /**
      * Set the handler of SQL log. (inheriting existing handlers as default) <br>
-     * This handler is called back before executing the SQL.
+     * This handler is called back before executing the SQL. <br>
+     * The handler methods may be called by nested process so pay attention to it. <br>
+     * And don't forget to terminate the last handler in finally scope.
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
      *     public void handle(SqlLogInfo info) {
      *         // You can get your SQL string here.
      *     }
      * });
+     * try {
+     *     ...(DB access)
+     * } finally {
+     *     CallbackContext.terminateLastSqlLogHandlerOnThread();
+     * }
      * </pre>
      * @param sqlLogHandler The handler of SQL log. (NullAllowed: completely clear, Inheritable)
      */
@@ -353,13 +366,20 @@ public class CallbackContext {
     //                                      ----------------
     /**
      * Set the handler of SQL result. (inheriting existing handlers as default) <br>
-     * This handler is called back before executing the SQL. 
+     * This handler is called back before executing the SQL. <br>
+     * The handler methods may be called by nested process so pay attention to it. <br>
+     * And don't forget to terminate the last handler in finally scope.
      * <pre>
      * context.setSqlResultHandler(new SqlResultHandler() {
      *     public void handle(SqlResultInfo info) {
      *         // You can get your SQL result information here.
      *     }
      * });
+     * try {
+     *     ...(DB access)
+     * } finally {
+     *     CallbackContext.terminateLastSqlResultHandlerOnThread();
+     * }
      * </pre>
      * @param sqlResultHandler The handler of SQL result. (NullAllowed: completely clear, Inheritable)
      */
@@ -400,13 +420,20 @@ public class CallbackContext {
     //                                       ---------------
     /**
      * Set the filter of SQL string. (inheriting existing filters as default) <br>
-     * This handler is called back before executing the SQL. 
+     * This handler is called back before executing the SQL. <br>
+     * The filter methods may be called by nested process so pay attention to it. <br>
+     * And don't forget to terminate the last filter in finally scope.
      * <pre>
      * context.setSqlStringFilter(new SqlStringFilter() {
      *     public String filter(String executedSql) {
      *         // You can filter your executed SQL string here.
      *     }
      * });
+     * try {
+     *     ...(DB access)
+     * } finally {
+     *     CallbackContext.terminateLastSqlStringFilterOnThread();
+     * }
      * </pre>
      * @param sqlStringFilter The filter of SQL string. (NullAllowed: completely clear, Inheritable)
      */
@@ -496,7 +523,7 @@ public class CallbackContext {
     /**
      * Set the hook interface of behavior commands. (inheriting existing hooks as default) <br>
      * This hook interface is called back before executing behavior commands and finally. <br> 
-     * The hook methods may be called by nested process so you should pay attention to it when you implements this.
+     * The hook methods may be called by nested process so pay attention to it.
      * <pre>
      * context.setBehaviorCommandHook(new BehaviorCommandHook() {
      *     public void hookBefore(BehaviorCommandMeta meta) {
@@ -535,7 +562,7 @@ public class CallbackContext {
     /**
      * Set the hook interface of SQL fires. (inheriting existing hooks as default) <br>
      * This hook interface is called back before firing SQL and finally. <br>
-     * The hook methods may be called by nested process so you should pay attention to it when you implements this.
+     * The hook methods may be called by nested process so pay attention to it.
      * <pre>
      * context.setSqlFireHook(new SqlFireHook() {
      *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
