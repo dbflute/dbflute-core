@@ -18,11 +18,12 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>${database.projectName} schema</title>
-#if ($database.isSchemaHtmlStyleSheetEmbedded())
+#set ($isSchemaHtmlStyleSheetInheritable = $database.isSchemaHtmlStyleSheetInheritable())
+#if (!$isSchemaHtmlStyleSheetInheritable && $database.isSchemaHtmlStyleSheetEmbedded())
 	<style type="text/css">
 ${database.schemaHtmlStyleSheetEmbedded}
 	</style>
-#elseif ($database.isSchemaHtmlStyleSheetLink())
+#elseif (!$isSchemaHtmlStyleSheetInheritable && $database.isSchemaHtmlStyleSheetLink())
 	${database.schemaHtmlStyleSheetLink}
 #else
 	<style type="text/css">
@@ -456,6 +457,13 @@ pre.spolicyviodisp {
 	color: #222277;
 }
 	</style>
+#if ($isSchemaHtmlStyleSheetInheritable && $database.isSchemaHtmlStyleSheetEmbedded())
+	<style type="text/css">
+${database.schemaHtmlStyleSheetEmbedded}
+	</style>
+#elseif ($isSchemaHtmlStyleSheetInheritable && $database.isSchemaHtmlStyleSheetLink())
+	${database.schemaHtmlStyleSheetLink}
+#end
 #end
 #if ($database.isSchemaHtmlJavaScriptEmbedded())
 	<script type="text/javascript">

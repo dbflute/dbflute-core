@@ -2436,6 +2436,10 @@ public class Database {
         return getProperties().getDocumentProperties().isSchemaHtmlStyleSheetLink();
     }
 
+    public boolean isSchemaHtmlStyleSheetInheritable() {
+        return getProperties().getDocumentProperties().isSchemaHtmlStyleSheetInheritable();
+    }
+
     public String getSchemaHtmlStyleSheetEmbedded() {
         return getProperties().getDocumentProperties().getSchemaHtmlStyleSheetEmbedded();
     }

@@ -328,6 +328,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     protected String getSchemaHtmlStyleSheet() { // closet
         return getProperty("schemaHtmlStyleSheet", null, getDocumentMap());
     }
+    
+    public boolean isSchemaHtmlStyleSheetInheritable() { // closet
+        return isProperty("isSchemaHtmlStyleSheetInheritable", false, getDocumentMap());
+    }
 
     // -----------------------------------------------------
     //                                            JavaScript
