@@ -333,6 +333,7 @@ public class DfSPolicyLogicalSecretary {
         br.addNotice("The schema policy has been violated.");
         br.addItem("Advice");
         br.addElement("Make sure your violating schema (ERD and DDL).");
+        br.addElement("You can see violations on this message or SchemaHTML.");
         br.addElement("And after that, execute renewal (or regenerate) again.");
         br.addElement("(tips: The schema policy is on schemaPolicyMap.dfprop)");
         // unneeded because of too big, already info, also violation with definition by jflute (2019/01/27)
