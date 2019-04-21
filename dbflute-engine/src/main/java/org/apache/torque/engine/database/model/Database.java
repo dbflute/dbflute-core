@@ -2490,6 +2490,10 @@ public class Database {
         return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetLink();
     }
 
+    public boolean isHistoryHtmlStyleSheetInheritable() {
+        return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetInheritable();
+    }
+
     public String getHistoryHtmlStyleSheetEmbedded() {
         return getProperties().getDocumentProperties().getHistoryHtmlStyleSheetEmbedded();
     }

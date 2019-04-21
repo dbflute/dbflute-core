@@ -312,49 +312,12 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
         return !isSuppressHistoryHtmlDiffGitBranch();
     }
 
-    // -----------------------------------------------------
-    //                                                Design
-    //                                                ------
-    // HistoryHTML only uses the determinations via selector... (others use $database) by jflute
-    public boolean isHistoryHtmlStyleSheetEmbedded() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
-    }
-
-    public boolean isHistoryHtmlStyleSheetLink() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetLink();
-    }
-
-    public String getHistoryHtmlStyleSheetEmbedded() {
-        return getDocumentProperties().getHistoryHtmlStyleSheetEmbedded();
-    }
-
-    public String getHistoryHtmlStyleSheetLink() {
-        return getDocumentProperties().getHistoryHtmlStyleSheetLink();
-    }
-
-    public boolean isHistoryHtmlJavaScriptEmbedded() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlJavaScriptEmbedded();
-    }
-
-    public boolean isHistoryHtmlJavaScriptLink() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlJavaScriptLink();
-    }
-
-    public String getHistoryHtmlJavaScriptEmbedded() {
-        return getDocumentProperties().getHistoryHtmlJavaScriptEmbedded();
-    }
-
-    public String getHistoryHtmlJavaScriptLink() {
-        return getDocumentProperties().getHistoryHtmlJavaScriptLink();
-    }
-
     // ===================================================================================
     //                                                                     Properties HTML
     //                                                                     ===============
     // -----------------------------------------------------
     //                                         Basic Process
     //                                         -------------
-
     /**
      * Load requests for properties HTML. <br>
      * If no property, do nothing.
