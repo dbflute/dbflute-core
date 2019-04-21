@@ -356,6 +356,19 @@ dl.procedurelist dd.column pre {
 }
 
 /* -------------------------------------------------
+                                    Schema Policy
+------------------------------------------------- */
+pre.spolicydisp {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+}
+pre.spolicyviodisp {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	color: #994747;
+}
+
+/* -------------------------------------------------
                                   Decomment Modal
 ------------------------------------------------- */
 .decommentmodal {
@@ -477,6 +490,9 @@ ${linkDelimiter} <a href="#outsidesql">OutsideSql List</a>
 #if ($database.isSchemaHtmlProcedureValid())
 ${linkDelimiter} <a href="#procedure">Procedure List</a>
 #end
+#if ($database.isSchemaHtmlSchemaPolicyValid())
+${linkDelimiter} <a href="#schemapolicy">Schema Policy</a>
+#end
 #if ($selector.hasSchemaDiagram())
 ${linkDelimiter} <a href="#diagram">Schema Diagram</a>
 #end
@@ -562,6 +578,16 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 	</table>
 	<button id="column-mapping-submit-button">Mapping</button>
 </div>
+#if ($database.isSchemaHtmlSchemaPolicyValid())
+#set ($schemaPolicyDisplay = $database.schemaPolicyDisplay)
+#if ($schemaPolicyDisplay.hasViolation())
+
+<h2 id="schemapolicyvio">SchemaPolicy Violation</h2>
+<pre class="spolicyviodisp">
+${schemaPolicyDisplay.violationMessage}
+</pre>
+#end
+#end
 
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
@@ -784,6 +810,14 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 </dl>
 #end
+#end
+#if ($database.isSchemaHtmlSchemaPolicyValid())
+#set ($schemaPolicyDisplay = $database.schemaPolicyDisplay)
+
+<h2 id="schemapolicy">Schema Policy</h2>
+<pre class="spolicydisp">
+${schemaPolicyDisplay.policyMessage}
+</pre>
 #end
 #if ($selector.hasSchemaDiagram())
 

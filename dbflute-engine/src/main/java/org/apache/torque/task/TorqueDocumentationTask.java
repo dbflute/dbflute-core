@@ -140,6 +140,8 @@ import org.dbflute.logic.doc.decomment.DfDecommentPickupProcess;
 import org.dbflute.logic.doc.hacomment.DfHacommentPickupProcess;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
+import org.dbflute.logic.doc.spolicy.display.DfSPolicyDisplay;
+import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
 import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
@@ -169,10 +171,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _varyingArg;
-    protected boolean _syncCheckGhastlyTragedy;
-    protected DfDecoMapPickup _decoMapPickup;
-    protected DfHacoMapPickup _hacoMapPickup;
+    protected String _varyingArg; // set by Ant process
+    protected boolean _syncCheckGhastlyTragedy; // set by schema-sync process
+    protected DfSPolicyResult _schemaPolicyResult; // null allowed (before policy check or no policy)
+    protected DfDecoMapPickup _decoMapPickup; // null allowed (before decomment process)
+    protected DfHacoMapPickup _hacoMapPickup; // null allowed (before hacomment process)
 
     // ===================================================================================
     //                                                                           Beginning
@@ -226,8 +229,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (processSubTask()) {
             return;
         }
-        processSchemaHtml();
-        processSchemaPolicyCheck();
+        processSchemaHtml(); // making SchemaHTML by velocity process
+
         // these processes are independent since 0.9.9.7B
         //processLoadDataReverse();
         //processSchemaSyncCheck();
@@ -239,7 +242,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             if (!isLoadDataReverseValid()) {
                 throwLoadDataReversePropertyNotFoundException();
             }
-            initializeSchemaData(); // needed
+            initializeSchemaData(); // needed => #thinking needed? ...does not use basic schema data
             processLoadDataReverse();
             return true;
         } else if (isSchemaSyncCheckOnly()) {
@@ -268,7 +271,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _documentSelector.selectLastaDocHtml(); // option
         processDecommentPickup();
         processHacommentPickup();
-        fireVelocityProcess();
+        purelyInitializeSchemaData(); // policy needs database meta data so initialize it here
+        processSchemaPolicyCheck(); // only check and keep result here (not ending yet)
+        fireVelocityProcess(); // making SchemaHTML
+        endingSchemaPolicyResult(); // may throw, after SchemaHTML to show policy result in SchemaHTML since 1.2.0
     }
 
     // -----------------------------------------------------
@@ -302,7 +308,13 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         }
         final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
         final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> _documentSelector.getSchemaDiffList());
-        checker.checkPolicyIfNeeds();
+        _schemaPolicyResult = checker.checkPolicyIfNeeds(); // not ending yet (ending after SchemaHTML)
+    }
+
+    protected void endingSchemaPolicyResult() { // may throw
+        if (_schemaPolicyResult != null) {
+            _schemaPolicyResult.ending();
+        }
     }
 
     // -----------------------------------------------------
@@ -404,15 +416,24 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                  Prepare Generation
     //                                                                  ==================
     @Override
-    protected void initializeSchemaData() {
+    protected void initializeSchemaData() { // basically called in fireVelocityProcess()
         if (isLoadDataReverseOnly() || isSchemaSyncCheckOnly()) { // don't use basic schema data
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
         } else { // normally here
-            super.initializeSchemaData();
+            if (_schemaData == null) { // basically false, already initialized in SchemaHTML process so just in case
+                purelyInitializeSchemaData();
+            }
             final Database database = _schemaData.getDatabase();
+            if (_schemaPolicyResult != null) { // null allowed when no policy
+                database.setSchemaPolicyDisplay(new DfSPolicyDisplay(_schemaPolicyResult));
+            }
             database.setEmbeddedPickup(_decoMapPickup);
             database.setFirstDateAgent(new DfFirstDateAgent(() -> _documentSelector.getSchemaDiffList()));
         }
+    }
+
+    protected void purelyInitializeSchemaData() {
+        super.initializeSchemaData();
     }
 
     // ===================================================================================

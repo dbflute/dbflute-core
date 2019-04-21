@@ -21,7 +21,7 @@ import java.util.List;
  * @author jflute
  * @since 1.1.2 (2017/1/03 Tuesday)
  */
-public class DfSPolicyParsedPolicy {
+public class DfSPolicyParsedPolicy { // also used by Velocity template (e.g. SchemaHTML)
 
     protected final DfSPolicyParsedPolicyPart _wholePolicyPart;
     protected final DfSPolicyParsedPolicyPart _tablePolicyPart;

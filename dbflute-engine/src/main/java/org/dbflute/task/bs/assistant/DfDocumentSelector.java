@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @author hakiba
  */
-public class DfDocumentSelector {
+public class DfDocumentSelector { // also has document supplement resources e.g. history, schema policy
 
     // ===================================================================================
     //                                                                          Definition
@@ -54,6 +54,10 @@ public class DfDocumentSelector {
     protected boolean _propertiesHtml;
     protected boolean _lastaDocHtml;
     protected DocumentType _currentDocumentType;
+
+    // -----------------------------------------------------
+    //                                   Supplement Resource
+    //                                   -------------------
     protected DfSchemaHistory _schemaHistory;
     protected DfPropHtmlManager _propHtmlManager;
     protected List<String> cachedLastaDocNameList;

@@ -328,7 +328,7 @@ public class DfSPolicyLogicalSecretary {
     // ===================================================================================
     //                                                                 Violation Exception
     //                                                                 ===================
-    public void throwSchemaPolicyCheckViolationException(Map<String, Object> policyMap, DfSPolicyResult result) {
+    public String buildSchemaPolicyCheckViolationMessage(DfSPolicyResult result) { // independent for SchemaHTML display
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema policy has been violated.");
         br.addItem("Advice");
@@ -355,8 +355,11 @@ public class DfSPolicyLogicalSecretary {
             }
             ++policyIndex;
         }
-        final String msg = br.buildExceptionMessage();
-        throw new DfSchemaPolicyCheckViolationException(msg);
+        return br.buildExceptionMessage();
+    }
+
+    public void throwSchemaPolicyCheckViolationException(String violationMessage) {
+        throw new DfSchemaPolicyCheckViolationException(violationMessage);
     }
 
     public String buildPolicyExp(Map<String, Object> policyMap) {

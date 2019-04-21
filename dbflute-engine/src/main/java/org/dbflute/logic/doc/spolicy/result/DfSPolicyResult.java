@@ -20,6 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.helper.function.IndependentProcessor;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyParsedPolicy;
+
 /**
  * @author jflute
  * @since 1.1.2 (2016/12/31 Saturday)
@@ -29,7 +32,30 @@ public class DfSPolicyResult {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DfSPolicyParsedPolicy _schemaPolicy; // not null
+
+    protected String _policyMessage; // not null after logging
     protected final Map<String, List<DfSPolicyViolation>> _violationMap = new LinkedHashMap<String, List<DfSPolicyViolation>>();
+    protected String _violationMessage; // not null after checked and violated
+
+    protected IndependentProcessor _endingHandler; // not null after checked
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSPolicyResult(DfSPolicyParsedPolicy schemaPolicy) {
+        _schemaPolicy = schemaPolicy;
+    }
+
+    // ===================================================================================
+    //                                                                       Schema Policy
+    //                                                                       =============
+    public void acceptPolicyMessage(String policyMessage) {
+        if (policyMessage == null) {
+            throw new IllegalArgumentException("The argument 'policyMessage' should not be null.");
+        }
+        _policyMessage = policyMessage;
+    }
 
     // ===================================================================================
     //                                                                           Violation
@@ -53,8 +79,8 @@ public class DfSPolicyResult {
         }
     }
 
-    public boolean isEmpty() {
-        return _violationMap.isEmpty();
+    public boolean hasViolation() {
+        return !_violationMap.isEmpty();
     }
 
     public void violate(String policy, String message) {
@@ -64,6 +90,30 @@ public class DfSPolicyResult {
             _violationMap.put(policy, violationList);
         }
         violationList.add(new DfSPolicyViolation(policy, message));
+    }
+
+    public void acceptViolationMessage(String violationMessage) {
+        if (violationMessage == null) {
+            throw new IllegalArgumentException("The argument 'violationMessage' should not be null.");
+        }
+        _violationMessage = violationMessage;
+    }
+
+    // ===================================================================================
+    //                                                                              Ending
+    //                                                                              ======
+    public void acceptEndingHandler(IndependentProcessor endingHandler) {
+        if (endingHandler == null) {
+            throw new IllegalArgumentException("The argument 'endingHandler' should not be null.");
+        }
+        _endingHandler = endingHandler;
+    }
+
+    public void ending() { // may throw
+        if (_endingHandler == null) {
+            throw new IllegalStateException("Not found the ending handler at that time.");
+        }
+        _endingHandler.process();
     }
 
     // ===================================================================================
@@ -77,7 +127,19 @@ public class DfSPolicyResult {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public DfSPolicyParsedPolicy getSchemaPolicy() {
+        return _schemaPolicy;
+    }
+
+    public String getPolicyMessage() {
+        return _policyMessage;
+    }
+
     public Map<String, List<DfSPolicyViolation>> getViolationMap() {
         return _violationMap;
+    }
+
+    public String getViolationMessage() {
+        return _violationMessage;
     }
 }

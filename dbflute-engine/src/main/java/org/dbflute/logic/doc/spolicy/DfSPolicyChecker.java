@@ -103,16 +103,12 @@ public class DfSPolicyChecker {
     // ===================================================================================
     //                                                                        Check Policy
     //                                                                        ============
-    public void checkPolicyIfNeeds() {
+    public DfSPolicyResult checkPolicyIfNeeds() { // null allowed if no policy
         if (_policyMap.isEmpty()) {
-            return;
+            return null;
         }
         _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * *");
-        _log.info("*                               *");
-        _log.info("*      Check Schema Policy      *");
-        _log.info("*                               *");
-        _log.info("* * * * * * * * * * * * * * * * *");
+        _log.info("...Beginning schema policy check");
         // map:{
         //     ; tableExceptList = list:{}
         //     ; tableTargetList = list:{}
@@ -135,8 +131,9 @@ public class DfSPolicyChecker {
         // }
         final long before = System.currentTimeMillis();
         final DfSPolicyParsedPolicy policy = parsePolicy();
-        showParsedPolicy(policy);
-        final DfSPolicyResult result = new DfSPolicyResult();
+        final String dispPolicy = showParsedPolicy(policy);
+        final DfSPolicyResult result = createPolicyResult(policy);
+        result.acceptPolicyMessage(dispPolicy);
         final List<Table> tableList = _database.getTableList();
         doCheckWhole(policy, result, tableList);
         for (Table table : tableList) {
@@ -145,15 +142,20 @@ public class DfSPolicyChecker {
             }
             doCheckTableColumn(policy, result, table);
         }
-        _log.info("...Ending schema policy check: " + result);
-        if (!result.isEmpty()) {
-            _logicalSecretary.throwSchemaPolicyCheckViolationException(_policyMap, result);
-        } else {
-            final long after = System.currentTimeMillis();
-            final String performanceView = DfTraceViewUtil.convertToPerformanceView(after - before); // for tuning
-            _log.info(" -> No violation of schema policy. Good DB design! [" + performanceView + "]");
-            _log.info("");
-        }
+        final String violationMessage = _logicalSecretary.buildSchemaPolicyCheckViolationMessage(result);
+        result.acceptViolationMessage(violationMessage);
+        result.acceptEndingHandler(() -> { // lazy handling for display of SchemaHTML
+            _log.info("...Ending schema policy check: " + result);
+            if (result.hasViolation()) {
+                _logicalSecretary.throwSchemaPolicyCheckViolationException(violationMessage);
+            } else {
+                final long after = System.currentTimeMillis();
+                final String performanceView = DfTraceViewUtil.convertToPerformanceView(after - before); // for tuning
+                _log.info(" -> No violation of schema policy. Good DB design! [" + performanceView + "]");
+                _log.info("");
+            }
+        });
+        return result; // not ending yet
     }
 
     protected void doCheckWhole(DfSPolicyParsedPolicy policy, DfSPolicyResult result, List<Table> tableList) {
@@ -240,7 +242,7 @@ public class DfSPolicyChecker {
         return Collections.unmodifiableList(statementList);
     }
 
-    protected void showParsedPolicy(DfSPolicyParsedPolicy policy) {
+    protected String showParsedPolicy(DfSPolicyParsedPolicy policy) {
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append("[Schema Policy]");
         sb.append(ln()).append(" tableExceptList: ").append(_exceptTargetSecretary.getTableExceptList());
@@ -250,7 +252,9 @@ public class DfSPolicyChecker {
         buildElementMap(sb, "wholeMap", policy.getWholePolicyPart());
         buildElementMap(sb, "tableMap", policy.getTablePolicyPart());
         buildElementMap(sb, "columnMap", policy.getColumnPolicyPart());
-        _log.info(sb.toString());
+        final String display = sb.toString();
+        _log.info(display);
+        return display;
     }
 
     protected void buildElementMap(StringBuilder sb, String title, DfSPolicyParsedPolicyPart policyPart) {
@@ -264,6 +268,13 @@ public class DfSPolicyChecker {
             sb.append(ln()).append("       parsed: ");
             sb.append(statement.getIfClause()).append(", ").append(statement.getThenClause());
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Policy Result
+    //                                                                       =============
+    protected DfSPolicyResult createPolicyResult(DfSPolicyParsedPolicy policy) {
+        return new DfSPolicyResult(policy);
     }
 
     // ===================================================================================

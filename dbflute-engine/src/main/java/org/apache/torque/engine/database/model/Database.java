@@ -156,6 +156,7 @@ import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataArrangeQuery;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataProcedure;
+import org.dbflute.logic.doc.spolicy.display.DfSPolicyDisplay;
 import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
@@ -256,14 +257,19 @@ public class Database {
     protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
 
     // -----------------------------------------------------
-    //                                      Decomment Pickup
-    //                                      ----------------
-    protected DfDecoMapPickup _embeddedPickup; // used by templates directly, null allowed: when doc only
+    //                                             Decomment
+    //                                             ---------
+    protected DfDecoMapPickup _embeddedPickup; // used by templates directly, not null when e.g. doc (SchemaHTML)
 
     // -----------------------------------------------------
     //                                            First Date
     //                                            ----------
-    protected DfFirstDateAgent _firstDateAgent; // null allowed, when doc only
+    protected DfFirstDateAgent _firstDateAgent; // used by Java only, not null when e.g. doc (SchemaHTML)
+
+    // -----------------------------------------------------
+    //                                          SchemaPolicy
+    //                                          ------------
+    protected DfSPolicyDisplay _schemaPolicyDisplay; // used by templates directly, null allowed no policy or no use process
 
     // -----------------------------------------------------
     //                                                 Other
@@ -2454,8 +2460,19 @@ public class Database {
         return getProperties().getDocumentProperties().getSchemaHtmlJavaScriptLink();
     }
 
-    public DfDecoMapPickup getEmbeddedPickup() {
+    public DfDecoMapPickup getEmbeddedPickup() { // not null when doc (SchemaHTML)
         return _embeddedPickup;
+    }
+
+    public boolean isSchemaHtmlSchemaPolicyValid() {
+        if (getProperties().getDocumentProperties().isSuppressSchemaHtmlSchemaPolicy()) {
+            return false;
+        }
+        return _schemaPolicyDisplay != null; // null means no policy
+    }
+
+    public DfSPolicyDisplay getSchemaPolicyDisplay() { // null allowed, so check before
+        return _schemaPolicyDisplay;
     }
 
     // -----------------------------------------------------
@@ -3024,10 +3041,14 @@ public class Database {
     }
 
     public void setEmbeddedPickup(DfDecoMapPickup embeddedPickup) {
-        this._embeddedPickup = embeddedPickup;
+        _embeddedPickup = embeddedPickup;
     }
 
     public void setFirstDateAgent(DfFirstDateAgent firstDateAgent) {
-        this._firstDateAgent = firstDateAgent;
+        _firstDateAgent = firstDateAgent;
+    }
+
+    public void setSchemaPolicyDisplay(DfSPolicyDisplay schemaPolicyDisplay) {
+        _schemaPolicyDisplay = schemaPolicyDisplay;
     }
 }

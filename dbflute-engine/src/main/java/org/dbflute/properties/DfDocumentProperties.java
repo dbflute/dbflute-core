@@ -263,6 +263,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isShowSchemaHtmlProcedureRegardlessOfGeneration", false, getDocumentMap());
     }
 
+    public boolean isSuppressSchemaHtmlSchemaPolicy() {
+        return isProperty("isSuppressSchemaHtmlSchemaPolicy", false, getDocumentMap());
+    }
+
     // -----------------------------------------------------
     //                                           Style Sheet
     //                                           -----------

@@ -47,7 +47,7 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     //                                                                  Prepare Generation
     //                                                                  ==================
     @Override
-    public Context initControlContext() throws Exception {
+    public Context initControlContext() throws Exception { // basically called in fireVelocityProcess()
         initializeSchemaData();
         initializeVelocityContext();
         return _context;
