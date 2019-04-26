@@ -30,17 +30,30 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                             Unicode
     //                                                                             =======
-    public void test_unicode_loadConvert() {
+    public void test_unicode_loadConvert_basic() {
         // ## Arrange ##
         JavaPropertiesReader reader = new JavaPropertiesReader(null, null);
-        String text = "\u938c\u5009\u306e\u3044\u306c";
+        String text = "\u304a\u308b\u3050\u3069\u3063\u304f\u3055\u3044\u3069\u3059\u3066\u30fc\u3058";
 
         // ## Act ##
         String actual = reader.loadConvert(text);
 
         // ## Assert ##
         log(actual);
-        assertEquals("鎌倉のいぬ", actual);
+        assertEquals("おるぐどっくさいどすてーじ", actual);
+    }
+
+    public void test_unicode_loadConvert_nonTrimmed() {
+        // ## Arrange ##
+        JavaPropertiesReader reader = new JavaPropertiesReader(null, null);
+        String text = " \u304a\u308b\u3050\u3069\u3063\u304f\u3055\u3044\u3069\u3059\u3066\u30fc\u3058  ";
+
+        // ## Act ##
+        String actual = reader.loadConvert(text);
+
+        // ## Assert ##
+        log(actual);
+        assertEquals(" おるぐどっくさいどすてーじ  ", actual);
     }
 
     // ===================================================================================
