@@ -263,7 +263,7 @@ public class DfSPolicyChecker {
         sb.append(ln()).append("   statementList:");
         final List<DfSPolicyStatement> tableStatementList = policyPart.getStatementList();
         for (DfSPolicyStatement statement : tableStatementList) {
-            sb.append(ln()).append("    >>> ").append(statement.getIfClause()).append(" ").append(statement.getThenClause());
+            sb.append(ln()).append("    ").append(statement.getIfClause()).append(" ").append(statement.getThenClause());
         }
     }
 
