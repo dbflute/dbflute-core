@@ -16,6 +16,7 @@
 package org.dbflute.logic.doc.spolicy.display;
 
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.supplement.escape.DfDocumentTextResolver;
 
 /**
  * @author jflute
@@ -27,6 +28,7 @@ public class DfSPolicyDisplay { // used by Velocity template
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyResult _policyResult; // not null
+    protected final DfDocumentTextResolver _documentTextResolver = new DfDocumentTextResolver();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -49,7 +51,15 @@ public class DfSPolicyDisplay { // used by Velocity template
         return _policyResult.getPolicyMessage();
     }
 
+    public String getPolicyMessageHtmlPreText() {
+        return _documentTextResolver.resolveSchemaHtmlPreText(_policyResult.getPolicyMessage());
+    }
+
     public String getViolationMessage() {
         return _policyResult.getViolationMessage();
+    }
+
+    public String getViolationMessageHtmlPreText() {
+        return _documentTextResolver.resolveSchemaHtmlPreText(_policyResult.getViolationMessage());
     }
 }

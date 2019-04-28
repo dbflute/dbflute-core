@@ -592,7 +592,7 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 
 <h2 id="schemapolicyvio">SchemaPolicy Violation</h2>
 <pre class="spolicyviodisp">
-${schemaPolicyDisplay.violationMessage}
+${schemaPolicyDisplay.violationMessageHtmlPreText}
 </pre>
 #end
 #end
@@ -824,7 +824,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 
 <h2 id="schemapolicy">Schema Policy</h2>
 <pre class="spolicydisp">
-${schemaPolicyDisplay.policyMessage}
+${schemaPolicyDisplay.policyMessageHtmlPreText}
 </pre>
 #end
 #if ($selector.hasSchemaDiagram())
