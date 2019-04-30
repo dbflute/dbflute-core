@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -14,56 +14,109 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${database.simpleCDefPackage};
+#set ($asDBFluteClassification = $database.isSimpleCDefAsDBFluteClassifiation())
+#set ($cdefClass = $database.simpleCDefClass)
+#set($cdefExtends = "")
+#if ($asDBFluteClassification)
+#set($cdefExtends = "extends Classification ")
+#end
+#set($defmetaExtends = "")
+#if ($asDBFluteClassification)
+#set($defmetaExtends = "implements ClassificationMeta ")
+#end
+#set($optReturnType = "Optional")
+#if ($asDBFluteClassification)
+#set($optReturnType = "OptionalThing")
+#end
+#set($clsReturnType = "${cdefClass}")
+#if ($asDBFluteClassification)
+#set($clsReturnType = "Classification")
+#end
+#set($metaReturnType = "DefMeta")
+#if ($asDBFluteClassification)
+#set($metaReturnType = "ClassificationMeta")
+#end
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
+#if ($asDBFluteClassification)
+
+import org.dbflute.exception.ClassificationNotFoundException;
+import org.dbflute.jdbc.Classification;
+import org.dbflute.jdbc.ClassificationCodeType;
+import org.dbflute.jdbc.ClassificationMeta;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.optional.OptionalThing;
+import static org.dbflute.util.DfTypeUtil.emptyStrings;
+#else
+
 import static ${database.simpleCDefPackage}.${database.simpleCDefClass}.XInternalCDefUtil.emptyStrings;
+#end
 
 /**
  * The definition of classification.
  * @author ${database.classAuthor}
  */
-public interface ${database.simpleCDefClass} {
-
-    /** The empty array for no sisters. */
-    String[] EMPTY_SISTERS = new String[]{};
-
-    /** The empty map for no sub-items. */
-    @SuppressWarnings("unchecked")
-    Map<String, Object> EMPTY_SUB_ITEM_MAP = (Map<String, Object>)Collections.EMPTY_MAP;
+public interface ${cdefClass} ${cdefExtends}{
+#if (!$asDBFluteClassification)
 
     /**
+     * Get the code of the classification.
      * @return The code of the classification. (NotNull)
      */
     String code();
 
     /**
+     * Get the name, means identity name, of the classification.
      * @return The name of the classification. (NotNull)
      */
     String name();
 
     /**
+     * Get the alias, means display name, of the classification.
      * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
      */
     String alias();
 
     /**
-     * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
+     * Get the set of sisters (alternate codes) for the classification.
+     * @return The read-only set of sister code for the classification. (NotNull, EmptyAllowed)
+     */
+    Set<String> sisterSet();
+
+    /**
+     * Is the classification in the group?
+     * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns false)
+     * @return The determination, true or false. (true: this classification is in the group)
+     */
+    boolean inGroup(String groupName);
+
+    /**
+     * Get the map of sub items that are your original attributes.
+     * @return The read-only map of sub-items. (NotNull, EmptyAllowed)
      */
     Map<String, Object> subItemMap();
 
     /**
+     * Get the meta of the classification.
      * @return The meta of the classification. (NotNull)
      */
     DefMeta meta();
 
     class XInternalCDefUtil {
+        private static String[] EMPTY_SISTERS = new String[]{};
         public static String[] emptyStrings() { return EMPTY_SISTERS; }
     }
+
+    class ClassificationNotFoundException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public ClassificationNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+#end
+
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #if ($classificationTop.hasTopComment())
@@ -82,11 +135,13 @@ public interface ${database.simpleCDefClass} {
 #set ($count = $count + 1)
 #end
         ;
-        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+        private static final Map<String, ${classificationName}> _codeClsMap = new HashMap<String, ${classificationName}>();
+        private static final Map<String, ${classificationName}> _nameClsMap = new HashMap<String, ${classificationName}>();
         static {
             for (${classificationName} value : values()) {
-                _codeValueMap.put(value.code().toLowerCase(), value);
-                for (String sister : value.sisters()) { _codeValueMap.put(sister.toLowerCase(), value); }
+                _codeClsMap.put(value.code().toLowerCase(), value);
+                for (String sister : value.sisterSet()) { _codeClsMap.put(sister.toLowerCase(), value); }
+                _nameClsMap.put(value.name().toLowerCase(), value);
             }
         }
 #if ($database.hasClassificationSubItemMap($classificationName))
@@ -104,51 +159,179 @@ public interface ${database.simpleCDefClass} {
 #end
         }
 #end
-        private String _code; private String _alias; private String[] _sisters;
+        private String _code; private String _alias; private Set<String> _sisterSet;
         private ${classificationName}(String code, String alias, String[] sisters)
-        { _code = code; _alias = alias; _sisters = sisters; }
+        { _code = code; _alias = alias; _sisterSet = Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(sisters))); }
         public String code() { return _code; } public String alias() { return _alias; }
-        private String[] sisters() { return _sisters; }
+        public Set<String> sisterSet() { return _sisterSet; }
 #if ($database.hasClassificationSubItemMap($classificationName))
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
-        public Map<String, Object> subItemMap() { return EMPTY_SUB_ITEM_MAP; }
+        public Map<String, Object> subItemMap() { return Collections.emptyMap(); }
 #end
-        public DefMeta meta() { return DefMeta.${classificationName}; }
+        public ${metaReturnType} meta() { return ${cdefClass}.DefMeta.${classificationName}; }
+
+#foreach ($regularSubItem in $classificationTop.regularSubItemList)
+#set ($subItemMap = $classificationElement.subItemMap)
+#set ($subItemType = "Object")
+#if ($regularSubItem.isSubItemTypeString())
+#set ($subItemType = "String")
+#end
+        public ${subItemType} ${regularSubItem.subItemName}() {
+#if ($regularSubItem.isSubItemTypeObject())
+            return subItemMap().get("${regularSubItem.subItemName}");
+#else
+            return (${subItemType})subItemMap().get("${regularSubItem.subItemName}");
+#end
+        }
+
+#end
+#foreach ($group in $classificationTop.groupList)
+        /**
+         * Is the classification in the group? <br>
+#if ($group.hasGroupComment())
+         * ${group.groupCommentForJavaDocNest} <br>
+#end
+         * ${group.buildElementDisp()}
+         * @return The determination, true or false.
+         */
+        public boolean is${group.groupNameInitCap}() {
+            return ${group.buildReturnExpThis()};
+        }
+
+#end
+        public boolean inGroup(String groupName) {
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equals(groupName)) { return is${group.groupNameInitCap}(); }
+#end
+            return false;
+        }
 
         /**
+         * Get the classification of the code. (CaseInsensitive)
+         * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns empty)
+         * @return The optional classification corresponding to the code. (NotNull, EmptyAllowed: if not found, returns empty)
+         */
+        public static ${optReturnType}<${classificationName}> of(Object code) {
+#if ($asDBFluteClassification)
+            if (code == null) { return OptionalThing.ofNullable(null, () -> { throw new ClassificationNotFoundException("null code specified"); }); }
+#else
+            if (code == null) { return Optional.empty(); }
+#end
+            if (code instanceof ${classificationName}) { return ${optReturnType}.of((${classificationName})code); }
+            if (code instanceof ${optReturnType}<?>) { return of(((${optReturnType}<?>)code).orElse(null)); }
+#if ($asDBFluteClassification)
+            return OptionalThing.ofNullable(_codeClsMap.get(code.toString().toLowerCase()), () ->{
+                throw new ClassificationNotFoundException("Unknown classification code: " + code);
+            });
+#else
+            return Optional.ofNullable(_codeClsMap.get(code.toString().toLowerCase()));
+#end
+        }
+
+        /**
+         * Find the classification by the name. (CaseInsensitive)
+         * @param name The string of name, which is case-insensitive. (NotNull)
+         * @return The optional classification corresponding to the name. (NotNull, EmptyAllowed: if not found, returns empty)
+         */
+        public static ${optReturnType}<${classificationName}> byName(String name) {
+            if (name == null) { throw new IllegalArgumentException("The argument 'name' should not be null."); }
+#if ($asDBFluteClassification)
+            return OptionalThing.ofNullable(_nameClsMap.get(name.toLowerCase()), () ->{
+                throw new ClassificationNotFoundException("Unknown classification name: " + name);
+            });
+#else
+            return Optional.ofNullable(_nameClsMap.get(name.toLowerCase()));
+#end
+        }
+
+        /**
+         * <span style="color: #AD4747; font-size: 120%">Old style so use of(code).</span> <br>
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
          */
         public static ${classificationName} codeOf(Object code) {
-            if (code == null) { return null; } if (code instanceof ${classificationName}) { return (${classificationName})code; }
-            return _codeValueMap.get(code.toString().toLowerCase());
+            if (code == null) { return null; }
+            if (code instanceof ${classificationName}) { return (${classificationName})code; }
+            return _codeClsMap.get(code.toString().toLowerCase());
         }
 
         /**
+         * <span style="color: #AD4747; font-size: 120%">Old style so use byName(name).</span> <br>
          * Get the classification by the name (also called 'value' in ENUM world).
          * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
          */
-        public static ${classificationName} nameOf(String name) { // null allowed
+        public static ${classificationName} nameOf(String name) {
             if (name == null) { return null; }
             try { return valueOf(name); } catch (RuntimeException ignored) { return null; }
         }
 
         /**
          * Get the list of all classification elements. (returns new copied list)
-         * @return The list of all classification elements. (NotNull)
+         * @return The snapshot list of all classification elements. (NotNull)
          */
         public static List<${classificationName}> listAll() {
             return new ArrayList<${classificationName}>(Arrays.asList(values()));
+        }
+
+        /**
+         * Get the list of classification elements in the specified group. (returns new copied list) <br>
+         * @param groupName The string of group name, which is case-insensitive. (NotNull)
+         * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if not found, throws exception)
+         */
+        public static List<${classificationName}> listByGroup(String groupName) {
+            if (groupName == null) { throw new IllegalArgumentException("The argument 'groupName' should not be null."); }
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equalsIgnoreCase(groupName)) { return listOf${group.groupNameInitCap}(); }
+#end
+            throw new ClassificationNotFoundException("Unknown classification group: ${classificationName}." + groupName);
+        }
+
+        /**
+         * Get the list of classification elements corresponding to the specified codes. (returns new copied list) <br>
+         * @param codeList The list of plain code, which is case-insensitive. (NotNull)
+         * @return The snapshot list of classification elements in the code list. (NotNull, EmptyAllowed: when empty specified)
+         */
+        public static List<${classificationName}> listOf(Collection<String> codeList) {
+            if (codeList == null) { throw new IllegalArgumentException("The argument 'codeList' should not be null."); }
+            List<${classificationName}> clsList = new ArrayList<${classificationName}>(codeList.size());
+            for (String code : codeList) { clsList.add(of(code).get()); }
+            return clsList;
+        }
+#foreach ($group in $classificationTop.groupList)
+
+        /**
+         * Get the list of group classification elements. (returns new copied list) <br>
+#if ($group.hasGroupComment())
+         * ${group.groupCommentForJavaDocNest} <br>
+#end
+         * ${group.buildElementDisp()}
+         * @return The snapshot list of classification elements in the group. (NotNull)
+         */
+        public static List<${classificationName}> listOf${group.groupNameInitCap}() {
+            return new ArrayList<${classificationName}>(Arrays.asList(${group.buildCDefArgExp()}));
+        }
+#end
+
+        /**
+         * Get the list of classification elements in the specified group. (returns new copied list) <br>
+         * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
+         * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if the group is not found)
+         */
+        public static List<${classificationName}> groupOf(String groupName) {
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equals(groupName)) { return listOf${group.groupNameInitCap}(); }
+#end
+            return new ArrayList<${classificationName}>(4);
         }
 
         @Override public String toString() { return code(); }
     }
 
 #end
-    public enum DefMeta {
+    public enum DefMeta ${defmetaExtends}{
 #set ($count = 0)
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
@@ -162,45 +345,118 @@ public interface ${database.simpleCDefClass} {
 #set ($count = $count + 1)
 #end
         ;
+        public String classificationName() {
+            return name(); // same as definition name
+        }
+#if ($asDBFluteClassification)
 
-        /**
-         * Get classification by the code.
-         * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
-         * @return The instance of the classification. (NullAllowed: when not found and code is null)
-         */
-        public ${database.simpleCDefClass} codeOf(Object code) {
+        public ${optReturnType}<? extends Classification> of(Object code) {
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
-            if ("${classificationName}".equals(name())) { return ${database.simpleCDefClass}.${classificationName}.codeOf(code); }
+            if (${classificationName}.name().equals(name())) { return ${cdefClass}.${classificationName}.of(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        /**
-         * Get classification by the name.
-         * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
-         * @return The instance of the classification. (NullAllowed: when not found and name is null)
-         */
-        public ${database.simpleCDefClass} nameOf(String name) {
+        public ${optReturnType}<? extends Classification> byName(String name) {
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
-            if ("${classificationName}".equals(name())) { return ${database.simpleCDefClass}.${classificationName}.valueOf(name); }
+            if (${classificationName}.name().equals(name())) { return ${cdefClass}.${classificationName}.byName(name); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+#end
+
+        public ${clsReturnType} codeOf(Object code) { // null if not found, old style so use of(code)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equals(name())) { return ${database.simpleCDefClass}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        /**
-         * Get the list of all classification elements. (returns new copied list)
-         * @return The list of classification elements. (NotNull)
-         */
-        public List<${database.simpleCDefClass}> listAll() {
+        public ${database.simpleCDefClass} nameOf(String name) { // null if not found, old style so use byName(name)
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
-            if ("${classificationName}".equals(name())) { return toClassificationList(${database.simpleCDefClass}.${classificationName}.listAll()); }
+            if (${classificationName}.name().equals(name())) { return ${database.simpleCDefClass}.${classificationName}.valueOf(name); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public List<${clsReturnType}> listAll() {
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equals(name())) { return toClsList(${database.simpleCDefClass}.${classificationName}.listAll()); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public List<${clsReturnType}> listByGroup(String groupName) { // exception if not found
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equals(name())) { return toClsList(${cdefClass}.${classificationName}.listByGroup(groupName)); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public List<${clsReturnType}> listOf(Collection<String> codeList) {
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equals(name())) { return toClsList(${cdefClass}.${classificationName}.listOf(codeList)); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public List<${clsReturnType}> groupOf(String groupName) { // old style
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equals(name())) { return toClsList(${cdefClass}.${classificationName}.groupOf(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         @SuppressWarnings("unchecked")
-        private List<${database.simpleCDefClass}> toClassificationList(List<?> clsList) {
-            return (List<${database.simpleCDefClass}>)clsList;
+        private List<${clsReturnType}> toClsList(List<?> clsList) {
+            return (List<${clsReturnType}>)clsList;
+        }
+#if ($asDBFluteClassification)
+
+        public ClassificationCodeType codeType() {
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#if ($classificationTop.hasCodeType())
+            if (${classificationName}.name().equals(name())) { return ClassificationCodeType.${classificationTop.codeType}; }
+#end
+#end
+            return ClassificationCodeType.String; // as default
+        }
+
+        public ClassificationUndefinedHandlingType undefinedHandlingType() {
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+            if (${classificationName}.name().equals(name())) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
+#end
+            return ClassificationUndefinedHandlingType.LOGGING; // as default
+        }
+#end
+
+        public static ${optReturnType}<${database.simpleCDefClass}.DefMeta> find(String classificationName) { // instead of valueOf()
+            if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${optReturnType}.of(${cdefClass}.DefMeta.${classificationName}); }
+#end
+#if ($asDBFluteClassification)
+            return OptionalThing.ofNullable(null, () -> {
+                throw new ClassificationNotFoundException("Unknown classification: " + classificationName);
+            });
+#else
+            return Optional.empty();
+#end
+        }
+
+        public static ${database.simpleCDefClass}.DefMeta meta(String classificationName) { // old style so use find(name)
+            if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
+            if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${cdefClass}.DefMeta.${classificationName}; }
+#end
+            throw new IllegalStateException("Unknown classification: " + classificationName);
+        }
+
+        @SuppressWarnings("unused")
+        private String[] xinternalEmptyString() {
+            return emptyStrings(); // to suppress 'unused' warning of import statement
         }
     }
 }

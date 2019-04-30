@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.dbflute.helper.dfmap;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -158,6 +159,61 @@ public class DfMapStyleTest extends RuntimeTestCase {
         Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
         log(ln() + generateMap);
         assertEquals(map, generateMap);
+    }
+
+    public void test_toMapString_nestedBean() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle() {
+            @Override
+            protected Map<String, Object> resolvePotentialMapOfBuildingMapString(Object value) {
+                if (value instanceof MockNestedBean) {
+                    return ((MockNestedBean) value).toMap();
+                } else {
+                    return super.resolvePotentialMapOfBuildingMapString(value);
+                }
+            }
+        };
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        map.put("bean", new MockNestedBean(1, "Pixy", LocalDate.now(), true));
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(map);
+
+        // ## Assert ##
+        log(ln() + mapString);
+        assertContains(mapString, "; memberName = Pixy");
+        Map<String, Object> restoredMap = mapStyle.fromMapString(mapString);
+        log(ln() + restoredMap);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> beanMap = (Map<String, Object>) restoredMap.get("bean");
+        assertNotNull(beanMap);
+        assertEquals("Pixy", beanMap.get("memberName"));
+    }
+
+    public static class MockNestedBean {
+
+        public final Integer memberId;
+        public final String memberName;
+        public final LocalDate birthdate;
+        public final Boolean formalized;
+
+        public MockNestedBean(Integer memberId, String memberName, LocalDate birthdate, Boolean formalized) {
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.birthdate = birthdate;
+            this.formalized = formalized;
+        }
+
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("memberId", memberId);
+            map.put("memberName", memberName);
+            map.put("birthdate", birthdate);
+            map.put("formalized", formalized);
+            return map;
+        }
     }
 
     // ===================================================================================

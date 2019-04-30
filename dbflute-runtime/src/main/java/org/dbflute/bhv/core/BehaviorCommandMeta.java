@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * governing permissions and limitations under the License.
  */
 package org.dbflute.bhv.core;
+
+import java.util.List;
 
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
@@ -175,6 +177,12 @@ public interface BehaviorCommandMeta {
      * @return The instance of entity. (NullAllowed: when entity unused and batch update, query delete...)
      */
     Entity getEntity();
+
+    /**
+     * Get the list of entity specified as list argument if it exists.
+     * @return The read-only list of entity instance. (NotNull, EmptyAllowed: when entity unused and entity update...)
+     */
+    List<Entity> getEntityList(); // since 1.2.0
 
     /**
      * Get the path of outside-SQL if it's outside-SQL.

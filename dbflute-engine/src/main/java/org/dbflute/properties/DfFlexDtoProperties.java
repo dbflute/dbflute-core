@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,8 +88,12 @@ public final class DfFlexDtoProperties extends DfAbstractDBFluteProperties {
     }
 
     // ===================================================================================
-    //                                                                       Target/Except
-    //                                                                       =============
+    //                                                              Bindable Target/Except
+    //                                                              ======================
+    public boolean isBindable(String tableName) {
+        return isProperty("isBindable", false) && !isBindableTableExcept(tableName);
+    }
+
     protected List<String> _bindableTableTargetList;
 
     public List<String> getBindableTableTargetList() {
@@ -127,8 +131,8 @@ public final class DfFlexDtoProperties extends DfAbstractDBFluteProperties {
     }
 
     // ===================================================================================
-    //                                                                            DTO Info
-    //                                                                            ========
+    //                                                                          Class File
+    //                                                                          ==========
     public String getBaseDtoPackage() {
         return getPropertyAsRequired("baseDtoPackage");
     }
@@ -157,8 +161,9 @@ public final class DfFlexDtoProperties extends DfAbstractDBFluteProperties {
         return isProperty("isOverrideExtended", false);
     }
 
-    public boolean isBindable(String tableName) {
-        return isProperty("isBindable", false) && !isBindableTableExcept(tableName);
+    public String getFileExtension() { // not null, has default for compatible
+        String prop = getPropertyIfNullEmpty("fileExtension");
+        return prop != null ? prop : "as"; // .as (ActionScript)
     }
 
     // ===================================================================================

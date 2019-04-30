@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -18,14 +18,27 @@
     #set($typeDocMetaList = $typeDocMeta.parameterTypeDocMetaList)
 #end
 #if (!$typeDocMetaList.isEmpty())
+#set($showPublicName = false)
+#foreach ($nestTypeDocMeta in $typeDocMetaList)
+#if (!$showPublicName && $nestTypeDocMeta.name != $nestTypeDocMeta.publicName)
+#set($showPublicName = true)
+#end
+#end
 <table>
     <thead>
     <tr>
         <th class="rownumhead">No.</th>
+#if ($showPublicName)
+        <th>public name</th>
+#else
         <th>name</th>
+#end
         <th>type</th>
         <th>comment</th>
         <th>annotations</th>
+#if ($showPublicName)
+        <th>property name</th>
+#end
     </tr>
     </thead>
 #foreach ($nestTypeDocMeta in $typeDocMetaList)
@@ -35,7 +48,11 @@
 #end
     <tr>
         <td class="rowcellnum" rowspan="$rowspan">${foreach.count}</td>
+#if ($showPublicName)
+        <td class="fieldpublicname">${nestTypeDocMeta.publicName}</td>
+#else
         <td>${nestTypeDocMeta.name}</td>
+#end
         <td><p title="$manager.htmlEscape($nestTypeDocMeta.typeName)">$manager.htmlEscape($nestTypeDocMeta.simpleTypeName)</p></td>
         <td class="fieldcomment">
             <p title="$!manager.htmlEscape($nestTypeDocMeta.comment)">$!manager.htmlEscape($nestTypeDocMeta.description)</p>
@@ -49,10 +66,17 @@
 #end
 #end
         </td>
+#if ($showPublicName)
+        <td class="fieldpropertyname">${nestTypeDocMeta.name}</td>
+#end
     </tr>
 #if (!$nestTypeDocMeta.nestTypeDocMetaList.isEmpty())
     <tr>
-        <td colspan="4">
+#set ($nestcolspan = 4)
+#if ($showPublicName)
+#set ($nestcolspan = 5)
+#end
+        <td colspan="$nestcolspan">
             <div class="nestedbean">
 $generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
             </div>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,13 +132,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -186,8 +185,6 @@ public class TypeMap {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(TypeMap.class);
     public static final String AUTO_MAPPING_MARK = "$$AutoMapping$$";
 
     // ===================================================================================
@@ -396,6 +393,10 @@ public class TypeMap {
         _javaNativeToFlexNativeMap.put("Number", initializeFlexNative("Number", "Number"));
         _javaNativeToFlexNativeMap.put("Boolean", initializeFlexNative("Boolean", "Boolean"));
         _javaNativeToFlexNativeMap.put("java.math.BigDecimal", initializeFlexNative("java.math.BigDecimal", "Number"));
+        _javaNativeToFlexNativeMap.put("java.math.BigInteger", initializeFlexNative("java.math.BigInteger", "Number"));
+        _javaNativeToFlexNativeMap.put("java.time.LocalDate", initializeFlexNative("java.time.LocalDate", "Date"));
+        _javaNativeToFlexNativeMap.put("java.time.LocalDateTime", initializeFlexNative("java.time.LocalDateTime", "Date"));
+        _javaNativeToFlexNativeMap.put("java.time.LocalTime", initializeFlexNative("java.time.LocalDate", "Date"));
         _javaNativeToFlexNativeMap.put("java.util.Date", initializeFlexNative("java.util.Date", "Date"));
         _javaNativeToFlexNativeMap.put("java.sql.Time", initializeFlexNative("java.sql.Time", "Date"));
         _javaNativeToFlexNativeMap.put("java.sql.Timestamp", initializeFlexNative("java.sql.Timestamp", "Date"));
@@ -548,12 +549,29 @@ public class TypeMap {
     protected static String doFindJavaNativeByJdbcType(String jdbcType) {
         initializeIfNeeds();
         if (!_jdbcTypeToJavaNativeMap.containsKey(jdbcType)) {
-            String msg = "_jdbcTypeToJavaNativeMap doesn't contain the type as key: ";
-            msg = msg + "key=" + jdbcType + " map=" + _jdbcTypeToJavaNativeMap;
-            _log.warn(msg);
-            throw new IllegalStateException(msg);
+            throwJdbcTypeToJavaNativeMapNotFoundException(jdbcType);
         }
         return _jdbcTypeToJavaNativeMap.get(jdbcType);
+    }
+
+    protected static void throwJdbcTypeToJavaNativeMapNotFoundException(String jdbcType) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("TypeMap@_jdbcTypeToJavaNativeMap doesn't contain the type as key.");
+        br.addItem("Advice");
+        br.addElement("Undefined JDBC type was specified.");
+        br.addElement("Confirm your JDBC type settings in DBFlute property (dfprop file).");
+        br.addElement(" e.g. commonColumnMap.dfprop, databaseInfoMap.dfprop, ...");
+        br.addItem("NotFound JDBC Type");
+        br.addElement(jdbcType);
+        br.addItem("_jdbcTypeToJavaNativeMap");
+        br.addElement("defined types: " + _jdbcTypeToJavaNativeMap.size());
+        for (Entry<String, String> entry : _jdbcTypeToJavaNativeMap.entrySet()) {
+            br.addElement(entry.getKey() + " = " + entry.getValue());
+        }
+        final String msg = br.buildExceptionMessage();
+        // memory of poor exception handling in template at old days
+        //_log.warn(msg);
+        throw new IllegalStateException(msg);
     }
 
     protected static boolean needsAutoMappingNumber(String jdbcType, final String javaType) {
@@ -576,7 +594,8 @@ public class TypeMap {
         if (!_javaNativeToFlexNativeMap.containsKey(javaNative)) {
             String msg = "_javaNativeToFlexNativeMap doesn't contain the type as key: ";
             msg = msg + "key=" + javaNative + " map=" + _javaNativeToFlexNativeMap;
-            _log.warn(msg);
+            // memory of poor exception handling in template at old days
+            //_log.warn(msg);
             throw new IllegalStateException(msg);
         }
         return _javaNativeToFlexNativeMap.get(javaNative);

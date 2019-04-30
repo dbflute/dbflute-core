@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ $manager.htmlEscape($actionDocMeta.url)
 <p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.methodComment)</p>
 #end
 #if (!$actionDocMeta.parameterTypeDocMetaList.isEmpty())
-<span class="doctitle">URL Parameter:</span>
+<span class="doctitle">Path Variables:</span>
 $generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta)
 #end
 #if ($actionDocMeta.formTypeDocMeta)

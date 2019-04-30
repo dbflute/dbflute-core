@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
+import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfBasicProperties;
@@ -89,7 +90,8 @@ public class DfSPolicyInRepsChecker {
             final Database database = appData.getDatabase();
             initializeClassificationDeployment(database); // for "then classification"
             final DfSPolicyChecker checker = createChecker(policyProp, database);
-            checker.checkPolicyIfNeeds();
+            final DfSPolicyResult policyResult = checker.checkPolicyIfNeeds();
+            policyResult.ending(); // immediately handles violation (may be throw)
         } finally {
             deleteTemporarySchemaXmlIfExists(schemaXml);
         }

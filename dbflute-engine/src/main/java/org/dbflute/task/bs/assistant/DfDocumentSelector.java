@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @author hakiba
  */
-public class DfDocumentSelector {
+public class DfDocumentSelector { // also has document supplement resources e.g. history, schema policy
 
     // ===================================================================================
     //                                                                          Definition
@@ -54,6 +54,10 @@ public class DfDocumentSelector {
     protected boolean _propertiesHtml;
     protected boolean _lastaDocHtml;
     protected DocumentType _currentDocumentType;
+
+    // -----------------------------------------------------
+    //                                   Supplement Resource
+    //                                   -------------------
     protected DfSchemaHistory _schemaHistory;
     protected DfPropHtmlManager _propHtmlManager;
     protected List<String> cachedLastaDocNameList;
@@ -308,49 +312,12 @@ public class DfDocumentSelector {
         return !isSuppressHistoryHtmlDiffGitBranch();
     }
 
-    // -----------------------------------------------------
-    //                                                Design
-    //                                                ------
-    // HistoryHTML only uses the determinations via selector... (others use $database) by jflute
-    public boolean isHistoryHtmlStyleSheetEmbedded() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
-    }
-
-    public boolean isHistoryHtmlStyleSheetLink() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetLink();
-    }
-
-    public String getHistoryHtmlStyleSheetEmbedded() {
-        return getDocumentProperties().getHistoryHtmlStyleSheetEmbedded();
-    }
-
-    public String getHistoryHtmlStyleSheetLink() {
-        return getDocumentProperties().getHistoryHtmlStyleSheetLink();
-    }
-
-    public boolean isHistoryHtmlJavaScriptEmbedded() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlJavaScriptEmbedded();
-    }
-
-    public boolean isHistoryHtmlJavaScriptLink() {
-        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlJavaScriptLink();
-    }
-
-    public String getHistoryHtmlJavaScriptEmbedded() {
-        return getDocumentProperties().getHistoryHtmlJavaScriptEmbedded();
-    }
-
-    public String getHistoryHtmlJavaScriptLink() {
-        return getDocumentProperties().getHistoryHtmlJavaScriptLink();
-    }
-
     // ===================================================================================
     //                                                                     Properties HTML
     //                                                                     ===============
     // -----------------------------------------------------
     //                                         Basic Process
     //                                         -------------
-
     /**
      * Load requests for properties HTML. <br>
      * If no property, do nothing.

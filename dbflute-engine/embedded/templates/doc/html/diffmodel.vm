@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>${database.projectName} ${selector.diffModelSmallTitle}</title>
-#if ($selector.isHistoryHtmlStyleSheetEmbedded())
+#set ($isStyleSheetInheritable = $database.isHistoryHtmlStyleSheetInheritable())
+#if (!$isStyleSheetInheritable && $database.isHistoryHtmlStyleSheetEmbedded())
 	<style type="text/css">
-${selector.historyHtmlStyleSheetEmbedded}
+${database.historyHtmlStyleSheetEmbedded}
 	</style>
-#elseif ($selector.isHistoryHtmlStyleSheetLink())
-	${selector.historyHtmlStyleSheetLink}
+#elseif (!$isStyleSheetInheritable && $database.isHistoryHtmlStyleSheetLink())
+	${database.historyHtmlStyleSheetLink}
 #else
 	<style type="text/css">
 /* -------------------------------------------------
@@ -227,13 +228,20 @@ dl.column-content dd span {
 	background-color: #eed;
 }
 	</style>
+#if ($isStyleSheetInheritable && $database.isHistoryHtmlStyleSheetEmbedded())
+	<style type="text/css">
+${database.historyHtmlStyleSheetEmbedded}
+	</style>
+#elseif ($isStyleSheetInheritable && $database.isHistoryHtmlStyleSheetLink())
+	${database.historyHtmlStyleSheetLink}
 #end
-#if ($selector.isHistoryHtmlJavaScriptEmbedded())
+#end
+#if ($database.isHistoryHtmlJavaScriptEmbedded())
 	<script type="text/javascript">
-${selector.historyHtmlJavaScriptEmbedded}
+${database.historyHtmlJavaScriptEmbedded}
 	</script>
-#elseif ($selector.isHistoryHtmlJavaScriptLink())
-	${selector.historyHtmlJavaScriptLink}
+#elseif ($database.isHistoryHtmlJavaScriptLink())
+	${database.historyHtmlJavaScriptLink}
 #end
 </head>
 

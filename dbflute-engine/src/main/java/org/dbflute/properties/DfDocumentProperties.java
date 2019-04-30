@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,6 +263,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isShowSchemaHtmlProcedureRegardlessOfGeneration", false, getDocumentMap());
     }
 
+    public boolean isSuppressSchemaHtmlSchemaPolicy() {
+        return isProperty("isSuppressSchemaHtmlSchemaPolicy", false, getDocumentMap());
+    }
+
     // -----------------------------------------------------
     //                                           Style Sheet
     //                                           -----------
@@ -281,36 +285,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     public String getSchemaHtmlStyleSheetEmbedded() {
-        return readSchemaHtmlStyleSheetEmbedded(getSchemaHtmlStyleSheet());
-    }
-
-    protected String readSchemaHtmlStyleSheetEmbedded(String styleSheet) {
-        final String purePath = Srl.substringFirstRear(styleSheet, STYLE_SHEET_EMBEDDED_MARK);
-        final File cssFile = new File(purePath);
-        BufferedReader br = null;
-        try {
-            final String encoding = getBasicProperties().getTemplateFileEncoding();
-            final String separator = getBasicProperties().getSourceCodeLineSeparator();
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
-            final StringBuilder sb = new StringBuilder();
-            while (true) {
-                final String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                sb.append(line).append(separator);
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            String msg = "Failed to read the CSS file: " + cssFile;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {}
-            }
-        }
+        return readEmbeddedStyleSheet(getSchemaHtmlStyleSheet());
     }
 
     public String getSchemaHtmlStyleSheetLink() {
@@ -323,6 +298,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected String getSchemaHtmlStyleSheet() { // closet
         return getProperty("schemaHtmlStyleSheet", null, getDocumentMap());
+    }
+
+    public boolean isSchemaHtmlStyleSheetInheritable() { // closet
+        return isProperty("isSchemaHtmlStyleSheetInheritable", false, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -635,7 +614,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     public String getHistoryHtmlStyleSheetEmbedded() {
-        return readSchemaHtmlStyleSheetEmbedded(getHistoryHtmlStyleSheet());
+        return readEmbeddedStyleSheet(getHistoryHtmlStyleSheet());
     }
 
     public String getHistoryHtmlStyleSheetLink() {
@@ -644,6 +623,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected String getHistoryHtmlStyleSheet() { // closet
         return getProperty("historyHtmlStyleSheet", null, getDocumentMap());
+    }
+
+    public boolean isHistoryHtmlStyleSheetInheritable() { // closet
+        return isProperty("isHistoryHtmlStyleSheetInheritable", false, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -1285,7 +1268,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     public String getPropertiesHtmlStyleSheetEmbedded() {
-        return readSchemaHtmlStyleSheetEmbedded(getSchemaHtmlStyleSheet());
+        return readEmbeddedStyleSheet(getSchemaHtmlStyleSheet());
     }
 
     public String getPropertiesHtmlStyleSheetLink() {
@@ -1319,5 +1302,42 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected String getPropertiesHtmlJavaScript() { // closet
         return getPropertiesHtmlHeaderJavaScript();
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected String readEmbeddedStyleSheet(String styleSheet) {
+        final String purePath = Srl.substringFirstRear(styleSheet, STYLE_SHEET_EMBEDDED_MARK);
+        final File cssFile = new File(purePath);
+        BufferedReader br = null;
+        try {
+            final String encoding = getBasicProperties().getTemplateFileEncoding();
+            final String separator = getBasicProperties().getSourceCodeLineSeparator();
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
+            final StringBuilder sb = new StringBuilder();
+            while (true) {
+                final String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                sb.append(line).append(separator);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            String currentPath = null;
+            try {
+                currentPath = new File(".").getCanonicalPath();
+            } catch (IOException ignored) {}
+            final String currentExp = currentPath != null ? " (current: " + currentPath + ")" : "";
+            String msg = "Failed to read the CSS file: " + cssFile + currentExp;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {}
+            }
+        }
     }
 }

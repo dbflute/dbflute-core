@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,14 +94,14 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
         br.addElement("    cb.query().existsPurchase(purchaseCB -> {");
-        br.addElement("        purchaseCB.setupSelect_Product(); // *NG");
+        br.addElement("        purchaseCB.setupSelect_Product(); // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (Union)");
         br.addElement("    cb.union(unionCB -> {");
-        br.addElement("        unionCB.setupSelect_MemberStatus(); // *NG");
+        br.addElement("        unionCB.setupSelect_MemberStatus(); // *Bad");
         br.addElement("    });");
         br.addElement("  (o): (Normal Use)");
-        br.addElement("    cb.setupSelect_MemberStatus(); // OK");
+        br.addElement("    cb.setupSelect_MemberStatus(); // Good");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
@@ -120,11 +120,11 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (x):");
         br.addElement("    ListResultBean<Member> memberList = memberBhv.selectList(cb -> {");
         br.addElement("        cb.query().existsPurchase(purchaseCB -> {");
-        br.addElement("            cb.setupSelect_MemberStatus(); // *NG");
+        br.addElement("            cb.setupSelect_MemberStatus(); // *Bad");
         br.addElement("        });");
         br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.setupSelect_MemberStatus(); // OK");
+        br.addElement("    cb.setupSelect_MemberStatus(); // Good");
         br.addElement("    ListResultBean<Member> memberList = memberBhv.selectList(cb -> {");
         br.addElement("        cb.query().existsPurchase(purchaseCB -> {");
         br.addElement("            purchaseCB.query().set... // you can use only purchaseCB here");
@@ -155,7 +155,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
     //    br.addElement("            unionCB.query().setXxx...;");
     //    br.addElement("        }");
     //    br.addElement("    });");
-    //    br.addElement("    cb.setupSelect_MemberStatus(); // *NG");
+    //    br.addElement("    cb.setupSelect_MemberStatus(); // *Bad");
     //    br.addElement("  (o):");
     //    br.addElement("    MemberCB cb = new MemberCB();");
     //    br.addElement("    cb.setupSelect_MemberStatus(); // you should call here");
@@ -185,14 +185,14 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
         br.addElement("    cb.query().existsPurchaseList(purchaseCB -> {");
-        br.addElement("        purchaseCB.specify()... // *NG");
+        br.addElement("        purchaseCB.specify()... // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (Union)");
         br.addElement("    cb.union(unionCB -> {");
-        br.addElement("        unionCB.specify()... // *NG");
+        br.addElement("        unionCB.specify()... // *Bad");
         br.addElement("    });");
         br.addElement("  (o): (ExistsReferrer)");
-        br.addElement("    cb.specify()... // OK");
+        br.addElement("    cb.specify()... // Good");
         br.addElement("    cb.query().existsPurchaseList(purchaseCB -> {");
         br.addElement("        purchaseCB.query().set...");
         br.addElement("    });");
@@ -211,12 +211,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    cb.specify().derivedPurchase().max(purchaseCB -> {");
-        br.addElement("        cb.specify().columnMemberId(); // *NG");
+        br.addElement("        cb.specify().columnMemberId(); // *Bad");
         br.addElement("        purchaseCB.query().set...");
         br.addElement("    }, ...);");
         br.addElement("  (o):");
         br.addElement("    cb.specify().derivedPurchase().max(purchaseCB -> {");
-        br.addElement("        purchaseCB.specify().columnMemberId(); // OK");
+        br.addElement("        purchaseCB.specify().columnMemberId(); // Good");
         br.addElement("        purchaseCB.query().set...");
         br.addElement("    }, ...);");
         br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
@@ -236,12 +236,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (x): (DerivedReferrer)");
         br.addElement("    cb.specify().derivedPurchase().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchaseCount();");
-        br.addElement("        purchaseCB.specify().columnPurchasePrice(); // *NG");
+        br.addElement("        purchaseCB.specify().columnPurchasePrice(); // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
         br.addElement("        colCB.specify().columnMemberName();");
-        br.addElement("        colCB.specify().columnBirthdate(); // *NG");
+        br.addElement("        colCB.specify().columnBirthdate(); // *Bad");
         br.addElement("    })...");
         br.addElement("  (o): (DerivedReferrer)");
         br.addElement("    cb.specify().derivedPurchase().max(purchaseCB -> {");
@@ -264,12 +264,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    memberBhv.selectEntity(cb -> {");
-        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // *NG");
+        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // *Bad");
         br.addElement("    });");
         br.addElement("  (o):");
         br.addElement("    memberBhv.selectEntity(cb -> {");
         br.addElement("        cb.setupSelect_MemberStatus(); // *Point");
-        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // OK");
+        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // Good");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -291,15 +291,15 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (x): (ColumnQuery)");
         br.addElement("    cb.columnQuery(cb -> {");
         br.addElement("        cb.specify().columnBirthdate();");
-        br.addElement("        cb.specify().derivedPurchase().max(...); // *NG");
+        br.addElement("        cb.specify().derivedPurchase().max(...); // *Bad");
         br.addElement("    }).greaterEqual(...);");
         br.addElement("  (o): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        colCB.specify().columnBirthdate(); // OK");
+        br.addElement("        colCB.specify().columnBirthdate(); // Good");
         br.addElement("    }).greaterEqual(...);");
         br.addElement("  (o): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        colCB.specify().derivedPurchase().max(...); // OK");
+        br.addElement("        colCB.specify().derivedPurchase().max(...); // Good");
         br.addElement("    }).greaterEqual(...);");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -433,19 +433,19 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (ScalarSelect)");
         br.addElement("    memberBhv.selectScalar(Date.class).max(cb -> {");
-        br.addElement("        cb.specify().specifyMemberStatus().col.. // *NG");
+        br.addElement("        cb.specify().specifyMemberStatus().col.. // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (ScalarCondition)");
         br.addElement("    cb.query().scalar_Equal().max(Date.class).max(scalarCB -> {");
-        br.addElement("        scalarCB.specify().specifyMemberStatusName().col..; // *NG");
+        br.addElement("        scalarCB.specify().specifyMemberStatusName().col..; // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (VaryingUpdate)");
         br.addElement("    memberBhv.varyingUpdate(member, op -> op.self(colCB -> {");
-        br.addElement("        colCB.specify().specifyMemberStatus().col.. // *NG");
+        br.addElement("        colCB.specify().specifyMemberStatus().col.. // *Bad");
         br.addElement("    });");
         br.addElement("  (o): (ScalarSelect)");
         br.addElement("    memberBhv.scalarSelect(Date.class).max(scalarCB -> {");
-        br.addElement("        scalarCB.specify().columnBirthdate(); // OK");
+        br.addElement("        scalarCB.specify().columnBirthdate(); // Good");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -465,11 +465,11 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (ScalaCondition)");
         br.addElement("    cb.query().scalar_Equal().max(scalarCB -> {");
-        br.addElement("        scalarCB.specify().derivedPurchase()...; // *NG");
+        br.addElement("        scalarCB.specify().derivedPurchase()...; // *Bad");
         br.addElement("    });");
         br.addElement("  (o): (ScalaCondition)");
         br.addElement("    cb.query().scalar_Equal().max(scalarCB -> {");
-        br.addElement("        scalarCB.specify().columnPurchaseCount(); // OK");
+        br.addElement("        scalarCB.specify().columnPurchaseCount(); // Good");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -490,11 +490,11 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (x): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
         br.addElement("        colCB.specify().derivedPurchase().max(...);");
-        br.addElement("        colCB.specify().derivedPurchase().max(...); // *NG");
+        br.addElement("        colCB.specify().derivedPurchase().max(...); // *Bad");
         br.addElement("    }).greaterEqual(...);");
         br.addElement("  (o): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        colCB.specify().derivedPurchase().max(...); // OK");
+        br.addElement("        colCB.specify().derivedPurchase().max(...); // Good");
         br.addElement("    }).greaterEqual(...);");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -517,19 +517,19 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("");
         br.addElement("  (x): (empty)");
         br.addElement("    memberBhv.selectScalar(LocalDate.class).max(cb -> {");
-        br.addElement("        // *NG, it should not be empty");
+        br.addElement("        // *Bad, it should not be empty");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (x): (duplicated)");
         br.addElement("    memberBhv.selectScalar(LocalDate.class).max(cb -> {");
-        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        // *Bad, it should be the only one");
         br.addElement("        cb.specify().columnBirthdate();");
         br.addElement("        cb.specify().columnRegisterDatetime();");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (o):");
         br.addElement("    memberBhv.selectScalar(LocalDate.class).max(cb -> {");
-        br.addElement("        cb.specify().columnBirthdate(); // OK");
+        br.addElement("        cb.specify().columnBirthdate(); // Good");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cb.getClass().getName());
@@ -557,7 +557,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (o):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
-        br.addElement("    }, Member.ALIAS_latestPurchaseDatetime); // OK");
+        br.addElement("    }, Member.ALIAS_latestPurchaseDatetime); // Good");
         br.addItem("BasePoint Table");
         br.addElement(localCQ.asTableDbName());
         final String msg = br.buildExceptionMessage();
@@ -573,12 +573,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (x):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
-        br.addElement("    }, \"$memberName\"); // *NG: same name as MEMBER's MEMBER_NAME");
+        br.addElement("    }, \"$memberName\"); // *Bad: same name as MEMBER's MEMBER_NAME");
         br.addElement("");
         br.addElement("  (o):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
-        br.addElement("    }, \"$latestPurchaseDatetime\"); // OK");
+        br.addElement("    }, \"$latestPurchaseDatetime\"); // Good");
         br.addItem("BasePoint Table");
         br.addElement(localCQ.asTableDbName());
         br.addItem("Conflict Alias Name");
@@ -599,7 +599,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (ConditionBean):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchasePrice();");
-        br.addElement("    }, Member.ALIAS_highestPurchasePrice); // OK");
+        br.addElement("    }, Member.ALIAS_highestPurchasePrice); // Good");
         br.addElement("");
         br.addElement("  (Extended Entity):");
         br.addElement("    // in the entity of Member...");
@@ -616,7 +616,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("You should add mappaable alias prefix '$' to your alias name like this:");
         br.addElement("For example:");
         br.addElement("  (ConditionBean and Entity handling):");
-        br.addElement("    String highestAlias = \"$HIGHEST_PURCHASE_PRICE\"; // OK");
+        br.addElement("    String highestAlias = \"$HIGHEST_PURCHASE_PRICE\"; // Good");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchasePrice();");
         br.addElement("    }, highestAlias);");
@@ -641,17 +641,17 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (empty)");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
-        br.addElement("        // *NG, it should not be empty");
+        br.addElement("        // *Bad, it should not be empty");
         br.addElement("    }, Member.ALIAS_latestPurchaseDatetime);");
         br.addElement("  (x): (duplicated)");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
-        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        // *Bad, it should be the only one");
         br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
         br.addElement("        purchaseCB.specify().columnPurchaseCount();");
         br.addElement("    }, Member.ALIAS_latestPurchaseDatetime);");
         br.addElement("  (o):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
-        br.addElement("        purchaseCB.specify().columnPurchaseDatetime(); // OK");
+        br.addElement("        purchaseCB.specify().columnPurchaseDatetime(); // Good");
         br.addElement("    }, Member.ALIAS_latestPurchaseDatetime);");
         br.addItem("Function Method");
         br.addElement(xconvertFunctionToMethod(function));
@@ -708,12 +708,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x)");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
-        br.addElement("        purchaseCB.specify().specifyProduct().columnProductName(); // *NG");
+        br.addElement("        purchaseCB.specify().specifyProduct().columnProductName(); // *Bad");
         br.addElement("    }, \"LATEST_PURCHASE_DATETIME\");");
         br.addElement("    cb.query().addSpecifiedDerivedOrderBy_Desc(\"WRONG_NAME_DATETIME\");");
         br.addElement("  (o):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
-        br.addElement("        purchaseCB.specify().columnPurchaseDatetime(); // OK");
+        br.addElement("        purchaseCB.specify().columnPurchaseDatetime(); // Good");
         br.addElement("    }, \"LATEST_PURCHASE_DATETIME\");");
         br.addElement("    cb.query().addSpecifiedDerivedOrderBy_Desc(\"LATEST_PURCHASE_DATETIME\");");
         br.addItem("NotFound Alias Name");
@@ -734,17 +734,17 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    cb.query().derivedPurchase().max(purchaseCB -> {");
-        br.addElement("        // *NG, it should not be empty");
+        br.addElement("        // *Bad, it should not be empty");
         br.addElement("    }).greaterEqual(123);");
         br.addElement("  (x):");
         br.addElement("    cb.query().derivedPurchase().max(purchaseCB -> {");
-        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        // *Bad, it should be the only one");
         br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
         br.addElement("        purchaseCB.specify().columnPurchaseCount();");
         br.addElement("    }).greaterEqual(123);");
         br.addElement("  (o):");
         br.addElement("    cb.query().derivedPurchase().max(purchaseCB -> {");
-        br.addElement("        purchaseCB.specify().columnPurchaseDatetime(); // OK");
+        br.addElement("        purchaseCB.specify().columnPurchaseDatetime(); // Good");
         br.addElement("    }).greaterEqual(123);");
         br.addItem("Function Method");
         br.addElement(xconvertFunctionToMethod(function));
@@ -802,23 +802,23 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        colCB.query().set...();  // *NG");
-        br.addElement("        colCB.columnQuery(...);  // *NG");
-        br.addElement("        colCB.orScopeQuery(...); // *NG");
+        br.addElement("        colCB.query().set...();  // *Bad");
+        br.addElement("        colCB.columnQuery(...);  // *Bad");
+        br.addElement("        colCB.orScopeQuery(...); // *Bad");
         br.addElement("    })...");
         br.addElement("  (x): (VaryingUpdate)");
         br.addElement("    UpdateOption option = new UpdateOption().self(colCB -> {");
-        br.addElement("        colCB.query().set...();  // *NG");
-        br.addElement("        colCB.columnQuery(...);  // *NG");
-        br.addElement("        colCB.orScopeQuery(...); // *NG");
+        br.addElement("        colCB.query().set...();  // *Bad");
+        br.addElement("        colCB.columnQuery(...);  // *Bad");
+        br.addElement("        colCB.orScopeQuery(...); // *Bad");
         br.addElement("    });");
         br.addElement("  (o): (ColumnQuery)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        colCB.specify().column...();  // OK");
+        br.addElement("        colCB.specify().column...();  // Good");
         br.addElement("    })...");
         br.addElement("  (o): (VaryingUpdate)");
         br.addElement("    UpdateOption option = new UpdateOption().self(colCB -> {");
-        br.addElement("        colCB.specify().column...();  // OK");
+        br.addElement("        colCB.specify().column...();  // Good");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -836,13 +836,13 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("(x):");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
         br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
-        br.addElement("      cb.query().setBirthdate_GreaterThan(currentDate()); // *NG");
+        br.addElement("      cb.query().setBirthdate_GreaterThan(currentDate()); // *Bad");
         br.addElement("  });");
         br.addElement("(o):");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
         br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
-        br.addElement("  cb.query().setBirthdate_GreaterThan(currentDate()); // OK");
+        br.addElement("  cb.query().setBirthdate_GreaterThan(currentDate()); // Good");
         br.addItem("Locked ConditionBean");
         br.addElement(lockedCB.getClass().getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
@@ -859,17 +859,17 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    cb.query().setMemberId_Equal(3);");
-        br.addElement("    cb.query().setMemberId_Equal(4); // *NG");
+        br.addElement("    cb.query().setMemberId_Equal(4); // *Bad");
         br.addElement("  (x):");
         br.addElement("    cb.query().setMemberId_Equal(3);");
-        br.addElement("    cb.query().setMemberId_Equal(3); // *NG");
+        br.addElement("    cb.query().setMemberId_Equal(3); // *Bad");
         br.addElement("  (o):");
         br.addElement("    cb.query().setMemberId_Equal(3);");
-        br.addElement("    cb.query().setMemberAccount_Equal(\"Pixy\"); // OK");
+        br.addElement("    cb.query().setMemberAccount_Equal(\"Pixy\"); // Good");
         br.addElement("  (o):");
         br.addElement("    cb.query().setMemberId_Equal(3); // overridden");
         br.addElement("    cb.enableOverridingQuery(() -> {");
-        br.addElement("        cb.query().setMemberId_Equal(4); // OK (overrides it)");
+        br.addElement("        cb.query().setMemberId_Equal(4); // Good (overrides it)");
         br.addElement("    });");
         br.addItem("Column Name");
         br.addElement(columnDbName);
@@ -928,15 +928,15 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
         br.addElement("    cb.query().existsPurchase(purchaseCB -> {");
-        br.addElement("        purchaseCB.query().addOrderBy...; // *NG");
+        br.addElement("        purchaseCB.query().addOrderBy...; // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (Union)");
         br.addElement("    cb.union(unionCB -> {");
-        br.addElement("        unionCB.query().addOrderBy...; // *NG");
+        br.addElement("        unionCB.query().addOrderBy...; // *Bad");
         br.addElement("    });");
         br.addElement("  (x): (DerivedReferrer)");
         br.addElement("    cb.specify().derivedPurchase().max(purchaseCB -> {");
-        br.addElement("        purchaseCB.query().addOrderBy...; // *NG");
+        br.addElement("        purchaseCB.query().addOrderBy...; // *Bad");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -958,11 +958,11 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (empty)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        // *NG, it should not be empty");
+        br.addElement("        // *Bad, it should not be empty");
         br.addElement("    }).lessThan...;");
         br.addElement("  (x): (duplicated)");
         br.addElement("    cb.columnQuery(colCB -> {");
-        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        // *Bad, it should be the only one");
         br.addElement("        colCB.specify().columnMemberName();");
         br.addElement("        colCB.specify().columnBirthdate();");
         br.addElement("    }).lessThan...;");
@@ -1007,7 +1007,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("The and-part of or-scope query works only in or-scope query.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.orScopeQueryAndPart(andCB -> { // *NG");
+        br.addElement("    cb.orScopeQueryAndPart(andCB -> { // *Bad");
         br.addElement("        ...");
         br.addElement("    });");
         br.addElement("  (o):");
@@ -1032,7 +1032,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("  (x):");
         br.addElement("    cb.orScopeQuery(orCB -> {");
         br.addElement("        orCB.orScopeQueryAndPart(andCB -> {");
-        br.addElement("            andCB.orScopeQueryAndPart(andCB -> {"); // *NG");
+        br.addElement("            andCB.orScopeQueryAndPart(andCB -> {"); // *Bad");
         br.addElement("                ...");
         br.addElement("            });");
         br.addElement("        });");
@@ -1056,19 +1056,19 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("  (x): (empty)");
         br.addElement("    cb.query().scalar_Equal().max(memberCB -> {");
-        br.addElement("        // *NG, it should not be empty");
+        br.addElement("        // *Bad, it should not be empty");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (x): (duplicated)");
         br.addElement("    cb.query().scalar_Equal().max(memberCB -> {");
-        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        // *Bad, it should be the only one");
         br.addElement("        memberCB.specify().columnBirthdate();");
         br.addElement("        memberCB.specify().columnMemberName();");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (o):");
         br.addElement("    cb.query().scalar_Equal().max(memberCB -> {");
-        br.addElement("        memberCB.specify().columnBirthdate(); // OK");
+        br.addElement("        memberCB.specify().columnBirthdate(); // Good");
         br.addElement("    });");
         br.addItem("Function Method");
         br.addElement(xconvertFunctionToMethod(function));
@@ -1086,14 +1086,14 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    cb.query().scalar_Equal().max(memberCB -> {");
         br.addElement("        memberCB.specify().columnBirthdate()");
         br.addElement("    }).partitionBy(colCB -> {");
-        br.addElement("        // *NG, it should not be empty");
+        br.addElement("        // *Bad, it should not be empty");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (x): (duplicated)");
         br.addElement("    cb.query().scalar_Equal().max(memberCB -> {");
         br.addElement("        memberCB.specify().columnBirthdate()");
         br.addElement("    }).partitionBy(colCB -> {");
-        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        // *Bad, it should be the only one");
         br.addElement("        colCB.specify().columnBirthdate();");
         br.addElement("        colCB.specify().columnMemberName();");
         br.addElement("    });");
@@ -1102,7 +1102,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    cb.query().scalar_Equal().max(memberCB -> {");
         br.addElement("        memberCB.specify().columnBirthdate()");
         br.addElement("    }).partitionBy(colCB -> {");
-        br.addElement("        colCB.specify().columnMemberStatusCode(); // OK");
+        br.addElement("        colCB.specify().columnMemberStatusCode(); // Good");
         br.addElement("    });");
         br.addItem("Function Method");
         br.addElement(xconvertFunctionToMethod(function));
@@ -1216,11 +1216,11 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("Make sure your implementation:");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.query().withManualOrder(op -> { // *NG");
+        br.addElement("    cb.query().withManualOrder(op -> { // *Bad");
         br.addElement("        op.when_LessEqual(...);");
         br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(op -> { // OK");
+        br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(op -> { // Good");
         br.addElement("        op.when_LessEqual(...);");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
@@ -1244,7 +1244,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob);");
-        br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(mob); // *NG");
+        br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(mob); // *Bad");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    ManualOrderOption birthMob = new ManualOrderOption();");
@@ -1252,7 +1252,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(birthMob);");
         br.addElement("    ManualOrderOption idMob = new ManualOrderOption();");
         br.addElement("    idMob.when_LessEqual(...);");
-        br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(idMob); // OK");
+        br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(idMob); // Good");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
         br.addItem("Existing Option");
@@ -1276,17 +1276,17 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("For example:");
         br.addElement("(x):");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
-        br.addElement("      cb.ignoreNullOrEmptyQuery(); // *NG");
+        br.addElement("      cb.ignoreNullOrEmptyQuery(); // *Bad");
         br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
         br.addElement("(o):");
-        br.addElement("  cb.ignoreNullOrEmptyQuery(); // OK");
+        br.addElement("  cb.ignoreNullOrEmptyQuery(); // Good");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
         br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
         br.addElement("(o):");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
-        br.addElement("      purchaseCB.ignoreNullOrEmptyQuery(); // OK");
+        br.addElement("      purchaseCB.ignoreNullOrEmptyQuery(); // Good");
         br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
         br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state

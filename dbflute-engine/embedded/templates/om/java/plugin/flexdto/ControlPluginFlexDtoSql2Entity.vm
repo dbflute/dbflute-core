@@ -1,0 +1,54 @@
+##
+## Copyright 2014-2019 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+
+## ===================================================================================
+##                                                                            Flex Dto
+##                                                                            ========
+#if ($database.hasFlexDtoDefinition())
+  $database.enableFlexDtoOutputDirectory()
+  $database.info("parseFlexDto() {")
+  #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
+  #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
+
+  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #foreach ($table in $database.tableList)
+    #if (!$table.isSql2EntityTypeSafeCursor())
+    #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
+    #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
+    #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.customize.${myExtendedObjectClassName}")
+
+    $database.info("    parse('${myExtendedObjectClassName}');")
+
+    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
+    $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedEntity())
+      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
+      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+      $database.reflectAllExCopyright($path)
+    #end
+    #end
+  #end
+  $database.info("}")
+  $database.backToSql2EntityOutputDirectory()
+#end

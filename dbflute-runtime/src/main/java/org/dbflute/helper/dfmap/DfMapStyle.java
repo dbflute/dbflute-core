@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,39 +217,17 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         @SuppressWarnings("unchecked")
         final Map<String, Object> casted = (Map<String, Object>) map;
         final boolean printOneLiner = isPrintOneLiner();
-        doBuildMapString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
+        buildMapString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
         return sb.toString();
     }
 
-    protected void doBuildMapString(StringBuilder sb, Map<String, Object> map, boolean printOneLiner, String previousIndent,
+    protected void buildMapString(StringBuilder sb, Map<String, Object> map, boolean printOneLiner, String previousIndent,
             String currentIndent) {
-        sb.append(_mapPrefix).append(_beginBrace);
+        doBuildMapStringBegin(sb, map, printOneLiner, previousIndent, currentIndent);
         if (!map.isEmpty()) {
             int index = 0;
             for (Entry<String, ? extends Object> entry : map.entrySet()) {
-                final String key = entry.getKey();
-                final Object value = entry.getValue();
-                if (printOneLiner) {
-                    if (index > 0) {
-                        sb.append(" ").append(_elementDelimiter);
-                    }
-                } else {
-                    sb.append(ln()).append(currentIndent).append(_elementDelimiter);
-                }
-                sb.append(" ").append(escapeControlMark(key)).append(" ").append(_valueEqual).append(" ");
-                if (value instanceof Map<?, ?>) {
-                    @SuppressWarnings("unchecked")
-                    final Map<String, Object> valueMap = (Map<String, Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
-                    doBuildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
-                } else if (value instanceof List<?>) {
-                    @SuppressWarnings("unchecked")
-                    final List<Object> valueList = (List<Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
-                    doBuildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
-                } else {
-                    sb.append(escapeControlMark(value));
-                }
+                doBuildMapStringCurrentEntry(sb, printOneLiner, previousIndent, currentIndent, index, entry.getKey(), entry.getValue());
                 ++index;
             }
             if (printOneLiner) {
@@ -258,6 +236,47 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
                 sb.append(ln()).append(previousIndent);
             }
         }
+        doBuildMapStringEnd(sb, map, printOneLiner, previousIndent, currentIndent);
+    }
+
+    protected void doBuildMapStringBegin(StringBuilder sb, Map<String, Object> map, boolean printOneLiner, String previousIndent,
+            String currentIndent) {
+        sb.append(_mapPrefix).append(_beginBrace);
+    }
+
+    protected void doBuildMapStringCurrentEntry(StringBuilder sb, boolean printOneLiner, String previousIndent, String currentIndent,
+            int index, String key, Object value) {
+        if (printOneLiner) {
+            if (index > 0) {
+                sb.append(" ").append(_elementDelimiter);
+            }
+        } else {
+            sb.append(ln()).append(currentIndent).append(_elementDelimiter);
+        }
+        sb.append(" ").append(escapeControlMark(key)).append(" ").append(_valueEqual).append(" ");
+        if (value instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> valueMap = (Map<String, Object>) value;
+            final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+            buildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
+        } else if (value instanceof List<?>) {
+            @SuppressWarnings("unchecked")
+            final List<Object> valueList = (List<Object>) value;
+            final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+            buildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
+        } else {
+            final Map<String, Object> resolvedMap = resolvePotentialMapOfBuildingMapString(value);
+            if (resolvedMap != null) {
+                final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+                buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
+            } else {
+                sb.append(escapeControlMark(value));
+            }
+        }
+    }
+
+    protected void doBuildMapStringEnd(StringBuilder sb, Map<String, Object> map, boolean printOneLiner, String previousIndent,
+            String currentIndent) {
         sb.append(_endBrace);
     }
 
@@ -275,37 +294,17 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         @SuppressWarnings("unchecked")
         final List<Object> casted = (List<Object>) list;
         final boolean printOneLiner = isPrintOneLiner();
-        doBuildListString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
+        buildListString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
         return sb.toString();
     }
 
-    protected void doBuildListString(StringBuilder sb, List<? extends Object> list, boolean printOneLiner, String previousIndent,
+    protected void buildListString(StringBuilder sb, List<? extends Object> list, boolean printOneLiner, String previousIndent,
             String currentIndent) {
-        sb.append(_listPrefix).append(_beginBrace);
+        doBuildListStringBegin(sb, list, printOneLiner, previousIndent, currentIndent);
         if (!list.isEmpty()) {
             int index = 0;
             for (Object value : list) {
-                if (printOneLiner) {
-                    if (index > 0) {
-                        sb.append(" ").append(_elementDelimiter);
-                    }
-                } else {
-                    sb.append(ln()).append(currentIndent).append(_elementDelimiter);
-                }
-                sb.append(" ");
-                if (value instanceof Map<?, ?>) {
-                    @SuppressWarnings("unchecked")
-                    final Map<String, Object> valueMap = (Map<String, Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
-                    doBuildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
-                } else if (value instanceof List<?>) {
-                    @SuppressWarnings("unchecked")
-                    final List<Object> valueList = (List<Object>) value;
-                    final String nextIndent = printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
-                    doBuildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
-                } else {
-                    sb.append(escapeControlMark(value));
-                }
+                doBuildListStringCurrentElement(sb, printOneLiner, previousIndent, currentIndent, index, value);
                 ++index;
             }
             if (printOneLiner) {
@@ -314,7 +313,66 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
                 sb.append(ln()).append(previousIndent);
             }
         }
+        doBuildListStringEnd(sb, list, printOneLiner, previousIndent, currentIndent);
+    }
+
+    protected void doBuildListStringBegin(StringBuilder sb, List<? extends Object> list, boolean printOneLiner, String previousIndent,
+            String currentIndent) {
+        sb.append(_listPrefix).append(_beginBrace);
+    }
+
+    protected void doBuildListStringCurrentElement(StringBuilder sb, boolean printOneLiner, String previousIndent, String currentIndent,
+            int index, Object value) {
+        if (printOneLiner) {
+            if (index > 0) {
+                sb.append(" ").append(_elementDelimiter);
+            }
+        } else {
+            sb.append(ln()).append(currentIndent).append(_elementDelimiter);
+        }
+        sb.append(" ");
+        if (value instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> valueMap = (Map<String, Object>) value;
+            final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+            buildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
+        } else if (value instanceof List<?>) {
+            @SuppressWarnings("unchecked")
+            final List<Object> valueList = (List<Object>) value;
+            final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+            buildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
+        } else {
+            final Map<String, Object> resolvedMap = resolvePotentialMapOfBuildingMapString(value);
+            if (resolvedMap != null) {
+                final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
+                buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
+            } else {
+                sb.append(escapeControlMark(value));
+            }
+        }
+    }
+
+    protected void doBuildListStringEnd(StringBuilder sb, List<? extends Object> list, boolean printOneLiner, String previousIndent,
+            String currentIndent) {
         sb.append(_endBrace);
+    }
+
+    // -----------------------------------------------------
+    //                                          Assist Logic
+    //                                          ------------
+    protected String deriveNextIndentOfBuildingMapString(boolean printOneLiner, String previousIndent, String currentIndent) {
+        return printOneLiner ? "" : generally_calculateNextIndent(previousIndent, currentIndent);
+    }
+
+    protected Map<String, Object> resolvePotentialMapOfBuildingMapString(Object value) { // value may be null
+        // you can override for your bean that can be map like this:
+        // e.g.
+        //  if (value instanceof Something) {
+        //      return ((Something) value).toMap();
+        //  } else {
+        //      return super.resolvePotentialMapOfBuildingMapString(value);
+        //  }
+        return null; // returning null means non-map value
     }
 
     // ===================================================================================
@@ -560,8 +618,8 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         if (isEscapeCharEscape()) {
             // performance headache but basically it does not come here
             // because of unsupported escaping escape-char
-            final String escapedEscapeChar = toEscapedMark(_escapeChar);
-            current = generally_replace(current, escapedEscapeChar, buildLengthSpace(escapedEscapeChar));
+            final String escapedEscapeChar = convertToEscapedMark(_escapeChar);
+            current = generally_replace(current, escapedEscapeChar, convertToLengthSpace(escapedEscapeChar));
         }
         int currentBeginIndex = _currentRemainderIndex;
         while (true) {
@@ -581,7 +639,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         }
     }
 
-    protected String buildLengthSpace(String value) {
+    protected String convertToLengthSpace(String value) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             sb.append(" ");
@@ -849,12 +907,12 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         }
         String filtered = value.toString();
         if (isEscapeCharEscape()) {
-            filtered = generally_replace(filtered, _escapeChar, toEscapedMark(_escapeChar));
+            filtered = generally_replace(filtered, _escapeChar, convertToEscapedMark(_escapeChar));
         }
-        filtered = generally_replace(filtered, _beginBrace, toEscapedMark(_beginBrace));
-        filtered = generally_replace(filtered, _endBrace, toEscapedMark(_endBrace));
-        filtered = generally_replace(filtered, _elementDelimiter, toEscapedMark(_elementDelimiter));
-        filtered = generally_replace(filtered, _valueEqual, toEscapedMark(_valueEqual));
+        filtered = generally_replace(filtered, _beginBrace, convertToEscapedMark(_beginBrace));
+        filtered = generally_replace(filtered, _endBrace, convertToEscapedMark(_endBrace));
+        filtered = generally_replace(filtered, _elementDelimiter, convertToEscapedMark(_elementDelimiter));
+        filtered = generally_replace(filtered, _valueEqual, convertToEscapedMark(_valueEqual));
         return filtered;
     }
 
@@ -870,19 +928,19 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         String filtered = value;
         final String escapedEscapeMark = ESCAPED_ESCAPE_MARK;
         if (isEscapeCharEscape()) {
-            filtered = generally_replace(filtered, toEscapedMark(_escapeChar), escapedEscapeMark);
+            filtered = generally_replace(filtered, convertToEscapedMark(_escapeChar), escapedEscapeMark);
         }
-        filtered = generally_replace(filtered, toEscapedMark(_beginBrace), _beginBrace);
-        filtered = generally_replace(filtered, toEscapedMark(_endBrace), _endBrace);
-        filtered = generally_replace(filtered, toEscapedMark(_elementDelimiter), _elementDelimiter);
-        filtered = generally_replace(filtered, toEscapedMark(_valueEqual), _valueEqual);
+        filtered = generally_replace(filtered, convertToEscapedMark(_beginBrace), _beginBrace);
+        filtered = generally_replace(filtered, convertToEscapedMark(_endBrace), _endBrace);
+        filtered = generally_replace(filtered, convertToEscapedMark(_elementDelimiter), _elementDelimiter);
+        filtered = generally_replace(filtered, convertToEscapedMark(_valueEqual), _valueEqual);
         if (isEscapeCharEscape()) {
             filtered = generally_replace(filtered, escapedEscapeMark, _escapeChar);
         }
         return filtered;
     }
 
-    protected String toEscapedMark(String mark) {
+    protected String convertToEscapedMark(String mark) {
         return _escapeChar + mark;
     }
 

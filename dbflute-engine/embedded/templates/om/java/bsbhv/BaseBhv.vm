@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -24,8 +24,11 @@ import org.dbflute.bhv.*;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 #end
 import org.dbflute.bhv.readable.*;
-#if ($table.isWritable() || $table.hasBehaviorFilterBeforeColumn())
+#if ($table.isWritable() || $table.hasBehaviorFilterBeforeColumn() || $table.isDatetimePrecisionTruncationOfUpdatedEntity())
 import org.dbflute.bhv.writable.*;
+#end
+#if ($table.isDatetimePrecisionTruncationOfUpdatedEntity())
+import org.dbflute.bhv.writable.coins.DateUpdateAdjuster;
 #end
 import org.dbflute.bhv.referrer.*;
 import org.dbflute.cbean.*;
@@ -1915,6 +1918,25 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public OutsideSqlAllFacadeExecutor<${myExtendedBhvClassName}> outsideSql() {
         return doOutsideSql();
     }
+#end
+#if ($table.isDatetimePrecisionTruncationOfUpdatedEntity())
+
+    // ===================================================================================
+    //                                                           Framework Filter Override
+    //                                                           =========================
+    @Override
+    protected void frameworkFilterEntityOfInsert(Entity entity, org.dbflute.optional.OptionalThing<InsertOption<? extends ConditionBean>> option) {
+        super.frameworkFilterEntityOfInsert(entity, option);
+        new DateUpdateAdjuster().truncatePrecisionOfEntityProperty(entity);
+    }
+#if ($table.isWritable())
+
+    @Override
+    protected void frameworkFilterEntityOfUpdate(Entity entity, org.dbflute.optional.OptionalThing<UpdateOption<? extends ConditionBean>> option) {
+        super.frameworkFilterEntityOfUpdate(entity, option);
+        new DateUpdateAdjuster().truncatePrecisionOfEntityProperty(entity);
+    }
+#end
 #end
 #if ($table.hasBehaviorFilterBeforeColumn())
 

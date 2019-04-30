@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
-#if ($tableMap.hasRefCls)
+#if ($tableMap.hasRefCls && !$tableMap.isSuppressDBClsCollaboration)
 import ${tableMap.allcommonPackage}.*;
 #end
 
@@ -165,7 +165,6 @@ public interface ${glCDef} extends Classification {
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
-         * @deprecated use of()
          */
         public static ${classificationName} codeOf(Object code) {
             if (code == null) { return null; }
@@ -242,6 +241,7 @@ public interface ${glCDef} extends Classification {
 #end
             return new ArrayList<${classificationName}>(4);
         }
+#if (!$tableMap.isSuppressDBClsCollaboration)
 #foreach ($refClsElement in $classificationTop.refClsElementList)
 
         /**
@@ -264,6 +264,7 @@ public interface ${glCDef} extends Classification {
                 throw new IllegalStateException("Cannot convert ${classificationName} to ${refClsElement.classificationName} by the app code: " + appCode);
             });
         }
+#end
 #end
 
         @Override public String toString() { return code(); }
@@ -302,14 +303,14 @@ public interface ${glCDef} extends Classification {
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public Classification codeOf(Object code) { // null if not found, old style so use classificationOf(code)
+        public Classification codeOf(Object code) { // null if not found, old style so use of(code)
 #foreach ($classificationName in $tableMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public Classification nameOf(String name) { // null if not found, old style so use classificationByName(name)
+        public Classification nameOf(String name) { // null if not found, old style so use byName(name)
 #foreach ($classificationName in $tableMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.valueOf(name); }
 #end

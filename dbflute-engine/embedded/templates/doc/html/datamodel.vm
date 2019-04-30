@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2018 the original author or authors.
+## Copyright 2014-2019 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>${database.projectName} schema</title>
-#if ($database.isSchemaHtmlStyleSheetEmbedded())
+#set ($isStyleSheetInheritable = $database.isSchemaHtmlStyleSheetInheritable())
+#if (!$isStyleSheetInheritable && $database.isSchemaHtmlStyleSheetEmbedded())
 	<style type="text/css">
 ${database.schemaHtmlStyleSheetEmbedded}
 	</style>
-#elseif ($database.isSchemaHtmlStyleSheetLink())
+#elseif (!$isStyleSheetInheritable && $database.isSchemaHtmlStyleSheetLink())
 	${database.schemaHtmlStyleSheetLink}
 #else
 	<style type="text/css">
@@ -356,6 +357,19 @@ dl.procedurelist dd.column pre {
 }
 
 /* -------------------------------------------------
+                                    Schema Policy
+------------------------------------------------- */
+pre.spolicydisp {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+}
+pre.spolicyviodisp {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	color: #994747;
+}
+
+/* -------------------------------------------------
                                   Decomment Modal
 ------------------------------------------------- */
 .decommentmodal {
@@ -443,6 +457,13 @@ dl.procedurelist dd.column pre {
 	color: #222277;
 }
 	</style>
+#if ($isStyleSheetInheritable && $database.isSchemaHtmlStyleSheetEmbedded())
+	<style type="text/css">
+${database.schemaHtmlStyleSheetEmbedded}
+	</style>
+#elseif ($isStyleSheetInheritable && $database.isSchemaHtmlStyleSheetLink())
+	${database.schemaHtmlStyleSheetLink}
+#end
 #end
 #if ($database.isSchemaHtmlJavaScriptEmbedded())
 	<script type="text/javascript">
@@ -476,6 +497,9 @@ ${linkDelimiter} <a href="#outsidesql">OutsideSql List</a>
 #end
 #if ($database.isSchemaHtmlProcedureValid())
 ${linkDelimiter} <a href="#procedure">Procedure List</a>
+#end
+#if ($database.isSchemaHtmlSchemaPolicyValid())
+${linkDelimiter} <a href="#schemapolicy">Schema Policy</a>
 #end
 #if ($selector.hasSchemaDiagram())
 ${linkDelimiter} <a href="#diagram">Schema Diagram</a>
@@ -562,6 +586,16 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 	</table>
 	<button id="column-mapping-submit-button">Mapping</button>
 </div>
+#if ($database.isSchemaHtmlSchemaPolicyValid())
+#set ($schemaPolicyDisplay = $database.schemaPolicyDisplay)
+#if ($schemaPolicyDisplay.hasViolation())
+
+<h2 id="schemapolicyvio">SchemaPolicy Violation</h2>
+<pre class="spolicyviodisp">
+${schemaPolicyDisplay.violationMessageHtmlPreText}
+</pre>
+#end
+#end
 
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
@@ -784,6 +818,14 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 </dl>
 #end
+#end
+#if ($database.isSchemaHtmlSchemaPolicyValid())
+#set ($schemaPolicyDisplay = $database.schemaPolicyDisplay)
+
+<h2 id="schemapolicy">Schema Policy</h2>
+<pre class="spolicydisp">
+${schemaPolicyDisplay.policyMessageHtmlPreText}
+</pre>
 #end
 #if ($selector.hasSchemaDiagram())
 
@@ -1492,6 +1534,7 @@ StoreClient.prototype = {
 			}
 			var decomment = {
 				"body": property["decomment"],
+				"pieceOwner": property["pieceOwner"],
 				"pieceGitBranch": property["pieceGitBranch"]
 			}
 			decomments.push(decomment);
@@ -1555,6 +1598,7 @@ StoreClient.prototype = {
 			}
 			var decomment = {
 				"body": property["decomment"],
+				"pieceOwner": property["pieceOwner"],
 				"pieceGitBranch": property["pieceGitBranch"]
 			}
 			decomments.push(decomment);
@@ -1624,6 +1668,7 @@ function PickupTableProperty(tableDbName, json) {
 		this.decomments = json.decomments || [];
 		this.previousPieces = json.previousPieces;
 		this.authors = json.authors;
+		this.pieceOwner = json.pieceOwner;
 		this.commentVersion = json.commentVersion;
 		this.columns = {};
 		var columns = json.columns || {};
@@ -1684,7 +1729,7 @@ PickupTableProperty.prototype = {
 			var decomment = this.decomments[key];
 			displayComment += decomment.body
 			if (this.isConflict() && decomment.pieceGitBranch) {
-				displayComment += '\n=======' + decomment.pieceGitBranch;
+				displayComment += '\n=======' + decomment.pieceGitBranch + ' (' + decomment.pieceOwner + ')';
 				if (key < commentCount - 1) {
 					displayComment += '\n\n'; // show between comments
 				}
@@ -1776,6 +1821,7 @@ function PickupColumnProperty(tableDbName, columnName, json) {
 		this.decomments = json['decomments'] || [];
 		this.previousPieces = json['previousPieces'];
 		this.authors = json['authors'];
+		this.pieceOwner = json['pieceOwner'];
 		this.commentVersion = json['commentVersion'];
 		this.previousWholeComment = json['previousWholeComment'];
 	}
@@ -1834,7 +1880,7 @@ PickupColumnProperty.prototype = {
 			var decomment = this.decomments[key];
 			displayComment += decomment.body
 			if (this.isConflict() && decomment.pieceGitBranch) {
-				displayComment += '\n=======' + decomment.pieceGitBranch;
+				displayComment += '\n=======' + decomment.pieceGitBranch + ' (' + decomment.pieceOwner + ')';
 				if (key < commentCount - 1) {
 					displayComment += '\n\n'; // show between comments
 				}

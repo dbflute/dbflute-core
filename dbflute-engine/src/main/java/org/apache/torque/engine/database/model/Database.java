@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,6 +156,7 @@ import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataArrangeQuery;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataProcedure;
+import org.dbflute.logic.doc.spolicy.display.DfSPolicyDisplay;
 import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
@@ -256,14 +257,19 @@ public class Database {
     protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
 
     // -----------------------------------------------------
-    //                                      Decomment Pickup
-    //                                      ----------------
-    protected DfDecoMapPickup _embeddedPickup; // used by templates directly, null allowed: when doc only
+    //                                             Decomment
+    //                                             ---------
+    protected DfDecoMapPickup _embeddedPickup; // used by templates directly, not null when e.g. doc (SchemaHTML)
 
     // -----------------------------------------------------
     //                                            First Date
     //                                            ----------
-    protected DfFirstDateAgent _firstDateAgent; // null allowed, when doc only
+    protected DfFirstDateAgent _firstDateAgent; // used by Java only, not null when e.g. doc (SchemaHTML)
+
+    // -----------------------------------------------------
+    //                                          SchemaPolicy
+    //                                          ------------
+    protected DfSPolicyDisplay _schemaPolicyDisplay; // used by templates directly, null allowed no policy or no use process
 
     // -----------------------------------------------------
     //                                                 Other
@@ -2430,6 +2436,10 @@ public class Database {
         return getProperties().getDocumentProperties().isSchemaHtmlStyleSheetLink();
     }
 
+    public boolean isSchemaHtmlStyleSheetInheritable() {
+        return getProperties().getDocumentProperties().isSchemaHtmlStyleSheetInheritable();
+    }
+
     public String getSchemaHtmlStyleSheetEmbedded() {
         return getProperties().getDocumentProperties().getSchemaHtmlStyleSheetEmbedded();
     }
@@ -2454,8 +2464,19 @@ public class Database {
         return getProperties().getDocumentProperties().getSchemaHtmlJavaScriptLink();
     }
 
-    public DfDecoMapPickup getEmbeddedPickup() {
+    public DfDecoMapPickup getEmbeddedPickup() { // not null when doc (SchemaHTML)
         return _embeddedPickup;
+    }
+
+    public boolean isSchemaHtmlSchemaPolicyValid() {
+        if (getProperties().getDocumentProperties().isSuppressSchemaHtmlSchemaPolicy()) {
+            return false;
+        }
+        return _schemaPolicyDisplay != null; // null means no policy
+    }
+
+    public DfSPolicyDisplay getSchemaPolicyDisplay() { // null allowed, so check before
+        return _schemaPolicyDisplay;
     }
 
     // -----------------------------------------------------
@@ -2467,6 +2488,10 @@ public class Database {
 
     public boolean isHistoryHtmlStyleSheetLink() {
         return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetLink();
+    }
+
+    public boolean isHistoryHtmlStyleSheetInheritable() {
+        return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetInheritable();
     }
 
     public String getHistoryHtmlStyleSheetEmbedded() {
@@ -2560,6 +2585,10 @@ public class Database {
         return getProperties().getSimpleDtoProperties().getSimpleCDefPackage();
     }
 
+    public boolean isSimpleCDefAsDBFluteClassifiation() {
+        return getProperties().getSimpleDtoProperties().isSimpleCDefAsDBFluteClassifiation();
+    }
+
     public boolean isSimpleCDefTarget(String classificationName) {
         return getProperties().getSimpleDtoProperties().isSimpleCDefTarget(classificationName);
     }
@@ -2605,6 +2634,10 @@ public class Database {
 
     public String getFlexDtoExtendedDtoSuffix() {
         return getProperties().getFlexDtoProperties().getExtendedDtoSuffix();
+    }
+
+    public String getFlexDtoFileExtension() {
+        return getProperties().getFlexDtoProperties().getFileExtension();
     }
 
     // ===================================================================================
@@ -2702,7 +2735,8 @@ public class Database {
         try {
             return TypeMap.findJavaNativeByJdbcType(jdbcType, null, null);
         } catch (RuntimeException e) {
-            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
+            // memory of poor exception handling in template at old days
+            //_log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
             throw e;
         }
     }
@@ -3015,10 +3049,14 @@ public class Database {
     }
 
     public void setEmbeddedPickup(DfDecoMapPickup embeddedPickup) {
-        this._embeddedPickup = embeddedPickup;
+        _embeddedPickup = embeddedPickup;
     }
 
     public void setFirstDateAgent(DfFirstDateAgent firstDateAgent) {
-        this._firstDateAgent = firstDateAgent;
+        _firstDateAgent = firstDateAgent;
+    }
+
+    public void setSchemaPolicyDisplay(DfSPolicyDisplay schemaPolicyDisplay) {
+        _schemaPolicyDisplay = schemaPolicyDisplay;
     }
 }

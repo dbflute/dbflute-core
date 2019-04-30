@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,13 +141,27 @@ public class DfUpgradeTask extends DfAbstractTask {
     //                                                                      ==============
     protected void extractEngine(String upgradeVersion, String archivePath) {
         final DfZipArchiver archiver = new DfZipArchiver(new File(archivePath));
-        final String baseDir = getMyDBFluteDir() + "/dbflute-" + upgradeVersion;
+        final String mydbfluteDir = getMyDBFluteDir();
+        final String baseDir;
+        if (determineSameVersionUpgrading(upgradeVersion)) { // patch
+            // cannot override engine myself in execution so extract to temporary directory 
+            // the current engine will be switched to this patched engine after the task
+            // in shell or windows script e.g. _df-upgrade.sh
+            baseDir = mydbfluteDir + "/working_patched_dbflute"; // synchronized with script
+        } else { // upgrade, normally here
+            baseDir = mydbfluteDir + "/dbflute-" + upgradeVersion;
+        }
         _log.info("...Extracting zip archive to " + baseDir);
         archiver.extract(new File(baseDir), new FileFilter() {
             public boolean accept(File file) {
                 return true;
             }
         });
+    }
+
+    protected boolean determineSameVersionUpgrading(String upgradeVersion) {
+        final String dbfluteHome = getDBFluteHome(); // basically not null (as unknown if null)
+        return dbfluteHome != null && dbfluteHome.contains("dbflute-" + upgradeVersion);
     }
 
     protected void deleteDownloadedArchive(String archivePath) {

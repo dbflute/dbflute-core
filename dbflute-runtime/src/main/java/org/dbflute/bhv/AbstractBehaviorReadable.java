@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1342,6 +1342,14 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                                                      Process Method
     //                                                                      ==============
     // defined here (on the readable interface) for non-primary key value
+    /**
+     * {Framework Method} Filter the entity of insert.
+     * @param entity The entity for insert. (NotNull)
+     * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
+     */
+    protected void frameworkFilterEntityOfInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
+    }
+
     /**
      * Filter the entity of insert. (basically for non-primary-key insert)
      * @param entity Target entity that the type is entity interface. (NotNull)

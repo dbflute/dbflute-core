@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,7 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,6 +57,7 @@ import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
+import org.dbflute.cbean.garnish.datefitting.DateConditionAdjuster;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.ordering.ManualOrderOptionCall;
 import org.dbflute.cbean.scoping.SubQuery;
@@ -1688,22 +1686,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected Object filterConditionValueIfNeeds(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
             ConditionOption option, ColumnInfo columnInfo) {
         if (value != null && isDatetimePrecisionTruncationOfConditionEnabled(columnDbName)) { // null check, just in case
-            if (columnInfo.isObjectNativeTypeDate()) { // contains Java8 Dates
-                final Integer datetimePrecision = columnInfo.getDatetimePrecision();
-                if (datetimePrecision == null || datetimePrecision == 0) { // non-millisecond date-time
-                    if (value instanceof LocalDateTime) {
-                        return ((LocalDateTime) value).truncatedTo(ChronoUnit.SECONDS); // means clear millisecond
-                    } else if (value instanceof LocalTime) {
-                        return ((LocalTime) value).truncatedTo(ChronoUnit.SECONDS); // means clear millisecond
-                    } else if (value instanceof Date && !(value instanceof java.sql.Date)) {
-                        final Calendar cal = DfTypeUtil.toCalendar(value);
-                        DfTypeUtil.clearCalendarMillisecond(cal);
-                        return DfTypeUtil.toDate(cal);
-                    }
-                }
-            }
+            return new DateConditionAdjuster().truncatePrecisionIfHasTime(columnInfo, value);
+        } else {
+            return value;
         }
-        return value;
     }
 
     protected boolean isDatetimePrecisionTruncationOfConditionEnabled(String columnDbName) { // may be overridden by option

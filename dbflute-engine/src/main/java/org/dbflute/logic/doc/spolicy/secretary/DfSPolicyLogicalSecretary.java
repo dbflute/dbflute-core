@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.exception.DfSchemaPolicyCheckIllegalIfThenStatementException;
+import org.dbflute.exception.DfSchemaPolicyCheckIllegalThenNotThemeException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownVariableException;
@@ -42,6 +43,7 @@ import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
+ * @author subaru
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
 public class DfSPolicyLogicalSecretary {
@@ -326,15 +328,17 @@ public class DfSPolicyLogicalSecretary {
     // ===================================================================================
     //                                                                 Violation Exception
     //                                                                 ===================
-    public void throwSchemaPolicyCheckViolationException(Map<String, Object> policyMap, DfSPolicyResult result) {
+    public String buildSchemaPolicyCheckViolationMessage(DfSPolicyResult result) { // independent for SchemaHTML display
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema policy has been violated.");
         br.addItem("Advice");
         br.addElement("Make sure your violating schema (ERD and DDL).");
+        br.addElement("You can see violations on this message or SchemaHTML.");
         br.addElement("And after that, execute renewal (or regenerate) again.");
         br.addElement("(tips: The schema policy is on schemaPolicyMap.dfprop)");
-        br.addItem("Schema Policy");
-        br.addElement(buildPolicyExp(policyMap));
+        // unneeded because of too big, already info, also violation with definition by jflute (2019/01/27)
+        //br.addItem("Schema Policy");
+        //br.addElement(buildPolicyExp(policyMap));
         br.addItem("Violation");
         final Map<String, List<DfSPolicyViolation>> violationMap = result.getViolationMap();
         int policyIndex = 0;
@@ -352,8 +356,11 @@ public class DfSPolicyLogicalSecretary {
             }
             ++policyIndex;
         }
-        final String msg = br.buildExceptionMessage();
-        throw new DfSchemaPolicyCheckViolationException(msg);
+        return br.buildExceptionMessage();
+    }
+
+    public void throwSchemaPolicyCheckViolationException(String violationMessage) {
+        throw new DfSchemaPolicyCheckViolationException(violationMessage);
     }
 
     public String buildPolicyExp(Map<String, Object> policyMap) {
@@ -441,5 +448,19 @@ public class DfSPolicyLogicalSecretary {
         br.addElement(nativeStatement);
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaPolicyCheckIllegalIfThenStatementException(msg);
+    }
+
+    public void throwSchemaPolicyCheckIllegalThenNotThemeException(String nativeStatement, String theme) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Illegal then-not theme for SchemaPolicyCheck.");
+        br.addItem("Advice");
+        br.addElement("Make sure your schemaPolicyMap.dfprop.");
+        br.addElement("then-not is prohibited with the specified theme");
+        br.addItem("Theme");
+        br.addElement(theme);
+        br.addItem("Statement");
+        br.addElement(nativeStatement);
+        final String msg = br.buildExceptionMessage();
+        throw new DfSchemaPolicyCheckIllegalThenNotThemeException(msg);
     }
 }

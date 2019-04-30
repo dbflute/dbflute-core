@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 package org.dbflute.helper.jprop;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +42,6 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
 import org.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
-import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
 
@@ -76,12 +76,13 @@ public class JavaPropertiesReader {
     protected Set<String> _variableExceptSet; // used if set
     protected boolean _suppressVariableOrder; // for compatible
 
-    // -----------------------------------------------------
-    //                                            Reflection
-    //                                            ----------
-    protected Method _convertMethod; // cached
-    protected boolean _convertMethodNotFound;
-    protected final Properties _reflectionProperties = new Properties();
+    // to avoid Java11 warning
+    //// -----------------------------------------------------
+    ////                                            Reflection
+    ////                                            ----------
+    //protected Method _convertMethod; // cached
+    //protected boolean _convertMethodNotFound;
+    //protected final Properties _reflectionProperties = new Properties();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -717,31 +718,46 @@ public class JavaPropertiesReader {
         if (expression == null) {
             return null;
         }
-        final Method method = getConvertMethod();
-        if (method == null) {
-            return expression;
+        final String encoding = "UTF-8";
+        final String fixedKey = "sea";
+        final String propStyle = fixedKey + " = " + Srl.quoteDouble(expression); // quote not to trim
+        try {
+            final Properties prop = new Properties(); // work instance
+            prop.load(new InputStreamReader(new ByteArrayInputStream(propStyle.getBytes(encoding)), encoding));
+            final String converted = prop.getProperty(fixedKey); // not null logically
+            return Srl.unquoteDouble(converted);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Not found the encoding: " + encoding, e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load the input stream: " + encoding, e);
         }
-        final char[] in = expression.toCharArray();
-        final Object[] args = new Object[] { in, 0, expression.length(), new char[] {} };
-        return (String) DfReflectionUtil.invoke(method, _reflectionProperties, args);
+        // to avoid Java11 warning
+        //final Method method = getConvertMethod();
+        //if (method == null) {
+        //    return expression;
+        //}
+        //final char[] in = expression.toCharArray();
+        //final Object[] args = new Object[] { in, 0, expression.length(), new char[] {} };
+        //return (String) DfReflectionUtil.invoke(method, _reflectionProperties, args);
     }
 
-    protected Method getConvertMethod() {
-        if (_convertMethod != null) {
-            return _convertMethod;
-        }
-        if (_convertMethodNotFound) {
-            return null;
-        }
-        final Class<?>[] argTypes = new Class<?>[] { char[].class, int.class, int.class, char[].class };
-        _convertMethod = DfReflectionUtil.getWholeMethod(Properties.class, "loadConvert", argTypes);
-        if (_convertMethod == null) {
-            _convertMethodNotFound = true;
-        } else {
-            _convertMethod.setAccessible(true);
-        }
-        return _convertMethod;
-    }
+    // to avoid Java11 warning
+    //protected Method getConvertMethod() {
+    //    if (_convertMethod != null) {
+    //        return _convertMethod;
+    //    }
+    //    if (_convertMethodNotFound) {
+    //        return null;
+    //    }
+    //    final Class<?>[] argTypes = new Class<?>[] { char[].class, int.class, int.class, char[].class };
+    //    _convertMethod = DfReflectionUtil.getWholeMethod(Properties.class, "loadConvert", argTypes);
+    //    if (_convertMethod == null) {
+    //        _convertMethodNotFound = true;
+    //    } else {
+    //        _convertMethod.setAccessible(true);
+    //    }
+    //    return _convertMethod;
+    //}
 
     // ===================================================================================
     //                                                                      General Helper

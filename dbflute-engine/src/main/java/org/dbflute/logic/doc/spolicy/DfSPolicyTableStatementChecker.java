@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,8 +158,12 @@ public class DfSPolicyTableStatementChecker {
         final String thenTheme = thenClause.getThenTheme(); // already not null here
         final boolean notThenClause = thenClause.isNotThenTheme();
         final String notOr = notThenClause ? "not " : "";
-        if (thenTheme.equalsIgnoreCase("bad") == !notThenClause) {
-            result.violate(policy, "The table is no good: " + toTableDisp(table));
+        if (thenTheme.equalsIgnoreCase("bad")) {
+            if (notThenClause) {
+                throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "bad");
+            } else {
+                result.violate(policy, "The table is no good: " + toTableDisp(table));
+            }
         } else if (thenTheme.contains("hasPK")) {
             if (!table.hasPrimaryKey() == !notThenClause) {
                 result.violate(policy, "The table should " + notOr + "have primary key: " + toTableDisp(table));
@@ -410,5 +414,9 @@ public class DfSPolicyTableStatementChecker {
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(DfSPolicyStatement statement, String additional) {
         _logicalSecretary.throwSchemaPolicyCheckIllegalIfThenStatementException(statement.getNativeExp(), additional);
+    }
+
+    protected void throwSchemaPolicyCheckIllegalThenNotThemeException(DfSPolicyStatement statement, String theme) {
+        _logicalSecretary.throwSchemaPolicyCheckIllegalThenNotThemeException(statement.getNativeExp(), theme);
     }
 }

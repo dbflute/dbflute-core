@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.dbflute.properties.assistant.lastaflute;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
         if (commonMap != null) {
             final String path = (String) commonMap.get("path");
             @SuppressWarnings("unchecked")
-            final List<String> propertiesHtmlList = (List<String>) commonMap.get(PROPERTIES_HTML_KEY);
+            final List<String> propertiesHtmlList = (List<String>) commonMap.getOrDefault(PROPERTIES_HTML_KEY, Collections.emptyList());
             for (String propertiesHtml : propertiesHtmlList) {
                 logger.info("...Reflecting common propertiesHtml settigs: " + propertiesHtml + ", " + path);
                 if ("env".equals(propertiesHtml)) {
@@ -104,7 +105,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
                 final Map<String, Object> defMap = entry.getValue();
                 final String path = (String) defMap.get("path");
                 @SuppressWarnings("unchecked")
-                final List<String> propertiesHtmlList = (List<String>) defMap.get(PROPERTIES_HTML_KEY);
+                final List<String> propertiesHtmlList = (List<String>) defMap.getOrDefault(PROPERTIES_HTML_KEY, Collections.emptyList());
                 for (String propertiesHtml : propertiesHtmlList) {
                     logger.info("...Reflecting application propertiesHtml settigs: " + appName + "." + propertiesHtml);
                     if ("env".equals(propertiesHtml)) {

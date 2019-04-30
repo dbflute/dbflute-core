@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,7 +231,7 @@ public class FunCustodial {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was set to the entity.");
         br.addItem("Advice");
-        br.addElement("Confirm the value of the classication column on your database,");
+        br.addElement("Confirm the value of the classification column on your database,");
         br.addElement("or setting value to your entity.");
         br.addElement("The code is NOT one of classification code defined on DBFlute.");
         br.addElement("");

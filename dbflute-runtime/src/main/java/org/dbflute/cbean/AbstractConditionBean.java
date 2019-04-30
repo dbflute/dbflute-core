@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,6 +178,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** The determiner to except SpecifyColumn required. (NullAllowed) {Internal} */
     protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
+
+    /** Is violation of SpecifyColumn required warning only? (both local and relation) {Internal} */
+    protected boolean _specifyColumnRequiredWarningOnly; // basically for production
 
     /** Does it allow selecting undefined classification code? {Internal} */
     protected boolean _undefinedClassificationSelectAllowed;
@@ -1286,6 +1289,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
         _specifyColumnRequired = false;
     }
 
+    protected void xenableSpecifyColumnRequiredWarningOnly() { // since 1.2.0
+        _specifyColumnRequiredWarningOnly = true;
+    }
+
     /** {@inheritDoc} */
     public void xcheckSpecifyColumnRequiredIfNeeds() {
         if (!_specifyColumnRequired || xisExceptSpecifyColumnRequired()) {
@@ -1305,7 +1312,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected SpecifyColumnRequiredChecker xcreateSpecifyColumnRequiredChecker() {
-        return new SpecifyColumnRequiredChecker();
+        final SpecifyColumnRequiredChecker checker = new SpecifyColumnRequiredChecker();
+        if (xisSpecifyColumnRequiredWarningOnly()) {
+            checker.warningOnly();
+        }
+        return checker;
+    }
+
+    protected boolean xisSpecifyColumnRequiredWarningOnly() { // since 1.2.0
+        return _specifyColumnRequiredWarningOnly;
     }
 
     protected void xsetSpecifyColumnRequiredExceptDeterminer(SpecifyColumnRequiredExceptDeterminer exceptDeterminer) {
