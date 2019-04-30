@@ -351,14 +351,14 @@ public interface ${cdefClass} ${cdefExtends}{
 #if ($asDBFluteClassification)
 
         public ${optReturnType}<? extends Classification> of(Object code) {
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equals(name())) { return ${cdefClass}.${classificationName}.of(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public ${optReturnType}<? extends Classification> byName(String name) {
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equals(name())) { return ${cdefClass}.${classificationName}.byName(name); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
@@ -387,21 +387,21 @@ public interface ${cdefClass} ${cdefExtends}{
         }
 
         public List<${clsReturnType}> listByGroup(String groupName) { // exception if not found
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${cdefClass}.${classificationName}.listByGroup(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<${clsReturnType}> listOf(Collection<String> codeList) {
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${cdefClass}.${classificationName}.listOf(codeList)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<${clsReturnType}> groupOf(String groupName) { // old style
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${cdefClass}.${classificationName}.groupOf(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
@@ -414,7 +414,7 @@ public interface ${cdefClass} ${cdefExtends}{
 #if ($asDBFluteClassification)
 
         public ClassificationCodeType codeType() {
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #if ($classificationTop.hasCodeType())
             if (${classificationName}.name().equals(name())) { return ClassificationCodeType.${classificationTop.codeType}; }
@@ -424,7 +424,7 @@ public interface ${cdefClass} ${cdefExtends}{
         }
 
         public ClassificationUndefinedHandlingType undefinedHandlingType() {
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
             if (${classificationName}.name().equals(name())) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
 #end
@@ -434,7 +434,7 @@ public interface ${cdefClass} ${cdefExtends}{
 
         public static ${optReturnType}<${database.simpleCDefClass}.DefMeta> find(String classificationName) { // instead of valueOf()
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${optReturnType}.of(${cdefClass}.DefMeta.${classificationName}); }
 #end
 #if ($asDBFluteClassification)
@@ -448,7 +448,7 @@ public interface ${cdefClass} ${cdefExtends}{
 
         public static ${database.simpleCDefClass}.DefMeta meta(String classificationName) { // old style so use find(name)
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
-#foreach ($classificationName in $database.classificationNameList)
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${cdefClass}.DefMeta.${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
