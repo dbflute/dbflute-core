@@ -3752,6 +3752,13 @@ public class Table {
         return getLittleAdjustmentProperties().isEntityDerivedMappable();
     }
 
+    // -----------------------------------------------------
+    //                                  Precision Truncation
+    //                                  --------------------
+    public boolean isDatetimePrecisionTruncationOfUpdatedEntity() {
+        return getLittleAdjustmentProperties().isDatetimePrecisionTruncationOfUpdatedEntity();
+    }
+
     // ===================================================================================
     //                                                            ConditionBean Adjustment
     //                                                            ========================

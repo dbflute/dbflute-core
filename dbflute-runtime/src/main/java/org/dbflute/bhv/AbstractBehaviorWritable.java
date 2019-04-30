@@ -1157,6 +1157,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
      * @param entity The entity for insert. (NotNull)
      * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
      */
+    @Override
     protected void frameworkFilterEntityOfInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
         injectSequenceToPrimaryKeyIfNeeds(entity);
         setupCommonColumnOfInsertIfNeeds(entity, option);

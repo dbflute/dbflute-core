@@ -1343,6 +1343,14 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                                                      ==============
     // defined here (on the readable interface) for non-primary key value
     /**
+     * {Framework Method} Filter the entity of insert.
+     * @param entity The entity for insert. (NotNull)
+     * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
+     */
+    protected void frameworkFilterEntityOfInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
+    }
+
+    /**
      * Filter the entity of insert. (basically for non-primary-key insert)
      * @param entity Target entity that the type is entity interface. (NotNull)
      * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)

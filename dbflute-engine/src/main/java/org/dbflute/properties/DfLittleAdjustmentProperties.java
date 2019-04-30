@@ -453,6 +453,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isDatetimePrecisionTruncationOfCondition", false);
     }
 
+    public boolean isDatetimePrecisionTruncationOfUpdatedEntity() { // closet
+        return isProperty("isDatetimePrecisionTruncationOfUpdatedEntity", false);
+    }
+
     public boolean isMakeConditionQueryEqualEmptyString() { // closet
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
