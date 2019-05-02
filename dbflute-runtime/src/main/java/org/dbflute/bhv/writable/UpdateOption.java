@@ -86,17 +86,14 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * 
      * <span style="color: #3F7E5E">// e.g. you can update by self calculation values</span>
-     * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #CC4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
-     * option.<span style="color: #CC4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *     public void specify(PurchaseCB cb) {
+     * purchaseBhv.<span style="color: #CC4747">varyingUpdate</span>(purchase, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     op.<span style="color: #CC4747">self</span>(cb <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *         cb.specify().<span style="color: #CC4747">columnPurchaseCount()</span>;
-     *     }
-     * }).<span style="color: #CC4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     *     }).<span style="color: #CC4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
      * 
-     * <span style="color: #3F7E5E">// e.g. you can update by your values for common columns</span>
-     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
-     * 
-     * purchaseBhv.<span style="color: #CC4747">varyingUpdate</span>(purchase, option);
+     *     <span style="color: #3F7E5E">// e.g. you can update by your values for common columns</span>
+     *     op.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
+     * });
      * </pre>
      */
     public UpdateOption() {
@@ -113,13 +110,11 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * Purchase purchase = new Purchase();
      * purchase.setPurchaseId(value); <span style="color: #3F7E5E">// required</span>
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
-     * UpdateOption&lt;PurchaseCB&gt; option = new UpdateOption&lt;PurchaseCB&gt;();
-     * option.<span style="color: #CC4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *     public void specify(PurchaseCB cb) {
+     * purchaseBhv.<span style="color: #CC4747">varyingUpdateNonstrict</span>(purchase, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     op.<span style="color: #CC4747">self</span>(cb <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *         cb.specify().<span style="color: #CC4747">columnPurchaseCount()</span>;
-     *     }
-     * }).<span style="color: #CC4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
-     * purchaseBhv.<span style="color: #CC4747">varyingUpdateNonstrict</span>(purchase, option);
+     *     }).<span style="color: #CC4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * });
      * </pre>
      * @param colCBLambda The callback for query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
@@ -196,23 +191,17 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addElement("For example:");
         br.addElement("");
         br.addElement("  (x):");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            // *no, empty");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        // *no, empty");
         br.addElement("    });");
         br.addElement("  (x):");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            cb.specify().columnPurchaseCount();");
-        br.addElement("            cb.specify().columnPurchasePrice(); // *no, duplicated");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        cb.specify().columnPurchaseCount();");
+        br.addElement("        cb.specify().columnPurchasePrice(); // *no, duplicated");
         br.addElement("    });");
         br.addElement("  (o)");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            cb.specify().columnPurchaseCount(); // OK");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        cb.specify().columnPurchaseCount(); // OK");
         br.addElement("    });");
         br.addItem("Target Table");
         br.addElement(cb.asTableDbName());
@@ -305,16 +294,12 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addItem("Advice");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            cb.specify().columnPurchaseCount().plus(1); // *NG");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        cb.specify().columnPurchaseCount().plus(1); // *NG");
         br.addElement("    }).multiply(3);");
         br.addElement("  (o):");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            cb.specify().columnPurchaseCount();");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        cb.specify().columnPurchaseCount();");
         br.addElement("    }).plus(1).multiply(3); // OK");
         br.addItem("Specified Column");
         br.addElement(columnDbName);
@@ -329,16 +314,12 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addElement("You should call plus()/minus()/... methods after specification.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            cb.specify().columnPurchaseCount();");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        cb.specify().columnPurchaseCount();");
         br.addElement("    }); // *NG");
         br.addElement("  (o):");
-        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
-        br.addElement("        public void specify(PurchaseCB cb) {");
-        br.addElement("            cb.specify().columnPurchaseCount();");
-        br.addElement("        }");
+        br.addElement("    option.self(cb -> {");
+        br.addElement("        cb.specify().columnPurchaseCount();");
         br.addElement("    }).plus(1); // OK");
         br.addItem("Specified Column");
         br.addElement(columnDbName);
@@ -359,16 +340,14 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * Member member = new Member();
      * member.setMemberId(3);
      * member.setOthers...(value);
-     * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
-     * option.<span style="color: #CC4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
-     *     public void query(MemberCB cb) {
+     * memberBhv.varyingUpdate(member, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     op.<span style="color: #CC4747">specify</span>(cb <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
      *         <span style="color: #3F7E5E">// with common columns for update and an exclusive control column</span>
      *         cb.specify().columnMemberName();
      *         cb.specify().columnBirthdate();
-     *     }
+     *     });
      * });
-     * memberBhv.varyingUpdate(member, option);
      * </pre>
      * @param colCBLambda The callback for query of specifying update columns. (NotNull)
      */
