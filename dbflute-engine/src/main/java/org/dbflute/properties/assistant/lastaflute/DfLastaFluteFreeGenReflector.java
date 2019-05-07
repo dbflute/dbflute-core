@@ -175,7 +175,7 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected void showFreeGenSettings() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("After LastaFlute refecting, existing freeGen settigs: ").append(_freeGenMap.keySet());
+        sb.append("After LastaFlute reflecting, existing freeGen settigs: ").append(_freeGenMap.keySet());
         for (Entry<String, Object> entry : _freeGenMap.entrySet()) {
             sb.append("\n ").append(entry.getKey()).append(": ").append(entry.getValue());
         }

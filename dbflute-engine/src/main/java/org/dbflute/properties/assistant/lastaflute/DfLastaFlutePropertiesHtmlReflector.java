@@ -135,7 +135,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
 
     protected void showPropertiesHtmlSettings() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("After LastaFlute refecting, existing propertiesHtml settigs: ").append(_propHtmlMap.keySet());
+        sb.append("After LastaFlute reflecting, existing propertiesHtml settigs: ").append(_propHtmlMap.keySet());
         for (Entry<String, Map<String, Object>> entry : _propHtmlMap.entrySet()) {
             sb.append("\n ").append(entry.getKey()).append(": ").append(entry.getValue());
         }
