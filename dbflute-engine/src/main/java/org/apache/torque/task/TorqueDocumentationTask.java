@@ -271,7 +271,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _documentSelector.selectLastaDocHtml(); // option
         processDecommentPickup();
         processHacommentPickup();
-        purelyInitializeSchemaData(); // policy needs database meta data so initialize it here
+        purelyInitializeSchemaHtmlSchemaData(); // policy needs database meta data so initialize it here
         processSchemaPolicyCheck(); // only check and keep result here (not ending yet)
         fireVelocityProcess(); // making SchemaHTML
         endingSchemaPolicyResult(); // may throw, after SchemaHTML to show policy result in SchemaHTML since 1.2.0
@@ -421,7 +421,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
         } else { // normally here
             if (_schemaData == null) { // basically false, already initialized in SchemaHTML process so just in case
-                purelyInitializeSchemaData();
+                purelyInitializeSchemaHtmlSchemaData();
             }
             final Database database = _schemaData.getDatabase();
             if (_schemaPolicyResult != null) { // null allowed when no policy
@@ -432,8 +432,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         }
     }
 
-    protected void purelyInitializeSchemaData() {
+    protected void purelyInitializeSchemaHtmlSchemaData() {
         super.initializeSchemaData();
+        _schemaData.getDatabase().initializeSupplementaryMetaData(); // needs to be here for e.g. SchemaPolicyCheck
     }
 
     // ===================================================================================

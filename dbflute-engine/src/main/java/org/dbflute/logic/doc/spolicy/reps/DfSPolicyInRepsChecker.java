@@ -88,7 +88,7 @@ public class DfSPolicyInRepsChecker {
             final DfSchemaXmlReader reader = createSchemaXmlReader(schemaXml);
             final AppData appData = reader.read();
             final Database database = appData.getDatabase();
-            initializeClassificationDeployment(database); // for "then classification"
+            initializeSupplementaryMetaData(database); // for e.g. "then classification"
             final DfSPolicyChecker checker = createChecker(policyProp, database);
             final DfSPolicyResult policyResult = checker.checkPolicyIfNeeds();
             policyResult.ending(); // immediately handles violation (may be throw)
@@ -106,9 +106,10 @@ public class DfSPolicyInRepsChecker {
         return DfSchemaXmlReader.createAsPlain(schemaXml, databaseType, /*readingFilter*/null); // filter unneeded
     }
 
-    protected void initializeClassificationDeployment(final Database database) {
-        final DfClassificationProperties clsProp = getClassificationProperties();
-        clsProp.initializeClassificationDeployment(database);
+    protected void initializeSupplementaryMetaData(Database database) {
+        // #thinking jflute fixedCondition's classification failure, needs to analyze deeply (2019/05/08)
+        //database.initializeSupplementaryMetaData();
+        database.initializeClassificationDeployment(); // only this since old days
     }
 
     protected DfSPolicyChecker createChecker(DfSchemaPolicyProperties policyProp, Database database) {

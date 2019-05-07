@@ -65,10 +65,6 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
     // ===================================================================================
     //                                                                         Coin Method
     //                                                                         ===========
-    public boolean needsInitializeProperties() {
-        return _schemaHtml || _historyHtml;
-    }
-
     public String getDiffModelBigTitle() {
         final String title;
         if (isCurrentHistoryHtml()) {

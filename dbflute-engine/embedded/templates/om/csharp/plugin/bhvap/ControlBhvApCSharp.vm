@@ -5,10 +5,7 @@ $database.enableGenerateOutputDirectory()
 ## - - - - - - - - - - - -
 ## Initialize properties.
 ## - - - - - - - - - - - -
-$database.initializeAdditionalPrimaryKey()
-$database.initializeAdditionalUniqueKey()
-$database.initializeAdditionalForeignKey()
-$database.initializeClassificationDeployment()
+$database.initializeSupplementaryMetaData()
 $database.initializeIncludeQuery()
 $database.checkProperties()
 
