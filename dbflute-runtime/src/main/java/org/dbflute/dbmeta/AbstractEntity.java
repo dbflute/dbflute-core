@@ -182,6 +182,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     public void clearSpecifiedInfo() {
         if (__specifiedProperties != null) {
             __specifiedProperties.clear();
+            __specifiedProperties = null; // means completely no specification, needed for no check 
         }
     }
 

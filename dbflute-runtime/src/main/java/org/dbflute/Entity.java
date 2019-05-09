@@ -111,7 +111,8 @@ public interface Entity {
 
     /**
      * Clear the information of specified properties. (basically for Framework) <br>
-     * It means no check of access to non-specified columns.
+     * It means no check of access to non-specified columns. <br>
+     * And you cannot use myspecifyProperty() without modifiedToSpecified() call.
      */
     void clearSpecifiedInfo();
 
