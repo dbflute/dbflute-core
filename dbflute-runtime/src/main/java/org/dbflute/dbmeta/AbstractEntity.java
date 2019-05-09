@@ -260,6 +260,11 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         return __createdBySelect;
     }
 
+    /** {@inheritDoc} */
+    public void clearMarkAsSelect() {
+        __createdBySelect = false;
+    }
+
     // ===================================================================================
     //                                                                   Referrer Property
     //                                                                   =================

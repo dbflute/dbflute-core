@@ -124,6 +124,10 @@ public class MockEntity implements Entity {
         return false;
     }
 
+    @Override
+    public void clearMarkAsSelect() {
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

@@ -168,7 +168,7 @@ public interface Entity {
     //                                                                     Birthplace Mark
     //                                                                     ===============
     /**
-     * Mark as select that means the entity is created by DBFlute select process. (basically for Framework) <br>
+     * Mark birthplace as select that means the entity is created by DBFlute select process. (basically for Framework) <br>
      * e.g. determine columns of batch insert
      */
     void markAsSelect();
@@ -178,6 +178,11 @@ public interface Entity {
      * @return The determination, true or false.
      */
     boolean createdBySelect();
+
+    /**
+     * Clear birthplace mark as created-by-select. (basically for Framework)
+     */
+    void clearMarkAsSelect();
 
     // ===================================================================================
     //                                                                    Extension Method

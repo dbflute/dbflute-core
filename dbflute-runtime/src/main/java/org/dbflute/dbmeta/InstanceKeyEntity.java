@@ -134,6 +134,11 @@ public class InstanceKeyEntity implements Entity {
     public boolean createdBySelect() {
         return _actualEntity.createdBySelect();
     }
+    
+    @Override
+    public void clearMarkAsSelect() {
+        _actualEntity.clearMarkAsSelect();
+    }
 
     // ===================================================================================
     //                                                                      Basic Override
