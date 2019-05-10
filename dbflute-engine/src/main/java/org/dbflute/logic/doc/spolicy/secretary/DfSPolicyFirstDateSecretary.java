@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.exception.DfSchemaPolicyCheckIllegalFirstDateException;
+import org.dbflute.exception.ParseDateExpressionFailureException;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
@@ -35,6 +36,11 @@ import org.dbflute.util.Srl;
  * @since 1.1.8 (2018/5/3 Thursday)
  */
 public class DfSPolicyFirstDateSecretary {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String EXAMPLE_DATE_EXPRESSION = "2018/05/03";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -52,26 +58,34 @@ public class DfSPolicyFirstDateSecretary {
     //                                                                           Determine
     //                                                                           =========
     public boolean determineTableFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Table table) {
-        return doDetermineColumnFirstDate(statement, ifValue, notIfValue, targetDate -> {
+        return doDetermineFirstDate(statement, ifValue, notIfValue, targetDate -> {
             return isTableFirstDateAfter(table, targetDate);
         });
     }
 
     public boolean determineColumnFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Column column) {
-        return doDetermineColumnFirstDate(statement, ifValue, notIfValue, targetDate -> {
+        return doDetermineFirstDate(statement, ifValue, notIfValue, targetDate -> {
             return isColumnFirstDateAfter(column, targetDate);
         });
     }
 
-    protected boolean doDetermineColumnFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue,
-            Predicate<Date> determiner) {
+    protected boolean doDetermineFirstDate(DfSPolicyStatement statement, String ifValue, boolean notIfValue, Predicate<Date> determiner) {
         if (notIfValue) { // "is not" is unsupported for firstDate
             throwSchemaPolicyCheckIllegalFirstDateException(statement, ifValue);
             return false; // unreachable
         }
         if (ifValue.startsWith("after:")) { // e.g. if firstDate is after:2018/05/03
             final String dateExp = Srl.substringFirstRear(ifValue, "after:").trim();
-            final Date targetDate = new HandyDate(dateExp).getDate();
+            if (dateExp.length() > EXAMPLE_DATE_EXPRESSION.length()) { // e.g. has time part
+                throwSchemaPolicyCheckIllegalDateExpressionFormatException(statement, dateExp, null);
+            }
+            final Date targetDate;
+            try {
+                targetDate = new HandyDate(dateExp).getDate();
+            } catch (ParseDateExpressionFailureException e) {
+                throwSchemaPolicyCheckIllegalDateExpressionFormatException(statement, dateExp, e);
+                return false; // unreachable
+            }
             return determiner.test(targetDate);
         } else {
             // only "after:" supported because other patterns might not be needed
@@ -97,6 +111,30 @@ public class DfSPolicyFirstDateSecretary {
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
+    protected void throwSchemaPolicyCheckIllegalDateExpressionFormatException(DfSPolicyStatement statement, String dateExp,
+            RuntimeException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Illegal format of the date expression for firstDate.");
+        br.addItem("Advice");
+        br.addElement("The date expression for firstDate should be e.g. 2018/05/03");
+        br.addElement("(slash separator, no time part)");
+        br.addElement("Confirm your schemaPolicyMap.dfprop.");
+        br.addElement("For example:");
+        br.addElement("  (x): after:2018/ab/cd");
+        br.addElement("  (x): after:2018/05/03 12:34:56");
+        br.addElement("  (o): after:2018/05/03");
+        br.addItem("Statement");
+        br.addElement(statement);
+        br.addItem("Date Expression");
+        br.addElement(dateExp);
+        final String msg = br.buildExceptionMessage();
+        if (cause != null) {
+            throw new IllegalStateException(msg, cause);
+        } else {
+            throw new IllegalStateException(msg);
+        }
+    }
+
     protected void throwSchemaPolicyCheckIllegalFirstDateException(DfSPolicyStatement statement, String ifValue) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the valid prefix of firstDate for SchemaPolicyCheck.");
