@@ -428,13 +428,16 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                 database.setSchemaPolicyDisplay(new DfSPolicyDisplay(_schemaPolicyResult));
             }
             database.setEmbeddedPickup(_decoMapPickup);
-            database.setFirstDateAgent(new DfFirstDateAgent(() -> _documentSelector.getSchemaDiffList()));
         }
     }
 
     protected void purelyInitializeSchemaHtmlSchemaData() {
         super.initializeSchemaData();
-        _schemaData.getDatabase().initializeSupplementaryMetaData(); // needs to be here for e.g. SchemaPolicyCheck
+
+        // needs to be here for e.g. SchemaPolicyCheck
+        final Database database = _schemaData.getDatabase();
+        database.setFirstDateAgent(new DfFirstDateAgent(() -> _documentSelector.getSchemaDiffList()));
+        database.initializeSupplementaryMetaData();
     }
 
     // ===================================================================================
