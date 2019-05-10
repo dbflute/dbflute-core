@@ -27,7 +27,7 @@ $database.initializeVersion(90)
 ##  o but only sister HTMLs
 ## - - - - - - - - - - - - - - - - - - - -
 #if ($selector.isHistoryHtml())
-$selector.loadSchemaHistoryAsCore()
+$selector.lazyLoadIfNeedsCoreSchemaDiffList()
 $selector.loadHacoMap()
 #end
 #if ($selector.isPropertiesHtml())

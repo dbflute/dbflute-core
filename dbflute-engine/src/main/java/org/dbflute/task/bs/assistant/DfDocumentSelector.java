@@ -214,7 +214,16 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
     // -----------------------------------------------------
     //                                         Basic Process
     //                                         -------------
-    public void loadSchemaHistoryAsCore() { // for HistoryHtml
+    // all process that needs history uses this lazy-load method
+    // because SchemaPolicyCheck may load history before making HistoryHTML
+    public List<DfSchemaDiff> lazyLoadIfNeedsCoreSchemaDiffList() { // for HistoryHtml and e,g, SchemaPolicy, ConventionalTakeAssert
+        if (_schemaHistory == null) { // means not loaded yet
+            loadSchemaHistoryAsCore();
+        }
+        return getSchemaDiffList();
+    }
+
+    protected void loadSchemaHistoryAsCore() { // for HistoryHtml
         final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsCore();
         doLoadSchemaHistory(schemaHistory);
     }
@@ -246,13 +255,6 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
 
     public List<DfSchemaDiff> getSchemaDiffList() {
         return _schemaHistory != null ? _schemaHistory.getSchemaDiffList() : DfCollectionUtil.emptyList();
-    }
-
-    public List<DfSchemaDiff> lazyLoadIfNeedsCoreSchemaDiffList() { // for e,g, SchemaPolicy, ConventionalTakeAssert
-        if (_schemaHistory == null) { // means not loaded yet
-            loadSchemaHistoryAsCore();
-        }
-        return getSchemaDiffList();
     }
 
     // -----------------------------------------------------
