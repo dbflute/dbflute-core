@@ -139,7 +139,7 @@ public class DfConventionalTakeAssertMap {
     public Date getErrorIfFirstDateAfter() { // null allowed
         final String key = "errorIfFirstDateAfter";
         final String prop = _propertyValueHandler.getProperty(key, null, getEmptyTableMap());
-        if (prop.length() > EXAMPLE_DATE_EXPRESSION.length()) { // e.g. has time part
+        if (prop != null && prop.length() > EXAMPLE_DATE_EXPRESSION.length()) { // e.g. has time part
             throwConventionalTakeAssertIllegalDateExpressionFormatException(key, prop, null);
         }
         try {
