@@ -360,13 +360,13 @@ public abstract class $myClassName implements Serializable {
     @JSONHint(format="${col.simpleDtoJsonicDecorationTimePattern}")
 #end
 #if ($col.hasSimpleDtoJacksonDecorationDatePattern())
-    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationDatePattern}")
+    @JsonFormat(pattern="${col.simpleDtoJacksonDecorationDatePattern}")
 #end
 #if ($col.hasSimpleDtoJacksonDecorationTimestampPattern())
-    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationTimestampPattern}")
+    @JsonFormat(pattern="${col.simpleDtoJacksonDecorationTimestampPattern}")
 #end
 #if ($col.hasSimpleDtoJacksonDecorationTimePattern())
-    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationTimePattern}")
+    @JsonFormat(pattern="${col.simpleDtoJacksonDecorationTimePattern}")
 #end
     public ${col.javaNative} get${col.javaName}() {
         return ${col.simpleDtoVariableName};
