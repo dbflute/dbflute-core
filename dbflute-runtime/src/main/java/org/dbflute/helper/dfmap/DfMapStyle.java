@@ -253,7 +253,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         } else {
             sb.append(ln()).append(currentIndent).append(_elementDelimiter);
         }
-        sb.append(" ").append(escapeControlMark(key)).append(" ").append(_valueEqual).append(" ");
+        sb.append(" ").append(escapeControlMarkAsMap(key)).append(" ").append(_valueEqual).append(" ");
         if (value instanceof Map<?, ?>) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> valueMap = (Map<String, Object>) value;
@@ -270,7 +270,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
                 final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
                 buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
             } else {
-                sb.append(escapeControlMark(value));
+                sb.append(escapeControlMarkAsMap(value));
             }
         }
     }
@@ -347,7 +347,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
                 final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
                 buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
             } else {
-                sb.append(escapeControlMark(value));
+                sb.append(escapeControlMarkAsList(value));
             }
         }
     }
@@ -482,7 +482,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) { // delimiter exists
                 // e.g. value1 ; key2=value2}
                 final String mapValue = substringRemainderFront(delimiterIndex);
-                registerToMap(currentMap, filterMapKey(mapKey), filterMapListValue(mapValue));
+                registerToMap(currentMap, filterParsedMapKey(mapKey), filterParsedMapValue(mapValue));
 
                 // because the map element continues since the delimiter,
                 // skip the delimiter and continue the loop
@@ -492,7 +492,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
 
             // e.g. value1} ; key2=value2}
             final String mapValue = substringRemainderScope(_currentRemainderIndex, endBraceIndex);
-            registerToMap(currentMap, filterMapKey(mapKey), filterMapListValue(mapValue));
+            registerToMap(currentMap, filterParsedMapKey(mapKey), filterParsedMapValue(mapValue));
 
             // analyzing map is over, so close and return.
             closeByEndBraceIndex(endBraceIndex);
@@ -539,7 +539,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) { // delimiter exists
                 // e.g. value1 ; value2 ; value3}
                 final String listValue = substringRemainderFront(delimiterIndex);
-                currentList.add(filterMapListValue(listValue));
+                currentList.add(filterParsedListValue(listValue));
 
                 // because the list element continues since the delimiter,
                 // skip the delimiter and continue the loop.
@@ -549,7 +549,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
 
             // e.g. value1}, value2, }
             final String listValue = substringRemainderFront(endBraceIndex);
-            currentList.add(filterMapListValue(listValue));
+            currentList.add(filterParsedListValue(listValue));
 
             // analyzing list is over, so close and return
             closeByEndBraceIndex(endBraceIndex);
@@ -817,7 +817,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
      */
     protected Map<String, Object> setupNestMap(Map<String, Object> currentMap, String mapKey) {
         final Map<String, Object> nestMap = newStringObjectMap();
-        registerToMap(currentMap, filterMapKey(mapKey), nestMap);
+        registerToMap(currentMap, filterParsedMapKey(mapKey), nestMap);
         return nestMap;
     }
 
@@ -840,7 +840,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
      */
     protected List<Object> setupNestList(Map<String, Object> currentMap, String mapKey) {
         final List<Object> nestList = newObjectList();
-        registerToMap(currentMap, filterMapKey(mapKey), nestList);
+        registerToMap(currentMap, filterParsedMapKey(mapKey), nestList);
         return nestList;
     }
 
@@ -858,20 +858,32 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     // -----------------------------------------------------
     //                                                Filter
     //                                                ------
-    protected String filterMapKey(String value) {
+    protected String filterParsedMapKey(String value) {
         if (value == null) {
             return null;
         }
-        final String filtered = unescapeControlMark(value.trim());
-        return (("".equals(filtered) || "null".equals(filtered)) ? null : filtered);
+        final String unescaped = unescapeControlMarkAsMap(value.trim());
+        return doFilterParsedMapListNullExpression(unescaped);
     }
 
-    protected String filterMapListValue(String value) {
+    protected String filterParsedMapValue(String value) {
         if (value == null) {
             return null;
         }
-        final String filtered = unescapeControlMark(value.trim());
-        return (("".equals(filtered) || "null".equals(filtered)) ? null : filtered);
+        final String unescaped = unescapeControlMarkAsMap(value.trim());
+        return doFilterParsedMapListNullExpression(unescaped);
+    }
+
+    protected String filterParsedListValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        final String unescaped = unescapeControlMarkAsList(value.trim());
+        return doFilterParsedMapListNullExpression(unescaped);
+    }
+
+    protected String doFilterParsedMapListNullExpression(String filtered) {
+        return ("".equals(filtered) || "null".equals(filtered)) ? null : filtered;
     }
 
     // -----------------------------------------------------
@@ -896,12 +908,41 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     // ===================================================================================
     //                                                                         Escape Mark
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                                Escape
+    //                                                ------
+    // escape is for e.g. toMapString(), toListString()
     /**
-     * Escape control marks as plain string in the value.
+     * Escape control marks as plain string in the map key and value.
      * @param value The value, might contain control marks. (NullAllowed: if null, return null)
      * @return The escaped string of the value. (NullAllowed: when the value is null)
      */
-    public String escapeControlMark(Object value) { // public for tools
+    public String escapeControlMarkAsMap(Object value) { // public for tools
+        return doEscapeControlMark(value, /*ignoreEqual*/false);
+    }
+
+    /**
+     * Escape control marks as plain string in the list value.
+     * @param value The value, might contain control marks. (NullAllowed: if null, return null)
+     * @return The escaped string of the value. (NullAllowed: when the value is null)
+     */
+    public String escapeControlMarkAsList(Object value) { // public for tools
+        return doEscapeControlMark(value, isIgnoreEqualAsEscapeControlMarkInList());
+    }
+
+    protected boolean isIgnoreEqualAsEscapeControlMarkInList() { // for e.g. toMapString(), toListString()
+        // now the equal "=" in list value, e.g. list:{ sea => land }, is escaped in spite of unnecessary
+        // I want to fix it but keep compatible to avoid rare case trouble so no change with extension point
+        // (and also other abstractions exist in other case...)
+        //
+        // so all control marks are escaped in both map and list (is specification of MapStyle)
+        // and small abstractions (receiving scope is wide) are allowed like this:
+        //  o list:{ sea => land }, list:{ sea \=> land } are parsed as list:{ sea => land }
+        //  o map:{key1=value1=value2} are parsed as map:{ key1 = value1=value2 }
+        return false;
+    }
+
+    protected String doEscapeControlMark(Object value, boolean ignoreEqual) {
         if (value == null) {
             return null;
         }
@@ -912,16 +953,39 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         filtered = generally_replace(filtered, _beginBrace, convertToEscapedMark(_beginBrace));
         filtered = generally_replace(filtered, _endBrace, convertToEscapedMark(_endBrace));
         filtered = generally_replace(filtered, _elementDelimiter, convertToEscapedMark(_elementDelimiter));
-        filtered = generally_replace(filtered, _valueEqual, convertToEscapedMark(_valueEqual));
+        if (!ignoreEqual) {
+            filtered = generally_replace(filtered, _valueEqual, convertToEscapedMark(_valueEqual));
+        }
         return filtered;
     }
 
+    // -----------------------------------------------------
+    //                                              Unescape
+    //                                              --------
+    // unescape is for e.g. fromMapString(), fromListString()
     /**
-     * Unescape control marks as plain string in the value.
+     * Unescape control marks as plain string in the map key and value.
      * @param value The value, might contain escaped control marks. (NullAllowed: if null, return null)
      * @return The unescaped string of the value. (NullAllowed: when the value is null)
      */
-    public String unescapeControlMark(String value) { // public for tools
+    public String unescapeControlMarkAsMap(String value) { // public for tools
+        return doUnescapeControlMark(value, /*ignoreEqual*/false);
+    }
+
+    /**
+     * Unescape control marks as plain string in the list value.
+     * @param value The value, might contain escaped control marks. (NullAllowed: if null, return null)
+     * @return The unescaped string of the value. (NullAllowed: when the value is null)
+     */
+    public String unescapeControlMarkAsList(String value) { // public for tools
+        return doUnescapeControlMark(value, isIgnoreEqualAsUnescapeControlMarkInList());
+    }
+
+    protected boolean isIgnoreEqualAsUnescapeControlMarkInList() { // for e.g. fromMapString(), fromListString()
+        return false; // same reason as isIgnoreEqualAsEscapeControlMarkInList()
+    }
+
+    protected String doUnescapeControlMark(String value, boolean ignoreEqual) {
         if (value == null) {
             return null;
         }
@@ -933,13 +997,18 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         filtered = generally_replace(filtered, convertToEscapedMark(_beginBrace), _beginBrace);
         filtered = generally_replace(filtered, convertToEscapedMark(_endBrace), _endBrace);
         filtered = generally_replace(filtered, convertToEscapedMark(_elementDelimiter), _elementDelimiter);
-        filtered = generally_replace(filtered, convertToEscapedMark(_valueEqual), _valueEqual);
+        if (!ignoreEqual) {
+            filtered = generally_replace(filtered, convertToEscapedMark(_valueEqual), _valueEqual);
+        }
         if (isEscapeCharEscape()) {
             filtered = generally_replace(filtered, escapedEscapeMark, _escapeChar);
         }
         return filtered;
     }
 
+    // -----------------------------------------------------
+    //                                          Assist Logic
+    //                                          ------------
     protected String convertToEscapedMark(String mark) {
         return _escapeChar + mark;
     }
