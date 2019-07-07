@@ -15,10 +15,6 @@
  */
 package org.dbflute.task.bs;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.tools.ant.types.FileSet;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
@@ -33,7 +29,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<FileSet> _filesets = new ArrayList<FileSet>();
     protected AppData _schemaData;
     protected Context _context;
 

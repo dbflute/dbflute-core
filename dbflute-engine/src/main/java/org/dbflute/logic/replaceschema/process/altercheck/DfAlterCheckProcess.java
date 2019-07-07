@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -32,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
 import org.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.dbflute.exception.DfAlterCheckDifferenceFoundException;
@@ -1264,7 +1265,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
 
     protected void copyFile(File src, File dest) {
         try {
-            FileUtils.getFileUtils().copyFile(src, dest);
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException e) {
             String msg = "Failed to copy file: " + src + " to " + dest;
             throw new IllegalStateException(msg, e);

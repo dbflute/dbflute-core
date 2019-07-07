@@ -26,7 +26,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.collections.ExtendedProperties;
-import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
@@ -254,8 +253,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             generator.parse(controlTemplate, ctx);
             generator.shutdown();
             cleanup();
-        } catch (BuildException e) {
-            throw e;
         } catch (MethodInvocationException e) {
             final String method = e.getReferenceName() + "." + e.getMethodName() + "()";
             String msg = "Exception thrown by " + method + ": control=" + controlTemplate;
@@ -264,6 +261,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             throw new IllegalStateException("Velocity syntax error: control=" + controlTemplate, e);
         } catch (ResourceNotFoundException e) {
             throw new IllegalStateException("Resource not found: control=" + controlTemplate, e);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new IllegalStateException("Generation failed: control=" + controlTemplate, e);
         }

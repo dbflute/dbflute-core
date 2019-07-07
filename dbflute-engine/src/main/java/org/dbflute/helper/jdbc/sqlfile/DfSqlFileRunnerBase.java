@@ -31,7 +31,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.tools.ant.BuildException;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
@@ -181,9 +180,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             final String encoding = _runInfo.isEncodingNull() ? "UTF-8" : _runInfo.getEncoding();
             return new InputStreamReader(new FileInputStream(_sqlFile), encoding);
         } catch (FileNotFoundException e) {
-            throw new BuildException("The file does not exist: " + _sqlFile, e);
+            throw new IllegalStateException("The file does not exist: " + _sqlFile, e);
         } catch (UnsupportedEncodingException e) {
-            throw new BuildException("The encoding is unsupported: " + _runInfo.getEncoding(), e);
+            throw new IllegalStateException("The encoding is unsupported: " + _runInfo.getEncoding(), e);
         }
     }
 
