@@ -15,6 +15,7 @@
             <emptyLine />
           </value>
         </option>
+        <option name="LINE_SEPARATOR" value="&#10;" />
         <option name="RIGHT_MARGIN" value="140" />
         <option name="ENABLE_JAVADOC_FORMATTING" value="false" />
         <option name="FORMATTER_TAGS_ENABLED" value="true" />
