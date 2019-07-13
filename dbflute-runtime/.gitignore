@@ -6,8 +6,10 @@
 
 # IntelliJ IDEA
 **/.idea/*
+!**/.idea/codeStyles
 !**/.idea/inspectionProfiles
 !**/.idea/codeStyleSettings.xml
+!**/.idea/encodings.xml
 !**/.idea/misc.xml
 !**/.idea/saveactions_settings.xml
 **/*.iml
@@ -20,6 +22,6 @@
 /dbflute-intro.*
 /mydbflute/intro_resources
 
-# project
+# application
 /release.properties
 /pom.xml.releaseBackup
