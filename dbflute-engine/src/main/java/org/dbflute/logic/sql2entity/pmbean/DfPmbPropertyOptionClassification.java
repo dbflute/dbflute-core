@@ -59,16 +59,16 @@ public class DfPmbPropertyOptionClassification {
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
-    public boolean isPropertyOptionSpecifiedClassification() {
+    public boolean isPropertyOptionSpecifiedClassification() { // :cls(Maihama) or fixed expression
         return extractClassificationNameFromOption(false) != null;
     }
 
-    public boolean isPropertyOptionClassificationFixedElement() {
+    public boolean isPropertyOptionClassificationFixedElement() { // :cls(Maihama.Sea) or :cls(Maihama.Sea, Land)
         final String classificationName = extractClassificationNameFromOption(false);
         return classificationName != null && classificationName.contains(".");
     }
 
-    public boolean isPropertyOptionClassificationFixedElementList() {
+    public boolean isPropertyOptionClassificationFixedElementList() { // :cls(Maihama.Sea, Land)
         final String classificationName = extractClassificationNameFromOption(false);
         return classificationName != null && classificationName.contains(".") && classificationName.contains(",");
     }
@@ -78,12 +78,12 @@ public class DfPmbPropertyOptionClassification {
         return Srl.substringFirstFront(classificationName, ".");
     }
 
-    public String getPropertyOptionClassificationFixedElement() { // returns Bar if "Foo.Bar" 
+    public String getPropertyOptionClassificationFixedElement() { // returns Sea if "Maihama.Sea" 
         final String classificationName = extractClassificationNameFromOption(true);
         return Srl.substringFirstRear(classificationName, ".");
     }
 
-    public List<String> getPropertyOptionClassificationFixedElementList() { // returns [Bar. Baz] if "Foo.Bar, Baz"
+    public List<String> getPropertyOptionClassificationFixedElementList() { // returns [Sea, Land] if "Maihama.Sea, Land"
         final String fixedElement = getPropertyOptionClassificationFixedElement();
         return Srl.splitListTrimmed(fixedElement, ",");
     }
