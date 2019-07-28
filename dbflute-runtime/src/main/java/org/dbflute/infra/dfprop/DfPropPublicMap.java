@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-import org.dbflute.helper.mapstring.MapListFile;
+import org.dbflute.helper.dfmap.DfMapFile;
 import org.dbflute.util.Srl;
 
 /**
@@ -63,7 +63,7 @@ public class DfPropPublicMap {
         try {
             final URL url = new URL(siteUrl);
             ins = url.openStream();
-            final MapListFile mapListFile = new MapListFile();
+            final DfMapFile mapListFile = new DfMapFile();
             _map = mapListFile.readMap(ins);
         } catch (IOException e) {
             throw new IllegalStateException("The url threw the IO exception: url=" + siteUrl, e);

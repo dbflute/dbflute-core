@@ -22,6 +22,7 @@ import org.dbflute.unit.RuntimeTestCase;
 /**
  * @author jflute
  */
+@SuppressWarnings("deprecation")
 public class MapListFileTest extends RuntimeTestCase {
 
     public void test_readString_lineComment_removed() throws Exception {
