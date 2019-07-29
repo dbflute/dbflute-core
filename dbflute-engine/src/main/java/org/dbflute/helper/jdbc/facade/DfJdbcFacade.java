@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Super simple facade for JDBC.
  * @author jflute
+ * @author p1us2er0
  */
 public class DfJdbcFacade {
 
@@ -118,16 +119,40 @@ public class DfJdbcFacade {
      */
     public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap,
             DfJFadStringConverter converter, int limit) {
+        return selectStringList(DfCollectionUtil.newArrayList(sql), columnValueTypeMap, converter, limit);
+    }
+
+    /**
+     * Select the list for records as string value using value types.
+     * @param trySqlList The try SQL strings. (NotNull)
+     * @param columnValueTypeMap The map of selected columns to value types. (NotNull, ValueTypeNullAllowed)
+     * @param converter The converter to convert to string value. (NullAllowed: means no conversion)
+     * @param limit The limit size for fetching. (MinusAllowed: means no limit)
+     * @return The list for result. (NotNull)
+     */
+    public List<Map<String, String>> selectStringList(List<String> trySqlList, Map<String, ValueType> columnValueTypeMap,
+            DfJFadStringConverter converter, int limit) {
         // [ATTENTION]: no use bind variables
         final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
+        String sql = trySqlList.isEmpty() ? null : trySqlList.get(0);
         try {
             conn = getConnection();
             beginTransactionIfNeeds(conn);
             st = conn.createStatement();
-            rs = st.executeQuery(sql);
+            for (String trySql : trySqlList) {
+                sql = trySql;
+                try {
+                    rs = st.executeQuery(trySql);
+                } catch (SQLException ignored) {
+                    _log.info("Statement.executeQuery() threw the exception!", createSQLExceptio(sql, ignored));
+                    continue;
+                }
+                break;
+            }
+
             final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, converter);
             int count = 0;
             while (wrapper.next()) {
@@ -172,15 +197,30 @@ public class DfJdbcFacade {
     //                                                ------
     public DfJFadCursorCallback selectCursor(final String sql, final Map<String, ValueType> columnValueTypeMap,
             final DfJFadStringConverter stringConverter) {
+        return selectCursor(DfCollectionUtil.newArrayList(sql), columnValueTypeMap, stringConverter);
+    }
+
+    public DfJFadCursorCallback selectCursor(final List<String> trySqlList, final Map<String, ValueType> columnValueTypeMap,
+            final DfJFadStringConverter stringConverter) {
         return new DfJFadCursorCallback() {
             public void select(DfJFadCursorHandler handler) {
                 Connection conn = null;
                 Statement st = null;
                 ResultSet rs = null;
+                String sql = trySqlList.isEmpty() ? null : trySqlList.get(0);
                 try {
                     conn = _dataSource.getConnection();
                     st = conn.createStatement();
-                    rs = st.executeQuery(sql);
+                    for (String trySql : trySqlList) {
+                        sql = trySql;
+                        try {
+                            rs = st.executeQuery(trySql);
+                        } catch (SQLException ignored) {
+                            _log.info("Statement.executeQuery() threw the exception!", createSQLExceptio(sql, ignored));
+                            continue;
+                        }
+                        break;
+                    }
                     handler.handle(new DfJFadResultSetWrapper(rs, columnValueTypeMap, stringConverter));
                 } catch (SQLException e) {
                     handleSQLException(sql, e);
@@ -298,7 +338,7 @@ public class DfJdbcFacade {
     // ===================================================================================
     //                                                                  Exception Handling
     //                                                                  ==================
-    protected void handleSQLException(String sql, SQLException e) {
+    protected SQLFailureException createSQLExceptio(String sql, SQLException e) {
         String msg = "Failed to execute the SQL:" + ln();
         msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "[SQL]" + ln() + sql + ln();
@@ -307,7 +347,11 @@ public class DfJdbcFacade {
         msg = msg + e.getClass() + ln();
         msg = msg + e.getMessage() + ln();
         msg = msg + "- - - - - - - - - -/";
-        throw new SQLFailureException(msg, e);
+        return new SQLFailureException(msg, e);
+    }
+
+    protected void handleSQLException(String sql, SQLException e) {
+        throw createSQLExceptio(sql, e);
     }
 
     // ===================================================================================

@@ -26,6 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.sql.DataSource;
 
@@ -37,6 +39,7 @@ import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadStringConverter;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.jdbc.ValueType;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.s2dao.valuetype.basic.StringType;
 import org.dbflute.s2dao.valuetype.basic.TimeType;
@@ -45,10 +48,12 @@ import org.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.dbflute.s2dao.valuetype.plugin.StringClobType;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
+ * @author p1us2er0
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfLReverseDataExtractor {
@@ -56,6 +61,7 @@ public class DfLReverseDataExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final int MAX_SELF_REFERENCE_DEPTH = 60; // join count limit of mysql
     protected final DataSource _dataSource;
     protected int _extractingLimit = -1;
     protected int _largeBorder = -1;
@@ -99,12 +105,49 @@ public class DfLReverseDataExtractor {
             }
         }
 
-        final String sql = buildExtractingSql(table);
+        final List<String> sqlList = DfCollectionUtil.newArrayList();
+        buildSelfReferenceForeignKeyExtractingTrySqlList(table).ifPresent(trySqlList -> {
+            sqlList.addAll(trySqlList);
+        });
+        sqlList.add(buildExtractingSql(table));
         if (large) {
-            return processLargeData(table, sql);
+            return processLargeData(table, sqlList);
         } else { // mainly here
-            return processNormalData(table, sql);
+            return processNormalData(table, sqlList);
         }
+    }
+
+    
+    protected OptionalThing<List<String>> buildSelfReferenceForeignKeyExtractingTrySqlList(Table table) {
+        final ForeignKey selfReferenceFK = table.getSelfReferenceForeignKey();
+        if (selfReferenceFK == null || !selfReferenceFK.isSimpleKeyFK()) {
+            return OptionalThing.empty();
+        }
+
+        final String tableSqlName = table.getTableSqlNameDirectUse();
+        final Column firstLocalColumn = table.getColumn(selfReferenceFK.getFirstLocalColumnName());
+        final String firstLocalName = firstLocalColumn.getColumnSqlNameDirectUse();
+        final Column firstForeignColumn = table.getColumn(selfReferenceFK.getFirstForeignColumnName());
+        final String firstForeignName = firstForeignColumn.getColumnSqlNameDirectUse();
+
+        final List<String> sqlList = DfCollectionUtil.newArrayList();
+        String sql = "WITH RECURSIVE cte AS (SELECT * FROM %1$s where %2$s is null UNION ALL SELECT child.* FROM %1$s AS child, cte WHERE cte.%3$s = child.%2$s) SELECT * FROM cte";
+        sqlList.add(String.format(sql, tableSqlName, firstLocalName, firstForeignName));
+        
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select ");
+        sb.append(table.getColumnList().stream().map(column -> "dfloc." + column.getColumnSqlNameDirectUse()).collect(Collectors.joining(", ")));
+        sb.append(IntStream.range(0, MAX_SELF_REFERENCE_DEPTH)
+                .mapToObj(index -> " left outer join " + tableSqlName + " dfrel_" + index + " on "
+                        + (index == 0 ? "dfloc" : "dfrel_" + (index - 1)) + "." + firstLocalName + " = dfrel_" + index + "." + firstForeignName)
+                .collect(Collectors.joining("", " from " + tableSqlName + " dfloc", "")));
+        sb.append(IntStream.range(0, MAX_SELF_REFERENCE_DEPTH)
+                .mapToObj(index -> " case when " + (index == 0 ? "dfloc" : "dfrel_" + index) + "." + firstLocalName
+                        + " is null then 0 else 1 end asc,")
+                .collect(Collectors.joining("", " order by", " dfloc." + firstForeignName + " asc")));
+        sqlList.add(sb.toString());
+
+        return OptionalThing.of(sqlList);
     }
 
     protected String buildExtractingSql(Table table) {
@@ -124,23 +167,23 @@ public class DfLReverseDataExtractor {
     // ===================================================================================
     //                                                                         Normal Data
     //                                                                         ===========
-    protected DfLReverseDataResult processNormalData(Table table, String sql) {
+    protected DfLReverseDataResult processNormalData(Table table, List<String> sqlList) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
         final Integer limit = _extractingLimit;
-        final List<Map<String, String>> resultList = facade.selectStringList(sql, valueTypeMap, converter, limit);
+        final List<Map<String, String>> resultList = facade.selectStringList(sqlList, valueTypeMap, converter, limit);
         return new DfLReverseDataResult(resultList);
     }
 
     // ===================================================================================
     //                                                                          Large Data
     //                                                                          ==========
-    protected DfLReverseDataResult processLargeData(Table table, final String sql) {
+    protected DfLReverseDataResult processLargeData(Table table, final List<String> sqlList) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
-        final DfJFadCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
+        final DfJFadCursorCallback callback = facade.selectCursor(sqlList, valueTypeMap, converter);
         return new DfLReverseDataResult(callback);
     }
 
