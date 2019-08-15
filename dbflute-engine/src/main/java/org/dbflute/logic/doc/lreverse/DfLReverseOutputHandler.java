@@ -257,9 +257,6 @@ public class DfLReverseOutputHandler {
         }
         final File delimiterDir = new File(_delimiterDataDir);
         final String ext = "tsv"; // fixed
-        final String outputInfo = "...Outputting the over-xls-limit table: " + table.getTableDispName();
-        _log.info(outputInfo);
-        sectionInfoList.add(outputInfo);
         if (!delimiterDir.exists()) {
             delimiterDir.mkdirs();
         }
@@ -297,7 +294,7 @@ public class DfLReverseOutputHandler {
                 } catch (IOException e) {
                     handleDelimiterDataFailureException(table, delimiterFilePath, e);
                 }
-                final String delimiterInfo = " -> " + delimiterFilePath + " (" + count + ")";
+                final String delimiterInfo = "  " + delimiterFilePath + " (" + count + ")";
                 _log.info(delimiterInfo);
                 sectionInfoList.add(delimiterInfo);
             }
