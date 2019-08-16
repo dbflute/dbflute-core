@@ -355,6 +355,10 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     public boolean isMySQLDatetime(final String dbTypeName) {
         return getJdbcTypeMapper().isMySQLDatetime(dbTypeName);
     }
+    
+    public boolean isPostgreSQLSerialFamily(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLSerialFamily(dbTypeName);
+    }
 
     public boolean isPostgreSQLBpChar(final String dbTypeName) {
         return getJdbcTypeMapper().isPostgreSQLBpChar(dbTypeName);

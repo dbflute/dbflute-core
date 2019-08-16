@@ -500,6 +500,10 @@ public class Column {
         return hasDbType() && _columnHandler.isMySQLDatetime(_dbType);
     }
 
+    public boolean isDbTypePostgreSQLSerialFamily() { // as pinpoint
+        return hasDbType() && _columnHandler.isPostgreSQLSerialFamily(_dbType);
+    }
+
     public boolean isDbTypePostgreSQLBytea() { // as pinpoint
         return hasDbType() && _columnHandler.isPostgreSQLBytea(_dbType);
     }
