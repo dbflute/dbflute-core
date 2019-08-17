@@ -146,17 +146,24 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         _log.info("|   Save Previous   |");
         _log.info("|                   |");
         _log.info("+-------------------+");
+
         deleteAllNGMark();
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
-        finalInfo.setResultMessage("{Save Previous}");
+        finalInfo.setResultMessage("Save Previous");
         if (!checkSavePreviousInvalidStatus(finalInfo)) {
             return finalInfo;
         }
+
+        final long before = System.currentTimeMillis();
         finishPreviousCheckedAlter();
         deleteExtractedPreviousResource();
         final List<File> copyToFileList = copyToPreviousResource();
         compressPreviousResource();
-        if (!checkSavedPreviousResource(finalInfo)) {
+        finalInfo.setResultMessage(finalInfo.getResultMessage() + ": saved=" + copyToFileList.size() + " file(s)");
+        final long after = System.currentTimeMillis();
+        finalInfo.setProcessPerformanceMillis(after - before); // except ReplaceSchema process
+
+        if (!checkSavedPreviousResource(finalInfo)) { // ReplaceSchema for previous
             return finalInfo; // failure
         }
         markPreviousOK(copyToFileList);
@@ -594,6 +601,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
         _log.info("|   Alter Schema   |");
         _log.info("|                  |");
         _log.info("+------------------+");
+        final long before = System.currentTimeMillis();
         submitDraftFile(finalInfo);
         executeAlterSql(finalInfo);
         if (finalInfo.isFailure()) {
@@ -606,6 +614,8 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
                 deleteSubmittedDraftFile(finalInfo);
             }
         }
+        final long after = System.currentTimeMillis();
+        finalInfo.setProcessPerformanceMillis(after - before);
     }
 
     // -----------------------------------------------------
@@ -778,7 +788,7 @@ public class DfAlterCheckProcess extends DfAbstractRepsProcess {
     }
 
     protected void handleTakeFinallyAssertionFailureException(DfAlterCheckFinalInfo finalInfo, DfTakeFinallyAssertionFailureException e) {
-        finalInfo.setResultMessage("{Alter Schema}: *asserted");
+        finalInfo.setResultMessage("Alter Check: *asserted");
         final int fileListSize = _executedAlterSqlFileList.size();
         int index = 0;
         for (File executedAlterSqlFile : _executedAlterSqlFileList) {

@@ -49,6 +49,7 @@ import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfDocumentSelector;
+import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -328,7 +329,21 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void checkSchemaPolicyInRepsIfNeeds() {
-        new DfSPolicyInRepsChecker(getDataSource(), _documentSelector).checkSchemaPolicyInRepsIfNeeds();
+        final long before = System.currentTimeMillis(); // no-if to be simple
+        final DfSPolicyInRepsChecker checker = new DfSPolicyInRepsChecker(getDataSource(), _documentSelector);
+        final boolean executed = checker.checkSchemaPolicyInRepsIfNeeds();
+        if (executed) {
+            final long after = System.currentTimeMillis();
+            final long preformanceMillis = after - before;
+            final Long originalMillis = _createSchemaFinalInfo.getProcessPerformanceMillis();
+            if (originalMillis != null) {
+                // because schema policy process is treated as create schema process in display
+                // (hard to move schema policy process to create schema process so adjust it by logging logic)
+                _createSchemaFinalInfo.setProcessPerformanceMillis(originalMillis + preformanceMillis);
+            }
+            final String performanceView = DfTraceViewUtil.convertToPerformanceView(preformanceMillis);
+            _createSchemaFinalInfo.addDetailMessage("(Schema Policy) - " + performanceView);
+        }
     }
 
     // -----------------------------------------------------
@@ -519,7 +534,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
             }
         }
 
-        // AlterSchema
+        // AlterCheck (AlterSchema, SavePrevious)
         {
             final DfAlterCheckFinalInfo alterCheckFinalInfo = _alterCheckFinalInfo;
             if (alterCheckFinalInfo != null && alterCheckFinalInfo.isValidInfo()) {
@@ -549,6 +564,10 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
 
     protected void buildSchemaTaskContents(StringBuilder sb, DfAbstractSchemaTaskFinalInfo finalInfo) {
         sb.append(" ").append(finalInfo.getResultMessage());
+        final Long processPerformanceMillis = finalInfo.getProcessPerformanceMillis();
+        if (processPerformanceMillis != null) { // almost true (except e.g. save failure)
+            sb.append(" - ").append(DfTraceViewUtil.convertToPerformanceView(processPerformanceMillis));
+        }
         final List<String> detailMessageList = finalInfo.getDetailMessageList();
         for (String detailMessage : detailMessageList) {
             sb.append(ln()).append("  ").append(detailMessage);

@@ -29,6 +29,6 @@ public class DfCreateSchemaFinalInfo extends DfAbstractSchemaTaskFinalInfo {
     }
 
     public void setBreakCause(SQLFailureException breakCause) {
-        this._breakCause = breakCause;
+        _breakCause = breakCause;
     }
 }

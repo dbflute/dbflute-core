@@ -27,6 +27,6 @@ public class DfLoadDataFinalInfo extends DfAbstractSchemaTaskFinalInfo {
     }
 
     public void setLoadEx(RuntimeException loadEx) {
-        this._loadEx = loadEx;
+        _loadEx = loadEx;
     }
 }

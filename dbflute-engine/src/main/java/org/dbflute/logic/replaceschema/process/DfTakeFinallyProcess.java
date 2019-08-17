@@ -172,6 +172,8 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
     //                                                                             Execute
     //                                                                             =======
     public DfTakeFinallyFinalInfo execute() {
+        final long before = System.currentTimeMillis();
+
         final DfRunnerInformation runInfo = createRunnerInformation();
         DfSqlFileFireResult fireResult = null;
         DfTakeFinallyAssertionFailureException assertionEx = null;
@@ -187,10 +189,15 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
             fireResult = createFailureFireResult(e, null);
             assertionEx = e;
         }
+
         final DfTakeFinallyFinalInfo finalInfo = createFinalInfo(fireResult, assertionEx);
         if (!finalInfo.isFailure()) { // because it might fail to create sequence
             incrementSequenceToDataMax();
         }
+
+        final long after = System.currentTimeMillis();
+        final long processPerformanceMillis = after - before;
+        finalInfo.setProcessPerformanceMillis(processPerformanceMillis);
         return finalInfo;
     }
 
@@ -416,6 +423,8 @@ public class DfTakeFinallyProcess extends DfAbstractRepsProcess {
             finalInfo.setFailure(fireResult.isExistsError());
         }
         finalInfo.setAssertionEx(assertionEx);
+        // not here for incrementing sequence
+        //finalInfo.setProcessPerformanceMillis(processPerformanceMillis);
         return finalInfo;
     }
 
