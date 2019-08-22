@@ -144,8 +144,9 @@ public class DfLReverseDataExtractor {
     }
 
     protected String doBuildSelfReferenceRecursiveSql(Table table, String tableSqlName, String firstLocalName, String firstForeignName) {
-        String sql =
-                "WITH RECURSIVE cte AS (SELECT * FROM %1$s where %2$s is null UNION ALL SELECT child.* FROM %1$s AS child, cte WHERE cte.%3$s = child.%2$s) SELECT * FROM cte";
+        String sql = "with recursive cte as "
+                + "(select * from %1$s where %2$s is null union all select child.* from %1$s AS child, cte where cte.%3$s = child.%2$s)"
+                + " select * from cte";
         return String.format(sql, tableSqlName, firstLocalName, firstForeignName);
     }
 
@@ -157,13 +158,36 @@ public class DfLReverseDataExtractor {
             return "dfloc." + column.getColumnSqlNameDirectUse();
         }).collect(Collectors.joining(", ")));
 
+        // e.g.
+        //  from PARENT_CATEGORY dfloc
+        //    left outer join PRODUCT_CATEGORY dfrel_0 on dfloc.PARENT_CATEGORY_CODE = dfrel_0.PRODUCT_CATEGORY_CODE
+        //    left outer join PRODUCT_CATEGORY dfrel_1 on dfrel_0.PARENT_CATEGORY_CODE = dfrel_1.PRODUCT_CATEGORY_CODE
+        //    ...
         sb.append(IntStream.range(0, MAX_SELF_REFERENCE_DEPTH).mapToObj(index -> {
-            return " left outer join " + tableSqlName + " dfrel_" + index + " on " + (index == 0 ? "dfloc" : "dfrel_" + (index - 1)) + "."
-                    + firstLocalName + " = dfrel_" + index + "." + firstForeignName;
+            return " left outer join " + tableSqlName + " dfrel_" + index // e.g. left outer join PRODUCT_CATEGORY dfrel_0
+                    + " on " + (index == 0 ? "dfloc" : "dfrel_" + (index - 1)) + "." + firstLocalName // e.g. on dfloc.PARENT_CATEGORY_CODE
+                    + " = dfrel_" + index + "." + firstForeignName; // e.g. = dfrel_0.PRODUCT_CATEGORY_CODE
         }).collect(Collectors.joining("", " from " + tableSqlName + " dfloc", "")));
 
+        // e.g. (actually no line separator)
+        //  order by case when dfloc.PARENT_CATEGORY_CODE is null then 0 else 1 end asc
+        //         , case when dfrel_0.PARENT_CATEGORY_CODE is null then 0 else 1 end asc
+        //         , case when dfrel_1.PARENT_CATEGORY_CODE is null then 0 else 1 end asc
+        //         , ...
+        //         , dfloc.PRODUCT_CATEGORY_CODE asc
         sb.append(IntStream.range(0, MAX_SELF_REFERENCE_DEPTH).mapToObj(index -> {
-            return " case when " + (index == 0 ? "dfloc" : "dfrel_" + index) + "." + firstLocalName + " is null then 0 else 1 end asc,";
+            final StringBuilder casewhenSb = new StringBuilder();
+            final String caseWhen = " case when ";
+            final String zeroElseOneAsc = " is null then 0 else 1 end asc,";
+            if (index == 0) {
+                // for base-point table
+                //  e.g. case when dfloc.PARENT_CATEGORY_CODE is null then 0 else 1 end asc,
+                casewhenSb.append(caseWhen + "dfloc.").append(firstLocalName).append(zeroElseOneAsc);
+            }
+            // for relationship table
+            //  e.g. case when dfrel_0.PARENT_CATEGORY_CODE is null then 0 else 1 end asc,
+            casewhenSb.append(caseWhen).append("dfrel_").append(index).append(".").append(firstLocalName).append(zeroElseOneAsc);
+            return casewhenSb.toString();
         }).collect(Collectors.joining("", " order by", " dfloc." + firstForeignName + " asc")));
 
         return sb.toString();
