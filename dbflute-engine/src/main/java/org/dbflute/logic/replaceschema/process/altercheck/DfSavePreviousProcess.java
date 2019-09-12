@@ -27,7 +27,7 @@ import org.dbflute.helper.io.compress.DfZipArchiver;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
-import org.dbflute.logic.replaceschema.process.altercheck.assist.DfAlterCoreProcessPlayer;
+import org.dbflute.logic.replaceschema.process.altercheck.player.DfAlterCoreProcessPlayer;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -76,7 +76,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
         }
 
         final long before = System.currentTimeMillis();
-        finishPreviousCheckedAlter();
+        _unreleasedAlterAgent.finishReleasedAlterSql();
         deleteExtractedPreviousResource();
         final List<File> copyToFileList = copyToPreviousResource();
         compressPreviousResource();
@@ -125,29 +125,6 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
     }
 
     // ===================================================================================
-    //                                                                 Finish CheckedAlter
-    //                                                                 ===================
-    protected void finishPreviousCheckedAlter() {
-        final String previousDate = findLatestPreviousDate();
-        if (previousDate == null) {
-            return;
-        }
-        final File checkedAlterZip = findLatestCheckedAlterZip(previousDate);
-        if (checkedAlterZip == null) {
-            return;
-        }
-        final String checkedAlterMarkBasicName = getMigrationCheckedAlterMarkBasicName();
-        final String finishedAlterMarkBasicName = getMigrationFinishedAlterMarkBasicName();
-        final String path = resolvePath(checkedAlterZip);
-        final String baseDir = Srl.substringLastFront(path, "/");
-        final String pureName = Srl.substringLastRear(path, "/");
-        final String renamedName = Srl.replace(pureName, checkedAlterMarkBasicName, finishedAlterMarkBasicName);
-        final File renamedFile = new File(baseDir + "/" + renamedName);
-        _log.info("...Finishing the previous history (renamed to): " + resolvePath(renamedFile));
-        checkedAlterZip.renameTo(renamedFile);
-    }
-
-    // ===================================================================================
     //                                                                   Compress Previous
     //                                                                   =================
     protected void compressPreviousResource() {
@@ -176,7 +153,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
     }
 
     protected void deleteExistingPreviousZip() {
-        final List<File> zipFiles = findPreviousZipList();
+        final List<File> zipFiles = _previousDBAgent.findPreviousZipList();
         for (File zipFile : zipFiles) {
             zipFile.delete();
         }
@@ -197,7 +174,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
         for (File mainFile : takeFinallySqlFileMap.values()) {
             doCopyToPreviousResource(mainFile, previousDir, playSqlDirSymbol, copyToFileList);
         }
-        final List<File> dataFileList = findHierarchyFileList(getSchemaDataDir());
+        final List<File> dataFileList = _alterControlAgent.findHierarchyFileList(getSchemaDataDir());
         for (File dataFile : dataFileList) {
             doCopyToPreviousResource(dataFile, previousDir, playSqlDirSymbol, copyToFileList);
         }
@@ -215,7 +192,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
             copyToFile.delete();
         }
         _log.info("...Saving the file to " + resolvePath(copyToFile));
-        copyFile(mainFile, copyToFile);
+        _alterControlAgent.copyFile(mainFile, copyToFile);
         copyToFileList.add(copyToFile);
     }
 
@@ -267,7 +244,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
             _log.info("...Marking previous-OK: " + okMark);
             markFile.createNewFile();
             final StringBuilder sb = new StringBuilder();
-            sb.append("[Saved Previous Resources]: " + currentDate());
+            sb.append("[Saved Previous Resources]: " + _alterControlAgent.currentDate());
             for (File moveToFile : copyToFileList) {
                 sb.append(ln()).append(resolvePath(moveToFile));
             }
@@ -283,5 +260,45 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
     protected void deleteSavePreviousMark() {
         final String mark = getMigrationSavePreviousMark();
         deleteFile(new File(mark), "...Deleting the save-previous mark");
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                         ReplaceSchema
+    //                                         -------------
+    protected String getPlaySqlDirPureName() {
+        return getReplaceSchemaProperties().getPlaySqlDirPureName();
+    }
+
+    protected Map<String, File> getReplaceSchemaSqlFileMap() {
+        return getReplaceSchemaProperties().getReplaceSchemaSqlFileMap(getPlaySqlDir());
+    }
+
+    protected Map<String, File> getTakeFinallySqlFileMap() {
+        return getReplaceSchemaProperties().getTakeFinallySqlFileMap(getPlaySqlDir());
+    }
+
+    protected String getSchemaDataDir() {
+        return getReplaceSchemaProperties().getSchemaDataDir(getPlaySqlDir());
+    }
+
+    // -----------------------------------------------------
+    //                                     Previous Resource
+    //                                     -----------------
+    protected String getMigrationPreviousDir() {
+        return getReplaceSchemaProperties().getMigrationPreviousDir();
+    }
+
+    // -----------------------------------------------------
+    //                                         Mark Resource
+    //                                         -------------
+    protected String getMigrationSavePreviousMark() {
+        return getReplaceSchemaProperties().getMigrationSavePreviousMark();
+    }
+
+    protected String getMigrationPreviousOKMark() {
+        return getReplaceSchemaProperties().getMigrationPreviousOKMark();
     }
 }

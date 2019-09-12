@@ -901,36 +901,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return schemaSqlDir.collectAlterTakeFinallySqlFileList();
     }
 
-    // -----------------------------------------------------
-    //                                           Alter Draft
-    //                                           -----------
-    public List<File> getMigrationDraftAlterSqlFileList() { // contains script files
-        final String targetDir = getMigrationDraftAlterDirectory();
-        final String sqlTitle = getMigrationAlterSchemaSqlTitle();
-        final List<String> suffixList = new ArrayList<String>();
-        suffixList.add(".sql");
-        suffixList.addAll(SystemScript.getSupportedExtList());
-        final String[] suffixes = suffixList.toArray(new String[] {});
-        final List<File> fileList = findSchemaResourceFileList(targetDir, sqlTitle, suffixes);
-        fileList.addAll(findSchemaResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
-        return fileList;
-    }
-
-    public List<File> getMigrationDraftTakeFinallySqlFileList() {
-        final String targetDir = getMigrationDraftAlterDirectory();
-        final String sqlTitle = getMigrationAlterTakeFinallySqlTitle();
-        final List<String> suffixList = new ArrayList<String>();
-        suffixList.add(".sql");
-        final String[] suffixes = suffixList.toArray(new String[] {});
-        final List<File> fileList = findSchemaResourceFileList(targetDir, sqlTitle, suffixes);
-        fileList.addAll(findSchemaResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
-        return fileList;
-    }
-
-    protected String getMigrationDraftAlterDirectory() {
-        return getMigrationDir() + "/alter/draft";
-    }
-
     protected String getMigrationAlterTakeFinallySqlTitle() {
         return DfRepsSchemaSqlDir.ALTER_TAKE_FINALLY_SQL_TITLE; // same as normal
     }
@@ -940,40 +910,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     //                                     -----------------
     public String getMigrationPreviousDir() {
         return getMigrationDir() + "/previous";
-    }
-
-    public boolean hasMigrationPreviousResource() {
-        return !getMigrationPreviousReplaceSchemaSqlFileList().isEmpty();
-    }
-
-    protected List<File> _migrationPreviousReplaceSchemaSqlFileList;
-
-    public List<File> getMigrationPreviousReplaceSchemaSqlFileList() {
-        if (_migrationPreviousReplaceSchemaSqlFileList != null) {
-            return _migrationPreviousReplaceSchemaSqlFileList;
-        }
-        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(getMigrationPreviousDir());
-        _migrationPreviousReplaceSchemaSqlFileList = schemaSqlDir.collectReplaceSchemaSqlFileList();
-        return _migrationPreviousReplaceSchemaSqlFileList;
-    }
-
-    public Map<String, File> getMigrationPreviousReplaceSchemaSqlFileMap() {
-        return convertToSchemaSqlFileMap(getMigrationPreviousReplaceSchemaSqlFileList());
-    }
-
-    protected List<File> _migrationPreviousTakeFinallySqlFileList;
-
-    public List<File> getMigrationPreviousTakeFinallySqlFileList() {
-        if (_migrationPreviousTakeFinallySqlFileList != null) {
-            return _migrationPreviousTakeFinallySqlFileList;
-        }
-        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(getMigrationPreviousDir());
-        _migrationPreviousTakeFinallySqlFileList = schemaSqlDir.collectTakeFinallySqlFileList();
-        return _migrationPreviousTakeFinallySqlFileList;
-    }
-
-    public Map<String, File> getMigrationPreviousTakeFinallySqlFileMap() {
-        return convertToSchemaSqlFileMap(getMigrationPreviousTakeFinallySqlFileList());
     }
 
     // -----------------------------------------------------

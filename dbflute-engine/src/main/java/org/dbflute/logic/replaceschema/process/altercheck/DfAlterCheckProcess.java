@@ -16,11 +16,9 @@
 package org.dbflute.logic.replaceschema.process.altercheck;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.List;
 
 import org.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
@@ -29,7 +27,6 @@ import org.dbflute.exception.DfAlterCheckEmptyAlterSqlSuccessException;
 import org.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.dbflute.exception.SQLFailureException;
-import org.dbflute.helper.io.compress.DfZipArchiver;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
@@ -51,7 +48,7 @@ import org.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
-import org.dbflute.logic.replaceschema.process.altercheck.assist.DfAlterCoreProcessPlayer;
+import org.dbflute.logic.replaceschema.process.altercheck.player.DfAlterCoreProcessPlayer;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -202,8 +199,8 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
                 deleteExtractedPreviousResource();
             }
         } catch (RuntimeException e) { // basically no way because of checked before saving
-            markPreviousNG(getAlterCheckRollbackSchemaFailureNotice());
-            throwAlterCheckRollbackSchemaFailureException(e);
+            markPreviousNG(_previousDBAgent.getAlterCheckRollbackSchemaFailureNotice());
+            _previousDBAgent.throwAlterCheckRollbackSchemaFailureException(e);
         }
     }
 
@@ -237,7 +234,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     protected void executeAlterSql(DfAlterCheckFinalInfo finalInfo) {
         List<File> alterSqlFileList = getMigrationAlterSqlFileList();
         if (alterSqlFileList.isEmpty()) {
-            restoreLatestCheckedAlterSql();
+            _unreleasedAlterAgent.restoreUnreleasedAlterSql();
             alterSqlFileList = getMigrationAlterSqlFileList();
             if (alterSqlFileList.isEmpty()) {
                 createEmptyAlterSqlFileIfNotExists();
@@ -294,23 +291,6 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         br.addElement("   |  |-schema");
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckAlterSqlNotFoundException(msg);
-    }
-
-    protected void restoreLatestCheckedAlterSql() {
-        final String previousDate = findLatestPreviousDate();
-        if (previousDate == null) {
-            return;
-        }
-        final File checkedAlterZip = findLatestCheckedAlterZip(previousDate);
-        if (checkedAlterZip == null) {
-            return;
-        }
-        _log.info("...Restoring the latest checked-alter: " + resolvePath(checkedAlterZip));
-        final DfZipArchiver archiver = new DfZipArchiver(checkedAlterZip);
-        archiver.extract(new File(getMigrationAlterDirectory()), file -> {
-            _log.info("  " + resolvePath(file));
-            return true;
-        });
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() {
@@ -551,7 +531,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         _log.info("|                   |");
         _log.info("+-------------------+");
         checkEmptyAlterSuccess(finalInfo);
-        saveHistory(finalInfo);
+        _unreleasedAlterAgent.saveUnreleasedAlterSql(finalInfo);
         deleteAllNGMark();
         deleteDiffResult();
     }
@@ -570,74 +550,6 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         br.addElement("You should check after changing schema.");
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckEmptyAlterSqlSuccessException(msg);
-    }
-
-    protected void saveHistory(DfAlterCheckFinalInfo finalInfo) {
-        final String previousDate = findLatestPreviousDate(); // may be null
-        final List<File> alterSqlFileList = finalInfo.getAlterSqlFileList();
-        if (alterSqlFileList == null) { // just in case
-            return;
-        }
-        final String checkedAlterZipName;
-        if (previousDate != null) {
-            checkedAlterZipName = buildCheckedAlterZipName(previousDate);
-        } else {
-            checkedAlterZipName = getMigrationCheckedAlterMarkBasicName() + ".zip";
-        }
-        skipSameStoryHistory(checkedAlterZipName, previousDate);
-        compressCheckedAlterZip(checkedAlterZipName);
-        deleteAlterSqlFile(alterSqlFileList);
-    }
-
-    protected void skipSameStoryHistory(String checkedAlterZipName, String previousDate) {
-        if (previousDate == null) { // basically for compatible
-            return;
-        }
-        final List<File> firstLevelDirList = findHistoryFirstLevelDirList();
-        final String markBasicName = getMigrationSkippedAlterMarkBasicName();
-        for (File firstLevelDir : firstLevelDirList) {
-            final List<File> secondLevelDirList = findHistorySecondLevelDirList(firstLevelDir);
-            for (File secondLevelDir : secondLevelDirList) {
-                final String basePath = resolvePath(secondLevelDir);
-                final File successStoryFile = new File(basePath + "/" + checkedAlterZipName);
-                if (successStoryFile.exists()) {
-                    _log.info("...Skipping the same story: " + basePath);
-                    final String skippedZipName = basePath + "/" + markBasicName + "-to-" + previousDate + ".zip";
-                    successStoryFile.renameTo(new File(skippedZipName));
-                }
-            }
-        }
-    }
-
-    protected void compressCheckedAlterZip(final String checkedAlterZipName) {
-        final String checkedAlterZipPath = getHistoryCurrentDir() + "/" + checkedAlterZipName;
-        _log.info("...Saving the history to " + checkedAlterZipPath);
-        final DfZipArchiver archiver = new DfZipArchiver(new File(checkedAlterZipPath));
-        archiver.suppressCompressSubDir();
-        archiver.compress(new File(getMigrationAlterDirectory()), new FileFilter() {
-            public boolean accept(File file) {
-                _log.info("  " + resolvePath(file));
-                return true;
-            }
-        });
-    }
-
-    protected String getHistoryCurrentDir() {
-        final String historyDir = getMigrationHistoryDir();
-        final Date currentDate = new Date();
-        final String middleDir = DfTypeUtil.toString(currentDate, "yyyyMM");
-        mkdirsDirIfNotExists(historyDir + "/" + middleDir);
-        // e.g. history/201104/20110429_2247
-        final String yyyyMMddHHmm = DfTypeUtil.toString(currentDate, "yyyyMMdd_HHmm");
-        final String currentDir = historyDir + "/" + middleDir + "/" + yyyyMMddHHmm;
-        mkdirsDirIfNotExists(currentDir);
-        return currentDir;
-    }
-
-    protected void deleteAlterSqlFile(final List<File> alterSqlFileList) {
-        for (File alterSqlFile : alterSqlFileList) {
-            deleteFile(alterSqlFile, "...Deleting the executed alterSqlFile");
-        }
     }
 
     // ===================================================================================
@@ -672,5 +584,61 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
                 deleteFile(metaFile, "...Deleting the craft meta");
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                        Alter Resource
+    //                                        --------------
+    protected String getMigrationAlterDirectory() {
+        return getReplaceSchemaProperties().getMigrationAlterDirectory();
+    }
+
+    protected File getMigrationSimpleAlterSqlFile() {
+        return getReplaceSchemaProperties().getMigrationSimpleAlterSqlFile();
+    }
+
+    // -----------------------------------------------------
+    //                                       Schema Resource
+    //                                       ---------------
+    protected String getMigrationAlterCheckDiffMapFile() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckDiffMapFile();
+    }
+
+    protected String getMigrationAlterCheckResultFilePath() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckResultFilePath();
+    }
+
+    protected String getMigrationAlterCheckPreviousSchemaXml() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckPreviousSchemaXml();
+    }
+
+    protected String getMigrationAlterCheckNextSchemaXml() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckNextSchemaXml();
+    }
+
+    protected String getMigrationAlterCheckCraftMetaDir() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckCraftMetaDir();
+    }
+
+    protected List<File> getCraftMetaFileList(String craftMetaDir) {
+        return getDocumentProperties().getCraftMetaFileList(craftMetaDir);
+    }
+
+    // -----------------------------------------------------
+    //                                         Mark Resource
+    //                                         -------------
+    protected String getMigrationAlterCheckMark() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckMark();
+    }
+
+    protected String getMigrationNextNGMark() {
+        return getReplaceSchemaProperties().getMigrationNextNGMark();
+    }
+
+    protected String getMigrationAlterNGMark() {
+        return getReplaceSchemaProperties().getMigrationAlterNGMark();
     }
 }
