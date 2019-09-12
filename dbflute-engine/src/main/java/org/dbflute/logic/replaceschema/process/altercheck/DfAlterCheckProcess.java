@@ -400,7 +400,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     protected void deleteAlterCheckMark() {
         final String mark = getMigrationAlterCheckMark();
-        deleteFile(new File(mark), "...Deleting the alter-check mark");
+        deleteFileWithMessage(new File(mark), "...Deleting the alter-check mark");
     }
 
     // ===================================================================================
@@ -531,7 +531,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         _log.info("|                   |");
         _log.info("+-------------------+");
         checkEmptyAlterSuccess(finalInfo);
-        _unreleasedAlterAgent.saveUnreleasedAlterSql(finalInfo);
+        _unreleasedAlterAgent.saveAlterSqlAsUnreleased(finalInfo);
         deleteAllNGMark();
         deleteDiffResult();
     }
@@ -561,9 +561,9 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     protected void deleteAlterCheckResultDiff() {
         final String diffMap = getMigrationAlterCheckDiffMapFile();
-        deleteFile(new File(diffMap), "...Deleting the AlterCheck diffmap file");
+        deleteFileWithMessage(new File(diffMap), "...Deleting the AlterCheck diffmap file");
         final String resultFile = getMigrationAlterCheckResultFilePath();
-        deleteFile(new File(resultFile), "...Deleting the AlterCheck result file");
+        deleteFileWithMessage(new File(resultFile), "...Deleting the AlterCheck result file");
     }
 
     // ===================================================================================
@@ -572,8 +572,8 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     protected void deleteSchemaXml() {
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
-        deleteFile(new File(previousXml), "...Deleting the SchemaXml file for previous schema");
-        deleteFile(new File(nextXml), "...Deleting the SchemaXml file for next schema");
+        deleteFileWithMessage(new File(previousXml), "...Deleting the SchemaXml file for previous schema");
+        deleteFileWithMessage(new File(nextXml), "...Deleting the SchemaXml file for next schema");
     }
 
     protected void deleteCraftMeta() {
@@ -581,7 +581,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         if (craftMetaDir != null) {
             final List<File> metaFileList = getCraftMetaFileList(craftMetaDir);
             for (File metaFile : metaFileList) {
-                deleteFile(metaFile, "...Deleting the craft meta");
+                deleteFileWithMessage(metaFile, "...Deleting the craft meta");
             }
         }
     }

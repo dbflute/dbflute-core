@@ -69,7 +69,7 @@ public class DfHistoryZipAgent {
     //    return checkedAlterZipList;
     //}
 
-    public File findLatestCheckedAlterZip(String previousDate) {
+    public File findLatestCheckedAlterZip(String previousDate) { // null allowed (when no checked-alter)
         final List<File> fisrtLevelDirList = findHistoryFirstLevelDirList();
         final File latestFisrtLevelDir = _alterControlAgent.findLatestNameFile(fisrtLevelDirList);
         if (latestFisrtLevelDir == null) {
@@ -80,10 +80,10 @@ public class DfHistoryZipAgent {
         if (latestSecondLevelDir == null) {
             return null;
         }
-        return findCheckedAlterZip(latestSecondLevelDir, previousDate);
+        return doFindCheckedAlterZip(latestSecondLevelDir, previousDate);
     }
 
-    protected File findCheckedAlterZip(File secondLevelDir, String previousDate) { // null allowed (when not found)
+    protected File doFindCheckedAlterZip(File secondLevelDir, String previousDate) { // null allowed (when not found)
         if (secondLevelDir == null) {
             return null;
         }

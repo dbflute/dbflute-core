@@ -115,12 +115,12 @@ public class DfPreviousDBAgent {
     // -----------------------------------------------------
     //                                         Previous Date
     //                                         -------------
-    public String findLatestPreviousDate() {
+    public String findLatestPreviousDate() { // null allowed (when not found)
         return doExtractPreviousDate(findLatestPreviousZip());
     }
 
     protected String doExtractPreviousDate(File previousZip) {
-        if (previousZip == null) {
+        if (previousZip == null) { // not found
             return null;
         }
         final String previousName = Srl.substringLastFront(previousZip.getName(), ".");
@@ -189,7 +189,7 @@ public class DfPreviousDBAgent {
             if (isPreviousZip(previousFile)) {
                 continue;
             }
-            _alterControlAgent.deleteFile(previousFile, null);
+            _alterControlAgent.deleteFileWithMessage(previousFile, null);
         }
     }
 

@@ -73,22 +73,22 @@ public class DfAlterControlAgent {
 
     public void deletePreviousOKMark() {
         final String previousOKMark = getMigrationPreviousOKMark();
-        deleteFile(new File(previousOKMark), "...Deleting the previous-OK mark");
+        deleteFileWithMessage(new File(previousOKMark), "...Deleting the previous-OK mark");
     }
 
     public void deleteNextNGMark() {
         final String replaceNGMark = getMigrationNextNGMark();
-        deleteFile(new File(replaceNGMark), "...Deleting the next-NG mark");
+        deleteFileWithMessage(new File(replaceNGMark), "...Deleting the next-NG mark");
     }
 
     public void deleteAlterNGMark() {
         final String alterNGMark = getMigrationAlterNGMark();
-        deleteFile(new File(alterNGMark), "...Deleting the alter-NG mark");
+        deleteFileWithMessage(new File(alterNGMark), "...Deleting the alter-NG mark");
     }
 
     public void deletePreviousNGMark() {
         final String previousNGMark = getMigrationPreviousNGMark();
-        deleteFile(new File(previousNGMark), "...Deleting the previous-NG mark");
+        deleteFileWithMessage(new File(previousNGMark), "...Deleting the previous-NG mark");
     }
 
     // -----------------------------------------------------
@@ -131,7 +131,7 @@ public class DfAlterControlAgent {
     // -----------------------------------------------------
     //                                        File Operation
     //                                        --------------
-    public void deleteFile(File file, String msg) {
+    public void deleteFileWithMessage(File file, String msg) {
         if (file.exists()) {
             if (msg != null) {
                 _log.info(msg + ": " + resolvePath(file));

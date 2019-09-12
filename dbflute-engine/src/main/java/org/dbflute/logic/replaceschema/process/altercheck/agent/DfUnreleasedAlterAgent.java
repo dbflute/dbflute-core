@@ -66,43 +66,49 @@ public class DfUnreleasedAlterAgent {
     //                                                            ========================
     public void restoreUnreleasedAlterSql() { // for AlterCheck first
         final String previousDate = _previousDBAgent.findLatestPreviousDate();
-        if (previousDate == null) {
+        if (previousDate == null) { // not found the previous (operation mistake)
             return;
         }
+
+        // ZIP operation is kept for compatible
         final File checkedAlterZip = _historyZipAgent.findLatestCheckedAlterZip(previousDate);
-        if (checkedAlterZip == null) {
-            return;
+        if (checkedAlterZip != null) { // second or more checks in the phase
+            _log.info("...Restoring the latest checked-alter: " + resolvePath(checkedAlterZip));
+            final DfZipArchiver archiver = new DfZipArchiver(checkedAlterZip);
+            archiver.extract(new File(getMigrationAlterDirectory()), file -> {
+                _log.info("  " + resolvePath(file));
+                return true;
+            });
         }
-        _log.info("...Restoring the latest checked-alter: " + resolvePath(checkedAlterZip));
-        final DfZipArchiver archiver = new DfZipArchiver(checkedAlterZip);
-        archiver.extract(new File(getMigrationAlterDirectory()), file -> {
-            _log.info("  " + resolvePath(file));
-            return true;
-        });
+
+        // #thinking *here, restore from unreleased-checked directory
     }
 
     // ===================================================================================
-    //                                                               Save Unreleased Alter
-    //                                                               =====================
-    public void saveUnreleasedAlterSql(DfAlterCheckFinalInfo finalInfo) { // for AlterCheck sucess
-        final String previousDate = _previousDBAgent.findLatestPreviousDate(); // may be null
+    //                                                            Save Alter as Unreleased
+    //                                                            ========================
+    public void saveAlterSqlAsUnreleased(DfAlterCheckFinalInfo finalInfo) { // for AlterCheck success
         final List<File> alterSqlFileList = finalInfo.getAlterSqlFileList();
-        if (alterSqlFileList == null) { // just in case
+        if (alterSqlFileList == null) { // basically no way here, just in case
             return;
         }
+
+        // #thinking *here, switch to unreleased-checked directory
+        final String previousDate = _previousDBAgent.findLatestPreviousDate();
         final String checkedAlterZipName;
-        if (previousDate != null) {
+        if (previousDate != null) { // basically true, already SavePrevious
             checkedAlterZipName = _historyZipAgent.buildCheckedAlterZipName(previousDate);
-        } else {
+        } else { // no way here, just in case
             checkedAlterZipName = getMigrationCheckedAlterMarkBasicName() + ".zip";
         }
-        skipSameStoryHistory(checkedAlterZipName, previousDate);
+        skipSameStoryHistory(checkedAlterZipName, previousDate); // rename old checked-ZIP files as skipped
         compressCheckedAlterZip(checkedAlterZipName);
+
         deleteAlterSqlFile(alterSqlFileList);
     }
 
     protected void skipSameStoryHistory(String checkedAlterZipName, String previousDate) {
-        if (previousDate == null) { // basically for compatible
+        if (previousDate == null) { // basically no way, for compatible
             return;
         }
         final List<File> firstLevelDirList = _historyZipAgent.findHistoryFirstLevelDirList();
@@ -139,6 +145,7 @@ public class DfUnreleasedAlterAgent {
         final Date currentDate = new Date();
         final String middleDir = DfTypeUtil.toString(currentDate, "yyyyMM");
         _alterControlAgent.mkdirsDirIfNotExists(historyDir + "/" + middleDir);
+
         // e.g. history/201104/20110429_2247
         final String yyyyMMddHHmm = DfTypeUtil.toString(currentDate, "yyyyMMdd_HHmm");
         final String currentDir = historyDir + "/" + middleDir + "/" + yyyyMMddHHmm;
@@ -148,7 +155,7 @@ public class DfUnreleasedAlterAgent {
 
     protected void deleteAlterSqlFile(final List<File> alterSqlFileList) {
         for (File alterSqlFile : alterSqlFileList) {
-            _alterControlAgent.deleteFile(alterSqlFile, "...Deleting the executed alterSqlFile");
+            _alterControlAgent.deleteFileWithMessage(alterSqlFile, "...Deleting the executed alterSqlFile");
         }
     }
 
@@ -157,22 +164,22 @@ public class DfUnreleasedAlterAgent {
     //                                                               =====================
     public void finishReleasedAlterSql() { // for SavePrevious
         final String previousDate = _previousDBAgent.findLatestPreviousDate();
-        if (previousDate == null) {
+        if (previousDate == null) { // not found the previous (operation mistake)
             return;
         }
         final File checkedAlterZip = _historyZipAgent.findLatestCheckedAlterZip(previousDate);
-        if (checkedAlterZip == null) {
-            return;
+        if (checkedAlterZip != null) {
+            final String checkedAlterMarkBasicName = getMigrationCheckedAlterMarkBasicName();
+            final String finishedAlterMarkBasicName = getMigrationFinishedAlterMarkBasicName();
+            final String path = resolvePath(checkedAlterZip);
+            final String baseDir = Srl.substringLastFront(path, "/");
+            final String pureName = Srl.substringLastRear(path, "/");
+            final String renamedName = Srl.replace(pureName, checkedAlterMarkBasicName, finishedAlterMarkBasicName);
+            final File renamedFile = new File(baseDir + "/" + renamedName);
+            _log.info("...Finishing the previous history (renamed to): " + resolvePath(renamedFile));
+            checkedAlterZip.renameTo(renamedFile);
         }
-        final String checkedAlterMarkBasicName = getMigrationCheckedAlterMarkBasicName();
-        final String finishedAlterMarkBasicName = getMigrationFinishedAlterMarkBasicName();
-        final String path = resolvePath(checkedAlterZip);
-        final String baseDir = Srl.substringLastFront(path, "/");
-        final String pureName = Srl.substringLastRear(path, "/");
-        final String renamedName = Srl.replace(pureName, checkedAlterMarkBasicName, finishedAlterMarkBasicName);
-        final File renamedFile = new File(baseDir + "/" + renamedName);
-        _log.info("...Finishing the previous history (renamed to): " + resolvePath(renamedFile));
-        checkedAlterZip.renameTo(renamedFile);
+        // #thinking *here, finish unreleased-checked directory
     }
 
     // ===================================================================================

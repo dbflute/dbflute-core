@@ -259,7 +259,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
 
     protected void deleteSavePreviousMark() {
         final String mark = getMigrationSavePreviousMark();
-        deleteFile(new File(mark), "...Deleting the save-previous mark");
+        deleteFileWithMessage(new File(mark), "...Deleting the save-previous mark");
     }
 
     // ===================================================================================

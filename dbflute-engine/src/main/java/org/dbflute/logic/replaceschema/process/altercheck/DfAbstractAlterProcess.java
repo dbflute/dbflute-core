@@ -126,8 +126,8 @@ public abstract class DfAbstractAlterProcess extends DfAbstractRepsProcess {
     // -----------------------------------------------------
     //                                        File Operation
     //                                        --------------
-    protected void deleteFile(File file, String msg) {
-        _alterControlAgent.deleteFile(file, msg);
+    protected void deleteFileWithMessage(File file, String msg) {
+        _alterControlAgent.deleteFileWithMessage(file, msg);
     }
 
     protected void writeNotice(File file, String notice) throws IOException {
