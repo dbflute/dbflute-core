@@ -42,9 +42,9 @@ import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
 import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
-import org.dbflute.logic.replaceschema.process.altercheck.DfAbstractDBMigrationProcess.CoreProcessPlayer;
 import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess;
 import org.dbflute.logic.replaceschema.process.altercheck.DfSavePreviousProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.assist.DfAlterCoreProcessPlayer;
 import org.dbflute.logic.replaceschema.process.arrangebefore.DfArrangeBeforeRepsProcess;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
@@ -189,9 +189,6 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         try {
             if (isAlterCheck()) {
                 final DfAlterCheckProcess process = createAlterCheckProcess();
-                if (isForcedAlterCheck()) {
-                    process.useDraftSpace();
-                }
                 _alterCheckFinalInfo = process.checkAlter();
                 if (_alterCheckFinalInfo.hasAlterCheckDiff()) {
                     outputAlterCheckResultHtml();
@@ -214,9 +211,9 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         return DfSavePreviousProcess.createAsMain(getDataSource(), createDBMigrationProcessPlayer());
     }
 
-    protected CoreProcessPlayer createDBMigrationProcessPlayer() {
+    protected DfAlterCoreProcessPlayer createDBMigrationProcessPlayer() {
         final boolean schemaOnly = isSchemaOnlyAlterCheck();
-        return new CoreProcessPlayer() {
+        return new DfAlterCoreProcessPlayer() {
             public void playNext(String sqlRootDirectory) {
                 executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().schemaOnly(schemaOnly));
             }

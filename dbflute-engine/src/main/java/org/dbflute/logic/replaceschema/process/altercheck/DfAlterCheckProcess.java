@@ -20,7 +20,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +51,7 @@ import org.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.assist.DfAlterCoreProcessPlayer;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfAlterCheckProcess extends DfAbstractDBMigrationProcess {
+public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     // ===================================================================================
     //                                                                          Definition
@@ -78,19 +78,14 @@ public class DfAlterCheckProcess extends DfAbstractDBMigrationProcess {
     //                                                 -----
     protected final List<File> _executedAlterSqlFileList = DfCollectionUtil.newArrayList();
 
-    // -----------------------------------------------------
-    //                                                Option
-    //                                                ------
-    protected boolean _useDraftSpace; // old style so basically unused
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfAlterCheckProcess(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+    protected DfAlterCheckProcess(DfSchemaSource dataSource, DfAlterCoreProcessPlayer coreProcessPlayer) {
         super(dataSource, coreProcessPlayer);
     }
 
-    public static DfAlterCheckProcess createAsMain(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+    public static DfAlterCheckProcess createAsMain(DfSchemaSource dataSource, DfAlterCoreProcessPlayer coreProcessPlayer) {
         return new DfAlterCheckProcess(dataSource, coreProcessPlayer);
     }
 
@@ -130,7 +125,6 @@ public class DfAlterCheckProcess extends DfAbstractDBMigrationProcess {
             deleteCraftMeta();
         }
 
-        deleteSubmittedDraftFile(finalInfo);
         deleteSchemaXml(); // not finally because of trace when abort
         return finalInfo;
     }
@@ -224,55 +218,17 @@ public class DfAlterCheckProcess extends DfAbstractDBMigrationProcess {
         _log.info("|                  |");
         _log.info("+------------------+");
         final long before = System.currentTimeMillis();
-        submitDraftFile(finalInfo);
         executeAlterSql(finalInfo);
         if (finalInfo.isFailure()) {
             markAlterNG(getAlterCheckAlterSqlFailureNotice());
-            deleteSubmittedDraftFile(finalInfo);
         } else {
             takeFinally(finalInfo);
             if (finalInfo.isFailure()) {
                 markAlterNG(getAlterCheckTakeFinallySqlFailureNotice());
-                deleteSubmittedDraftFile(finalInfo);
             }
         }
         final long after = System.currentTimeMillis();
         finalInfo.setProcessPerformanceMillis(after - before);
-    }
-
-    // -----------------------------------------------------
-    //                                            Draft File
-    //                                            ----------
-    protected void submitDraftFile(DfAlterCheckFinalInfo finalInfo) {
-        if (!_useDraftSpace) {
-            return;
-        }
-        final List<File> submittedFileList = new ArrayList<File>();
-        final List<File> draftAlterSqlFileList = getMigrationDraftAlterSqlFileList();
-        draftAlterSqlFileList.addAll(getMigrationDraftTakeFinallySqlFileList());
-        for (File draftAlterSqlFile : draftAlterSqlFileList) {
-            final String draftFilePath = resolvePath(draftAlterSqlFile);
-            final String dirBase = Srl.substringLastFront(draftFilePath, "/alter/draft/");
-            String pureFileName = Srl.substringLastRear(draftFilePath, "/draft/");
-            if (pureFileName.startsWith("draft-")) {
-                pureFileName = Srl.substringFirstRear(pureFileName, "draft-");
-            }
-            final File dest = new File(dirBase + "/alter/" + pureFileName);
-            submittedFileList.add(dest);
-            _log.info("...Submitting the draft file to " + resolvePath(dest));
-            copyFile(draftAlterSqlFile, dest);
-        }
-        finalInfo.addSubmittedDraftFileAll(submittedFileList);
-    }
-
-    protected void deleteSubmittedDraftFile(DfAlterCheckFinalInfo finalInfo) {
-        final List<File> submittedFileList = finalInfo.getSubmittedDraftFileList();
-        if (submittedFileList == null) {
-            return;
-        }
-        for (File submittedFile : submittedFileList) {
-            deleteFile(submittedFile, "...Deleting the submitted draft file");
-        }
     }
 
     // -----------------------------------------------------
@@ -351,11 +307,9 @@ public class DfAlterCheckProcess extends DfAbstractDBMigrationProcess {
         }
         _log.info("...Restoring the latest checked-alter: " + resolvePath(checkedAlterZip));
         final DfZipArchiver archiver = new DfZipArchiver(checkedAlterZip);
-        archiver.extract(new File(getMigrationAlterDirectory()), new FileFilter() {
-            public boolean accept(File file) {
-                _log.info("  " + resolvePath(file));
-                return true;
-            }
+        archiver.extract(new File(getMigrationAlterDirectory()), file -> {
+            _log.info("  " + resolvePath(file));
+            return true;
         });
     }
 
@@ -718,12 +672,5 @@ public class DfAlterCheckProcess extends DfAbstractDBMigrationProcess {
                 deleteFile(metaFile, "...Deleting the craft meta");
             }
         }
-    }
-
-    // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
-    public void useDraftSpace() {
-        _useDraftSpace = true;
     }
 }

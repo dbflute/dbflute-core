@@ -19,7 +19,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import org.dbflute.helper.io.compress.DfZipArchiver;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.process.DfAbstractRepsProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.assist.DfAlterCoreProcessPlayer;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
@@ -48,13 +48,13 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess {
+public abstract class DfAbstractAlterProcess extends DfAbstractRepsProcess {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(DfAbstractDBMigrationProcess.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAbstractAlterProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -63,12 +63,12 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
     //                                        Basic Resource
     //                                        --------------
     protected final DfSchemaSource _dataSource;
-    protected final CoreProcessPlayer _coreProcessPlayer;
+    protected final DfAlterCoreProcessPlayer _coreProcessPlayer;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfAbstractDBMigrationProcess(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+    protected DfAbstractAlterProcess(DfSchemaSource dataSource, DfAlterCoreProcessPlayer coreProcessPlayer) {
         if (dataSource == null) { // for example, ReplaceSchema may have lazy connection
             throwAlterCheckDataSourceNotFoundException();
         }
@@ -86,13 +86,6 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
         throw new DfAlterCheckDataSourceNotFoundException(msg);
     }
 
-    public static interface CoreProcessPlayer {
-
-        void playNext(String sqlRootDir);
-
-        void playPrevious(String sqlRootDir);
-    }
-
     // ===================================================================================
     //                                                                   AlterDDL Resource
     //                                                                   =================
@@ -108,11 +101,7 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
             return null;
         }
         final String checkedAlterZipName = buildCheckedAlterZipName(previousDate);
-        final File[] listFiles = secondLevelDir.listFiles(new FilenameFilter() {
-            public boolean accept(File file, String name) {
-                return name.equals(checkedAlterZipName);
-            }
-        });
+        final File[] listFiles = secondLevelDir.listFiles((file, name) -> name.equals(checkedAlterZipName));
         if (listFiles == null || listFiles.length == 0) {
             return null;
         }
@@ -157,11 +146,7 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
         if (!historyDir.isDirectory() || !historyDir.exists()) {
             return DfCollectionUtil.newArrayList();
         }
-        final File[] firstLevelDirList = historyDir.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
+        final File[] firstLevelDirList = historyDir.listFiles(file -> file.isDirectory());
         if (firstLevelDirList == null) {
             return DfCollectionUtil.newArrayList();
         }
@@ -172,11 +157,7 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
         if (firstLevelDir == null) {
             return DfCollectionUtil.newArrayList();
         }
-        final File[] secondLevelDirList = firstLevelDir.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
+        final File[] secondLevelDirList = firstLevelDir.listFiles(file -> file.isDirectory());
         if (secondLevelDirList == null) {
             return DfCollectionUtil.newArrayList();
         }
@@ -226,6 +207,9 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
         return "Failed to rollback the schema to previous state.";
     }
 
+    // ===================================================================================
+    //                                                                 PreviousDB Resource
+    //                                                                 ===================
     // -----------------------------------------------------
     //                                         Previous Date
     //                                         -------------
@@ -241,9 +225,6 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
         return Srl.substringFirstRear(previousName, "previous-");
     }
 
-    // ===================================================================================
-    //                                                                 PreviousDB Resource
-    //                                                                 ===================
     // -----------------------------------------------------
     //                                      Extract Resource
     //                                      ----------------
@@ -257,13 +238,11 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
         _log.info("...Extracting the previous resources from zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         final Set<String> traceSet = new HashSet<String>();
-        archiver.extract(new File(getMigrationPreviousDir()), new FileFilter() {
-            public boolean accept(File file) {
-                final String path = resolvePath(file);
-                traceSet.add(path);
-                _log.info("  " + path);
-                return true;
-            }
+        archiver.extract(new File(getMigrationPreviousDir()), file -> {
+            final String path = resolvePath(file);
+            traceSet.add(path);
+            _log.info("  " + path);
+            return true;
         });
         if (traceSet.isEmpty()) {
             String msg = "Not found the files in the zip: " + resolvePath(previousZip);
@@ -285,11 +264,7 @@ public abstract class DfAbstractDBMigrationProcess extends DfAbstractRepsProcess
 
     protected List<File> findPreviousZipList() {
         final File previousDir = new File(getMigrationPreviousDir());
-        final File[] zipFiles = previousDir.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return isPreviousZip(file);
-            }
-        });
+        final File[] zipFiles = previousDir.listFiles(file -> isPreviousZip(file));
         final List<File> fileList;
         if (zipFiles != null) {
             fileList = Arrays.asList(zipFiles);

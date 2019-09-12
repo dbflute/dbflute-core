@@ -16,7 +16,6 @@
 package org.dbflute.logic.replaceschema.process.altercheck;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,7 @@ import org.dbflute.helper.io.compress.DfZipArchiver;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
+import org.dbflute.logic.replaceschema.process.altercheck.assist.DfAlterCoreProcessPlayer;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 1.2.1 (2019/09/12 Thursday) from DfAlterCheckProcess
  */
-public class DfSavePreviousProcess extends DfAbstractDBMigrationProcess {
+public class DfSavePreviousProcess extends DfAbstractAlterProcess {
 
     // ===================================================================================
     //                                                                          Definition
@@ -49,11 +49,11 @@ public class DfSavePreviousProcess extends DfAbstractDBMigrationProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfSavePreviousProcess(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+    protected DfSavePreviousProcess(DfSchemaSource dataSource, DfAlterCoreProcessPlayer coreProcessPlayer) {
         super(dataSource, coreProcessPlayer);
     }
 
-    public static DfSavePreviousProcess createAsMain(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+    public static DfSavePreviousProcess createAsMain(DfSchemaSource dataSource, DfAlterCoreProcessPlayer coreProcessPlayer) {
         return new DfSavePreviousProcess(dataSource, coreProcessPlayer);
     }
 
@@ -155,20 +155,18 @@ public class DfSavePreviousProcess extends DfAbstractDBMigrationProcess {
         final File previousZip = getCurrentTargetPreviousZip();
         _log.info("...Compressing the previous resources to zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
-        archiver.compress(new File(getMigrationPreviousDir()), new FileFilter() {
-            public boolean accept(File file) {
-                final String name = file.getName();
-                final boolean result;
-                if (file.isDirectory()) {
-                    result = !name.startsWith(".");
-                } else {
-                    result = !name.endsWith(".zip");
-                }
-                if (result) {
-                    _log.info("  " + resolvePath(file));
-                }
-                return result;
+        archiver.compress(new File(getMigrationPreviousDir()), file -> {
+            final String name = file.getName();
+            final boolean result;
+            if (file.isDirectory()) {
+                result = !name.startsWith(".");
+            } else {
+                result = !name.endsWith(".zip");
             }
+            if (result) {
+                _log.info("  " + resolvePath(file));
+            }
+            return result;
         });
     }
 
