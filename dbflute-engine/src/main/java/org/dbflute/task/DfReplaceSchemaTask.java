@@ -42,8 +42,9 @@ import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
 import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.DfAbstractDBMigrationProcess.CoreProcessPlayer;
 import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess;
-import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess.CoreProcessPlayer;
+import org.dbflute.logic.replaceschema.process.altercheck.DfSavePreviousProcess;
 import org.dbflute.logic.replaceschema.process.arrangebefore.DfArrangeBeforeRepsProcess;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
@@ -185,9 +186,9 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void doProcessAlterCheck() {
-        final DfAlterCheckProcess process = createAlterCheckProcess();
         try {
             if (isAlterCheck()) {
+                final DfAlterCheckProcess process = createAlterCheckProcess();
                 if (isForcedAlterCheck()) {
                     process.useDraftSpace();
                 }
@@ -196,6 +197,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
                     outputAlterCheckResultHtml();
                 }
             } else if (isSavePrevious()) {
+                final DfSavePreviousProcess process = createSavePreviousProcess();
                 _alterCheckFinalInfo = process.savePrevious();
             }
             _alterCheckFinalInfo.throwAlterCheckExceptionIfExists();
@@ -205,8 +207,16 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected DfAlterCheckProcess createAlterCheckProcess() {
+        return DfAlterCheckProcess.createAsMain(getDataSource(), createDBMigrationProcessPlayer());
+    }
+
+    protected DfSavePreviousProcess createSavePreviousProcess() {
+        return DfSavePreviousProcess.createAsMain(getDataSource(), createDBMigrationProcessPlayer());
+    }
+
+    protected CoreProcessPlayer createDBMigrationProcessPlayer() {
         final boolean schemaOnly = isSchemaOnlyAlterCheck();
-        return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
+        return new CoreProcessPlayer() {
             public void playNext(String sqlRootDirectory) {
                 executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().schemaOnly(schemaOnly));
             }
@@ -214,7 +224,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
             public void playPrevious(String sqlRootDirectory) {
                 executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().asPrevious().schemaOnly(schemaOnly));
             }
-        });
+        };
     }
 
     protected void outputAlterCheckResultHtml() {
