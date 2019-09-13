@@ -814,7 +814,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     return true;
                 }
                 final boolean bothValid = next != null && previous != null;
-                if (bothValid && isSystemSequence(next) && isSystemSequence(previous)) {
+                if (bothValid && isSystemDefaultValue(next) && isSystemDefaultValue(previous)) {
                     return true;
                 }
                 return false;
@@ -824,6 +824,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 diff.setDefaultValueDiff(nextPreviousDiff);
             }
         });
+    }
+
+    protected boolean isSystemDefaultValue(String defaultValue) {
+        if (isDatabaseDB2()) {
+            return isSystemSequence(defaultValue); // no confirmation but for compatible
+        } else if (isDatabaseH2()) {
+            // e.g. NEXT VALUE FOR "PUBLIC"."SYSTEM_SEQUENCE_...
+            return Srl.startsWithIgnoreCase(defaultValue, "NEXT VALUE FOR")
+                    && Srl.containsAllIgnoreCase(defaultValue, KEYWORD_H2_SYSTEM_SEQUENCE);
+        }
+        return false;
     }
 
     protected void processNotNull(Column next, Column previous, DfColumnDiff columnDiff) {
