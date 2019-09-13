@@ -171,12 +171,12 @@ public class DfUnreleasedAlterAgent {
         if (previousDate == null) { // basically no way, for compatible
             return;
         }
-        final List<File> firstLevelDirList = _historyZipAgent.findHistoryFirstLevelDirList();
+        final List<File> firstLevelDateDirList = _historyZipAgent.findHistoryFirstLevelDateDirList();
         final String markBasicName = getMigrationSkippedAlterMarkBasicName();
-        for (File firstLevelDir : firstLevelDirList) {
-            final List<File> secondLevelDirList = _historyZipAgent.findHistorySecondLevelDirList(firstLevelDir);
-            for (File secondLevelDir : secondLevelDirList) {
-                final String basePath = resolvePath(secondLevelDir);
+        for (File firstLevelDateDir : firstLevelDateDirList) {
+            final List<File> secondLevelDateDirList = _historyZipAgent.findHistorySecondLevelDateDirList(firstLevelDateDir);
+            for (File secondLevelDateDir : secondLevelDateDirList) {
+                final String basePath = resolvePath(secondLevelDateDir);
                 final File successStoryFile = new File(basePath + "/" + checkedAlterZipName);
                 if (successStoryFile.exists()) {
                     _log.info("...Skipping same story: " + basePath);
@@ -236,7 +236,7 @@ public class DfUnreleasedAlterAgent {
         }
         _log.info("...Marking notice in unreleased directory: " + resolvePath(noticeMark));
         try {
-            _alterControlAgent.writeControlSimple(noticeMark, "This directory is managed by DBFlute (AlterCheck), so read-only.");
+            _alterControlAgent.writeMarkSimple(noticeMark, "This directory is managed by DBFlute (AlterCheck), so read-only.");
         } catch (IOException e) {
             String msg = "Failed to write notice mark file in unreleased directory: " + resolvePath(noticeMark);
             throw new IllegalStateException(msg, e);
@@ -250,7 +250,7 @@ public class DfUnreleasedAlterAgent {
         }
         _log.info("...Marking previous in unreleased directory: " + resolvePath(previousMark));
         try {
-            _alterControlAgent.writeControlSimple(previousMark, "The AlterDDL files are for the PreviousDB.");
+            _alterControlAgent.writeMarkSimple(previousMark, "The AlterDDL files are for the PreviousDB.");
         } catch (IOException e) {
             String msg = "Failed to write previous mark file in unreleased directory: " + resolvePath(previousMark);
             throw new IllegalStateException(msg, e);
@@ -259,12 +259,12 @@ public class DfUnreleasedAlterAgent {
 
     protected void skipOldStyleCheckedZip(String previousDate) {
         final String checkedAlterZipName = _historyZipAgent.buildCheckedAlterZipName(previousDate);
-        final List<File> firstLevelDirList = _historyZipAgent.findHistoryFirstLevelDirList();
+        final List<File> firstLevelDateDirList = _historyZipAgent.findHistoryFirstLevelDateDirList();
         final String markBasicName = getMigrationSkippedAlterMarkBasicName();
-        for (File firstLevelDir : firstLevelDirList) {
-            final List<File> secondLevelDirList = _historyZipAgent.findHistorySecondLevelDirList(firstLevelDir);
-            for (File secondLevelDir : secondLevelDirList) {
-                final String basePath = resolvePath(secondLevelDir);
+        for (File firstLevelDateDir : firstLevelDateDirList) {
+            final List<File> secondLevelDateDirList = _historyZipAgent.findHistorySecondLevelDateDirList(firstLevelDateDir);
+            for (File secondLevelDateDir : secondLevelDateDirList) {
+                final String basePath = resolvePath(secondLevelDateDir);
                 final File oldStyleFile = new File(basePath + "/" + checkedAlterZipName);
                 if (oldStyleFile.exists()) {
                     _log.info("...Skipping old style checked-alter ZIP: " + basePath);
@@ -357,8 +357,16 @@ public class DfUnreleasedAlterAgent {
     }
 
     protected void deleteUnreleasedPreviousMark(String previousDate) {
-        final File previousMark = new File(getMigrationHistoryUnreleasedPreviousMark(previousDate));
-        _alterControlAgent.deleteControlFile(previousMark, "...Deleting already-released previous mark");
+        final DfSchemaResourceFinder finder = new DfSchemaResourceFinder();
+        finder.addPrefix(getMigrationHistoryUnreleasedPreviousMarkFilePrefix());
+        finder.addSuffix(getMigrationHistoryUnreleasedPreviousMarkFileExt());
+        final List<File> previousMarkFileList = finder.findResourceFileList(getMigrationHistoryUnreleasedDir());
+        _log.info("...Deleting already-released previous mark(s): " + previousMarkFileList.size());
+        for (File previousMarkFile : previousMarkFileList) { // may contain old phase previous
+            if (previousMarkFile.exists()) { // just in case
+                previousMarkFile.delete();
+            }
+        }
     }
 
     // ===================================================================================
@@ -454,6 +462,14 @@ public class DfUnreleasedAlterAgent {
 
     public String getMigrationHistoryUnreleasedPreviousMark(String previousDate) {
         return getReplaceSchemaProperties().getMigrationHistoryUnreleasedPreviousMark(previousDate);
+    }
+
+    public String getMigrationHistoryUnreleasedPreviousMarkFilePrefix() {
+        return getReplaceSchemaProperties().getMigrationHistoryUnreleasedPreviousMarkFilePrefix();
+    }
+
+    public String getMigrationHistoryUnreleasedPreviousMarkFileExt() {
+        return getReplaceSchemaProperties().getMigrationHistoryUnreleasedPreviousMarkFileExt();
     }
 
     public boolean isCompatibleMigrationHistoryCheckedZip() {

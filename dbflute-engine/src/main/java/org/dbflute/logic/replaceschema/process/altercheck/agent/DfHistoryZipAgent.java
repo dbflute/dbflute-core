@@ -70,17 +70,17 @@ public class DfHistoryZipAgent {
     //}
 
     public File findLatestCheckedAlterZip(String previousDate) { // null allowed (when no checked-alter)
-        final List<File> fisrtLevelDirList = findHistoryFirstLevelDirList();
-        final File latestFisrtLevelDir = _alterControlAgent.findLatestNameFile(fisrtLevelDirList);
-        if (latestFisrtLevelDir == null) {
+        final List<File> fisrtLevelDateDirList = findHistoryFirstLevelDateDirList();
+        final File latestFisrtLevelDateDir = _alterControlAgent.findLatestNameFile(fisrtLevelDateDirList);
+        if (latestFisrtLevelDateDir == null) {
             return null;
         }
-        final List<File> secondLevelDirList = findHistorySecondLevelDirList(latestFisrtLevelDir);
-        final File latestSecondLevelDir = _alterControlAgent.findLatestNameFile(secondLevelDirList);
-        if (latestSecondLevelDir == null) {
+        final List<File> secondLevelDateDirList = findHistorySecondLevelDateDirList(latestFisrtLevelDateDir);
+        final File latestSecondLevelDateDir = _alterControlAgent.findLatestNameFile(secondLevelDateDirList);
+        if (latestSecondLevelDateDir == null) {
             return null;
         }
-        return doFindCheckedAlterZip(latestSecondLevelDir, previousDate);
+        return doFindCheckedAlterZip(latestSecondLevelDateDir, previousDate);
     }
 
     protected File doFindCheckedAlterZip(File secondLevelDir, String previousDate) { // null allowed (when not found)
@@ -112,27 +112,29 @@ public class DfHistoryZipAgent {
     // -----------------------------------------------------
     //                                    First/Second Level
     //                                    ------------------
-    public List<File> findHistoryFirstLevelDirList() {
+    public List<File> findHistoryFirstLevelDateDirList() { // except unreleased directory
         final File historyDir = new File(getMigrationHistoryDir());
         if (!historyDir.isDirectory() || !historyDir.exists()) {
             return DfCollectionUtil.newArrayList();
         }
-        final File[] firstLevelDirList = historyDir.listFiles(file -> file.isDirectory());
-        if (firstLevelDirList == null) {
+        final File[] firstLevelDateDirList = historyDir.listFiles(file -> { // needs to avoid unreleased directory
+            return file.isDirectory() && !file.getName().equals(getMigrationHistoryUnreleasedDirPureName());
+        });
+        if (firstLevelDateDirList == null) {
             return DfCollectionUtil.newArrayList();
         }
-        return DfCollectionUtil.newArrayList(firstLevelDirList);
+        return DfCollectionUtil.newArrayList(firstLevelDateDirList);
     }
 
-    public List<File> findHistorySecondLevelDirList(File firstLevelDir) {
-        if (firstLevelDir == null) {
+    public List<File> findHistorySecondLevelDateDirList(File firstLevelDateDir) {
+        if (firstLevelDateDir == null) {
             return DfCollectionUtil.newArrayList();
         }
-        final File[] secondLevelDirList = firstLevelDir.listFiles(file -> file.isDirectory());
-        if (secondLevelDirList == null) {
+        final File[] secondLevelDateDirList = firstLevelDateDir.listFiles(file -> file.isDirectory());
+        if (secondLevelDateDirList == null) {
             return DfCollectionUtil.newArrayList();
         }
-        return DfCollectionUtil.newArrayList(secondLevelDirList);
+        return DfCollectionUtil.newArrayList(secondLevelDateDirList);
     }
 
     // ===================================================================================
@@ -151,6 +153,10 @@ public class DfHistoryZipAgent {
     //                                      ----------------
     protected String getMigrationHistoryDir() {
         return getReplaceSchemaProperties().getMigrationHistoryDir();
+    }
+
+    protected String getMigrationHistoryUnreleasedDirPureName() {
+        return getReplaceSchemaProperties().getMigrationHistoryUnreleasedDirPureName();
     }
 
     // -----------------------------------------------------

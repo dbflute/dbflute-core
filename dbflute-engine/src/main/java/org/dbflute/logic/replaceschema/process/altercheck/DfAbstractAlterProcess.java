@@ -127,11 +127,11 @@ public abstract class DfAbstractAlterProcess extends DfAbstractRepsProcess {
     //                                        File Operation
     //                                        --------------
     protected void deleteControlFile(File file, String msg) {
-        _alterControlAgent.deleteControlFile(file, msg);
+        _alterControlAgent.deleteMarkFile(file, msg);
     }
 
     protected void writeControlLogRoad(File file, String notice) throws IOException {
-        _alterControlAgent.writeControlLogRoad(file, notice);
+        _alterControlAgent.writeMarkLogRoad(file, notice);
     }
 
     // ===================================================================================

@@ -951,7 +951,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     //  |  |  |  |-previous-20190712-2222.zip
 
     public String getMigrationHistoryUnreleasedDir() {
-        return getMigrationHistoryDir() + "/unreleased-checked-alter";
+        return getMigrationHistoryDir() + "/" + getMigrationHistoryUnreleasedDirPureName();
+    }
+
+    public String getMigrationHistoryUnreleasedDirPureName() {
+        return "unreleased-checked-alter";
     }
 
     public String getMigrationHistoryUnreleasedFilePrefix() {
@@ -963,7 +967,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     }
 
     public String getMigrationHistoryUnreleasedPreviousMark(String previousDate) {
-        return getMigrationHistoryUnreleasedDir() + "/for-previous-" + previousDate + ".dfmark";
+        final String filePrefix = getMigrationHistoryUnreleasedPreviousMarkFilePrefix();
+        final String fileExt = getMigrationHistoryUnreleasedPreviousMarkFileExt();
+        return getMigrationHistoryUnreleasedDir() + "/" + filePrefix + previousDate + fileExt;
+    }
+
+    public String getMigrationHistoryUnreleasedPreviousMarkFilePrefix() {
+        return "for-previous-";
+    }
+
+    public String getMigrationHistoryUnreleasedPreviousMarkFileExt() {
+        return ".dfmark";
     }
 
     public boolean isCompatibleMigrationHistoryCheckedZip() { // closet and maintenance, removed at future

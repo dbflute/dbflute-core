@@ -54,8 +54,8 @@ public class DfAlterControlAgent {
     }
 
     // ===================================================================================
-    //                                                                    Control Resource
-    //                                                                    ================
+    //                                                                     Current Control
+    //                                                                     ===============
     // -----------------------------------------------------
     //                                          Current Date
     //                                          ------------
@@ -67,38 +67,9 @@ public class DfAlterControlAgent {
         return DfTypeUtil.toString(currentDate(), "yyyy/MM/dd HH:mm:ss");
     }
 
-    // -----------------------------------------------------
-    //                                           Delete Mark
-    //                                           -----------
-    public void deleteAllNGMark() {
-        deleteNextNGMark();
-        deleteAlterNGMark();
-        deletePreviousNGMark();
-    }
-
-    public void deletePreviousOKMark() {
-        final String previousOKMark = getMigrationPreviousOKMark();
-        deleteControlFile(new File(previousOKMark), "...Deleting previous-OK mark");
-    }
-
-    public void deleteNextNGMark() {
-        final String replaceNGMark = getMigrationNextNGMark();
-        deleteControlFile(new File(replaceNGMark), "...Deleting next-NG mark");
-    }
-
-    public void deleteAlterNGMark() {
-        final String alterNGMark = getMigrationAlterNGMark();
-        deleteControlFile(new File(alterNGMark), "...Deleting alter-NG mark");
-    }
-
-    public void deletePreviousNGMark() {
-        final String previousNGMark = getMigrationPreviousNGMark();
-        deleteControlFile(new File(previousNGMark), "...Deleting previous-NG mark");
-    }
-
-    // -----------------------------------------------------
-    //                                        Hierarchy File
-    //                                        --------------
+    // ===================================================================================
+    //                                                                        File Control
+    //                                                                        ============
     public List<File> findHierarchyFileList(String rootDir) {
         final List<File> fileList = new ArrayList<File>();
         doFindHierarchyFileList(fileList, new File(rootDir));
@@ -133,37 +104,6 @@ public class DfAlterControlAgent {
         return latestFile;
     }
 
-    // -----------------------------------------------------
-    //                                        File Operation
-    //                                        --------------
-    public void deleteControlFile(File file, String msg) {
-        if (file.exists()) {
-            if (msg != null) {
-                _log.info(msg + ": " + resolvePath(file));
-            }
-            file.delete();
-        }
-    }
-
-    public void writeControlLogRoad(File file, String notice) throws IOException {
-        writeControlSimple(file, notice + ln() + "Look at the log for detail.");
-    }
-
-    public void writeControlSimple(File file, String notice) throws IOException {
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-            bw.write(notice);
-            bw.flush();
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {}
-            }
-        }
-    }
-
     public void copyFile(File src, File dest) {
         try {
             FileUtils.getFileUtils().copyFile(src, dest);
@@ -177,6 +117,69 @@ public class DfAlterControlAgent {
         final File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Mark Control
+    //                                                                        ============
+    // -----------------------------------------------------
+    //                                           Delete Mark
+    //                                           -----------
+    public void deleteAllNGMark() {
+        deleteNextNGMark();
+        deleteAlterNGMark();
+        deletePreviousNGMark();
+    }
+
+    public void deletePreviousOKMark() {
+        final String previousOKMark = getMigrationPreviousOKMark();
+        deleteMarkFile(new File(previousOKMark), "...Deleting previous-OK mark");
+    }
+
+    public void deleteNextNGMark() {
+        final String replaceNGMark = getMigrationNextNGMark();
+        deleteMarkFile(new File(replaceNGMark), "...Deleting next-NG mark");
+    }
+
+    public void deleteAlterNGMark() {
+        final String alterNGMark = getMigrationAlterNGMark();
+        deleteMarkFile(new File(alterNGMark), "...Deleting alter-NG mark");
+    }
+
+    public void deletePreviousNGMark() {
+        final String previousNGMark = getMigrationPreviousNGMark();
+        deleteMarkFile(new File(previousNGMark), "...Deleting previous-NG mark");
+    }
+
+    public void deleteMarkFile(File file, String msg) {
+        if (file.exists()) {
+            if (msg != null) {
+                _log.info(msg + ": " + resolvePath(file));
+            }
+            file.delete();
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Write Mark
+    //                                            ----------
+    public void writeMarkLogRoad(File file, String notice) throws IOException {
+        writeMarkSimple(file, notice + ln() + "Look at the log for detail.");
+    }
+
+    public void writeMarkSimple(File file, String notice) throws IOException {
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            bw.write(notice);
+            bw.flush();
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {}
+            }
         }
     }
 
