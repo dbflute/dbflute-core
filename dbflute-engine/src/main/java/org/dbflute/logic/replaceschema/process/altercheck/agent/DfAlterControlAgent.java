@@ -62,7 +62,7 @@ public class DfAlterControlAgent {
     public Date currentDate() {
         return DBFluteSystem.currentDate();
     }
-    
+
     public String currentDateExp() {
         return DfTypeUtil.toString(currentDate(), "yyyy/MM/dd HH:mm:ss");
     }
@@ -145,11 +145,15 @@ public class DfAlterControlAgent {
         }
     }
 
-    public void writeControlNotice(File file, String notice) throws IOException {
+    public void writeControlLogRoad(File file, String notice) throws IOException {
+        writeControlSimple(file, notice + ln() + "Look at the log for detail.");
+    }
+
+    public void writeControlSimple(File file, String notice) throws IOException {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-            bw.write(notice + ln() + "Look at the log for detail.");
+            bw.write(notice);
             bw.flush();
         } finally {
             if (bw != null) {

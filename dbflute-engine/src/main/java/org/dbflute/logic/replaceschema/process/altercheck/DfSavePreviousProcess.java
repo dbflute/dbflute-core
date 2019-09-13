@@ -254,7 +254,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
             }
             sb.append(ln()).append("(").append(copyToFileList.size()).append(" files)");
             sb.append(ln());
-            writeControlNotice(markFile, sb.toString());
+            writeControlLogRoad(markFile, sb.toString());
         } catch (IOException e) {
             String msg = "Failed to create a file for previous-OK mark: " + okMark;
             throw new IllegalStateException(msg, e);

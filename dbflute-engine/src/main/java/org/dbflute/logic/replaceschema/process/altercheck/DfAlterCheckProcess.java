@@ -156,7 +156,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
             if (!markFile.exists()) {
                 _log.info("...Marking next-NG: " + ngMark);
                 markFile.createNewFile();
-                writeControlNotice(markFile, notice);
+                writeControlLogRoad(markFile, notice);
             }
         } catch (IOException e) {
             String msg = "Failed to create a file for next-NG mark: " + ngMark;
@@ -486,7 +486,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
             if (!markFile.exists()) {
                 _log.info("...Marking alter-NG: " + ngMark);
                 markFile.createNewFile();
-                writeControlNotice(markFile, notice);
+                writeControlLogRoad(markFile, notice);
             }
         } catch (IOException e) {
             String msg = "Failed to create a file for alter-NG mark: " + ngMark;

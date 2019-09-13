@@ -143,10 +143,11 @@ public class DfUnreleasedAlterAgent {
             return;
         }
         final String previousDate = _previousDBAgent.findLatestPreviousDate(); // not null here
-        if (isCompatibleMigrationHistoryCheckedZip()) {
+        if (isCompatibleMigrationHistoryCheckedZip()) { // for maintenance
             doSaveAlterInCheckedZip(previousDate); // old style
         } else {
             doSaveAlterInUnreleasedDir(previousDate, alterSqlFileList); // renewal2019 for parallel work 
+            skipOldStyleCheckedZip(previousDate); // already merged in unreleased
         }
         deleteAlterSqlFile(alterSqlFileList);
     }
@@ -221,7 +222,8 @@ public class DfUnreleasedAlterAgent {
         _log.info("...Moving alter SQL files to unreleased directory: " + alterSqlFileList.size());
         final String unreleasedDir = getMigrationHistoryUnreleasedDir();
         for (File alterSqlFile : alterSqlFileList) {
-            final File unreleasedSqlFile = new File(unreleasedDir + "/" + alterSqlFile.getName());
+            final String prefix = getMigrationHistoryUnreleasedFilePrefix();
+            final File unreleasedSqlFile = new File(unreleasedDir + "/" + prefix + alterSqlFile.getName());
             _log.info("  to " + resolvePath(unreleasedSqlFile));
             alterSqlFile.renameTo(unreleasedSqlFile);
         }
@@ -234,7 +236,7 @@ public class DfUnreleasedAlterAgent {
         }
         _log.info("...Marking notice in unreleased directory: " + resolvePath(noticeMark));
         try {
-            _alterControlAgent.writeControlNotice(noticeMark, "Read the AlterCheck document.");
+            _alterControlAgent.writeControlSimple(noticeMark, "This directory is managed by DBFlute (AlterCheck), so read-only.");
         } catch (IOException e) {
             String msg = "Failed to write notice mark file in unreleased directory: " + resolvePath(noticeMark);
             throw new IllegalStateException(msg, e);
@@ -248,10 +250,28 @@ public class DfUnreleasedAlterAgent {
         }
         _log.info("...Marking previous in unreleased directory: " + resolvePath(previousMark));
         try {
-            _alterControlAgent.writeControlNotice(previousMark, "The AlterDDLs are for the PreviousDB.");
+            _alterControlAgent.writeControlSimple(previousMark, "The AlterDDL files are for the PreviousDB.");
         } catch (IOException e) {
             String msg = "Failed to write previous mark file in unreleased directory: " + resolvePath(previousMark);
             throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected void skipOldStyleCheckedZip(String previousDate) {
+        final String checkedAlterZipName = _historyZipAgent.buildCheckedAlterZipName(previousDate);
+        final List<File> firstLevelDirList = _historyZipAgent.findHistoryFirstLevelDirList();
+        final String markBasicName = getMigrationSkippedAlterMarkBasicName();
+        for (File firstLevelDir : firstLevelDirList) {
+            final List<File> secondLevelDirList = _historyZipAgent.findHistorySecondLevelDirList(firstLevelDir);
+            for (File secondLevelDir : secondLevelDirList) {
+                final String basePath = resolvePath(secondLevelDir);
+                final File oldStyleFile = new File(basePath + "/" + checkedAlterZipName);
+                if (oldStyleFile.exists()) {
+                    _log.info("...Skipping old style checked-alter ZIP: " + basePath);
+                    final String skippedZipName = basePath + "/" + markBasicName + "-to-" + previousDate + ".zip";
+                    oldStyleFile.renameTo(new File(skippedZipName));
+                }
+            }
         }
     }
 

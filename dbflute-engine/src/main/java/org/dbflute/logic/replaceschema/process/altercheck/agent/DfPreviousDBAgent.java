@@ -87,7 +87,7 @@ public class DfPreviousDBAgent {
             if (!markFile.exists()) {
                 _log.info("...Marking previous-NG: " + ngMark);
                 markFile.createNewFile();
-                _alterControlAgent.writeControlNotice(markFile, notice);
+                _alterControlAgent.writeControlLogRoad(markFile, notice);
             }
         } catch (IOException e) {
             String msg = "Failed to create a file for previous-NG mark: " + ngMark;
