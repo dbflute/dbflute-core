@@ -77,7 +77,7 @@ public class DfUnreleasedAlterAgent {
     //  |  |  |  |  |-[date-time directory] e.g. 20190415_0123
     //  |  |  |  |  |   |-finished-alter-...zip
     //  |  |  |  |
-    //  |  |  |  |-unreleased-checked
+    //  |  |  |  |-unreleased-checked-alter
     //  |  |  |  |  |-DONT_EDIT_HERE.dfmark
     //  |  |  |  |  |-for-previous-20190712-2222.dfmark
     //  |  |  |  |  |-READONLY_alter-schema-ABC001.sql
