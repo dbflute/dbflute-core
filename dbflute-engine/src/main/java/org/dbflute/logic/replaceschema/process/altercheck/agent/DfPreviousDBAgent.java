@@ -87,7 +87,7 @@ public class DfPreviousDBAgent {
             if (!markFile.exists()) {
                 _log.info("...Marking previous-NG: " + ngMark);
                 markFile.createNewFile();
-                _alterControlAgent.writeNotice(markFile, notice);
+                _alterControlAgent.writeControlNotice(markFile, notice);
             }
         } catch (IOException e) {
             String msg = "Failed to create a file for previous-NG mark: " + ngMark;
@@ -137,7 +137,7 @@ public class DfPreviousDBAgent {
             return false;
         }
         deleteExtractedPreviousResource();
-        _log.info("...Extracting the previous resources from zip: " + resolvePath(previousZip));
+        _log.info("...Extracting previous resources from zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         final Set<String> traceSet = new HashSet<String>();
         archiver.extract(new File(getMigrationPreviousDir()), file -> {
@@ -184,12 +184,14 @@ public class DfPreviousDBAgent {
         if (previousFileList.isEmpty()) {
             return;
         }
-        _log.info("...Deleting the extracted previous resources");
+        _log.info("...Deleting extracted previous resources");
         for (File previousFile : previousFileList) {
             if (isPreviousZip(previousFile)) {
                 continue;
             }
-            _alterControlAgent.deleteFileWithMessage(previousFile, null);
+            if (previousFile.exists()) { // just in case
+                previousFile.delete();
+            }
         }
     }
 

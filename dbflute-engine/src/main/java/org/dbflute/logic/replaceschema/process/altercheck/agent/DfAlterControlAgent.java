@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.tools.ant.util.FileUtils;
@@ -58,8 +59,12 @@ public class DfAlterControlAgent {
     // -----------------------------------------------------
     //                                          Current Date
     //                                          ------------
-    public String currentDate() {
-        return DfTypeUtil.toString(DBFluteSystem.currentDate(), "yyyy/MM/dd HH:mm:ss");
+    public Date currentDate() {
+        return DBFluteSystem.currentDate();
+    }
+    
+    public String currentDateExp() {
+        return DfTypeUtil.toString(currentDate(), "yyyy/MM/dd HH:mm:ss");
     }
 
     // -----------------------------------------------------
@@ -73,22 +78,22 @@ public class DfAlterControlAgent {
 
     public void deletePreviousOKMark() {
         final String previousOKMark = getMigrationPreviousOKMark();
-        deleteFileWithMessage(new File(previousOKMark), "...Deleting the previous-OK mark");
+        deleteControlFile(new File(previousOKMark), "...Deleting previous-OK mark");
     }
 
     public void deleteNextNGMark() {
         final String replaceNGMark = getMigrationNextNGMark();
-        deleteFileWithMessage(new File(replaceNGMark), "...Deleting the next-NG mark");
+        deleteControlFile(new File(replaceNGMark), "...Deleting next-NG mark");
     }
 
     public void deleteAlterNGMark() {
         final String alterNGMark = getMigrationAlterNGMark();
-        deleteFileWithMessage(new File(alterNGMark), "...Deleting the alter-NG mark");
+        deleteControlFile(new File(alterNGMark), "...Deleting alter-NG mark");
     }
 
     public void deletePreviousNGMark() {
         final String previousNGMark = getMigrationPreviousNGMark();
-        deleteFileWithMessage(new File(previousNGMark), "...Deleting the previous-NG mark");
+        deleteControlFile(new File(previousNGMark), "...Deleting previous-NG mark");
     }
 
     // -----------------------------------------------------
@@ -131,7 +136,7 @@ public class DfAlterControlAgent {
     // -----------------------------------------------------
     //                                        File Operation
     //                                        --------------
-    public void deleteFileWithMessage(File file, String msg) {
+    public void deleteControlFile(File file, String msg) {
         if (file.exists()) {
             if (msg != null) {
                 _log.info(msg + ": " + resolvePath(file));
@@ -140,16 +145,7 @@ public class DfAlterControlAgent {
         }
     }
 
-    public void copyFile(File src, File dest) {
-        try {
-            FileUtils.getFileUtils().copyFile(src, dest);
-        } catch (IOException e) {
-            String msg = "Failed to copy file: " + src + " to " + dest;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
-    public void writeNotice(File file, String notice) throws IOException {
+    public void writeControlNotice(File file, String notice) throws IOException {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
@@ -161,6 +157,15 @@ public class DfAlterControlAgent {
                     bw.close();
                 } catch (IOException ignored) {}
             }
+        }
+    }
+
+    public void copyFile(File src, File dest) {
+        try {
+            FileUtils.getFileUtils().copyFile(src, dest);
+        } catch (IOException e) {
+            String msg = "Failed to copy file: " + src + " to " + dest;
+            throw new IllegalStateException(msg, e);
         }
     }
 

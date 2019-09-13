@@ -97,7 +97,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
     //                                                                        Check Status
     //                                                                        ============
     protected boolean checkSavePreviousInvalidStatus(DfAlterCheckFinalInfo finalInfo) {
-        final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        final List<File> alterSqlFileList = findMigrationAlterSqlFileList();
         if (!alterSqlFileList.isEmpty()) {
             setupAlterCheckSavePreviousInvalidStatusException(finalInfo);
         }
@@ -106,6 +106,10 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
             return false;
         }
         return true;
+    }
+
+    protected List<File> findMigrationAlterSqlFileList() {
+        return createBasicAlterSqlFileFinder().findResourceFileList(getMigrationAlterDirectory());
     }
 
     protected void setupAlterCheckSavePreviousInvalidStatusException(DfAlterCheckFinalInfo finalInfo) {
@@ -130,7 +134,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
     protected void compressPreviousResource() {
         deleteExistingPreviousZip();
         final File previousZip = getCurrentTargetPreviousZip();
-        _log.info("...Compressing the previous resources to zip: " + resolvePath(previousZip));
+        _log.info("...Compressing previous resources to zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         archiver.compress(new File(getMigrationPreviousDir()), file -> {
             final String name = file.getName();
@@ -191,7 +195,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
         if (copyToFile.exists()) {
             copyToFile.delete();
         }
-        _log.info("...Saving the file to " + resolvePath(copyToFile));
+        _log.info("...Saving replace-schema file to " + resolvePath(copyToFile));
         _alterControlAgent.copyFile(mainFile, copyToFile);
         copyToFileList.add(copyToFile);
     }
@@ -201,7 +205,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
     //                                                                     ===============
     protected boolean checkSavedPreviousResource(DfAlterCheckFinalInfo finalInfo) {
         final boolean unzipped = extractPreviousResource();
-        _log.info("...Checking the previous resources by replacing");
+        _log.info("...Checking previous resources by replacing");
         try {
             playPreviousSchema();
         } catch (RuntimeException threwLater) { // basically no way because of checked before saving
@@ -244,13 +248,13 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
             _log.info("...Marking previous-OK: " + okMark);
             markFile.createNewFile();
             final StringBuilder sb = new StringBuilder();
-            sb.append("[Saved Previous Resources]: " + _alterControlAgent.currentDate());
+            sb.append("[Saved Previous Resources]: " + _alterControlAgent.currentDateExp());
             for (File moveToFile : copyToFileList) {
                 sb.append(ln()).append(resolvePath(moveToFile));
             }
             sb.append(ln()).append("(").append(copyToFileList.size()).append(" files)");
             sb.append(ln());
-            writeNotice(markFile, sb.toString());
+            writeControlNotice(markFile, sb.toString());
         } catch (IOException e) {
             String msg = "Failed to create a file for previous-OK mark: " + okMark;
             throw new IllegalStateException(msg, e);
@@ -259,7 +263,7 @@ public class DfSavePreviousProcess extends DfAbstractAlterProcess {
 
     protected void deleteSavePreviousMark() {
         final String mark = getMigrationSavePreviousMark();
-        deleteFileWithMessage(new File(mark), "...Deleting the save-previous mark");
+        deleteControlFile(new File(mark), "...Deleting save-previous mark");
     }
 
     // ===================================================================================

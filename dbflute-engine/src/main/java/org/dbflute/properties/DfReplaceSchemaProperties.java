@@ -864,27 +864,36 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     }
 
     // -----------------------------------------------------
+    //                                          Alter Finder
+    //                                          ------------
+    public DfSchemaResourceFinder createMigrationBasicAlterSqlFileFinder() {
+        return doCreateMigrationAlterSqlFileFinder(null);
+    }
+
+    public DfSchemaResourceFinder createMigrationUnreleasedAlterSqlFileFinder() {
+        return doCreateMigrationAlterSqlFileFinder(getMigrationHistoryUnreleasedFilePrefix());
+    }
+
+    protected DfSchemaResourceFinder doCreateMigrationAlterSqlFileFinder(String superPrefix) {
+        final DfSchemaResourceFinder finder = new DfSchemaResourceFinder();
+        finder.addPrefix((superPrefix != null ? superPrefix : "") + getMigrationAlterSchemaSqlTitle());
+        finder.addSuffix(".sql");
+        List<String> supportedExtList = SystemScript.getSupportedExtList();
+        for (String supportedExt : supportedExtList) {
+            finder.addSuffix(supportedExt);
+        }
+        return finder;
+    }
+
+    // -----------------------------------------------------
     //                                          Alter Schema
     //                                          ------------
     public String getMigrationAlterDirectory() {
         return getMigrationDir() + "/alter";
     }
 
-    public List<File> getMigrationAlterSqlFileList() { // contains script files
-        final String targetDir = getMigrationAlterDirectory();
-        final String sqlTitle = getMigrationAlterSchemaSqlTitle();
-        final List<String> suffixList = new ArrayList<String>();
-        suffixList.add(".sql");
-        suffixList.addAll(SystemScript.getSupportedExtList());
-        return findSchemaResourceFileList(targetDir, sqlTitle, suffixList.toArray(new String[] {}));
-    }
-
     public String getMigrationAlterSchemaSqlTitle() {
         return "alter-schema";
-    }
-
-    public boolean hasMigrationAlterSqlResource() {
-        return !getMigrationAlterSqlFileList().isEmpty();
     }
 
     public File getMigrationSimpleAlterSqlFile() {
@@ -918,6 +927,47 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     public String getMigrationHistoryDir() {
         final String baseDirectory = getMigrationDir();
         return baseDirectory + "/history";
+    }
+
+    // e.g. directory structure for renewal2019
+    //  |-playsql
+    //  |  |
+    //  |  |-migration
+    //  |  |  |
+    //  |  |  |-alter
+    //  |  |  |
+    //  |  |  |-history
+    //  |  |  |  |-[date directory]
+    //  |  |  |  |  |-[date-time directory] e.g. 20190415_0123
+    //  |  |  |  |  |   |-finished-alter-...zip
+    //  |  |  |  |
+    //  |  |  |  |-unreleased-checked
+    //  |  |  |  |  |-DONT_EDIT_HERE.dfmark
+    //  |  |  |  |  |-for-previous-20190712-2222.dfmark
+    //  |  |  |  |  |-READONLY_alter-schema-ABC001.sql
+    //  |  |  |  |  |-READONLY_alter-schema-ABC002.sql
+    //  |  |  |
+    //  |  |  |-previous
+    //  |  |  |  |-previous-20190712-2222.zip
+
+    public String getMigrationHistoryUnreleasedDir() {
+        return getMigrationHistoryDir() + "/unreleased-checked";
+    }
+
+    public String getMigrationHistoryUnreleasedFilePrefix() {
+        return "READONLY_";
+    }
+
+    public String getMigrationHistoryUnreleasedNoticeMark() {
+        return getMigrationHistoryUnreleasedDir() + "/DONT_EDIT_HERE.dfmark";
+    }
+
+    public String getMigrationHistoryUnreleasedPreviousMark(String previousDate) {
+        return getMigrationHistoryUnreleasedDir() + "/for-previous-" + previousDate + ".dfmark";
+    }
+
+    public boolean isCompatibleMigrationHistoryCheckedZip() { // closet and maintenance, removed at future
+        return isProperty("isCompatibleMigrationHistoryCheckedZip", false, getReplaceSchemaMap());
     }
 
     // -----------------------------------------------------
@@ -960,8 +1010,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     }
 
     // -----------------------------------------------------
-    //                                         Mark Resource
-    //                                         -------------
+    //                                        Migration Mark
+    //                                        --------------
     public String getMigrationAlterCheckMark() {
         return doGetMigrationMark("alter-check.dfmark");
     }
@@ -1010,6 +1060,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return doHasMigrationMark(getMigrationPreviousNGMark());
     }
 
+    protected String doGetMigrationMark(String pureName) {
+        return getMigrationDir() + "/" + pureName;
+    }
+
+    protected boolean doHasMigrationMark(String markPath) {
+        return new File(markPath).exists();
+    }
+
+    // -----------------------------------------------------
+    //                                       AlterZIP prefix
+    //                                       ---------------
     public String getMigrationCheckedAlterMarkBasicName() {
         return "checked-alter";
     }
@@ -1022,14 +1083,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return "finished-alter";
     }
 
-    protected String doGetMigrationMark(String pureName) {
-        return getMigrationDir() + "/" + pureName;
-    }
-
-    protected boolean doHasMigrationMark(String markPath) {
-        return new File(markPath).exists();
-    }
-
+    // -----------------------------------------------------
+    //                                 SchemaOnly AlterCheck
+    //                                 ---------------------
     public boolean isSchemaOnlyAlterCheck() { // closet, to avoid big data loading
         return isProperty("isSchemaOnlyAlterCheck", false, getReplaceSchemaMap());
     }

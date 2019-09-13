@@ -50,7 +50,7 @@ public class DfHistoryZipAgent {
     //                                     Checked-Alter ZIP
     //                                     -----------------
     public String buildCheckedAlterZipName(String previousDate) {
-        return getMigrationCheckedAlterMarkBasicName() + "-to-" + previousDate + ".zip";
+        return doBuildAlterZipName(getMigrationCheckedAlterMarkBasicName(), previousDate);
     }
 
     // latest-checked only used at old DBFlute so parallel work problem causes, however renewal can resolve it
@@ -93,6 +93,20 @@ public class DfHistoryZipAgent {
             return null;
         }
         return listFiles[0]; // must be only one
+    }
+
+    // -----------------------------------------------------
+    //                                    Finished-Alter ZIP
+    //                                    ------------------
+    public String buildFinishedAlterZipName(String previousDate) { // for renewal logic
+        return doBuildAlterZipName(getMigrationFinishedAlterMarkBasicName(), previousDate);
+    }
+
+    // -----------------------------------------------------
+    //                                             Alter ZIP
+    //                                             ---------
+    protected String doBuildAlterZipName(String basicName, String previousDate) {
+        return basicName + "-to-" + previousDate + ".zip";
     }
 
     // -----------------------------------------------------
@@ -144,5 +158,9 @@ public class DfHistoryZipAgent {
     //                                         -------------
     public String getMigrationCheckedAlterMarkBasicName() {
         return getReplaceSchemaProperties().getMigrationCheckedAlterMarkBasicName();
+    }
+
+    public String getMigrationFinishedAlterMarkBasicName() {
+        return getReplaceSchemaProperties().getMigrationFinishedAlterMarkBasicName();
     }
 }

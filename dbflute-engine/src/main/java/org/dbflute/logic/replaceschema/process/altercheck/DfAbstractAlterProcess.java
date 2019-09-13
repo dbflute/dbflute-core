@@ -17,11 +17,11 @@ package org.dbflute.logic.replaceschema.process.altercheck;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
 import org.dbflute.logic.replaceschema.process.DfAbstractRepsProcess;
 import org.dbflute.logic.replaceschema.process.altercheck.agent.DfAlterControlAgent;
 import org.dbflute.logic.replaceschema.process.altercheck.agent.DfHistoryZipAgent;
@@ -126,12 +126,12 @@ public abstract class DfAbstractAlterProcess extends DfAbstractRepsProcess {
     // -----------------------------------------------------
     //                                        File Operation
     //                                        --------------
-    protected void deleteFileWithMessage(File file, String msg) {
-        _alterControlAgent.deleteFileWithMessage(file, msg);
+    protected void deleteControlFile(File file, String msg) {
+        _alterControlAgent.deleteControlFile(file, msg);
     }
 
-    protected void writeNotice(File file, String notice) throws IOException {
-        _alterControlAgent.writeNotice(file, notice);
+    protected void writeControlNotice(File file, String notice) throws IOException {
+        _alterControlAgent.writeControlNotice(file, notice);
     }
 
     // ===================================================================================
@@ -154,7 +154,11 @@ public abstract class DfAbstractAlterProcess extends DfAbstractRepsProcess {
     // -----------------------------------------------------
     //                                        Alter Resource
     //                                        --------------
-    protected List<File> getMigrationAlterSqlFileList() {
-        return getReplaceSchemaProperties().getMigrationAlterSqlFileList();
+    protected String getMigrationAlterDirectory() {
+        return getReplaceSchemaProperties().getMigrationAlterDirectory();
+    }
+
+    protected DfSchemaResourceFinder createBasicAlterSqlFileFinder() {
+        return getReplaceSchemaProperties().createMigrationBasicAlterSqlFileFinder();
     }
 }

@@ -156,7 +156,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
             if (!markFile.exists()) {
                 _log.info("...Marking next-NG: " + ngMark);
                 markFile.createNewFile();
-                writeNotice(markFile, notice);
+                writeControlNotice(markFile, notice);
             }
         } catch (IOException e) {
             String msg = "Failed to create a file for next-NG mark: " + ngMark;
@@ -232,13 +232,13 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     //                                            Alter Fire
     //                                            ----------
     protected void executeAlterSql(DfAlterCheckFinalInfo finalInfo) {
-        List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        List<File> alterSqlFileList = findMigrationAlterSqlFileList();
         if (alterSqlFileList.isEmpty()) {
             _unreleasedAlterAgent.restoreUnreleasedAlterSql();
-            alterSqlFileList = getMigrationAlterSqlFileList();
+            alterSqlFileList = findMigrationAlterSqlFileList();
             if (alterSqlFileList.isEmpty()) {
                 createEmptyAlterSqlFileIfNotExists();
-                alterSqlFileList = getMigrationAlterSqlFileList();
+                alterSqlFileList = findMigrationAlterSqlFileList();
                 if (alterSqlFileList.isEmpty()) { // no way
                     throwAlterCheckAlterSqlNotFoundException();
                 }
@@ -256,6 +256,10 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         }
     }
 
+    protected List<File> findMigrationAlterSqlFileList() {
+        return createBasicAlterSqlFileFinder().findResourceFileList(getMigrationAlterDirectory());
+    }
+
     protected File createEmptyAlterSqlFileIfNotExists() {
         final String alterDirPath = getMigrationAlterDirectory();
         {
@@ -267,7 +271,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         final File alterSqlFile = getMigrationSimpleAlterSqlFile();
         if (!alterSqlFile.exists()) {
             try {
-                _log.info("...Creating the alter SQL file as empty to " + resolvePath(alterSqlFile));
+                _log.info("...Creating alter SQL file as empty to " + resolvePath(alterSqlFile));
                 alterSqlFile.createNewFile();
             } catch (IOException e) {
                 String msg = "Failed to create new file: " + alterSqlFile;
@@ -400,7 +404,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     protected void deleteAlterCheckMark() {
         final String mark = getMigrationAlterCheckMark();
-        deleteFileWithMessage(new File(mark), "...Deleting the alter-check mark");
+        deleteControlFile(new File(mark), "...Deleting alter-check mark");
     }
 
     // ===================================================================================
@@ -482,7 +486,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
             if (!markFile.exists()) {
                 _log.info("...Marking alter-NG: " + ngMark);
                 markFile.createNewFile();
-                writeNotice(markFile, notice);
+                writeControlNotice(markFile, notice);
             }
         } catch (IOException e) {
             String msg = "Failed to create a file for alter-NG mark: " + ngMark;
@@ -531,7 +535,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         _log.info("|                   |");
         _log.info("+-------------------+");
         checkEmptyAlterSuccess(finalInfo);
-        _unreleasedAlterAgent.saveAlterSqlAsUnreleased(finalInfo);
+        _unreleasedAlterAgent.saveAlterAsUnreleased(finalInfo);
         deleteAllNGMark();
         deleteDiffResult();
     }
@@ -561,9 +565,9 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     protected void deleteAlterCheckResultDiff() {
         final String diffMap = getMigrationAlterCheckDiffMapFile();
-        deleteFileWithMessage(new File(diffMap), "...Deleting the AlterCheck diffmap file");
+        deleteControlFile(new File(diffMap), "...Deleting AlterCheck diffmap file");
         final String resultFile = getMigrationAlterCheckResultFilePath();
-        deleteFileWithMessage(new File(resultFile), "...Deleting the AlterCheck result file");
+        deleteControlFile(new File(resultFile), "...Deleting AlterCheck result file");
     }
 
     // ===================================================================================
@@ -572,8 +576,8 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     protected void deleteSchemaXml() {
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
-        deleteFileWithMessage(new File(previousXml), "...Deleting the SchemaXml file for previous schema");
-        deleteFileWithMessage(new File(nextXml), "...Deleting the SchemaXml file for next schema");
+        deleteControlFile(new File(previousXml), "...Deleting SchemaXml file for previous schema");
+        deleteControlFile(new File(nextXml), "...Deleting SchemaXml file for next schema");
     }
 
     protected void deleteCraftMeta() {
@@ -581,7 +585,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         if (craftMetaDir != null) {
             final List<File> metaFileList = getCraftMetaFileList(craftMetaDir);
             for (File metaFile : metaFileList) {
-                deleteFileWithMessage(metaFile, "...Deleting the craft meta");
+                deleteControlFile(metaFile, "...Deleting craft meta");
             }
         }
     }
@@ -592,10 +596,6 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     // -----------------------------------------------------
     //                                        Alter Resource
     //                                        --------------
-    protected String getMigrationAlterDirectory() {
-        return getReplaceSchemaProperties().getMigrationAlterDirectory();
-    }
-
     protected File getMigrationSimpleAlterSqlFile() {
         return getReplaceSchemaProperties().getMigrationSimpleAlterSqlFile();
     }
