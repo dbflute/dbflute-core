@@ -221,6 +221,10 @@ public class DfUnreleasedAlterAgent {
     protected void moveAlterSqlFileToUnreleasedDir(List<File> alterSqlFileList) {
         _log.info("...Moving alter SQL files to unreleased directory: " + alterSqlFileList.size());
         final String unreleasedDir = getMigrationHistoryUnreleasedDir();
+        final File unreleasedFileObj = new File(unreleasedDir);
+        if (!unreleasedFileObj.exists()) {
+            unreleasedFileObj.mkdirs();
+        }
         for (File alterSqlFile : alterSqlFileList) {
             final String prefix = getMigrationHistoryUnreleasedFilePrefix();
             final File unreleasedSqlFile = new File(unreleasedDir + "/" + prefix + alterSqlFile.getName());
@@ -232,10 +236,11 @@ public class DfUnreleasedAlterAgent {
     protected void makeUnreleasedNoticeMark() {
         final File noticeMark = new File(getMigrationHistoryUnreleasedNoticeMark());
         if (noticeMark.exists()) {
-            noticeMark.delete(); // to overwrite
+            noticeMark.delete(); // to overwrite as latest version
         }
         _log.info("...Marking notice in unreleased directory: " + resolvePath(noticeMark));
         try {
+            noticeMark.createNewFile();
             _alterControlAgent.writeMarkSimple(noticeMark, "This directory is managed by DBFlute (AlterCheck), so read-only.");
         } catch (IOException e) {
             String msg = "Failed to write notice mark file in unreleased directory: " + resolvePath(noticeMark);
@@ -246,10 +251,11 @@ public class DfUnreleasedAlterAgent {
     protected void markUnreleasedPreviousMark(String previousDate) {
         final File previousMark = new File(getMigrationHistoryUnreleasedPreviousMark(previousDate));
         if (previousMark.exists()) {
-            previousMark.delete();
+            previousMark.delete(); // to overwrite as latest version
         }
         _log.info("...Marking previous in unreleased directory: " + resolvePath(previousMark));
         try {
+            previousMark.createNewFile();
             _alterControlAgent.writeMarkSimple(previousMark, "The AlterDDL files are for the PreviousDB.");
         } catch (IOException e) {
             String msg = "Failed to write previous mark file in unreleased directory: " + resolvePath(previousMark);
