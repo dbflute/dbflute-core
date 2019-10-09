@@ -65,6 +65,7 @@ $database.checkProperties()
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 #set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}${glAllcommonPrefix}DBFluteBeansJavaConfig")
 #set ($glDBFluteModule = "${glProjectPrefix}${glAllcommonPrefix}DBFluteModule")
+#set ($glDBFluteBeansFactory = "${glProjectPrefix}${glAllcommonPrefix}DBFluteBeansFactory")
 #set ($glDBFluteDiXmlNamespace = "${database.DBFluteDiXmlNamespace}")
 #set ($glDBFluteDiXmlFileName = "${database.DBFluteDiXmlFileName}")
 #set ($glRdbDiXmlResourceName = "${database.RdbDiXmlResourceName}")
@@ -228,6 +229,22 @@ $database.info("public void parseContainerConfig() {")
   #set ($path = "${dbfluteDiXmlPackageName}/${glDBFluteDiXmlFileName}" )
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/lasta/DBFluteDiXml.${glTemplateFileExtension}", $path, "", "")
+#end
+#end
+#if ($database.isTargetContainerMicronaut())
+#if ($database.isDBFluteBeansGeneratedAsJavaConfig())
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteBeansFactory}.${glClassFileExtension}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/micronaut/MicronautDBFluteBeansFactory.${glTemplateFileExtension}", $path, "", "")
+#else
+  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
+  #set ($path = "${dbfluteBeansPackageName}" )
+  $database.makeDirectory($path)
+
+  #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/micronaut/MicronautDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #end
 #end
 #end
 $database.info("}")

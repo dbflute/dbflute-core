@@ -348,9 +348,13 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("lasta_di");
     }
 
+    public boolean isTargetContainerMicronaut() {
+        return getTargetContainerName().trim().equalsIgnoreCase("micronaut");
+    }
+
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi", "lasta_di")) {
+        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi", "lasta_di", "micronaut")) {
             return;
         }
         String msg = "The targetContainer is unknown: targetContainer=" + containerName;

@@ -1411,6 +1411,10 @@ public class Database {
         return getBasicProperties().isTargetContainerLastaDi();
     }
 
+    public boolean isTargetContainerMicronaut() {
+        return getBasicProperties().isTargetContainerMicronaut();
+    }
+
     // -----------------------------------------------------
     //                                             Extension
     //                                             ---------
