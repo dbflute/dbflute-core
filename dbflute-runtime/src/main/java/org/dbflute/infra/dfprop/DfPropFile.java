@@ -27,9 +27,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.exception.DfPropFileReadFailureException;
-import org.dbflute.exception.MapListStringDuplicateEntryException;
-import org.dbflute.exception.MapListStringParseFailureException;
 import org.dbflute.helper.dfmap.DfMapFile;
+import org.dbflute.helper.dfmap.exception.DfMapDuplicateEntryException;
+import org.dbflute.helper.dfmap.exception.DfMapParseFailureException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
@@ -119,16 +119,16 @@ public class DfPropFile {
     protected Map<String, Object> actuallyReadMap(String path) throws FileNotFoundException, IOException {
         try {
             return createMapFileStructural().readMap(createInputStream(path));
-        } catch (MapListStringDuplicateEntryException e) {
+        } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
-        } catch (MapListStringParseFailureException e) {
+        } catch (DfMapParseFailureException e) {
             throwDfPropMapStringParseFailureException(path, e);
             return null; // unreachable
         }
     }
 
-    protected void throwDfPropDuplicateEntryException(String path, MapListStringDuplicateEntryException e) {
+    protected void throwDfPropDuplicateEntryException(String path, DfMapDuplicateEntryException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Duplicate entry in the map file.");
         br.addItem("Advice");
@@ -154,7 +154,7 @@ public class DfPropFile {
         throw new DfPropFileReadFailureException(msg, e);
     }
 
-    protected void throwDfPropMapStringParseFailureException(String path, MapListStringParseFailureException e) {
+    protected void throwDfPropMapStringParseFailureException(String path, DfMapParseFailureException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the map file.");
         br.addItem("Advice");
@@ -209,7 +209,7 @@ public class DfPropFile {
     protected Map<String, String> actuallyReadMapAsStringValue(String path) throws FileNotFoundException, IOException {
         try {
             return createMapFileStructural().readMap(createInputStream(path), String.class);
-        } catch (MapListStringDuplicateEntryException e) {
+        } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
         }
@@ -249,7 +249,7 @@ public class DfPropFile {
             final DfMapFile mapFile = createMapFileStructural();
             final Map<String, Object> readMap = mapFile.readMap(createInputStream(path), Object.class);
             return convertToStringListMap(readMap);
-        } catch (MapListStringDuplicateEntryException e) {
+        } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
         }
@@ -300,7 +300,7 @@ public class DfPropFile {
             final DfMapFile mapFile = createMapFileStructural();
             final Map<String, Object> readMap = mapFile.readMap(createInputStream(path), Object.class);
             return convertToStringMapValue(readMap);
-        } catch (MapListStringDuplicateEntryException e) {
+        } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
         }
@@ -351,7 +351,7 @@ public class DfPropFile {
     protected List<Object> actuallyReadList(String path) throws FileNotFoundException, IOException {
         try {
             return createMapFileStructural().readList(createInputStream(path));
-        } catch (MapListStringDuplicateEntryException e) {
+        } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
         }
