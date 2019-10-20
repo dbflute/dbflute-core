@@ -182,6 +182,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     public void clearSpecifiedInfo() {
         if (__specifiedProperties != null) {
             __specifiedProperties.clear();
+            __specifiedProperties = null; // means completely no specification, needed for no check 
         }
     }
 
@@ -258,6 +259,11 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     /** {@inheritDoc} */
     public boolean createdBySelect() {
         return __createdBySelect;
+    }
+
+    /** {@inheritDoc} */
+    public void clearMarkAsSelect() {
+        __createdBySelect = false;
     }
 
     // ===================================================================================

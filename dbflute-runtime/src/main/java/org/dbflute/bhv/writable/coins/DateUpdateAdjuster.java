@@ -45,14 +45,24 @@ public class DateUpdateAdjuster { // may be used in velocity template
         }
         final DBMeta dbmeta = entity.asDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
-        for (ColumnInfo columnInfo : columnInfoList) {
-            if (columnInfo.isObjectNativeTypeDate()) {
-                // it does not need to read/write if LocalDate, but no-if to be simple
-                // (and read/write by columnInfo does not use reflection so no worry)
-                final Object dateValue = columnInfo.read(entity); // is date
-                if (dateValue != null) {
-                    columnInfo.write(entity, doTruncatePrecisionIfHasTime(columnInfo, dateValue));
+        final boolean createdBySelect = entity.createdBySelect();
+        if (createdBySelect) {
+            entity.clearMarkAsSelect(); // to avoid non-specified column check
+        }
+        try {
+            for (ColumnInfo columnInfo : columnInfoList) {
+                if (columnInfo.isObjectNativeTypeDate()) {
+                    // it does not need to read/write if LocalDate, but no-if to be simple
+                    // (and read/write by columnInfo does not use reflection so no worry)
+                    final Object dateValue = columnInfo.read(entity); // is date
+                    if (dateValue != null) {
+                        columnInfo.write(entity, doTruncatePrecisionIfHasTime(columnInfo, dateValue));
+                    }
                 }
+            }
+        } finally {
+            if (createdBySelect) {
+                entity.markAsSelect(); // restore
             }
         }
     }

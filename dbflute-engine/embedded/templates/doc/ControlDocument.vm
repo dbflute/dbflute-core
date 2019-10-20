@@ -20,12 +20,6 @@ $database.enableDocumentOutputDirectory()
 ## Initialize properties.
 ## - - - - - - - - - - - -
 $database.initializeVersion(90)
-#if ($selector.needsInitializeProperties())
-$database.initializeAdditionalPrimaryKey()
-$database.initializeAdditionalUniqueKey()
-$database.initializeAdditionalForeignKey()
-$database.initializeClassificationDeployment()
-#end
 
 ## - - - - - - - - - - - - - - - - - - - -
 ## Loading HTML resource before generation 
@@ -33,7 +27,7 @@ $database.initializeClassificationDeployment()
 ##  o but only sister HTMLs
 ## - - - - - - - - - - - - - - - - - - - -
 #if ($selector.isHistoryHtml())
-$selector.loadSchemaHistoryAsCore()
+$selector.lazyLoadIfNeedsCoreSchemaDiffList()
 $selector.loadHacoMap()
 #end
 #if ($selector.isPropertiesHtml())

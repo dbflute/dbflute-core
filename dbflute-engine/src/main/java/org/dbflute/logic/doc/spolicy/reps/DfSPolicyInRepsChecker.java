@@ -70,16 +70,21 @@ public class DfSPolicyInRepsChecker {
     // ===================================================================================
     //                                                                               Check
     //                                                                               =====
-    public void checkSchemaPolicyInRepsIfNeeds() {
+    public boolean checkSchemaPolicyInRepsIfNeeds() { // returns check executed or not
         final DfReplaceSchemaProperties repsProp = getReplaceSchemaProperties();
         if (!repsProp.isCheckSchemaPolicyInReps()) {
-            return;
+            return false;
         }
         final DfSchemaPolicyProperties policyProp = getSchemaPolicyProperties();
         if (!policyProp.hasPolicy()) {
-            return;
+            return false;
         }
-        _log.info("...Beginning schema policy check in replace-schema");
+        _log.info("");
+        _log.info("* * * * * * * * * * * *");
+        _log.info("*                     *");
+        _log.info("*    Schema Policy    *");
+        _log.info("*                     *");
+        _log.info("* * * * * * * * * * * *");
         final String schemaXml = repsProp.getSchemaPolicyInRepsSchemaXml();
         deleteTemporarySchemaXmlIfExists(schemaXml);
         final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(schemaXml);
@@ -88,13 +93,17 @@ public class DfSPolicyInRepsChecker {
             final DfSchemaXmlReader reader = createSchemaXmlReader(schemaXml);
             final AppData appData = reader.read();
             final Database database = appData.getDatabase();
-            initializeClassificationDeployment(database); // for "then classification"
+            initializeSupplementaryMetaData(database); // for e.g. "then classification"
             final DfSPolicyChecker checker = createChecker(policyProp, database);
             final DfSPolicyResult policyResult = checker.checkPolicyIfNeeds();
+            if (policyResult == null) { // no way already checked, just in case
+                return false;
+            }
             policyResult.ending(); // immediately handles violation (may be throw)
         } finally {
             deleteTemporarySchemaXmlIfExists(schemaXml);
         }
+        return true;
     }
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(final String schemaXml) {
@@ -106,9 +115,10 @@ public class DfSPolicyInRepsChecker {
         return DfSchemaXmlReader.createAsPlain(schemaXml, databaseType, /*readingFilter*/null); // filter unneeded
     }
 
-    protected void initializeClassificationDeployment(final Database database) {
-        final DfClassificationProperties clsProp = getClassificationProperties();
-        clsProp.initializeClassificationDeployment(database);
+    protected void initializeSupplementaryMetaData(Database database) {
+        // #thinking jflute fixedCondition's classification failure, needs to analyze deeply (2019/05/08)
+        //database.initializeSupplementaryMetaData();
+        database.initializeClassificationDeployment(); // only this since old days
     }
 
     protected DfSPolicyChecker createChecker(DfSchemaPolicyProperties policyProp, Database database) {

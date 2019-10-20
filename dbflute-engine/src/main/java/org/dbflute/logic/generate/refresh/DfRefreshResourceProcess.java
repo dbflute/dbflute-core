@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.dbflute.helper.mapstring.MapListString;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -161,22 +160,19 @@ public class DfRefreshResourceProcess {
     protected void handleRefreshIOException(IOException e) {
         final boolean retrySuccess = retryDefaultSecondary();
         if (!retrySuccess) {
-            show(buildIOExceptionMessage(e));
+            show(buildContinuedIOExceptionMessage(e));
         }
     }
 
-    protected String buildIOExceptionMessage(IOException ioEx) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to refresh the resources.");
-        br.addItem("Project List");
-        br.addElement(_projectNameList);
-        br.addItem("Request URL");
-        br.addElement(_requestUrl);
-        br.addItem("IOExpception");
+    protected String buildContinuedIOExceptionMessage(IOException ioEx) {
+        // not use ExceptionMessageBuilder to be simple (not need to be rich)
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Failed to refresh the resources (continued)");
+        sb.append(": url=").append(_requestUrl);
+        sb.append(", cause=").append(ioEx.getClass().getSimpleName());
         final String ioMsg = ioEx.getMessage();
-        br.addElement(ioEx.getClass().getSimpleName());
-        br.addElement(ioMsg != null ? ioMsg.trim() : null);
-        return br.buildExceptionMessage();
+        sb.append("(").append(ioMsg != null ? ioMsg.trim() : null).append(")");
+        return sb.toString();
     }
 
     // -----------------------------------------------------

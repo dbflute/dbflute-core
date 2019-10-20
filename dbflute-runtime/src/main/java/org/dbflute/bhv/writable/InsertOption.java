@@ -72,15 +72,13 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * <pre>
      * Member member = new Member();
      * member.set...(value);
-     * InsertOption&lt;MemberCB&gt; option = <span style="color: #CC4747">new InsertOption&lt;MemberCB&gt;()</span>;
+     * memberBhv.<span style="color: #CC4747">varyingInsert</span>(member, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// e.g. you can insert by your values for common columns</span>
+     *     op.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
      * 
-     * <span style="color: #3F7E5E">// e.g. you can insert by your values for common columns</span>
-     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
-     * 
-     * <span style="color: #3F7E5E">// e.g. you can insert by your values for primary key</span>
-     * option.<span style="color: #CC4747">disablePrimaryKeyIdentity</span>();
-     * 
-     * memberBhv.<span style="color: #CC4747">varyingInsert</span>(member, option);
+     *     <span style="color: #3F7E5E">// e.g. you can insert by your values for primary key</span>
+     *     op.<span style="color: #CC4747">disablePrimaryKeyIdentity</span>();
+     * });
      * </pre>
      */
     public InsertOption() {
@@ -99,16 +97,14 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * Member member = new Member();
      * member.setMemberId(3);
      * member.setOthers...(value);
-     * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #CC4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
-     *     public void query(MemberCB cb) {
+     * memberBhv.varyingUpdate(member, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     op.<span style="color: #CC4747">specify</span>(cb <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
      *         <span style="color: #3F7E5E">// with common columns for update and an exclusive control column</span>
      *         cb.specify().columnMemberName();
      *         cb.specify().columnBirthdate();
-     *     }
+     *     });
      * });
-     * memberBhv.varyingUpdate(member, option);
      * </pre>
      * @param insertColumnSpecification The query for specifying insert columns. (NotNull)
      */
@@ -363,9 +359,9 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setRegisterUser(registerUser);
      * member.setUpdateDatetime(updateDatetime);
      * member.setUpdateUser(updateUser);
-     * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
-     * memberBhv.varyingInsert(member, option);
+     * memberBhv.varyingInsert(member, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     op.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
+     * });
      * </pre>
      * @return The option of insert. (NotNull: returns this)
      */
@@ -388,9 +384,9 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * Member member = new Member();
      * member.setMemberId(123); <span style="color: #3F7E5E">// instead of identity</span>
      * member.setOthers...(value);
-     * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #CC4747">disablePrimaryKeyIdentity</span>();
-     * memberBhv.varyingInsert(member, option);
+     * memberBhv.varyingInsert(member, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     op.<span style="color: #CC4747">disablePrimaryKeyIdentity</span>();
+     * });
      * </pre>
      * @return The option of insert. (NotNull: returns this)
      */

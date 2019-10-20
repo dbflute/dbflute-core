@@ -133,6 +133,7 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
         _log.info("* Load Data         *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
+        final long before = System.currentTimeMillis();
         RuntimeException loadEx = null;
         try {
             // applicationPlaySql is used only for xls,
@@ -165,7 +166,9 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
         } catch (RuntimeException e) {
             loadEx = e;
         }
-        return createFinalInfo(loadEx);
+        final long after = System.currentTimeMillis();
+        final long processPerformanceMillis = after - before;
+        return createFinalInfo(loadEx, processPerformanceMillis);
     }
 
     // ===================================================================================
@@ -405,12 +408,11 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    protected DfLoadDataFinalInfo createFinalInfo(RuntimeException loadEx) {
+    protected DfLoadDataFinalInfo createFinalInfo(RuntimeException loadEx, long processPerformanceMillis) {
         final DfLoadDataFinalInfo finalInfo = new DfLoadDataFinalInfo();
+        finalInfo.setResultMessage("Load Data" + ": " + buildEnvTypeCountExp());
         final List<DfLoadedFile> loadedFileList = _loadedDataInfo.getLoadedFileList();
         final int loadedFileCount = loadedFileList.size();
-        final String title = "{Load Data}";
-        final String resultMessage = title + ": loaded-files=" + loadedFileCount;
         final boolean failure;
         final List<String> detailMessageList = new ArrayList<String>();
         if (_success) {
@@ -428,13 +430,45 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
             }
             detailMessageList.add("x (failed: Look at the exception message)");
         }
-        finalInfo.setResultMessage(resultMessage);
         for (String detailMessage : detailMessageList) {
             finalInfo.addDetailMessage(detailMessage);
         }
         finalInfo.setFailure(failure);
         finalInfo.setLoadEx(loadEx);
+        finalInfo.setProcessPerformanceMillis(processPerformanceMillis);
         return finalInfo;
+    }
+
+    protected String buildEnvTypeCountExp() {
+        final StringBuilder sb = new StringBuilder();
+        final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo.getLoadedFileListHierarchyMap();
+        if (!hierarchyMap.isEmpty()) {
+            int envEntryIndex = 0;
+            for (Entry<String, Map<String, List<DfLoadedFile>>> envEntry : hierarchyMap.entrySet()) {
+                if (envEntryIndex > 0) {
+                    sb.append(", ");
+                }
+                final String envType = envEntry.getKey();
+                sb.append(envType).append(":");
+
+                final Map<String, List<DfLoadedFile>> fileTypeLoadedMap = envEntry.getValue();
+                sb.append("{");
+                int fileEntryIndex = 0;
+                for (Entry<String, List<DfLoadedFile>> fileEntry : fileTypeLoadedMap.entrySet()) {
+                    if (fileEntryIndex > 0) {
+                        sb.append(", ");
+                    }
+                    final List<DfLoadedFile> loadedFileList = fileEntry.getValue();
+                    sb.append(fileEntry.getKey()).append("=").append(loadedFileList.size());
+                    ++fileEntryIndex;
+                }
+                sb.append("}");
+                ++envEntryIndex;
+            }
+        } else {
+            sb.append("*empty loading");
+        }
+        return sb.toString();
     }
 
     protected void setupDetailMessage(List<String> detailMessageList) {
@@ -456,11 +490,12 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
         if (fileTypeKeyListMap == null || fileTypeKeyListMap.isEmpty()) {
             return;
         }
-        detailMessageList.add("(" + envType + ")");
+        detailMessageList.add("<" + envType + ">");
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(FIRSTXLS_FILE_TYPE), 10);
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(REVERSEXLS_FILE_TYPE), 10);
-        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(TSV_FILE_TYPE), 3);
-        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(CSV_FILE_TYPE), 3);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(REVERSETSV_FILE_TYPE), 10);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(TSV_FILE_TYPE), 10);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(CSV_FILE_TYPE), 10);
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);
     }
 

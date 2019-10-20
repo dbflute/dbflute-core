@@ -33,7 +33,6 @@ public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
 
     // one exists, the others always does not exist
     protected final List<File> _alterSqlFileList = new ArrayList<File>();
-    protected final List<File> _submittedDraftFileList = new ArrayList<File>();
     protected int _alterSqlCount;
     protected SQLFailureException _breakCause;
     protected DfAlterCheckSavePreviousFailureException _savePreviousFailureEx;
@@ -77,14 +76,6 @@ public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
 
     public void addAlterSqlFileAll(List<File> alterSqlFileList) {
         this._alterSqlFileList.addAll(alterSqlFileList);
-    }
-
-    public List<File> getSubmittedDraftFileList() {
-        return _submittedDraftFileList;
-    }
-
-    public void addSubmittedDraftFileAll(List<File> submittedDraftFileList) {
-        this._submittedDraftFileList.addAll(submittedDraftFileList);
     }
 
     public int getAlterSqlCount() {

@@ -111,7 +111,8 @@ public interface Entity {
 
     /**
      * Clear the information of specified properties. (basically for Framework) <br>
-     * It means no check of access to non-specified columns.
+     * It means no check of access to non-specified columns. <br>
+     * And you cannot use myspecifyProperty() without modifiedToSpecified() call.
      */
     void clearSpecifiedInfo();
 
@@ -168,7 +169,7 @@ public interface Entity {
     //                                                                     Birthplace Mark
     //                                                                     ===============
     /**
-     * Mark as select that means the entity is created by DBFlute select process. (basically for Framework) <br>
+     * Mark birthplace as select that means the entity is created by DBFlute select process. (basically for Framework) <br>
      * e.g. determine columns of batch insert
      */
     void markAsSelect();
@@ -178,6 +179,11 @@ public interface Entity {
      * @return The determination, true or false.
      */
     boolean createdBySelect();
+
+    /**
+     * Clear birthplace mark as created-by-select. (basically for Framework)
+     */
+    void clearMarkAsSelect();
 
     // ===================================================================================
     //                                                                    Extension Method

@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.exception.ParseDateExpressionFailureException;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.dfmap.DfMapStyle;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.base.DfPropertyValueHandler;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
@@ -40,7 +42,8 @@ public class DfConventionalTakeAssertMap {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfConventionalTakeAssertMap.class);
-    private static final String KEY_conventionalTakeAssertMap = "conventionalTakeAssertMap";
+    protected static final String KEY_conventionalTakeAssertMap = "conventionalTakeAssertMap";
+    protected static final String EXAMPLE_DATE_EXPRESSION = "2018/05/03";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -134,7 +137,43 @@ public class DfConventionalTakeAssertMap {
     }
 
     public Date getErrorIfFirstDateAfter() { // null allowed
-        final String prop = _propertyValueHandler.getProperty("errorIfFirstDateAfter", null, getEmptyTableMap());
-        return prop != null ? new HandyDate(prop).getDate() : null;
+        final String key = "errorIfFirstDateAfter";
+        final String prop = _propertyValueHandler.getProperty(key, null, getEmptyTableMap());
+        if (prop != null && prop.length() > EXAMPLE_DATE_EXPRESSION.length()) { // e.g. has time part
+            throwConventionalTakeAssertIllegalDateExpressionFormatException(key, prop, null);
+        }
+        try {
+            return prop != null ? new HandyDate(prop).getDate() : null;
+        } catch (ParseDateExpressionFailureException e) {
+            throwConventionalTakeAssertIllegalDateExpressionFormatException(key, prop, e);
+            return null; // unreachable
+        }
     }
+
+    // ===================================================================================
+    //                                                                           Exception
+    //                                                                           =========
+    protected void throwConventionalTakeAssertIllegalDateExpressionFormatException(String key, String prop, RuntimeException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Illegal format of the date expression for firstDate.");
+        br.addItem("Advice");
+        br.addElement("The date expression for firstDate should be e.g. 2018/05/03");
+        br.addElement("(slash separator, no time part)");
+        br.addElement("Confirm your " + KEY_conventionalTakeAssertMap + ".");
+        br.addElement("For example:");
+        br.addElement("  (x): 2018/ab/cd");
+        br.addElement("  (x): 2018/05/03 12:34:56");
+        br.addElement("  (o): 2018/05/03");
+        br.addItem("Property Key");
+        br.addElement(key);
+        br.addItem("Property Value");
+        br.addElement(prop);
+        final String msg = br.buildExceptionMessage();
+        if (cause != null) {
+            throw new IllegalStateException(msg, cause);
+        } else {
+            throw new IllegalStateException(msg);
+        }
+    }
+
 }

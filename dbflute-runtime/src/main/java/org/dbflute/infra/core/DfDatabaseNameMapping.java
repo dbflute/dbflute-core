@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.dbway.DBDef;
-import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.helper.dfmap.DfMapStyle;
 
 /**
  * @author jflute
@@ -77,8 +77,8 @@ public class DfDatabaseNameMapping {
     //                                                                       Analyzing
     //                                                                       =========
     protected Map<String, Map<String, String>> analyze() {
-        final MapListString mapListString = new MapListString();
-        final Map<String, Object> map = mapListString.generateMap(_databaseNameMappingString);
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final Map<String, Object> map = mapStyle.fromMapString(_databaseNameMappingString);
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();
         final Set<Entry<String, Object>> entrySet = map.entrySet();
         for (Entry<String, Object> entry : entrySet) {

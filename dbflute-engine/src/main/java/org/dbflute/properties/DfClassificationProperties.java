@@ -1078,7 +1078,12 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
      * This method calls initializeClassificationDefinition() internally.
      * @param database The database object. (NotNull)
      */
-    public void initializeClassificationDeployment(Database database) { // this should be called when the task start
+    public void initializeClassificationDeployment(Database database) {
+        // this should be called immediately after creating schema data
+        // it should be called after additional-foreign-key initialization
+        // so no modification for now
+        _log.info("...Initializing ClassificationDeployment: project={}", database.getProjectName());
+
         // only overridden if called with same database
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
@@ -1169,6 +1174,8 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
         Map<String, String> plainMap = deploymentMap.get(tableName);
         if (plainMap == null) {
+            // should it be merged with all's map? no modification for now...
+            // (so needs to call initializeClassificationDeployment())
             final String allMark = MARK_allColumnClassification;
             if (deploymentMap.containsKey(allMark)) {
                 // because the mark is unresolved when ReplaceSchema task

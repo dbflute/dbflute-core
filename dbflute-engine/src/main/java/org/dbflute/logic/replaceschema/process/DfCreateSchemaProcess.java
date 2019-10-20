@@ -48,6 +48,7 @@ import org.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitial
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,14 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
     protected boolean _skippedInitializeSchema;
     protected boolean _alreadyExistsMainSchema;
     protected boolean _retryInitializeSchemaFinished;
+
+    // -----------------------------------------------------
+    //                                        Process Result
+    //                                        --------------
+    protected String _createSchemaPerformanceView;
+    protected boolean _initializeSchemaExecuted;
+    protected String _initializeSchemaPerformanceView;
+    protected Long _processPerformanceMillis;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -137,10 +146,16 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
     //                                                                             Execute
     //                                                                             =======
     public DfCreateSchemaFinalInfo execute() {
+        final long before = System.currentTimeMillis();
+
         checkBeforeInitialize();
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireResult fireResult = createSchema(runInfo);
+
+        final long after = System.currentTimeMillis();
+        _processPerformanceMillis = after - before;
+
         return createFinalInfo(fireResult);
     }
 
@@ -183,15 +198,21 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
     //                                                                   Initialize Schema
     //                                                                   =================
     protected void initializeSchema() {
+        final long before = System.currentTimeMillis();
+
         // additional first for dropping references to main schema
-        initializeSchemaAdditionalDrop();
-        initializeSchemaMainDrop();
+        final boolean additional = initializeSchemaAdditionalDrop();
+        final boolean main = initializeSchemaMainDrop();
+
+        final long after = System.currentTimeMillis();
+        _initializeSchemaExecuted = additional || main;
+        _initializeSchemaPerformanceView = DfTraceViewUtil.convertToPerformanceView(after - before);
     }
 
-    protected void initializeSchemaAdditionalDrop() {
+    protected boolean initializeSchemaAdditionalDrop() {
         final List<Map<String, Object>> additionalDropMapList = getReplaceSchemaProperties().getAdditionalDropMapList();
         if (additionalDropMapList.isEmpty()) {
-            return;
+            return false;
         }
         _log.info("");
         _log.info("* * * * * * * * * * * * * * * * * * * *");
@@ -201,8 +222,9 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
         _log.info("* * * * * * * * * * * * * * * * * * * *");
         if (_lazyConnection) {
             _log.info("*Passed because it's a lazy connection");
-            return;
+            return false;
         }
+        boolean initialized = false;
         for (Map<String, Object> additionalDropMap : additionalDropMapList) {
             final UnifiedSchema dropSchema = getReplaceSchemaProperties().getAdditionalDropSchema(additionalDropMap);
             final String dropUrl = getReplaceSchemaProperties().getAdditionalDropUrl(additionalDropMap);
@@ -221,11 +243,13 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
             final DfSchemaInitializer initializer = createSchemaInitializerAdditional(additionalDropMap);
             if (initializer != null) {
                 initializer.initializeSchema();
+                initialized = true;
             }
         }
+        return initialized;
     }
 
-    protected void initializeSchemaMainDrop() {
+    protected boolean initializeSchemaMainDrop() {
         _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
@@ -235,12 +259,15 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
         if (_lazyConnection) {
             _log.info("*Passed because it's a lazy connection");
             _skippedInitializeSchema = true;
-            return;
+            return false;
         }
         final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.MAIN);
+        boolean initialized = false;
         if (initializer != null) {
             initializer.initializeSchema();
+            initialized = true;
         }
+        return initialized;
     }
 
     protected DfSchemaInitializer createSchemaInitializer(InitializeType initializeType) {
@@ -269,10 +296,13 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
         _log.info("* Create Schema *");
         _log.info("*               *");
         _log.info("* * * * * * * * *");
+        final long before = System.currentTimeMillis();
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Create Schema");
         final DfSqlFileFireResult result = fireMan.fire(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
         destroyChangeUserConnection();
+        final long after = System.currentTimeMillis();
+        _createSchemaPerformanceView = DfTraceViewUtil.convertToPerformanceView(after - before);
         return result;
     }
 
@@ -581,12 +611,19 @@ public class DfCreateSchemaProcess extends DfAbstractRepsProcess {
     protected DfCreateSchemaFinalInfo createFinalInfo(DfSqlFileFireResult fireResult) {
         final DfCreateSchemaFinalInfo finalInfo = new DfCreateSchemaFinalInfo();
         finalInfo.setResultMessage(fireResult.getResultMessage());
+        if (_initializeSchemaExecuted) { // almost true (except e.g. lazy connection)
+            finalInfo.addDetailMessage("(Initialize Schema) - " + _initializeSchemaPerformanceView);
+        }
+        finalInfo.addDetailMessage("(Create Schema) - " + _createSchemaPerformanceView);
         final List<String> detailMessageList = extractDetailMessageList(fireResult);
         for (String detailMessage : detailMessageList) {
             finalInfo.addDetailMessage(detailMessage);
         }
         finalInfo.setBreakCause(fireResult.getBreakCause());
         finalInfo.setFailure(fireResult.isExistsError());
+        if (_processPerformanceMillis != null) { // basically true just in case
+            finalInfo.setProcessPerformanceMillis(_processPerformanceMillis);
+        }
         return finalInfo;
     }
 

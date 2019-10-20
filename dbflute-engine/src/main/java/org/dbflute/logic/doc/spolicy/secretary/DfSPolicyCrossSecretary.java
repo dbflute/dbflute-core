@@ -25,7 +25,9 @@ import java.util.stream.Collectors;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
@@ -143,7 +145,15 @@ public class DfSPolicyCrossSecretary {
 
     public String determineSameColumnDbTypeIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting) {
         final boolean ignoreEmpty = false; // basically cannot be empty
-        return determineSameWhatIfSameColumnName(myColumn, yourTargeting, col -> col.getDbType(), ignoreEmpty);
+        final Predicate<? super Column> forcedTargeting = col -> { // for both my and your
+            // serial type can be referred by e.g. integer column so normally it has difference
+            // and quit too complex comparing logic with other many number types so simply ignore
+            return !col.isDbTypePostgreSQLSerialFamily();
+        };
+        if (!forcedTargeting.test(myColumn)) {
+            return null; // out of target
+        }
+        return determineSameWhatIfSameColumnName(myColumn, yourTargeting.and(forcedTargeting), col -> col.getDbType(), ignoreEmpty);
     }
 
     public String determineSameColumnSizeIfSameColumnName(Column myColumn, Predicate<Column> yourTargeting) {
@@ -171,7 +181,7 @@ public class DfSPolicyCrossSecretary {
                 return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
             }
         }
-        return null;
+        return null; // no problem
 
         // memorable code before performance tuning
         //for (Table yourTable : myTable.getDatabase().getTableList()) {
@@ -447,5 +457,12 @@ public class DfSPolicyCrossSecretary {
 
     protected String toColumnExp(Column column) { // simple for comparing
         return column.getTable().getTableDispName() + "." + column.getName();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
     }
 }

@@ -122,5 +122,4 @@ public class DfLoadedDataInfo {
     public void acceptImplicitClassificationLazyCheck(List<DfLoadedClassificationLazyChecker> checkerList) {
         _loadedClassificationLazyChecker.addAll(checkerList);
     }
-
 }

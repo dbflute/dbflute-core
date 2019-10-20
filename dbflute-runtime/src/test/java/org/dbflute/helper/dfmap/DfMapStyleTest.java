@@ -244,7 +244,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
+        showMap(resultMap);
         assertEquals("value1", resultMap.get("key1"));
         assertEquals(Arrays.asList(new String[] { "value2-1", "value2-2", "value2-3" }), resultMap.get("key2"));
         assertEquals("value3", resultMap.get("key3"));
@@ -259,7 +259,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
+        showMap(resultMap);
         assertEquals(resultMap.get("key1"), "value1");
         assertEquals(resultMap.get("key2"), null);
         assertEquals(resultMap.get("key3"), Arrays.asList(new String[] { null, "value3-2", null, null }));
@@ -275,7 +275,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> generatedMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(generatedMap);
+        showMap(generatedMap);
         assertEquals("value1", generatedMap.get("key1"));
         assertEquals("value2", generatedMap.get("key2"));
         assertEquals("val\nue3", generatedMap.get("key3"));
@@ -291,7 +291,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> generatedMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(generatedMap);
+        showMap(generatedMap);
     }
 
     // ===================================================================================
@@ -314,12 +314,9 @@ public class DfMapStyleTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
-    //                                                                       Specification
-    //                                                                       =============
-    // -----------------------------------------------------
-    //                                             Duplicate
-    //                                             ---------
-    public void test_fromMapString_duplicate_basic() throws Exception {
+    //                                                                     Duplicate Entry
+    //                                                                     ===============
+    public void test_duplicate_fromMapString_basic() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         final String mapString = "map:{key1=value1;key2=value2;key1=value3}";
@@ -328,12 +325,12 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
+        showMap(resultMap);
         assertEquals("value3", resultMap.get("key1"));
         assertEquals("value2", resultMap.get("key2"));
     }
 
-    public void test_fromMapString_duplicate_nested() throws Exception {
+    public void test_duplicate_fromMapString_nested() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         final String mapString = "map:{key1=value1;key1=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
@@ -342,12 +339,12 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
+        showMap(resultMap);
         assertEquals(newHashMap("key1", "value2", "key2", "value4"), resultMap.get("key1"));
         assertEquals("value3", resultMap.get("key3"));
     }
 
-    public void test_fromMapString_duplicate_checked_basic() throws Exception {
+    public void test_duplicate_fromMapString_checked_basic() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
         final String mapString = "map:{key1=value1;key2=map:{key1=value2;key2=value3;key2=value4};key1=value3}";
@@ -362,7 +359,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         }
     }
 
-    public void test_fromMapString_duplicate_checked_list() throws Exception {
+    public void test_duplicate_fromMapString_checked_list() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
         final String mapString = "map:{key1=value1;key1=list:{a;b;c};key3=value3}";
@@ -377,7 +374,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         }
     }
 
-    public void test_fromMapString_duplicate_checked_map() throws Exception {
+    public void test_duplicate_fromMapString_checked_map() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
         final String mapString = "map:{key1=value1;key1=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
@@ -392,7 +389,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         }
     }
 
-    public void test_fromMapString_duplicate_checked_nested() throws Exception {
+    public void test_duplicate_fromMapString_checked_nested() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle().checkDuplicateEntry();
         final String mapString = "map:{key1=value1;key2=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
@@ -407,10 +404,13 @@ public class DfMapStyleTest extends RuntimeTestCase {
         }
     }
 
+    // ===================================================================================
+    //                                                                         Escape Mark
+    //                                                                         ===========
     // -----------------------------------------------------
-    //                                                Escape
-    //                                                ------
-    public void test_fromMapString_escape_basic() throws Exception {
+    //                                           Map String
+    //                                           -----------
+    public void test_escape_mapString_basic() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         final String mapString = "map:{ke\\{y1\"=v\\;\\}al\\}u\\=e\\\\}1\\ }"; // needs space
@@ -419,11 +419,14 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
-        assertEquals("v;}al}u=e\\}1\\", resultMap.get("ke{y1\""));
+        showMap(resultMap);
+        assertEquals("v;}al}u=e\\}1\\", resultMap.get("ke{y1\"")); // escaping escape char is not supported
+        String reversed = mapStyle.toMapString(resultMap);
+        log(reversed);
+        assertContains(reversed, "; ke\\{y1\" = v\\;\\}al\\}u\\=e\\\\}1\\");
     }
 
-    public void test_fromMapString_escape_border() throws Exception {
+    public void test_escape_mapString_border() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         final String mapString = "map:{\\{key1\\;=\\\\{v\\;al\\}u\\=e\\}1\\;\\}}";
@@ -432,59 +435,14 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
+        showMap(resultMap);
         assertEquals("\\{v;al}u=e}1;}", resultMap.get("{key1;"));
+        String reversed = mapStyle.toMapString(resultMap);
+        log(reversed);
+        assertContains(reversed, "; \\{key1\\; = \\\\{v\\;al\\}u\\=e\\}1\\;\\}");
     }
 
-    // -----------------------------------------------------
-    //                                                Quoted
-    //                                                ------
-    public void test_fromMapString_quoted_basic() throws Exception {
-        // ## Arrange ##
-        final DfMapStyle mapStyle = new DfMapStyle();
-        final String mapString = "map:{key1=\"value1\"}";
-
-        // ## Act ##
-        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
-
-        // ## Assert ##
-        showGeneratedMap(resultMap);
-        assertEquals("\"value1\"", resultMap.get("key1")); // keep quoted
-    }
-
-    // -----------------------------------------------------
-    //                                               Trimmed
-    //                                               -------
-    public void test_fromMapString_trimmed_basic() throws Exception {
-        // ## Arrange ##
-        final DfMapStyle mapStyle = new DfMapStyle();
-        final String mapString = "  map:{ key1    = value1  }      ";
-
-        // ## Act ##
-        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
-
-        // ## Assert ##
-        showGeneratedMap(resultMap);
-        assertEquals("value1", resultMap.get("key1"));
-    }
-
-    // -----------------------------------------------------
-    //                                              Surprise
-    //                                              --------
-    public void test_fromMapString_surprise_beginPrefixInValue() throws Exception {
-        // ## Arrange ##
-        final DfMapStyle mapStyle = new DfMapStyle();
-        final String mapString = "map:{key1=value1 map:value2 list:{ }";
-
-        // ## Act ##
-        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
-
-        // ## Assert ##
-        showGeneratedMap(resultMap);
-        assertEquals("value1 map:value2 list:{", resultMap.get("key1"));
-    }
-
-    public void test_fromMapString_surprise_two_equal() throws Exception {
+    public void test_escape_mapString_two_equal() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         final String mapString = "map:{key1=value1=value2}";
@@ -493,14 +451,172 @@ public class DfMapStyleTest extends RuntimeTestCase {
         final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
 
         // ## Assert ##
-        showGeneratedMap(resultMap);
-        assertEquals("value1=value2", resultMap.get("key1"));
+        showMap(resultMap);
+        assertEquals("value1=value2", resultMap.get("key1")); // no need to escape here
+        String reversed = mapStyle.toMapString(resultMap);
+        log(reversed);
+        assertContains(reversed, "; key1 = value1\\=value2");
+    }
+
+    // -----------------------------------------------------
+    //                                           List String
+    //                                           -----------
+    public void test_escape_listString_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "list:{ke\\{y1\"=>v\\;\\}al\\}u\\=e\\\\}1\\ }"; // needs space
+
+        // ## Act ##
+        final List<Object> resultList = mapStyle.fromListString(mapString);
+
+        // ## Assert ##
+        showList(resultList);
+        assertEquals("ke{y1\"=>v;}al}u=e\\}1\\", resultList.get(0)); // escaping escape char is not supported
+        String reversed = mapStyle.toListString(resultList);
+        log(reversed);
+        assertContains(reversed, "ke\\{y1\"\\=>v\\;\\}al\\}u\\=e\\\\}1\\");
+    }
+
+    public void test_escape_listString_ignoreEqualAsEscape() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle() {
+            @Override
+            protected boolean isIgnoreEqualAsEscapeControlMarkInList() {
+                return true;
+            }
+        };
+        final String mapString = "list:{ke\\{y1\"=>v\\;\\}al\\}u\\=e\\\\}1\\ }"; // needs space
+
+        // ## Act ##
+        final List<Object> resultList = mapStyle.fromListString(mapString);
+
+        // ## Assert ##
+        showList(resultList);
+        assertEquals("ke{y1\"=>v;}al}u=e\\}1\\", resultList.get(0)); // escaping escape char is not supported
+        String reversed = mapStyle.toListString(resultList);
+        log(reversed);
+        assertContains(reversed, "ke\\{y1\"=>v\\;\\}al\\}u=e\\\\}1\\");
+    }
+
+    public void test_escape_listString_ignoreEqualAsUnescape() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle() {
+            @Override
+            protected boolean isIgnoreEqualAsUnescapeControlMarkInList() {
+                return true;
+            }
+        };
+        final String mapString = "list:{ke\\{y1\"=>v\\;\\}al\\}u\\=e\\\\}1\\ }"; // needs space
+
+        // ## Act ##
+        final List<Object> resultList = mapStyle.fromListString(mapString);
+
+        // ## Assert ##
+        showList(resultList);
+        assertEquals("ke{y1\"=>v;}al}u\\=e\\}1\\", resultList.get(0)); // escaping escape char is not supported
+        String reversed = mapStyle.toListString(resultList);
+        log(reversed);
+        assertContains(reversed, "ke\\{y1\"\\=>v\\;\\}al\\}u\\\\=e\\\\}1\\");
+    }
+
+    public void test_escape_listString_inMap_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{ s\\=ea = list:{ke\\{y1\"=>v\\;\\}al\\}u\\=e\\\\}1\\ } }";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showMap(resultMap);
+        @SuppressWarnings("unchecked")
+        List<Object> elementList = (List<Object>) resultMap.get("s=ea");
+        assertEquals("ke{y1\"=>v;}al}u=e\\}1\\", elementList.get(0)); // escaping escape char is not supported
+        String reversed = mapStyle.toMapString(resultMap);
+        log(reversed);
+        assertContains(reversed, "ke\\{y1\"\\=>v\\;\\}al\\}u\\=e\\\\}1\\");
+    }
+
+    public void test_escape_listString_inMap_ignoreEqualAsUnescape() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle() {
+            @Override
+            protected boolean isIgnoreEqualAsUnescapeControlMarkInList() {
+                return true;
+            }
+        };
+        final String mapString = "map:{ s\\=ea = list:{ke\\{y1\"=>v\\;\\}al\\}u\\=e\\\\}1\\ } ; land = one=man }";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showMap(resultMap);
+        @SuppressWarnings("unchecked")
+        List<Object> elementList = (List<Object>) resultMap.get("s=ea");
+        assertEquals("ke{y1\"=>v;}al}u\\=e\\}1\\", elementList.get(0)); // escaping escape char is not supported
+        assertEquals("one=man", resultMap.get("land"));
+        String reversed = mapStyle.toMapString(resultMap);
+        log(reversed);
+        assertContains(reversed, "ke\\{y1\"\\=>v\\;\\}al\\}u\\\\=e\\\\}1\\");
+        assertContains(reversed, "one\\=man");
+    }
+
+    // ===================================================================================
+    //                                                               Various Specification
+    //                                                               =====================
+    // -----------------------------------------------------
+    //                                                Quoted
+    //                                                ------
+    public void test_quoted_fromMapString_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=\"value1\"}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showMap(resultMap);
+        assertEquals("\"value1\"", resultMap.get("key1")); // keep quoted
+    }
+
+    // -----------------------------------------------------
+    //                                               Trimmed
+    //                                               -------
+    public void test_trimmed_fromMapString_basic() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "  map:{ key1    = value1  }      ";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showMap(resultMap);
+        assertEquals("value1", resultMap.get("key1"));
+    }
+
+    // -----------------------------------------------------
+    //                                              Surprise
+    //                                              --------
+    public void test_surprise_fromMapString_beginPrefixInValue() throws Exception {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+        final String mapString = "map:{key1=value1 map:value2 list:{ }";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = mapStyle.fromMapString(mapString);
+
+        // ## Assert ##
+        showMap(resultMap);
+        assertEquals("value1 map:value2 list:{", resultMap.get("key1"));
     }
 
     // -----------------------------------------------------
     //                                               Illegal
     //                                               -------
-    public void test_fromMapString_parse_failure() throws Exception {
+    public void test_parse_fromMapString_failure() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
 
@@ -530,7 +646,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
     // -----------------------------------------------------
     //                                           Performance
     //                                           -----------
-    public void test_fromMapString_performance_check() throws Exception {
+    public void test_performance_fromMapString_check() throws Exception {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         String mapString;
@@ -571,7 +687,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    protected void showGeneratedMap(Map<String, Object> generatedMap) {
+    protected void showMap(Map<String, Object> generatedMap) {
         final String targetString = generatedMap.toString();
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append(targetString);

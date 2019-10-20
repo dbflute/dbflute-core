@@ -100,11 +100,12 @@ public class DfSqlFileFireMan {
     protected void buildResultMessage(List<File> sqlFileList, final DfSqlFileFireResult fireResult, int goodSqlCount, int totalSqlCount,
             final String title) {
         final StringBuilder resultSb = new StringBuilder();
-        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount);
+        resultSb.append(title).append(": success=").append(goodSqlCount);
+        resultSb.append(", failure=");
         if (fireResult.getBreakCause() != null) {
-            resultSb.append(" failure=1 *break");
+            resultSb.append("1 *break");
         } else { // normal or continue-error
-            resultSb.append(" failure=").append(totalSqlCount - goodSqlCount);
+            resultSb.append(totalSqlCount - goodSqlCount);
         }
         resultSb.append(" (in ").append(sqlFileList.size()).append(" files)");
         fireResult.setResultMessage(resultSb.toString());

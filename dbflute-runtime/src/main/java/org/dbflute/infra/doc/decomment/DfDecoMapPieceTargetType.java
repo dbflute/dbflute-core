@@ -90,7 +90,7 @@ public enum DfDecoMapPieceTargetType implements Classification {
     }
 
     public ClassificationMeta meta() {
-        // TODO cabos confirm it by jflute (2017/11/11)
+        // done cabos confirm it by jflute (2017/11/11)
         return new ClassificationMeta() { // may be used by LastaFlute (in DBFlute Intro)
 
             @Override

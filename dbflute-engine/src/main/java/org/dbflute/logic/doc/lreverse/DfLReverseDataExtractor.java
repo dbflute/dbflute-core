@@ -26,6 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.sql.DataSource;
 
@@ -37,6 +39,7 @@ import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadStringConverter;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.jdbc.ValueType;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.s2dao.valuetype.basic.StringType;
 import org.dbflute.s2dao.valuetype.basic.TimeType;
@@ -45,10 +48,12 @@ import org.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.dbflute.s2dao.valuetype.plugin.StringClobType;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
+ * @author p1us2er0
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfLReverseDataExtractor {
@@ -56,6 +61,9 @@ public class DfLReverseDataExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // e.g. join count limit of MySQL: 60
+    // however too big SQL so small size for now (may be enough)
+    protected final int MAX_SELF_REFERENCE_DEPTH = 10;
     protected final DataSource _dataSource;
     protected int _extractingLimit = -1;
     protected int _largeBorder = -1;
@@ -91,7 +99,7 @@ public class DfLReverseDataExtractor {
         boolean large = false;
         if (_largeBorder >= 0) {
             if (_extractingLimit < 0 || _largeBorder < _extractingLimit) {
-                final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+                final DfJdbcFacade facade = createJdbcFacade();
                 final int countAll = facade.selectCountAll(tableSqlName);
                 if (countAll > _largeBorder) { // it's large
                     large = true;
@@ -99,15 +107,96 @@ public class DfLReverseDataExtractor {
             }
         }
 
-        final String sql = buildExtractingSql(table);
-        if (large) {
-            return processLargeData(table, sql);
+        final List<String> sqlList = DfCollectionUtil.newArrayList();
+        buildSelfReferenceExtractingTrySqlList(table).ifPresent(trySqlList -> {
+            sqlList.addAll(trySqlList);
+        });
+        sqlList.add(buildDefaultExtractionSql(table));
+        if (large) { // also mainly here if e.g. xlsLimit = 0
+            return processLargeData(table, sqlList);
         } else { // mainly here
-            return processNormalData(table, sql);
+            return processNormalData(table, sqlList);
         }
     }
 
-    protected String buildExtractingSql(Table table) {
+    // ===================================================================================
+    //                                                                      Extraction SQL
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                        Self Reference
+    //                                        --------------
+    protected OptionalThing<List<String>> buildSelfReferenceExtractingTrySqlList(Table table) {
+        final ForeignKey selfReferenceFK = table.getSelfReferenceForeignKey();
+        if (selfReferenceFK == null || !selfReferenceFK.isSimpleKeyFK()) {
+            return OptionalThing.empty();
+        }
+
+        final String tableSqlName = table.getTableSqlNameDirectUse();
+        final Column firstLocalColumn = table.getColumn(selfReferenceFK.getFirstLocalColumnName());
+        final String firstLocalName = firstLocalColumn.getColumnSqlNameDirectUse();
+        final Column firstForeignColumn = table.getColumn(selfReferenceFK.getFirstForeignColumnName());
+        final String firstForeignName = firstForeignColumn.getColumnSqlNameDirectUse();
+
+        final List<String> sqlList = DfCollectionUtil.newArrayList();
+        sqlList.add(doBuildSelfReferenceRecursiveSql(table, tableSqlName, firstLocalName, firstForeignName));
+        sqlList.add(doBuildSelfReferenceJoinJoinSql(table, tableSqlName, firstLocalName, firstForeignName));
+        return OptionalThing.of(sqlList);
+    }
+
+    protected String doBuildSelfReferenceRecursiveSql(Table table, String tableSqlName, String firstLocalName, String firstForeignName) {
+        String sql = "with recursive cte as "
+                + "(select * from %1$s where %2$s is null union all select child.* from %1$s AS child, cte where cte.%3$s = child.%2$s)"
+                + " select * from cte";
+        return String.format(sql, tableSqlName, firstLocalName, firstForeignName);
+    }
+
+    protected String doBuildSelfReferenceJoinJoinSql(Table table, String tableSqlName, String firstLocalName, String firstForeignName) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select ");
+
+        sb.append(table.getColumnList().stream().map(column -> {
+            return "dfloc." + column.getColumnSqlNameDirectUse();
+        }).collect(Collectors.joining(", ")));
+
+        // e.g.
+        //  from PARENT_CATEGORY dfloc
+        //    left outer join PRODUCT_CATEGORY dfrel_0 on dfloc.PARENT_CATEGORY_CODE = dfrel_0.PRODUCT_CATEGORY_CODE
+        //    left outer join PRODUCT_CATEGORY dfrel_1 on dfrel_0.PARENT_CATEGORY_CODE = dfrel_1.PRODUCT_CATEGORY_CODE
+        //    ...
+        sb.append(IntStream.range(0, MAX_SELF_REFERENCE_DEPTH).mapToObj(index -> {
+            return " left outer join " + tableSqlName + " dfrel_" + index // e.g. left outer join PRODUCT_CATEGORY dfrel_0
+                    + " on " + (index == 0 ? "dfloc" : "dfrel_" + (index - 1)) + "." + firstLocalName // e.g. on dfloc.PARENT_CATEGORY_CODE
+                    + " = dfrel_" + index + "." + firstForeignName; // e.g. = dfrel_0.PRODUCT_CATEGORY_CODE
+        }).collect(Collectors.joining("", " from " + tableSqlName + " dfloc", "")));
+
+        // e.g. (actually no line separator)
+        //  order by case when dfloc.PARENT_CATEGORY_CODE is null then 0 else 1 end asc
+        //         , case when dfrel_0.PARENT_CATEGORY_CODE is null then 0 else 1 end asc
+        //         , case when dfrel_1.PARENT_CATEGORY_CODE is null then 0 else 1 end asc
+        //         , ...
+        //         , dfloc.PRODUCT_CATEGORY_CODE asc
+        sb.append(IntStream.range(0, MAX_SELF_REFERENCE_DEPTH).mapToObj(index -> {
+            final StringBuilder casewhenSb = new StringBuilder();
+            final String caseWhen = " case when ";
+            final String zeroElseOneAsc = " is null then 0 else 1 end asc,";
+            if (index == 0) {
+                // for base-point table
+                //  e.g. case when dfloc.PARENT_CATEGORY_CODE is null then 0 else 1 end asc,
+                casewhenSb.append(caseWhen + "dfloc.").append(firstLocalName).append(zeroElseOneAsc);
+            }
+            // for relationship table
+            //  e.g. case when dfrel_0.PARENT_CATEGORY_CODE is null then 0 else 1 end asc,
+            casewhenSb.append(caseWhen).append("dfrel_").append(index).append(".").append(firstLocalName).append(zeroElseOneAsc);
+            return casewhenSb.toString();
+        }).collect(Collectors.joining("", " order by", " dfloc." + firstForeignName + " asc")));
+
+        return sb.toString();
+    }
+
+    // -----------------------------------------------------
+    //                                    Default Extraction
+    //                                    ------------------
+    protected String buildDefaultExtractionSql(Table table) {
         final String sql;
         {
             final List<Column> columnList = table.getColumnList();
@@ -121,131 +210,6 @@ public class DfLReverseDataExtractor {
         return sql;
     }
 
-    // ===================================================================================
-    //                                                                         Normal Data
-    //                                                                         ===========
-    protected DfLReverseDataResult processNormalData(Table table, String sql) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
-        final DfJFadStringConverter converter = createStringConverter();
-        final Integer limit = _extractingLimit;
-        final List<Map<String, String>> resultList = facade.selectStringList(sql, valueTypeMap, converter, limit);
-        return new DfLReverseDataResult(resultList);
-    }
-
-    // ===================================================================================
-    //                                                                          Large Data
-    //                                                                          ==========
-    protected DfLReverseDataResult processLargeData(Table table, final String sql) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
-        final DfJFadStringConverter converter = createStringConverter();
-        final DfJFadCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
-        return new DfLReverseDataResult(callback);
-    }
-
-    public class DfLReverseLargeDataResultSetWrapper {
-        protected final ResultSet _rs;
-        protected final Map<String, ValueType> _columnValueTypeMap;
-
-        public DfLReverseLargeDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
-            _rs = rs;
-            _columnValueTypeMap = columnValueTypeMap;
-        }
-
-        public boolean next() throws SQLException {
-            return _rs.next();
-        }
-
-        public String getString(String columnName) throws SQLException {
-            final ValueType valueType = _columnValueTypeMap.get(columnName);
-            return convertToStringValue(valueType.getValue(_rs, columnName));
-        }
-    }
-
-    // ===================================================================================
-    //                                                                       JDBC Handling
-    //                                                                       =============
-    protected Map<String, ValueType> createColumnValueTypeMap(List<Column> columnList) {
-        final Map<String, ValueType> valueTypeMap = new LinkedHashMap<String, ValueType>();
-        for (Column column : columnList) {
-            final String columnName = column.getName();
-
-            // create value type for the column
-            final ValueType valueType;
-            if (column.isJavaNativeStringObject()) {
-                if (column.isDbTypeStringClob()) {
-                    valueType = new StringClobType();
-                } else {
-                    valueType = new StringType();
-                }
-            } else if (column.isJavaNativeDateObject()) {
-                // date types should be treated correctly
-                if (column.isJdbcTypeTime()) {
-                    valueType = new TimeType();
-                } else if (column.isJdbcTypeTimestamp()) {
-                    valueType = new TimestampType();
-                } else if (column.isJdbcTypeDate()) {
-                    if (column.isDbTypeOracleDate()) {
-                        valueType = new UtilDateAsTimestampType();
-                    } else {
-                        valueType = new UtilDateAsSqlDateType();
-                    }
-                } else { // no way
-                    valueType = new TimestampType();
-                }
-            } else if (column.isJavaNativeBinaryObject()) {
-                // unsupported BLOG as loda data
-                valueType = new NullBytesType();
-            } else {
-                // other types are treated as string
-                // because ReplaceSchema can accept them
-                valueType = new StringType();
-            }
-
-            valueTypeMap.put(columnName, valueType);
-        }
-        return valueTypeMap;
-    }
-
-    protected static class NullBytesType extends BytesType {
-
-        public NullBytesType() {
-            super(BytesType.BLOB_TRAIT);
-        }
-
-        @Override
-        public Object getValue(ResultSet rs, int index) throws SQLException {
-            return null;
-        };
-
-        @Override
-        public Object getValue(ResultSet rs, String columnName) throws SQLException {
-            return null;
-        };
-    }
-
-    protected void close(Connection conn, Statement st, ResultSet rs) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException ignored) {}
-        }
-        if (st != null) {
-            try {
-                st.close();
-            } catch (SQLException ignored) {}
-        }
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException ignored) {}
-        }
-    }
-
-    // ===================================================================================
-    //                                                                          SQL Clause
-    //                                                                          ==========
     protected String buildSelectClause(List<Column> columnList) {
         final StringBuilder sb = new StringBuilder();
         for (Column column : columnList) {
@@ -291,6 +255,136 @@ public class DfLReverseDataExtractor {
     protected boolean hasLimitQuery() {
         final DfBasicProperties prop = getBasicProperties();
         return prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL() || prop.isDatabaseH2();
+    }
+
+    // ===================================================================================
+    //                                                                         Normal Data
+    //                                                                         ===========
+    protected DfLReverseDataResult processNormalData(Table table, List<String> sqlList) {
+        final DfJdbcFacade facade = createJdbcFacade();
+        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
+        final DfJFadStringConverter converter = createStringConverter();
+        final Integer limit = _extractingLimit;
+        final List<Map<String, String>> resultList = facade.selectStringList(sqlList, valueTypeMap, converter, limit);
+        return new DfLReverseDataResult(resultList);
+    }
+
+    // ===================================================================================
+    //                                                                          Large Data
+    //                                                                          ==========
+    protected DfLReverseDataResult processLargeData(Table table, final List<String> sqlList) {
+        final DfJdbcFacade facade = createJdbcFacade();
+        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
+        final DfJFadStringConverter converter = createStringConverter();
+        final DfJFadCursorCallback callback = facade.selectCursor(sqlList, valueTypeMap, converter);
+        return new DfLReverseDataResult(callback);
+    }
+
+    public class DfLReverseLargeDataResultSetWrapper {
+        protected final ResultSet _rs;
+        protected final Map<String, ValueType> _columnValueTypeMap;
+
+        public DfLReverseLargeDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
+            _rs = rs;
+            _columnValueTypeMap = columnValueTypeMap;
+        }
+
+        public boolean next() throws SQLException {
+            return _rs.next();
+        }
+
+        public String getString(String columnName) throws SQLException {
+            final ValueType valueType = _columnValueTypeMap.get(columnName);
+            return convertToStringValue(valueType.getValue(_rs, columnName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       JDBC Handling
+    //                                                                       =============
+    protected DfJdbcFacade createJdbcFacade() {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        if (getBasicProperties().isSuperDebug()) {
+            facade.debugRetryable();
+        }
+        return facade;
+    }
+
+    protected Map<String, ValueType> createColumnValueTypeMap(List<Column> columnList) {
+        final Map<String, ValueType> valueTypeMap = new LinkedHashMap<String, ValueType>();
+        for (Column column : columnList) {
+            final String columnName = column.getName();
+
+            // create value type for the column
+            final ValueType valueType;
+            if (column.isJavaNativeStringObject()) {
+                if (column.isDbTypeStringClob()) {
+                    valueType = new StringClobType();
+                } else {
+                    valueType = new StringType();
+                }
+            } else if (column.isJavaNativeDateObject()) {
+                // date types should be treated correctly
+                if (column.isJdbcTypeTime()) {
+                    valueType = new TimeType();
+                } else if (column.isJdbcTypeTimestamp()) {
+                    valueType = new TimestampType();
+                } else if (column.isJdbcTypeDate()) {
+                    if (column.isDbTypeOracleDate()) {
+                        valueType = new UtilDateAsTimestampType();
+                    } else {
+                        valueType = new UtilDateAsSqlDateType();
+                    }
+                } else { // no way
+                    valueType = new TimestampType();
+                }
+            } else if (column.isJavaNativeBinaryObject()) {
+                // unsupported BLOG as load data
+                valueType = new NullBytesType();
+            } else {
+                // other types are treated as string
+                // because ReplaceSchema can accept them
+                valueType = new StringType();
+            }
+
+            valueTypeMap.put(columnName, valueType);
+        }
+        return valueTypeMap;
+    }
+
+    protected static class NullBytesType extends BytesType {
+
+        public NullBytesType() {
+            super(BytesType.BLOB_TRAIT);
+        }
+
+        @Override
+        public Object getValue(ResultSet rs, int index) throws SQLException {
+            return null;
+        };
+
+        @Override
+        public Object getValue(ResultSet rs, String columnName) throws SQLException {
+            return null;
+        };
+    }
+
+    protected void close(Connection conn, Statement st, ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignored) {}
+        }
+        if (st != null) {
+            try {
+                st.close();
+            } catch (SQLException ignored) {}
+        }
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {}
+        }
     }
 
     // ===================================================================================

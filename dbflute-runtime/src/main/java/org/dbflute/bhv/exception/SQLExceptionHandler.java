@@ -218,16 +218,7 @@ public class SQLExceptionHandler {
     protected void setupTargetSqlElement(ExceptionMessageBuilder br, SQLExceptionResource resource) {
         final String displaySql = resource.getDisplaySql();
         if (displaySql != null) {
-            if (resource.isDisplaySqlPartHandling()) {
-                br.addItem("Part of Display SQLs");
-                br.addElement(displaySql);
-                br.addElement("...");
-                br.addElement("...");
-                br.addElement("(and other statements)");
-            } else {
-                br.addItem("Display SQL");
-                br.addElement(displaySql);
-            }
+            doSetupTargetSqlElement(br, displaySql, resource.isDisplaySqlPartHandling());
         }
         // this is example to use executed SQL
         //final String executedSql = resource.getExecutedSql();
@@ -236,6 +227,20 @@ public class SQLExceptionHandler {
         //    br.addElement(executedSql);
         //    br.addElement("*NOT use displaySql for security");
         //}
+    }
+
+    // split for application mask requirement
+    protected void doSetupTargetSqlElement(ExceptionMessageBuilder br, String displaySql, boolean partHandling) {
+        if (partHandling) {
+            br.addItem("Part of Display SQLs");
+            br.addElement(displaySql);
+            br.addElement("...");
+            br.addElement("...");
+            br.addElement("(and other statements)");
+        } else {
+            br.addItem("Display SQL");
+            br.addElement(displaySql);
+        }
     }
 
     // ===================================================================================

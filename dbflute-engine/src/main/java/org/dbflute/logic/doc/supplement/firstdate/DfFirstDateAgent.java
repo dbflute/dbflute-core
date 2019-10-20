@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.schemadiff.DfColumnDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -66,30 +67,40 @@ public class DfFirstDateAgent {
     // e.g. firstDate is after:2018/05/03
     public boolean isTableFirstDateAfter(String tableDbName, Date targetDate) {
         final Map<String, Date> tableFirstDateMap = getTableFirstDateMap();
-        final Date firstDate = tableFirstDateMap.get(tableDbName);
+        final Date firstDate = tableFirstDateMap.get(tableDbName); // may have time part
         if (firstDate != null) {
-            return firstDate.after(targetDate);
+            // e.g.
+            //  2018/05/03 12:34:56, 2018/05/03 00:00:00 => false
+            //  2018/05/04 00:00:00, 2018/05/03 00:00:00 => true
+            return isAfterWithoutTimepart(firstDate, targetDate);
         } else { // no new difference
             return true; // treated as new table
         }
     }
 
-    // e.g. columnFirstDate is after:2018/05/03
     public boolean isColumnFirstDateAfter(String tableDbName, String columnDbName, Date targetDate) {
         final Map<String, Date> columnFirstDateMap = getColumnFirstDateMap();
         final String columnKey = generateColumnKey(tableDbName, columnDbName);
-        final Date firstDate = columnFirstDateMap.get(columnKey);
-        if (firstDate != null) {
-            return firstDate.after(targetDate);
+        final Date columnFirstDate = columnFirstDateMap.get(columnKey); // may have time part
+        if (columnFirstDate != null) {
+            return isAfterWithoutTimepart(columnFirstDate, targetDate);
         } else { // no new difference, means that it may be in new table difference
             final Map<String, Date> tableFirstDateMap = getTableFirstDateMap();
-            final Date tableFirstDate = tableFirstDateMap.get(tableDbName);
+            final Date tableFirstDate = tableFirstDateMap.get(tableDbName); // may have time part
             if (tableFirstDate != null) { // so use table first date
-                return tableFirstDate.after(targetDate);
+                return isAfterWithoutTimepart(tableFirstDate, targetDate);
             } else {
                 return true; // treated as new column
             }
         }
+    }
+
+    protected boolean isAfterWithoutTimepart(Date firstDate, Date targetDate) {
+        return asNonTimeDate(firstDate).after(asNonTimeDate(targetDate));
+    }
+
+    protected Date asNonTimeDate(Date firstDate) {
+        return new HandyDate(firstDate).clearTimeParts().getDate();
     }
 
     // ===================================================================================

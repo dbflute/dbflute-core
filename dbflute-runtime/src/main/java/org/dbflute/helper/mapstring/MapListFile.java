@@ -33,6 +33,7 @@ import java.util.Set;
 /**
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
+ * @deprecated use DfMapFile
  */
 public class MapListFile {
 

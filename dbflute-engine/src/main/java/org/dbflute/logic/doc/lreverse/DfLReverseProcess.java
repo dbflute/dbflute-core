@@ -133,7 +133,7 @@ public class DfLReverseProcess {
     //                                                                             Prepare
     //                                                                             =======
     protected Database prepareDatabase() {
-        final String schemaXml = getLoadDataReverseSchemaXml();
+        final String schemaXml = getReverseSchemaXml();
         final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(schemaXml);
         serializer.serialize();
         final DfSchemaXmlReader reader = createSchemaXmlReader(schemaXml);
@@ -152,9 +152,17 @@ public class DfLReverseProcess {
     protected List<String> prepareTitleSection(final List<Table> tableList) {
         final List<String> sectionInfoList = new ArrayList<String>();
         sectionInfoList.add("...Outputting load data: tables=" + tableList.size());
+        final Integer recordLimit = getRecordLimit();
+        if (recordLimit != null) {
+            sectionInfoList.add("  recordLimit = " + recordLimit);
+        }
         sectionInfoList.add("  isReplaceSchemaDirectUse = " + isReplaceSchemaDirectUse());
         sectionInfoList.add("  isOverrideExistingDataFile = " + isOverrideExistingDataFile());
         sectionInfoList.add("  isSynchronizeOriginDate = " + isSynchronizeOriginDate());
+        final Integer xlsLimit = getXlsLimit();
+        if (xlsLimit != null) { // e.g. xlsLimit = 0 (all TSV mode)
+            sectionInfoList.add("  xlsLimit = " + xlsLimit);
+        }
         for (String sectionInfo : sectionInfoList) {
             _log.info(sectionInfo);
         }
@@ -311,7 +319,7 @@ public class DfLReverseProcess {
 
     protected File createAddedTableXlsFile() {
         final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
-        return new File(getReverseXlsDataDir() + "/" + getLoadDataReverseFileTitle() + "-99-added-table" + fileExtension);
+        return new File(getReverseXlsDataDir() + "/" + getReverseFileTitle() + "-99-added-table" + fileExtension);
     }
 
     protected DfLReverseOutputResource createOutputResource(File xlsFile, List<Table> tableList, int sectionNo, String mainName) {
@@ -363,7 +371,7 @@ public class DfLReverseProcess {
     //                                                                       =============
     protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
         deletePreviousDataFile(baseDir);
-        final Integer limit = getLoadDataReverseRecordLimit();
+        final Integer limit = getRecordLimit();
         for (Entry<File, DfLReverseOutputResource> entry : orderedMap.entrySet()) {
             final File xlsFile = entry.getKey();
             final DfLReverseOutputResource resource = entry.getValue();
@@ -436,7 +444,7 @@ public class DfLReverseProcess {
     }
 
     protected String buildXlsFilePath(String number, String mainName) {
-        final String fileTitle = getLoadDataReverseFileTitle();
+        final String fileTitle = getReverseFileTitle();
         final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
         return getReverseXlsDataDir() + "/" + fileTitle + "-" + number + "-" + mainName + fileExtension;
     }
@@ -592,7 +600,11 @@ public class DfLReverseProcess {
     // -----------------------------------------------------
     //                                         File Resource
     //                                         -------------
-    protected String getLoadDataReverseSchemaXml() {
+    protected Integer getRecordLimit() {
+        return getDocumentProperties().getLoadDataReverseRecordLimit();
+    }
+
+    protected String getReverseSchemaXml() {
         return getDocumentProperties().getLoadDataReverseSchemaXml();
     }
 
@@ -600,11 +612,7 @@ public class DfLReverseProcess {
         return getDocumentProperties().getLoadDataReverseXlsDataDir();
     }
 
-    protected Integer getLoadDataReverseRecordLimit() {
-        return getDocumentProperties().getLoadDataReverseRecordLimit();
-    }
-
-    protected String getLoadDataReverseFileTitle() {
+    protected String getReverseFileTitle() {
         return getDocumentProperties().getLoadDataReverseFileTitle();
     }
 

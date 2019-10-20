@@ -28,6 +28,7 @@ public class DfAbstractSchemaTaskFinalInfo {
     protected String _resultMessage;
     protected final List<String> _detailMessageList = new ArrayList<String>();
     protected boolean _failure;
+    protected Long _processPerformanceMillis; // null allowed (almost exists after execution however not required)
 
     public boolean isValidInfo() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_resultMessage);
@@ -38,7 +39,7 @@ public class DfAbstractSchemaTaskFinalInfo {
     }
 
     public void setResultMessage(String resultMessage) {
-        this._resultMessage = resultMessage;
+        _resultMessage = resultMessage;
     }
 
     public List<String> getDetailMessageList() {
@@ -46,7 +47,7 @@ public class DfAbstractSchemaTaskFinalInfo {
     }
 
     public void addDetailMessage(String detailMessage) {
-        this._detailMessageList.add(detailMessage);
+        _detailMessageList.add(detailMessage);
     }
 
     public boolean isFailure() {
@@ -54,6 +55,14 @@ public class DfAbstractSchemaTaskFinalInfo {
     }
 
     public void setFailure(boolean failure) {
-        this._failure = failure;
+        _failure = failure;
+    }
+
+    public Long getProcessPerformanceMillis() {
+        return _processPerformanceMillis;
+    }
+
+    public void setProcessPerformanceMillis(Long processPerformanceMillis) {
+        _processPerformanceMillis = processPerformanceMillis;
     }
 }

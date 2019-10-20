@@ -1014,10 +1014,20 @@ public class Database {
     // ===================================================================================
     //                                                                         Initializer
     //                                                                         ===========
+    // #hope jflute should it be embedded with creating schema data? (2019/05/08)
+    public void initializeSupplementaryMetaData() { // also called by control velocity file
+        // unneeded because of lazy-loaded (also no call since old days)
+        //getClassificationProperties().initializeClassificationDefinition(); // followings may use
+        initializeAdditionalPrimaryKey();
+        initializeAdditionalUniqueKey();
+        initializeAdditionalForeignKey();
+        initializeClassificationDeployment();
+    }
+
     // -----------------------------------------------------
     //                                  AdditionalPrimaryKey
     //                                  --------------------
-    public void initializeAdditionalPrimaryKey() {
+    public void initializeAdditionalPrimaryKey() { // already can be protected but public just in case
         final DfAdditionalPrimaryKeyInitializer initializer = new DfAdditionalPrimaryKeyInitializer(this);
         initializer.initializeAdditionalPrimaryKey();
     }
@@ -1025,7 +1035,7 @@ public class Database {
     // -----------------------------------------------------
     //                                   AdditionalUniqueKey
     //                                   -------------------
-    public void initializeAdditionalUniqueKey() {
+    public void initializeAdditionalUniqueKey() { // already can be protected but public just in case
         final DfAdditionalUniqueKeyInitializer initializer = new DfAdditionalUniqueKeyInitializer(this);
         initializer.initializeAdditionalUniqueKey();
     }
@@ -1037,7 +1047,7 @@ public class Database {
      * Initialize additional foreign key. <br>
      * This is basically for Generate task. (Not Sql2Entity)
      */
-    public void initializeAdditionalForeignKey() {
+    public void initializeAdditionalForeignKey() { // already can be protected but public just in case
         // /- - - - - - - - - - - - - - - - -
         // Initialize additional foreign key
         // - - - - - - - - - -/
@@ -1048,7 +1058,7 @@ public class Database {
     // -----------------------------------------------------
     //                              ClassificationDeployment
     //                              ------------------------
-    public void initializeClassificationDeployment() {
+    public void initializeClassificationDeployment() { // also called by control velocity file (Sql2Entity)
         final DfClassificationProperties clsProp = getClassificationProperties();
 
         // Initialize classification definition before initializing deployment.

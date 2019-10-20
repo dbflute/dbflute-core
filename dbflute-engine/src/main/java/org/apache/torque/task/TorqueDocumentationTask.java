@@ -74,6 +74,8 @@
  */
 package org.apache.torque.task;
 
+import java.util.List;
+
 /* ====================================================================
  *
  * Copyright (c) 2001-2003 The Apache Software Foundation.  All rights
@@ -144,6 +146,7 @@ import org.dbflute.logic.doc.spolicy.display.DfSPolicyDisplay;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
 import org.dbflute.logic.doc.supplement.firstdate.DfFirstDateAgent;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
+import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfSchemaPolicyProperties;
@@ -271,7 +274,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _documentSelector.selectLastaDocHtml(); // option
         processDecommentPickup();
         processHacommentPickup();
-        purelyInitializeSchemaData(); // policy needs database meta data so initialize it here
+        purelyInitializeSchemaHtmlSchemaData(); // policy needs database meta data so initialize it here
         processSchemaPolicyCheck(); // only check and keep result here (not ending yet)
         fireVelocityProcess(); // making SchemaHTML
         endingSchemaPolicyResult(); // may throw, after SchemaHTML to show policy result in SchemaHTML since 1.2.0
@@ -307,7 +310,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             throw new IllegalStateException("SchemaPolicyCheck should be before making SchemaHTML because of schema data.");
         }
         final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
-        final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> _documentSelector.getSchemaDiffList());
+        final DfSPolicyChecker checker = prop.createChecker(_schemaData.getDatabase(), () -> prepareCoreSchemaDiffList());
         _schemaPolicyResult = checker.checkPolicyIfNeeds(); // not ending yet (ending after SchemaHTML)
     }
 
@@ -419,21 +422,28 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected void initializeSchemaData() { // basically called in fireVelocityProcess()
         if (isLoadDataReverseOnly() || isSchemaSyncCheckOnly()) { // don't use basic schema data
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
-        } else { // normally here
+        } else { // normally here (SchemaHTML, HistoryHTML)
             if (_schemaData == null) { // basically false, already initialized in SchemaHTML process so just in case
-                purelyInitializeSchemaData();
+                purelyInitializeSchemaHtmlSchemaData();
             }
             final Database database = _schemaData.getDatabase();
             if (_schemaPolicyResult != null) { // null allowed when no policy
                 database.setSchemaPolicyDisplay(new DfSPolicyDisplay(_schemaPolicyResult));
             }
             database.setEmbeddedPickup(_decoMapPickup);
-            database.setFirstDateAgent(new DfFirstDateAgent(() -> _documentSelector.getSchemaDiffList()));
+            database.setFirstDateAgent(new DfFirstDateAgent(() -> { // for SchemaHTML's firstDate display
+                return prepareCoreSchemaDiffList();
+            }));
         }
     }
 
-    protected void purelyInitializeSchemaData() {
+    protected void purelyInitializeSchemaHtmlSchemaData() {
         super.initializeSchemaData();
+        _schemaData.getDatabase().initializeSupplementaryMetaData(); // needs to be here for e.g. SchemaPolicyCheck
+    }
+
+    protected List<DfSchemaDiff> prepareCoreSchemaDiffList() {
+        return _documentSelector.lazyLoadIfNeedsCoreSchemaDiffList();
     }
 
     // ===================================================================================

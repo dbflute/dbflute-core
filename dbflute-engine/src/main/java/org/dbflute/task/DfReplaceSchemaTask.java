@@ -43,12 +43,14 @@ import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDat
 import org.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess;
-import org.dbflute.logic.replaceschema.process.altercheck.DfAlterCheckProcess.CoreProcessPlayer;
+import org.dbflute.logic.replaceschema.process.altercheck.DfSavePreviousProcess;
+import org.dbflute.logic.replaceschema.process.altercheck.player.DfAlterCoreProcessPlayer;
 import org.dbflute.logic.replaceschema.process.arrangebefore.DfArrangeBeforeRepsProcess;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfDocumentSelector;
+import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,17 +186,15 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void doProcessAlterCheck() {
-        final DfAlterCheckProcess process = createAlterCheckProcess();
         try {
             if (isAlterCheck()) {
-                if (isForcedAlterCheck()) {
-                    process.useDraftSpace();
-                }
+                final DfAlterCheckProcess process = createAlterCheckProcess();
                 _alterCheckFinalInfo = process.checkAlter();
                 if (_alterCheckFinalInfo.hasAlterCheckDiff()) {
                     outputAlterCheckResultHtml();
                 }
             } else if (isSavePrevious()) {
+                final DfSavePreviousProcess process = createSavePreviousProcess();
                 _alterCheckFinalInfo = process.savePrevious();
             }
             _alterCheckFinalInfo.throwAlterCheckExceptionIfExists();
@@ -204,8 +204,16 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected DfAlterCheckProcess createAlterCheckProcess() {
+        return DfAlterCheckProcess.createAsMain(getDataSource(), createDBMigrationProcessPlayer());
+    }
+
+    protected DfSavePreviousProcess createSavePreviousProcess() {
+        return DfSavePreviousProcess.createAsMain(getDataSource(), createDBMigrationProcessPlayer());
+    }
+
+    protected DfAlterCoreProcessPlayer createDBMigrationProcessPlayer() {
         final boolean schemaOnly = isSchemaOnlyAlterCheck();
-        return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
+        return new DfAlterCoreProcessPlayer() {
             public void playNext(String sqlRootDirectory) {
                 executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().schemaOnly(schemaOnly));
             }
@@ -213,7 +221,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
             public void playPrevious(String sqlRootDirectory) {
                 executeCoreProcess(sqlRootDirectory, new DfRepsCoreProcessSelector().asPrevious().schemaOnly(schemaOnly));
             }
-        });
+        };
     }
 
     protected void outputAlterCheckResultHtml() {
@@ -328,7 +336,21 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void checkSchemaPolicyInRepsIfNeeds() {
-        new DfSPolicyInRepsChecker(getDataSource(), _documentSelector).checkSchemaPolicyInRepsIfNeeds();
+        final long before = System.currentTimeMillis(); // no-if to be simple
+        final DfSPolicyInRepsChecker checker = new DfSPolicyInRepsChecker(getDataSource(), _documentSelector);
+        final boolean executed = checker.checkSchemaPolicyInRepsIfNeeds();
+        if (executed) {
+            final long after = System.currentTimeMillis();
+            final long preformanceMillis = after - before;
+            final Long originalMillis = _createSchemaFinalInfo.getProcessPerformanceMillis();
+            if (originalMillis != null) {
+                // because schema policy process is treated as create schema process in display
+                // (hard to move schema policy process to create schema process so adjust it by logging logic)
+                _createSchemaFinalInfo.setProcessPerformanceMillis(originalMillis + preformanceMillis);
+            }
+            final String performanceView = DfTraceViewUtil.convertToPerformanceView(preformanceMillis);
+            _createSchemaFinalInfo.addDetailMessage("(Schema Policy) - " + performanceView);
+        }
     }
 
     // -----------------------------------------------------
@@ -519,7 +541,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
             }
         }
 
-        // AlterSchema
+        // AlterCheck (AlterSchema, SavePrevious)
         {
             final DfAlterCheckFinalInfo alterCheckFinalInfo = _alterCheckFinalInfo;
             if (alterCheckFinalInfo != null && alterCheckFinalInfo.isValidInfo()) {
@@ -549,6 +571,10 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
 
     protected void buildSchemaTaskContents(StringBuilder sb, DfAbstractSchemaTaskFinalInfo finalInfo) {
         sb.append(" ").append(finalInfo.getResultMessage());
+        final Long processPerformanceMillis = finalInfo.getProcessPerformanceMillis();
+        if (processPerformanceMillis != null) { // almost true (except e.g. save failure)
+            sb.append(" - ").append(DfTraceViewUtil.convertToPerformanceView(processPerformanceMillis));
+        }
         final List<String> detailMessageList = finalInfo.getDetailMessageList();
         for (String detailMessage : detailMessageList) {
             sb.append(ln()).append("  ").append(detailMessage);

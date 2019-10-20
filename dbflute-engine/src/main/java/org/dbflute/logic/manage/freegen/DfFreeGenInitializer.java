@@ -222,10 +222,7 @@ public class DfFreeGenInitializer {
 
         // same as ControlGenerateJava.vm
         database.initializeVersion(90);
-        database.initializeAdditionalPrimaryKey();
-        database.initializeAdditionalUniqueKey();
-        database.initializeAdditionalForeignKey();
-        database.initializeClassificationDeployment();
+        database.initializeSupplementaryMetaData();
         database.initializeIncludeQuery();
         database.checkProperties();
         return database;

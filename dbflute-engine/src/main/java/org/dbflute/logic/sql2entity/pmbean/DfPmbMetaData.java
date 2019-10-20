@@ -589,17 +589,17 @@ public class DfPmbMetaData {
         return column != null && column.hasClassification();
     }
 
-    protected boolean isPropertyOptionSpecifiedClassification(String propertyName) { // :cls(Foo)
+    protected boolean isPropertyOptionSpecifiedClassification(String propertyName) { // :cls(Maihama) or fixed expression
         final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
         return obj.isPropertyOptionSpecifiedClassification();
     }
 
-    public boolean isPropertyOptionClassificationFixedElement(String propertyName) { // :cls(Foo.Bar)
+    public boolean isPropertyOptionClassificationFixedElement(String propertyName) { // :cls(Maihama.Sea) or :cls(Maihama.Sea, Land)
         final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
         return obj.isPropertyOptionClassificationFixedElement();
     }
 
-    public boolean isPropertyOptionClassificationFixedElementList(String propertyName) { // :cls(Foo.Bar, Baz)
+    public boolean isPropertyOptionClassificationFixedElementList(String propertyName) { // :cls(Maihama.Sea, Land)
         final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
         return obj.isPropertyOptionClassificationFixedElementList();
     }
@@ -1106,11 +1106,15 @@ public class DfPmbMetaData {
             final String beforeType = propertyNameTypeMap.get(propertyName);
             String afterType = null;
             if (isPropertyTypeList(propertyName) && isPropertyOptionClassification(propertyName, schemaData)) {
-                // list and classification option
-                final String classificationName = getPropertyOptionClassificationName(propertyName, schemaData);
-                final String plainType = "$$CDef$$." + classificationName;
-                // ParameterBean has the "import" clause of language-embedded utility
-                afterType = packageResolver.resolvePackageNameExceptUtil(plainType);
+                if (isPropertyOptionClassificationFixedElement(propertyName)) { // :cls(Maihama.Sea) or :cls(Maihama.Sea, Land)
+                    // e.g. /*pmb.maihamaList:cls(Maihama.Sea)*/ or /*pmb.maihamaList:cls(Maihama.Sea, Land)*/
+                    // no adjustment because fixed element list needs List<String> as framework-internal property
+                } else { // list property by public setter, wants to be e.g. List<CDef.Maihama>
+                    final String classificationName = getPropertyOptionClassificationName(propertyName, schemaData);
+                    final String plainType = "$$CDef$$." + classificationName;
+                    // ParameterBean has the "import" clause of language-embedded utility
+                    afterType = packageResolver.resolvePackageNameExceptUtil(plainType);
+                }
             } else if (!beforeType.contains("CDef")) {
                 final Column refColumn = getPropertyOptionReferenceColumn(propertyName, schemaData);
                 if (refColumn != null) {

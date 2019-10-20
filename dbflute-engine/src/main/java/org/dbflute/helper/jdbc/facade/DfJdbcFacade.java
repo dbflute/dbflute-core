@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Super simple facade for JDBC.
  * @author jflute
+ * @author p1us2er0
  */
 public class DfJdbcFacade {
 
@@ -52,6 +54,7 @@ public class DfJdbcFacade {
     protected final DataSource _dataSource;
     protected final Connection _conn;
     protected boolean _useTransaction;
+    protected boolean _debugRetryable;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -79,57 +82,43 @@ public class DfJdbcFacade {
      * @return The list for result. (NotNull)
      */
     public List<Map<String, String>> selectStringList(String sql, List<String> columnList) {
-        return selectStringList(sql, columnList, -1);
-    }
-
-    /**
-     * Select the list for records as string value simply.
-     * @param sql The SQL string. (NotNull)
-     * @param columnList The list of selected columns. (NotNull)
-     * @param limit The limit size for fetching. (MinusAllowed: means no limit)
-     * @return The list for result. (NotNull)
-     */
-    public List<Map<String, String>> selectStringList(String sql, List<String> columnList, int limit) {
         final Map<String, ValueType> columnValueTypeMap = new LinkedHashMap<String, ValueType>();
         for (String column : columnList) {
             columnValueTypeMap.put(column, null);
         }
-        return selectStringList(sql, columnValueTypeMap, null, limit);
+        return selectStringList(DfCollectionUtil.newArrayList(sql), columnValueTypeMap, null, -1);
     }
 
     /**
      * Select the list for records as string value using value types.
-     * @param sql The SQL string. (NotNull)
-     * @param columnValueTypeMap The map of selected columns to value types. (NotNull, ValueTypeNullAllowed)
-     * @param converter The converter to convert to string value. (NullAllowed: means no conversion)
-     * @return The list for result. (NotNull)
-     */
-    public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap, DfJFadStringConverter converter) {
-        return selectStringList(sql, columnValueTypeMap, converter, -1);
-    }
-
-    /**
-     * Select the list for records as string value using value types.
-     * @param sql The SQL string. (NotNull)
+     * @param trySqlList The try SQL strings. (NotNull)
      * @param columnValueTypeMap The map of selected columns to value types. (NotNull, ValueTypeNullAllowed)
      * @param converter The converter to convert to string value. (NullAllowed: means no conversion)
      * @param limit The limit size for fetching. (MinusAllowed: means no limit)
      * @return The list for result. (NotNull)
      */
-    public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap,
+    public List<Map<String, String>> selectStringList(List<String> trySqlList, Map<String, ValueType> columnValueTypeMap,
             DfJFadStringConverter converter, int limit) {
-        // [ATTENTION]: no use bind variables
+        if (trySqlList == null || trySqlList.isEmpty()) {
+            throw new IllegalArgumentException("The argument 'trySqlList' should not be null and empty: " + trySqlList);
+        }
+        // [ATTENTION]: no use bind variables because of framework internal use
         final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
+        String currentSql = null;
         try {
             conn = getConnection();
             beginTransactionIfNeeds(conn);
             st = conn.createStatement();
-            rs = st.executeQuery(sql);
-            final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, converter);
+
+            final DfCurrentSqlResult result = retryableExecuteQuery(trySqlList, st);
+            currentSql = result.getCurrentSql(); // not null, keep for later SQLException
+            rs = result.getResultSet(); // not null
+
             int count = 0;
+            final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, converter);
             while (wrapper.next()) {
                 if (isOverLimit(limit, count)) {
                     break;
@@ -146,7 +135,7 @@ public class DfJdbcFacade {
             }
             commitTrasactionIfNeeds(conn);
         } catch (SQLException e) {
-            handleSQLException(sql, e);
+            handleSQLException(currentSql, e);
             return null; // unreachable
         } finally {
             rollbackTransactionIfNeeds(conn);
@@ -170,20 +159,29 @@ public class DfJdbcFacade {
     // -----------------------------------------------------
     //                                                Cursor
     //                                                ------
-    public DfJFadCursorCallback selectCursor(final String sql, final Map<String, ValueType> columnValueTypeMap,
-            final DfJFadStringConverter stringConverter) {
+    public DfJFadCursorCallback selectCursor(List<String> trySqlList, Map<String, ValueType> columnValueTypeMap,
+            DfJFadStringConverter stringConverter) {
+        if (trySqlList == null || trySqlList.isEmpty()) {
+            throw new IllegalArgumentException("The argument 'trySqlList' should not be null and empty: " + trySqlList);
+        }
         return new DfJFadCursorCallback() {
             public void select(DfJFadCursorHandler handler) {
                 Connection conn = null;
                 Statement st = null;
                 ResultSet rs = null;
+                String currentSql = null;
                 try {
                     conn = _dataSource.getConnection();
                     st = conn.createStatement();
-                    rs = st.executeQuery(sql);
-                    handler.handle(new DfJFadResultSetWrapper(rs, columnValueTypeMap, stringConverter));
+
+                    final DfCurrentSqlResult result = retryableExecuteQuery(trySqlList, st);
+                    currentSql = result.getCurrentSql(); // not null, keep for later SQLException
+                    rs = result.getResultSet(); // not null
+
+                    final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, stringConverter);
+                    handler.handle(wrapper);
                 } catch (SQLException e) {
-                    handleSQLException(sql, e);
+                    handleSQLException(currentSql, e);
                 } finally {
                     closeResultSet(rs);
                     closeStatement(st);
@@ -194,10 +192,70 @@ public class DfJdbcFacade {
     }
 
     // -----------------------------------------------------
+    //                                            Retry-able
+    //                                            ----------
+    protected DfCurrentSqlResult retryableExecuteQuery(List<String> trySqlList, Statement st) throws SQLException {
+        ResultSet rs = null;
+        String currentSql = null;
+        SQLException latestEx = null;
+        for (String trySql : trySqlList) {
+            currentSql = trySql;
+            try {
+                rs = st.executeQuery(trySql);
+                if (latestEx != null) { // retry now
+                    if (_debugRetryable) {
+                        _log.info("retry SQL success: {}", trySql);
+                    }
+                }
+                latestEx = null;
+                break;
+            } catch (SQLException continued) {
+                latestEx = continued;
+                if (_debugRetryable) {
+                    final SQLFailureException failureEx = createSQLFailureException(currentSql, continued);
+                    _log.info("try SQL failure: {}", failureEx.getMessage());
+                }
+            }
+        }
+        if (rs == null) {
+            if (latestEx != null) { // basically here
+                throw latestEx;
+            } else { // basically no way (executeQuery() does not return null), just in case
+                throw new IllegalStateException("Cannot make result set by the SQL: currentSql=" + currentSql);
+            }
+        }
+        return new DfCurrentSqlResult(currentSql, rs);
+    }
+
+    protected static class DfCurrentSqlResult {
+
+        protected final String _currentSql;
+        protected final ResultSet _resultSet;
+
+        public DfCurrentSqlResult(String currentSql, ResultSet resultSet) {
+            _currentSql = currentSql;
+            _resultSet = resultSet;
+        }
+
+        public String getCurrentSql() {
+            return _currentSql;
+        }
+
+        public ResultSet getResultSet() {
+            return _resultSet;
+        }
+    }
+
+    // -----------------------------------------------------
     //                                           Transaction
     //                                           -----------
     public DfJdbcFacade useTransaction() {
         _useTransaction = true;
+        return this;
+    }
+
+    public DfJdbcFacade debugRetryable() {
+        _debugRetryable = true;
         return this;
     }
 
@@ -298,22 +356,19 @@ public class DfJdbcFacade {
     // ===================================================================================
     //                                                                  Exception Handling
     //                                                                  ==================
-    protected void handleSQLException(String sql, SQLException e) {
-        String msg = "Failed to execute the SQL:" + ln();
-        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "[SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Exception]" + ln();
-        msg = msg + e.getClass() + ln();
-        msg = msg + e.getMessage() + ln();
-        msg = msg + "- - - - - - - - - -/";
-        throw new SQLFailureException(msg, e);
+    protected SQLFailureException createSQLFailureException(String sql, SQLException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to execute the SQL");
+        br.addItem("Executed SQL");
+        br.addElement(sql); // may be null when e.g. connection failure
+        br.addItem("SQLException");
+        br.addElement(e.getClass());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        return new SQLFailureException(msg, e);
     }
 
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return "\n";
+    protected void handleSQLException(String sql, SQLException e) {
+        throw createSQLFailureException(sql, e);
     }
 }

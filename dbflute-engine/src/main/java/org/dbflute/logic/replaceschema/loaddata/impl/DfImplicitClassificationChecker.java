@@ -28,6 +28,7 @@ import org.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueExcepti
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.properties.DfClassificationProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,8 +90,10 @@ public class DfImplicitClassificationChecker {
 
     protected String buildDistinctSql(String tableDbName, String columnDbName, boolean quote, List<String> codeList) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select distinct ").append(columnDbName).append(" from ").append(tableDbName);
-        sb.append(" where ").append(columnDbName).append(" not in ");
+        final String tableSqlName = toTableSqlName(tableDbName);
+        final String columnSqlName = toColumnSqlName(columnDbName);
+        sb.append("select distinct ").append(columnSqlName).append(" from ").append(tableSqlName);
+        sb.append(" where ").append(columnSqlName).append(" not in ");
         sb.append("(");
         int index = 0;
         for (String code : codeList) {
@@ -102,6 +105,15 @@ public class DfImplicitClassificationChecker {
         }
         sb.append(")");
         return sb.toString();
+    }
+
+    // #for_now easy SQL name here, referring to Column.class's getTableSqlName() by jflute (2019/08/15)
+    protected String toTableSqlName(String tableDbName) {
+        return getLittleAdjustmentProperties().quoteTableNameIfNeeds(tableDbName);
+    }
+
+    protected String toColumnSqlName(String columnDbName) {
+        return getLittleAdjustmentProperties().quoteColumnNameIfNeeds(columnDbName);
     }
 
     protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName, String columnDbName,
@@ -161,5 +173,9 @@ public class DfImplicitClassificationChecker {
 
     protected DfClassificationProperties getClassificationProperties() {
         return getProperties().getClassificationProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 }
