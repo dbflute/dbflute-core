@@ -81,14 +81,21 @@ public class DfPreviousDBAgent {
     //                                       ---------------
     public void markPreviousNG(String notice) {
         _alterControlAgent.deletePreviousOKMark();
+        makePreviousNGMarkFile(notice);
+        // no needed now so code design is still hard, will implement at future
+        //_alterControlAgent.makeWholeNGStateMapFile(...);
+    }
+
+    protected void makePreviousNGMarkFile(String notice) {
         final String ngMark = getMigrationPreviousNGMark();
         try {
-            final File markFile = new File(ngMark);
-            if (!markFile.exists()) {
-                _log.info("...Marking previous-NG: " + ngMark);
-                markFile.createNewFile();
-                _alterControlAgent.writeMarkLogRoad(markFile, notice);
+            final File ngFile = new File(ngMark);
+            if (ngFile.exists()) { // basically already deleted here 
+                ngFile.delete(); // overwrite just in case
             }
+            _log.info("...Marking previous-NG: " + ngMark);
+            ngFile.createNewFile();
+            _alterControlAgent.writeMarkLogRoad(ngFile, notice);
         } catch (IOException e) {
             String msg = "Failed to create a file for previous-NG mark: " + ngMark;
             throw new IllegalStateException(msg, e);

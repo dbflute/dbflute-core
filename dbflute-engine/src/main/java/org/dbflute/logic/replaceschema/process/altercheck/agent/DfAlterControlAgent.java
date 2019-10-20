@@ -25,11 +25,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.dfmap.DfMapFile;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -130,26 +134,30 @@ public class DfAlterControlAgent {
         deleteNextNGMark();
         deleteAlterNGMark();
         deletePreviousNGMark();
+        deleteWholeNGStateMap();
     }
 
-    public void deletePreviousOKMark() {
-        final String previousOKMark = getMigrationPreviousOKMark();
-        deleteMarkFile(new File(previousOKMark), "...Deleting previous-OK mark");
-    }
-
-    public void deleteNextNGMark() {
+    protected void deleteNextNGMark() {
         final String replaceNGMark = getMigrationNextNGMark();
         deleteMarkFile(new File(replaceNGMark), "...Deleting next-NG mark");
     }
 
-    public void deleteAlterNGMark() {
-        final String alterNGMark = getMigrationAlterNGMark();
-        deleteMarkFile(new File(alterNGMark), "...Deleting alter-NG mark");
+    protected void deleteAlterNGMark() {
+        deleteMarkFile(new File(getMigrationAlterNGMark()), "...Deleting alter-NG mark");
     }
 
-    public void deletePreviousNGMark() {
+    protected void deletePreviousNGMark() {
         final String previousNGMark = getMigrationPreviousNGMark();
         deleteMarkFile(new File(previousNGMark), "...Deleting previous-NG mark");
+    }
+
+    protected void deleteWholeNGStateMap() {
+        deleteMarkFile(new File(getMigrationWholeNGStateMap()), "...Deleting whole-NG-state map");
+    }
+
+    public void deletePreviousOKMark() { // called by agent
+        final String previousOKMark = getMigrationPreviousOKMark();
+        deleteMarkFile(new File(previousOKMark), "...Deleting previous-OK mark");
     }
 
     public void deleteMarkFile(File file, String msg) {
@@ -165,7 +173,20 @@ public class DfAlterControlAgent {
     //                                            Write Mark
     //                                            ----------
     public void writeMarkLogRoad(File file, String notice) throws IOException {
-        writeMarkSimple(file, notice + ln() + "Look at the log for detail.");
+        writeMarkSimple(file, buildMarkLogRoadBase(notice));
+    }
+
+    public void writeMarkLogRoad(File file, String notice, Map<String, Object> metaMap) throws IOException {
+        final String roadBase = buildMarkLogRoadBase(notice);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(roadBase);
+        sb.append(ln()).append("---").append(ln()); // simple delimiter
+        sb.append(new DfMapStyle().toMapString(metaMap));
+        writeMarkSimple(file, sb.toString());
+    }
+
+    protected String buildMarkLogRoadBase(String notice) {
+        return notice + ln() + "Look at the log for detail.";
     }
 
     public void writeMarkSimple(File file, String notice) throws IOException {
@@ -180,6 +201,24 @@ public class DfAlterControlAgent {
                     bw.close();
                 } catch (IOException ignored) {}
             }
+        }
+    }
+
+    public void makeWholeNGStateMapFile(String domainCode, String stateCode) {
+        final String stateMap = getMigrationWholeNGStateMap();
+        try {
+            final File mapFile = new File(stateMap);
+            if (mapFile.exists()) { // basically already deleted here
+                mapFile.delete(); // just in case
+            }
+            _log.info("...Marking whole-NG-state: " + stateMap);
+            mapFile.createNewFile();
+            final Map<String, Object> metaMap // e.g. map:{domainCode=ALT;stateCode=DIF}
+                    = DfCollectionUtil.newLinkedHashMap("domainCode", domainCode, "stateCode", stateCode);
+            new DfMapFile().writeMap(new FileOutputStream(mapFile), metaMap);
+        } catch (IOException e) {
+            String msg = "Failed to create a file for alter-state map: " + stateMap;
+            throw new IllegalStateException(msg, e);
         }
     }
 
@@ -219,6 +258,10 @@ public class DfAlterControlAgent {
 
     protected String getMigrationAlterNGMark() {
         return getReplaceSchemaProperties().getMigrationAlterNGMark();
+    }
+
+    protected String getMigrationWholeNGStateMap() {
+        return getReplaceSchemaProperties().getMigrationWholeNGStateMap();
     }
 
     protected String getMigrationPreviousNGMark() {

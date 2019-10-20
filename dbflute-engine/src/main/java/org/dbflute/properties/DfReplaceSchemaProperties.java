@@ -1026,7 +1026,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     // -----------------------------------------------------
     //                                        Migration Mark
     //                                        --------------
-    public String getMigrationAlterCheckMark() {
+    public String getMigrationAlterCheckMark() { // already unused? by jflute (2019/10/20)
         return doGetMigrationMark("alter-check.dfmark");
     }
 
@@ -1072,6 +1072,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
 
     public boolean hasMigrationPreviousNGMark() {
         return doHasMigrationMark(getMigrationPreviousNGMark());
+    }
+
+    public String getMigrationWholeNGStateMap() {
+        return doGetMigrationMark("whole-NG-state.dfmap");
+    }
+
+    public boolean hasMigrationWholeNGStateMap() {
+        return doHasMigrationMark(getMigrationWholeNGStateMap());
     }
 
     protected String doGetMigrationMark(String pureName) {

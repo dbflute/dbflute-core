@@ -150,14 +150,21 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     }
 
     protected void markNextNG(String notice) {
+        makeNextNGMarkFile(notice);
+        // no needed now so code design is still hard, will implement at future
+        //_alterControlAgent.makeWholeNGStateMapFile(...);
+    }
+
+    protected void makeNextNGMarkFile(String notice) {
         final String ngMark = getMigrationNextNGMark();
         try {
-            final File markFile = new File(ngMark);
-            if (!markFile.exists()) {
-                _log.info("...Marking next-NG: " + ngMark);
-                markFile.createNewFile();
-                writeControlLogRoad(markFile, notice);
+            final File ngFile = new File(ngMark);
+            if (ngFile.exists()) { // basically already deleted here 
+                ngFile.delete(); // overwrite just in case
             }
+            _log.info("...Marking next-NG: " + ngMark);
+            ngFile.createNewFile();
+            writeControlLogRoad(ngFile, notice);
         } catch (IOException e) {
             String msg = "Failed to create a file for next-NG mark: " + ngMark;
             throw new IllegalStateException(msg, e);
@@ -217,11 +224,11 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         final long before = System.currentTimeMillis();
         executeAlterSql(finalInfo);
         if (finalInfo.isFailure()) {
-            markAlterNG(getAlterCheckAlterSqlFailureNotice());
+            markAlterNG(getAlterCheckAlterSqlFailureNotice(), "ALF");
         } else {
             takeFinally(finalInfo);
             if (finalInfo.isFailure()) {
-                markAlterNG(getAlterCheckTakeFinallySqlFailureNotice());
+                markAlterNG(getAlterCheckTakeFinallySqlFailureNotice(), "TFF");
             }
         }
         final long after = System.currentTimeMillis();
@@ -463,7 +470,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         _log.info("|                     |");
         _log.info("+---------------------+");
         serializeSchemaDiff(schemaDiff);
-        markAlterNG(getAlterDiffNotice());
+        markAlterNG(getAlterDiffNotice(), "DIF");
         handleAlterDiff(finalInfo, schemaDiff);
     }
 
@@ -479,15 +486,21 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         }
     }
 
-    protected void markAlterNG(String notice) {
+    protected void markAlterNG(String notice, String alterNgCode) { // e.g. DIF, ALF, TFF
+        makeAlterNGMarkFile(notice);
+        _alterControlAgent.makeWholeNGStateMapFile("ALT", alterNgCode);
+    }
+
+    protected void makeAlterNGMarkFile(String notice) {
         final String ngMark = getMigrationAlterNGMark();
         try {
-            final File markFile = new File(ngMark);
-            if (!markFile.exists()) {
-                _log.info("...Marking alter-NG: " + ngMark);
-                markFile.createNewFile();
-                writeControlLogRoad(markFile, notice);
+            final File ngFile = new File(ngMark);
+            if (ngFile.exists()) { // basically already deleted here 
+                ngFile.delete(); // overwrite just in case
             }
+            _log.info("...Marking alter-NG: " + ngMark);
+            ngFile.createNewFile();
+            writeControlLogRoad(ngFile, notice);
         } catch (IOException e) {
             String msg = "Failed to create a file for alter-NG mark: " + ngMark;
             throw new IllegalStateException(msg, e);

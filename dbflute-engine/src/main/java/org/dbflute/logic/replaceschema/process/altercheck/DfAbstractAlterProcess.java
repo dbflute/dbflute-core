@@ -17,6 +17,7 @@ package org.dbflute.logic.replaceschema.process.altercheck;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import org.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
@@ -132,6 +133,10 @@ public abstract class DfAbstractAlterProcess extends DfAbstractRepsProcess {
 
     protected void writeControlLogRoad(File file, String notice) throws IOException {
         _alterControlAgent.writeMarkLogRoad(file, notice);
+    }
+
+    protected void writeControlLogRoad(File file, String notice, Map<String, Object> metaMap) throws IOException {
+        _alterControlAgent.writeMarkLogRoad(file, notice, metaMap);
     }
 
     // ===================================================================================
