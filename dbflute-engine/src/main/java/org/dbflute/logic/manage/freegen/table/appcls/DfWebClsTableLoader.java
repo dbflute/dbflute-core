@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.helper.mapstring.MapListFile;
+import org.dbflute.helper.dfmap.DfMapFile;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
@@ -74,7 +74,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         final String resourceFile = resource.getResourceFile();
         final Map<String, Object> webclsMap;
         try {
-            webclsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
+            webclsMap = new DfMapFile().readMap(new FileInputStream(resourceFile));
         } catch (FileNotFoundException e) {
             throw new DfIllegalPropertySettingException("Not found the dfprop file: " + resourceFile, e);
         } catch (IOException e) {
