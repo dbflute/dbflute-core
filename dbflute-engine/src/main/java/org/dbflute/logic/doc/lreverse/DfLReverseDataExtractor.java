@@ -97,7 +97,7 @@ public class DfLReverseDataExtractor {
         final String tableSqlName = table.getTableSqlNameDirectUse();
 
         boolean large = false;
-        if (_largeBorder >= 0) {
+        if (_largeBorder > 0) {
             if (_extractingLimit < 0 || _largeBorder < _extractingLimit) {
                 final DfJdbcFacade facade = createJdbcFacade();
                 final int countAll = facade.selectCountAll(tableSqlName);
@@ -105,6 +105,8 @@ public class DfLReverseDataExtractor {
                     large = true;
                 }
             }
+        } else if (_largeBorder == 0) { // means all large mode (all TSV files)
+            large = true;
         }
 
         final List<String> sqlList = DfCollectionUtil.newArrayList();
