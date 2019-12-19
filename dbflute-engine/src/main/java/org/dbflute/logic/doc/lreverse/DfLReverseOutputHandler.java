@@ -311,7 +311,8 @@ public class DfLReverseOutputHandler {
     protected String buildDelimiterFilePrefix(DfLReverseOutputResource resource, int sheetNumber) {
         final int sectionNo = resource.getSectionNo();
         final String sectionPrefix = sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo);
-        return "cyclic_" + sectionPrefix + "_" + sheetNumber + "-";
+        final String sheetPrefix = sheetNumber < 10 ? "0" + sheetNumber : String.valueOf(sheetNumber);
+        return "cyclic_" + sectionPrefix + "_" + sheetPrefix + "-";
     }
 
     protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception cause) {
