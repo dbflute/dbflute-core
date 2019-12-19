@@ -1492,6 +1492,20 @@ public interface SqlClause {
      */
     boolean isDatetimePrecisionTruncationOfConditionEnabled();
 
+    // [DBFlute-1.2.2]
+    // ===================================================================================
+    //                                                                        Dynamic Hint
+    //                                                                        ============
+    // too difficult so unsupported for now by jflute (2019/12/19)
+    //void registerDynamicHintSelectRear(String hint); // for e.g. Oracle
+
+    /**
+     * Read the source code.
+     * @param hint The hint expression on SQL. (NotNull, NotTrimmedEmpty)
+     * @deprecated You may have DBMS dependency and breakable SQL, so be careful.
+     */
+    void registerDynamicHintFromBaseTable(String hint); // for e.g. MySQL, TiDB
+
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                               DBWay

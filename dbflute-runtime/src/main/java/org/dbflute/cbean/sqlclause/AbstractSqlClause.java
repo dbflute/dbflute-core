@@ -381,6 +381,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it truncate date-time precision of condition value? */
     protected boolean _datetimePrecisionTruncationOfCondition;
 
+    // -----------------------------------------------------
+    //                                          Dynamic Hint
+    //                                          ------------
+    /** The hint expression of from-base-table as dynamic. (NullAllowed: option) */
+    protected String _dynamicHintFromBaseTable;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -1083,6 +1089,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             sb.append(tableSqlName).append(" ").append(basePointAliasName);
         }
         sb.append(getFromBaseTableHint());
+        if (_dynamicHintFromBaseTable != null) {
+            sb.append(" ").append(_dynamicHintFromBaseTable);
+        }
         sb.append(getLeftOuterJoinClause());
     }
 
@@ -3762,6 +3771,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** {@inheritDoc} */
     public boolean isDatetimePrecisionTruncationOfConditionEnabled() {
         return _datetimePrecisionTruncationOfCondition;
+    }
+
+    // [DBFlute-1.2.2]
+    // ===================================================================================
+    //                                                                        Dynamic Hint
+    //                                                                        ============
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    public void registerDynamicHintFromBaseTable(String hint) {
+        assertStringNotNullAndNotTrimmedEmpty("hint", hint);
+        _dynamicHintFromBaseTable = hint;
     }
 
     // ===================================================================================
