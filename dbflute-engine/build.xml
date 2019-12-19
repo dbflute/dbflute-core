@@ -5,10 +5,10 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.2.1" />
-	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.2.1" />
-	<property name="runtime.build.version" value="${runtime.version}" />
+	<property name="version" value="1.2.2" />
+	<property name="build.version" value="${version}-RC1" />
+	<property name="runtime.version" value="1.2.2" />
+	<property name="runtime.build.version" value="${runtime.version}-RC1-A-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
