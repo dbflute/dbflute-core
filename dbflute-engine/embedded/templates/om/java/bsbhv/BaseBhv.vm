@@ -19,7 +19,9 @@ ${database.allClassCopyright}package ${myBaseBhvPackageName};
 import java.util.List;
 
 import org.dbflute.*;
+#if ($table.needsBehaviorDirectPackageImport())
 import org.dbflute.bhv.*;
+#end
 #if ($database.needsBehaviorSpringAutowired())
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 #end
