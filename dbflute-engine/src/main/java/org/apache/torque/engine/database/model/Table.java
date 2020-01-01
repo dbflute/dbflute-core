@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,8 @@ import java.util.TreeMap;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.bhv.AbstractBehaviorReadable;
+import org.dbflute.bhv.AbstractBehaviorWritable;
 import org.dbflute.bhv.referrer.ConditionBeanSetupper;
 import org.dbflute.bhv.referrer.ReferrerConditionSetupper;
 import org.dbflute.cbean.chelper.HpSDRFunction;
@@ -2270,8 +2272,30 @@ public class Table {
     //    return buildBaseEntityClassName("LoaderOf");
     //}
 
+    public boolean needsBehaviorDirectPackageImport() {
+        return !hasExtendedAbstractBehavior();
+    }
+
+    protected boolean hasExtendedAbstractBehavior() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return isWritable() ? prop.hasExtendedAbstractBehaviorWritableClass() : prop.hasExtendedAbstractBehaviorReadableClass();
+    }
+
     public String getBaseBehaviorExtendsClassName() {
-        return isWritable() ? "AbstractBehaviorWritable" : "AbstractBehaviorReadable";
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (isWritable()) {
+            if (prop.hasExtendedAbstractBehaviorWritableClass()) {
+                return prop.getExtendedAbstractBehaviorWritableClass();
+            } else { // basically here
+                return AbstractBehaviorWritable.class.getSimpleName();
+            }
+        } else {
+            if (prop.hasExtendedAbstractBehaviorReadableClass()) {
+                return prop.getExtendedAbstractBehaviorReadableClass();
+            } else {
+                return AbstractBehaviorReadable.class.getSimpleName();
+            }
+        }
     }
 
     // -----------------------------------------------------

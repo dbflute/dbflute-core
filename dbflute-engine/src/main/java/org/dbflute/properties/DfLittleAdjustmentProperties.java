@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.dbflute.bhv.AbstractBehaviorReadable;
+import org.dbflute.bhv.AbstractBehaviorWritable;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.exception.DfColumnNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
@@ -188,6 +190,27 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
 
     public boolean isMakeBatchUpdateSpecifyColumn() { // closet
         return isProperty("isMakeBatchUpdateSpecifyColumn", isCompatibleBeforeJava8());
+    }
+
+    // -----------------------------------------------------
+    //                                     Abstract Extended
+    //                                     -----------------
+    public boolean hasExtendedAbstractBehaviorReadableClass() {
+        return getExtendedAbstractBehaviorReadableClass() != null;
+    }
+
+    public String getExtendedAbstractBehaviorReadableClass() { // closet
+        final String readableName = AbstractBehaviorReadable.class.getSimpleName();
+        return hasExtensionClass(readableName) ? findExtendedExtensionClassProperty(readableName) : null;
+    }
+
+    public boolean hasExtendedAbstractBehaviorWritableClass() {
+        return getExtendedAbstractBehaviorWritableClass() != null;
+    }
+
+    public String getExtendedAbstractBehaviorWritableClass() { // closet
+        final String writableName = AbstractBehaviorWritable.class.getSimpleName();
+        return hasExtensionClass(writableName) ? findExtendedExtensionClassProperty(writableName) : null;
     }
 
     // -----------------------------------------------------
@@ -722,46 +745,46 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     //                                                                  Extended Component
     //                                                                  ==================
     public String getDBFluteInitializerClass() { // Java only
-        return getExtensionClassAllcommon("DBFluteInitializer");
+        return prepareExtensionClassAllcommon("DBFluteInitializer");
     }
 
     public String getImplementedInvokerAssistantClass() { // Java only, closet
-        return getExtensionClassAllcommon("ImplementedInvokerAssistant");
+        return prepareExtensionClassAllcommon("ImplementedInvokerAssistant");
     }
 
     public String getImplementedCommonColumnAutoSetupperClass() { // Java only, closet
-        return getExtensionClassAllcommon("ImplementedCommonColumnAutoSetupper");
+        return prepareExtensionClassAllcommon("ImplementedCommonColumnAutoSetupper");
     }
 
     public String getBehaviorCommandInvokerClass() { // Java only
-        return getExtensionClassRuntime(BehaviorCommandInvoker.class.getName());
+        return prepareExtensionClassRuntime(BehaviorCommandInvoker.class.getName());
     }
 
     public String getBehaviorCommandInvokerSimpleIfPlainClass() { // Java only
-        return getExtensionClassRuntime(BehaviorCommandInvoker.class.getSimpleName());
+        return prepareExtensionClassRuntime(BehaviorCommandInvoker.class.getSimpleName());
     }
 
     public String getS2DaoSettingClass() { // CSharp only, closet
         final String className = "S2DaoSetting";
         if (hasExtensionClass(className)) {
-            return getExtendedExtensionClass(className);
+            return findExtendedExtensionClassProperty(className);
         } else {
             return getBasicProperties().getProjectPrefix() + className;
         }
     }
 
-    protected String getExtensionClassAllcommon(String className) {
-        return doGetExtensionClass(className, false);
+    protected String prepareExtensionClassAllcommon(String className) {
+        return doPrepareExtensionClass(className, false);
     }
 
-    protected String getExtensionClassRuntime(String className) {
-        return doGetExtensionClass(className, true);
+    protected String prepareExtensionClassRuntime(String className) {
+        return doPrepareExtensionClass(className, true);
     }
 
-    protected String doGetExtensionClass(String className, boolean runtime) {
+    protected String doPrepareExtensionClass(String className, boolean runtime) { // not null
         final String plainName = Srl.substringLastRear(className, ".");
         if (hasExtensionClass(plainName)) {
-            return getExtendedExtensionClass(plainName);
+            return findExtendedExtensionClassProperty(plainName);
         } else {
             if (runtime) { // e.g. BehaviorCommandInvoker
                 return className;
@@ -776,11 +799,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     protected boolean hasExtensionClass(String className) {
-        String str = getExtendedExtensionClass(className);
+        String str = findExtendedExtensionClassProperty(className);
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    protected String getExtendedExtensionClass(String className) {
+    protected String findExtendedExtensionClassProperty(String className) { // null allowed
         return getProperty("extended" + className + "Class", null);
     }
 

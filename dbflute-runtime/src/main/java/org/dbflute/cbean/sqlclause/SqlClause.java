@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1491,6 +1491,20 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isDatetimePrecisionTruncationOfConditionEnabled();
+
+    // [DBFlute-1.2.2]
+    // ===================================================================================
+    //                                                                        Dynamic Hint
+    //                                                                        ============
+    // too difficult so unsupported for now by jflute (2019/12/19)
+    //void registerDynamicHintSelectRear(String hint); // for e.g. Oracle
+
+    /**
+     * Read the source code.
+     * @param hint The hint expression on SQL. (NotNull, NotTrimmedEmpty)
+     * @deprecated You may have DBMS dependency and breakable SQL, so be careful.
+     */
+    void registerDynamicHintFromBaseTable(String hint); // for e.g. MySQL, TiDB
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================

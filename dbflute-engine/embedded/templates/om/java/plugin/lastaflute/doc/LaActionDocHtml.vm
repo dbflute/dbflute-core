@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2019 the original author or authors.
+## Copyright 2014-2020 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
     <tr>
         <th rowspan="2">No.</th>
         <th rowspan="2">URL</th>
+        <th rowspan="2">type</th>
 #if (!$table.tableMap.isSuppressDescriptionInList)
         <th rowspan="2">description</th>
 #end
@@ -39,6 +40,16 @@
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell"><a href="#$manager.htmlEscapeAsId($actionDocMeta.url)::$manager.htmlEscapeAsId($actionDocMeta.methodName)">$manager.htmlEscape($actionDocMeta.url)</a></td>
+        <td class="rowcell">
+# simple implementation for now
+#if ($actionDocMeta.returnTypeDocMeta and $actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse')
+            html
+#elseif ($actionDocMeta.returnTypeDocMeta and $actionDocMeta.returnTypeDocMeta.simpleTypeName == 'StreamResponse')
+            stream
+#else
+            api
+#end
+        </td>
 #if (!$table.tableMap.isSuppressDescriptionInList)
         <td class="rowcell">$!manager.htmlEscape($actionDocMeta.description)</td>
 #end

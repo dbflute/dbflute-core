@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,7 +311,8 @@ public class DfLReverseOutputHandler {
     protected String buildDelimiterFilePrefix(DfLReverseOutputResource resource, int sheetNumber) {
         final int sectionNo = resource.getSectionNo();
         final String sectionPrefix = sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo);
-        return "cyclic_" + sectionPrefix + "_" + sheetNumber + "-";
+        final String sheetPrefix = sheetNumber < 10 ? "0" + sheetNumber : String.valueOf(sheetNumber);
+        return "cyclic_" + sectionPrefix + "_" + sheetPrefix + "-";
     }
 
     protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception cause) {
