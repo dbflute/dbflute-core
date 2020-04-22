@@ -119,7 +119,7 @@ public class DfMapStyleTest extends RuntimeTestCase {
         assertEquals(map, generateMap);
     }
 
-    public void test_toMapString_printOneLiner() {
+    public void test_toMapString_printOneLiner_basic() {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle().printOneLiner();
         Map<String, Object> map = new LinkedHashMap<String, Object>();
@@ -155,6 +155,48 @@ public class DfMapStyleTest extends RuntimeTestCase {
         assertTrue(mapString.contains("; key2 = value2"));
         assertTrue(mapString.contains("; key3 = map:{"));
         assertTrue(mapString.contains(" key3-1 = value3-1"));
+        assertFalse(mapString.contains(ln()));
+        Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
+    public void test_toMapString_printOneLiner_withoutSideSpace() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().printOneLiner().withoutDisplaySideSpace();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key3-1", "value3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key4-3-1", "value4-3-1");
+            valueMap.put("key4-3-2", "value4-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(map);
+
+        // ## Assert ##
+        log(ln() + mapString);
+        assertTrue(mapString.contains("key1=value1"));
+        assertTrue(mapString.contains(";key2=value2"));
+        assertTrue(mapString.contains(";key3=map:{"));
+        assertTrue(mapString.contains("key3-1=value3-1"));
         assertFalse(mapString.contains(ln()));
         Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
         log(ln() + generateMap);

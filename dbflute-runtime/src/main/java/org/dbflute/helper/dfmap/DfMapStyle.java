@@ -148,6 +148,9 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     /** Does it print as one-liner for building? */
     protected boolean _printOneLiner;
 
+    /** Is it without display side spaces? */
+    protected boolean _withoutDisplaySideSpace;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -200,6 +203,16 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         return this;
     }
 
+    /**
+     * Print without display side spaces. <br>
+     * e.g. map:{ sea = mystic ; land = oneman } to map:{sea=mystic;land=oneman}.
+     * @return this. (NotNull)
+     */
+    public DfMapStyle withoutDisplaySideSpace() {
+        _withoutDisplaySideSpace = true;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                    Object to String
     //                                                                    ================
@@ -217,21 +230,23 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         @SuppressWarnings("unchecked")
         final Map<String, Object> casted = (Map<String, Object>) map;
         final boolean printOneLiner = isPrintOneLiner();
-        buildMapString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
+        final boolean withoutDisplaySideSpace = isWithoutDisplaySideSpace();
+        buildMapString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ", withoutDisplaySideSpace);
         return sb.toString();
     }
 
     protected void buildMapString(StringBuilder sb, Map<String, Object> map, boolean printOneLiner, String previousIndent,
-            String currentIndent) {
+            String currentIndent, boolean withoutDisplaySideSpace) {
         doBuildMapStringBegin(sb, map, printOneLiner, previousIndent, currentIndent);
         if (!map.isEmpty()) {
             int index = 0;
             for (Entry<String, ? extends Object> entry : map.entrySet()) {
-                doBuildMapStringCurrentEntry(sb, printOneLiner, previousIndent, currentIndent, index, entry.getKey(), entry.getValue());
+                doBuildMapStringCurrentEntry(sb, printOneLiner, previousIndent, currentIndent, withoutDisplaySideSpace, index,
+                        entry.getKey(), entry.getValue());
                 ++index;
             }
             if (printOneLiner) {
-                sb.append(" ");
+                appendDisplaySideSpace(sb, withoutDisplaySideSpace);
             } else {
                 sb.append(ln()).append(previousIndent);
             }
@@ -245,30 +260,39 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     }
 
     protected void doBuildMapStringCurrentEntry(StringBuilder sb, boolean printOneLiner, String previousIndent, String currentIndent,
-            int index, String key, Object value) {
+            boolean withoutDisplaySideSpace, int index, String key, Object value) {
         if (printOneLiner) {
             if (index > 0) {
-                sb.append(" ").append(_elementDelimiter);
+                if (!isWithoutDisplaySideSpace()) {
+                    sb.append(" ");
+                }
+                sb.append(_elementDelimiter);
             }
         } else {
             sb.append(ln()).append(currentIndent).append(_elementDelimiter);
         }
-        sb.append(" ").append(escapeControlMarkAsMap(key)).append(" ").append(_valueEqual).append(" ");
+        appendDisplaySideSpace(sb, withoutDisplaySideSpace);
+        sb.append(escapeControlMarkAsMap(key));
+        appendDisplaySideSpace(sb, withoutDisplaySideSpace);
+        sb.append(_valueEqual);
+        if (!isWithoutDisplaySideSpace()) {
+            sb.append(" ");
+        }
         if (value instanceof Map<?, ?>) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> valueMap = (Map<String, Object>) value;
             final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
-            buildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
+            buildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent, withoutDisplaySideSpace);
         } else if (value instanceof List<?>) {
             @SuppressWarnings("unchecked")
             final List<Object> valueList = (List<Object>) value;
             final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
-            buildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
+            buildListString(sb, valueList, printOneLiner, currentIndent, nextIndent, withoutDisplaySideSpace);
         } else {
             final Map<String, Object> resolvedMap = resolvePotentialMapOfBuildingMapString(value);
             if (resolvedMap != null) {
                 final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
-                buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
+                buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent, withoutDisplaySideSpace);
             } else {
                 sb.append(escapeControlMarkAsMap(value));
             }
@@ -294,21 +318,22 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         @SuppressWarnings("unchecked")
         final List<Object> casted = (List<Object>) list;
         final boolean printOneLiner = isPrintOneLiner();
-        buildListString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
+        final boolean withoutDisplaySideSpace = isWithoutDisplaySideSpace();
+        buildListString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ", withoutDisplaySideSpace);
         return sb.toString();
     }
 
     protected void buildListString(StringBuilder sb, List<? extends Object> list, boolean printOneLiner, String previousIndent,
-            String currentIndent) {
+            String currentIndent, boolean withoutDisplaySideSpace) {
         doBuildListStringBegin(sb, list, printOneLiner, previousIndent, currentIndent);
         if (!list.isEmpty()) {
             int index = 0;
             for (Object value : list) {
-                doBuildListStringCurrentElement(sb, printOneLiner, previousIndent, currentIndent, index, value);
+                doBuildListStringCurrentElement(sb, printOneLiner, previousIndent, currentIndent, withoutDisplaySideSpace, index, value);
                 ++index;
             }
             if (printOneLiner) {
-                sb.append(" ");
+                appendDisplaySideSpace(sb, withoutDisplaySideSpace);
             } else {
                 sb.append(ln()).append(previousIndent);
             }
@@ -322,30 +347,31 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     }
 
     protected void doBuildListStringCurrentElement(StringBuilder sb, boolean printOneLiner, String previousIndent, String currentIndent,
-            int index, Object value) {
+            boolean withoutDisplaySideSpace, int index, Object value) {
         if (printOneLiner) {
             if (index > 0) {
-                sb.append(" ").append(_elementDelimiter);
+                appendDisplaySideSpace(sb, withoutDisplaySideSpace);
+                sb.append(_elementDelimiter);
             }
         } else {
             sb.append(ln()).append(currentIndent).append(_elementDelimiter);
         }
-        sb.append(" ");
+        appendDisplaySideSpace(sb, withoutDisplaySideSpace);
         if (value instanceof Map<?, ?>) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> valueMap = (Map<String, Object>) value;
             final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
-            buildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent);
+            buildMapString(sb, valueMap, printOneLiner, currentIndent, nextIndent, withoutDisplaySideSpace);
         } else if (value instanceof List<?>) {
             @SuppressWarnings("unchecked")
             final List<Object> valueList = (List<Object>) value;
             final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
-            buildListString(sb, valueList, printOneLiner, currentIndent, nextIndent);
+            buildListString(sb, valueList, printOneLiner, currentIndent, nextIndent, withoutDisplaySideSpace);
         } else {
             final Map<String, Object> resolvedMap = resolvePotentialMapOfBuildingMapString(value);
             if (resolvedMap != null) {
                 final String nextIndent = deriveNextIndentOfBuildingMapString(printOneLiner, previousIndent, currentIndent);
-                buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent);
+                buildMapString(sb, resolvedMap, printOneLiner, currentIndent, nextIndent, withoutDisplaySideSpace);
             } else {
                 sb.append(escapeControlMarkAsList(value));
             }
@@ -373,6 +399,12 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
         //      return super.resolvePotentialMapOfBuildingMapString(value);
         //  }
         return null; // returning null means non-map value
+    }
+
+    protected void appendDisplaySideSpace(StringBuilder sb, boolean withoutDisplaySideSpace) {
+        if (!withoutDisplaySideSpace) {
+            sb.append(" ");
+        }
     }
 
     // ===================================================================================
@@ -1492,5 +1524,9 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
 
     public boolean isPrintOneLiner() {
         return _printOneLiner;
+    }
+
+    public boolean isWithoutDisplaySideSpace() {
+        return _withoutDisplaySideSpace;
     }
 }
