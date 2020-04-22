@@ -36,6 +36,9 @@ public class DfMapStyleTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                        to MapString
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public void test_toMapString_basic() {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
@@ -77,7 +80,10 @@ public class DfMapStyleTest extends RuntimeTestCase {
         assertEquals(map, generateMap);
     }
 
-    public void test_toMapString_escape() {
+    // -----------------------------------------------------
+    //                                                Escape
+    //                                                ------
+    public void test_toMapString_escape_basic() {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle();
         Map<String, Object> map = new LinkedHashMap<String, Object>();
@@ -119,6 +125,51 @@ public class DfMapStyleTest extends RuntimeTestCase {
         assertEquals(map, generateMap);
     }
 
+    public void test_toMapString_escape_withoutDisplaySideSpace() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle().withoutDisplaySideSpace();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("k=ey1", "val{ue1");
+        map.put("ke;y2", "va=lu}e2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("k}ey3-1", "va;lue3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key=4-3-1", "value4-3-1");
+            valueMap.put("key@4-3-2", "val{ue4=-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(map);
+
+        // ## Assert ##
+        log(ln() + mapString);
+        assertTrue(mapString.contains(";k\\=ey1=val\\{ue1" + ln()));
+        assertTrue(mapString.contains(";ke\\;y2=va\\=lu\\}e2" + ln()));
+        assertTrue(mapString.contains(";key3=map:{" + ln()));
+        assertTrue(mapString.contains(";k\\}ey3-1=va\\;lue3-1" + ln()));
+        assertTrue(mapString.contains(";key@4-3-2=val\\{ue4\\=-3-2" + ln()));
+        Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
+    // -----------------------------------------------------
+    //                                        Print OneLiner
+    //                                        --------------
     public void test_toMapString_printOneLiner_basic() {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle().printOneLiner();
@@ -203,6 +254,9 @@ public class DfMapStyleTest extends RuntimeTestCase {
         assertEquals(map, generateMap);
     }
 
+    // -----------------------------------------------------
+    //                                           Nested Bean
+    //                                           -----------
     public void test_toMapString_nestedBean() {
         // ## Arrange ##
         final DfMapStyle mapStyle = new DfMapStyle() {
