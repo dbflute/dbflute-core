@@ -248,7 +248,8 @@ public class DfMapStyleTest extends RuntimeTestCase {
         assertTrue(mapString.contains(";key2=value2"));
         assertTrue(mapString.contains(";key3=map:{"));
         assertTrue(mapString.contains("key3-1=value3-1"));
-        assertFalse(mapString.contains(ln()));
+        assertNotContains(mapString, ln());
+        assertNotContains(mapString, " ");
         Map<String, Object> generateMap = mapStyle.fromMapString(mapString);
         log(ln() + generateMap);
         assertEquals(map, generateMap);
