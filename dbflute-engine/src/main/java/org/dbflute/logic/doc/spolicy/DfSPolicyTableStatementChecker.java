@@ -240,9 +240,10 @@ public class DfSPolicyTableStatementChecker {
             }
         } else if (thenItem.equalsIgnoreCase("pkName")) { // e.g. pkName is prefix:PK_
             if (table.hasPrimaryKey()) {
-                final Column pk = table.getPrimaryKey().get(0); // same name if compound
+                final List<Column> columnList = table.getPrimaryKey();
+                final Column pk = columnList.get(0); // same name if compound
                 final String pkName = pk.getPrimaryKeyName();
-                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue, columnList);
                 if (!isHitExp(statement, pkName, comparingThenValue) == !notThenValue) {
                     final String disp = pkName + (pk.isAdditionalPrimaryKey() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
@@ -251,7 +252,7 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
             for (ForeignKey fk : table.getForeignKeyList()) {
                 final String fkName = fk.getName();
-                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue, fk.getLocalColumnList());
                 if (!isHitExp(statement, fkName, comparingThenValue) == !notThenValue) {
                     final String disp = fkName + (fk.isAdditionalForeignKey() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
@@ -260,7 +261,7 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
             for (Unique uq : table.getUniqueList()) {
                 final String uqName = uq.getName();
-                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue, uq.getColumnList());
                 if (!isHitExp(statement, uqName, comparingThenValue)) {
                     final String disp = uqName + (uq.isAdditional() ? ADDITIONAL_SUFFIX : "");
                     return violationCall.apply(disp);
@@ -269,7 +270,7 @@ public class DfSPolicyTableStatementChecker {
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
             for (Index ix : table.getIndexList()) {
                 final String ixName = ix.getName();
-                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue);
+                final String comparingThenValue = toConstraintNameComparingThenValue(table, thenValue, ix.getColumnList());
                 if (!isHitExp(statement, ixName, comparingThenValue) == !notThenValue) {
                     return violationCall.apply(ixName);
                 }
@@ -311,8 +312,8 @@ public class DfSPolicyTableStatementChecker {
         return convertToAliasComparingValue(table, thenValue);
     }
 
-    protected String toConstraintNameComparingThenValue(Table table, String thenValue) {
-        return convertToConstraintNameComparingValue(table, thenValue);
+    protected String toConstraintNameComparingThenValue(Table table, String thenValue, List<Column> columnList) {
+        return convertToConstraintNameComparingValue(table, thenValue, columnList);
     }
 
     protected String buildViolation(Table table, DfSPolicyThenPart thenPart, String actual) {
@@ -352,11 +353,17 @@ public class DfSPolicyTableStatementChecker {
         return comparingValue;
     }
 
-    protected String convertToConstraintNameComparingValue(Table table, String thenValue) {
+    protected String convertToConstraintNameComparingValue(Table table, String thenValue, List<Column> columnList) {
         final String tableName = toComparingTableName(table);
         String comparingValue = thenValue;
         comparingValue = replaceComparingValue(comparingValue, "tableName", tableName, /*suppressUpper*/true); // @since 1.1.9
         comparingValue = replaceComparingValue(comparingValue, "table", tableName); // facade style, @since first
+        if (!columnList.isEmpty()) { // no way, just in case
+            // for MySQL only-one column unique constraint @since 1.2.3
+            //  e.g. then uniqueName is UQ_$$tableName$$ or $$first_columnName$$
+            final Column firstColumn = columnList.get(0);
+            comparingValue = replaceComparingValue(comparingValue, "first_columnName", firstColumn.getName(), /*suppressUpper*/true);
+        }
         return comparingValue;
     }
 
