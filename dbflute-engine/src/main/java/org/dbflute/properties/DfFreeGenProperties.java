@@ -81,15 +81,21 @@ public final class DfFreeGenProperties extends DfAbstractDBFluteProperties {
 
     public Map<String, Object> getFreeGenMap() {
         if (_freeGenMap == null) {
-            Map<String, Object> specifiedMap = mapProp("torque.freeGenMap", null);
-            if (specifiedMap == null) {
-                specifiedMap = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP); // for compatible
-            }
+            final String mapName = "freeGenMap";
+            final Map<String, Object> specifiedMap = resolveSplit(mapName, doGetFreeGenMap(mapName));
             _freeGenMap = newLinkedHashMap();
-            reflectEmbeddedProperties();
-            reflectSpecifiedProperties(specifiedMap);
+            reflectEmbeddedProperties(); // uses _freeGenMap
+            reflectSpecifiedProperties(specifiedMap); // uses _freeGenMap
         }
         return _freeGenMap;
+    }
+
+    protected Map<String, Object> doGetFreeGenMap(final String mapName) {
+        Map<String, Object> specifiedMap = mapProp("torque." + mapName, null);
+        if (specifiedMap == null) {
+            specifiedMap = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP); // for compatible
+        }
+        return specifiedMap;
     }
 
     protected void reflectEmbeddedProperties() {
