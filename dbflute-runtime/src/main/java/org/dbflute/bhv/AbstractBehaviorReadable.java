@@ -1413,6 +1413,9 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                               -------
     public void warmUpCommand() {
         {
+            newConditionBean().localCQ(); // to load classes of condition-bean and condition-query
+        }
+        {
             final SelectCountCBCommand cmd = createSelectCountCBCommand(newConditionBean(), true);
             cmd.setInitializeOnly(true);
             invoke(cmd);
