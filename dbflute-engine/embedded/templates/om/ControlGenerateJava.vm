@@ -229,20 +229,9 @@ $database.info("public void parseContainerConfig() {")
 #end
 #end
 #if ($database.isTargetContainerMicronaut())
-#if ($database.isDBFluteBeansGeneratedAsJavaConfig())
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteBeansFactory}.${glClassFileExtension}" )
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/micronaut/MicronautDBFluteBeansFactory.${glTemplateFileExtension}", $path, "", "")
-#else
-  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
-  #set ($path = "${dbfluteBeansPackageName}" )
-  $database.makeDirectory($path)
-
-  #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-  $database.info("    parse('${path}')")
-  $generator.parse("om/${glResourceDirectory}/allcommon/container/micronaut/MicronautDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
-  #end
-#end
 #end
 $database.info("}")
 

@@ -25,9 +25,6 @@ import org.dbflute.dbway.DBDef;
 #if ($database.isTargetContainerSpring())
 import org.dbflute.jdbc.DataSourceHandler;
 #end
-#if ($database.isTargetContainerMicronaut())
-import org.dbflute.jdbc.DataSourceHandler;
-#end
 import org.dbflute.system.DBFluteSystem;
 
 import org.slf4j.Logger;
@@ -50,9 +47,6 @@ public class ${glDBFluteInitializer} {
 #if ($database.isTargetContainerSpring())
     protected final String _dataSourceFqcn;
 #end
-#if ($database.isTargetContainerMicronaut())
-    protected final String _dataSourceFqcn;
-#end
 
     // ===================================================================================
     //                                                                         Constructor
@@ -60,15 +54,6 @@ public class ${glDBFluteInitializer} {
     /**
      * Constructor, which initializes various components.
 #if ($database.isTargetContainerSpring())
-     * @param dataSource The instance of data source. (NotNull)
-     */
-    public ${glDBFluteInitializer}(javax.sql.DataSource dataSource) {
-        if (dataSource == null) {
-            String msg = "The argument 'dataSource' should not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        _dataSourceFqcn = dataSource.getClass().getName();
-#elseif ($database.isTargetContainerMicronaut())
      * @param dataSource The instance of data source. (NotNull)
      */
     public ${glDBFluteInitializer}(javax.sql.DataSource dataSource) {
@@ -105,8 +90,6 @@ public class ${glDBFluteInitializer} {
 #if ($database.isTargetContainerSeasar())
         loadCoolClasses();
 #elseif ($database.isTargetContainerSpring())
-        setupDataSourceHandler(_dataSourceFqcn);
-#elseif ($database.isTargetContainerMicronaut())
         setupDataSourceHandler(_dataSourceFqcn);
 #end
         adjustDBFluteSystem();
@@ -155,42 +138,6 @@ public class ${glDBFluteInitializer} {
         if (needsSpringTransactionalDataSource(dataSourceFqcn)) {
             config.unlock();
             config.setDataSourceHandler(new ${glDBFluteConfig}.SpringTransactionalDataSourceHandler());
-        }
-    }
-
-    protected boolean needsSpringTransactionalDataSource(String dataSourceFqcn) {
-        return dataSourceFqcn.startsWith("org.apache.commons.dbcp.")
-            || dataSourceFqcn.startsWith("org.apache.commons.dbcp2.")
-            || dataSourceFqcn.startsWith("org.apache.tomcat.jdbc.pool.")
-#if ($database.hasDBFluteBeansTransactionalDataSourcePackage())
-            || dataSourceFqcn.startsWith("${database.DBFluteBeansTransactionalDataSourcePackage}.") // your data source
-#end
-            || dataSourceFqcn.startsWith("com.zaxxer.hikari.");
-    }
-
-#end
-#if ($database.isTargetContainerMicronaut())
-    /**
-     * Set up the handler of data source to the configuration of DBFlute. <br>
-     * If it uses commons-DBCP, it needs to arrange some for transaction.
-     * <ul>
-     *     <li>A. To use DataSourceUtils which is Spring Framework class.</li>
-     *     <li>B. To use TransactionConnection that is original class and doesn't close really.</li>
-     * </ul>
-     * If you use a transaction library which has a data source which supports transaction,
-     * It doesn't need these arrangement. (For example, the framework 'Atomikos') <br>
-     * This method should be executed when application is initialized.
-     * @param dataSourceFqcn The FQCN of data source. (NotNull)
-     */
-    protected void setupDataSourceHandler(String dataSourceFqcn) { // for Spring
-        final ${glDBFluteConfig} config = ${glDBFluteConfig}.getInstance();
-        final DataSourceHandler dataSourceHandler = config.getDataSourceHandler();
-        if (dataSourceHandler != null) {
-            return;
-        }
-        if (needsSpringTransactionalDataSource(dataSourceFqcn)) {
-            config.unlock();
-            config.setDataSourceHandler(new ${glDBFluteConfig}.MicronautTransactionalDataSourceHandler());
         }
     }
 

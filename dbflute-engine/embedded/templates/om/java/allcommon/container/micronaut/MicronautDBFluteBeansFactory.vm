@@ -42,7 +42,7 @@ public class ${glDBFluteBeansFactory} {
     @Inject
     protected ApplicationContext _container;
 
-    // Currently, DBFlute for Micronaut does'nt support multiple DB
+    // Currently, DBFlute for Micronaut doesn't support multiple DB
     @Inject
     protected DataSource _dataSource;
 
