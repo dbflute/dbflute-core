@@ -1,0 +1,46 @@
+##
+## Copyright 2014-2019 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+    ${database.DBFluteBeansDefaultAttribute}>
+
+    <!-- The components of DBFlute Runtime. -->
+    <bean id="${database.DBFluteInitializerComponentName}" class="${database.DBFluteInitializerClass}">
+        <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
+    </bean>
+    <bean id="${database.invokerAssistantComponentName}" class="${database.implementedInvokerAssistantClass}" autowire="byType">
+        <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
+        <property name="introduction"><ref bean="${database.DBFluteInitializerComponentName}"/></property>
+    </bean>
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.implementedCommonColumnAutoSetupperClass}" autowire="byType"/>
+    <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
+    <bean id="${database.behaviorCommandInvokerComponentName}" class="${database.behaviorCommandInvokerClass}" autowire="byType">
+        <property name="invokerAssistant"><ref bean="${database.invokerAssistantComponentName}"/></property>
+    </bean>
+
+    <!-- The components of Behavior. -->
+#foreach ($table in $database.behaviorTableList)
+	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType">
+        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
+        <property name="behaviorSelector"><ref bean="${database.behaviorSelectorComponentName}"/></property>
+#if ($table.isWritable())
+        <property name="commonColumnAutoSetupper"><ref bean="${database.commonColumnAutoSetupperComponentName}"/></property>
+#end
+    </bean>
+#end
+</beans>

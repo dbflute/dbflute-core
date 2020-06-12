@@ -63,6 +63,9 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.lastaflute.jta.dbcp.ConnectionWrapper;
 import org.lastaflute.di.exception.SQLRuntimeException;
 #end
+#if ($database.isTargetContainerMicronaut())
+import org.springframework.jdbc.datasource.DataSourceUtils;
+#end
 
 /**
  * @author ${database.classAuthor}
@@ -981,6 +984,31 @@ public class ${glDBFluteConfig} {
     //                                                Spring
     //                                                ------
     public static class SpringTransactionalDataSourceHandler implements DataSourceHandler {
+
+        public Connection getConnection(DataSource ds) throws SQLException {
+            final Connection conn = getConnectionFromUtils(ds);
+            if (isConnectionTransactional(conn, ds)) {
+                return new NotClosingConnectionWrapper(conn);
+            } else {
+                return conn;
+            }
+        }
+
+        public Connection getConnectionFromUtils(DataSource ds) {
+            return DataSourceUtils.getConnection(ds);
+        }
+
+        public boolean isConnectionTransactional(Connection conn, DataSource ds) {
+            return DataSourceUtils.isConnectionTransactional(conn, ds);
+        }
+    }
+
+#end
+#if ($database.isTargetContainerMicronaut())
+    // -----------------------------------------------------
+    //                                             Micronaut
+    //                                             ---------
+    public static class MicronautTransactionalDataSourceHandler implements DataSourceHandler {
 
         public Connection getConnection(DataSource ds) throws SQLException {
             final Connection conn = getConnectionFromUtils(ds);

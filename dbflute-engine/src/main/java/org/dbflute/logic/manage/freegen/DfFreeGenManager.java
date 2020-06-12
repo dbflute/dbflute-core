@@ -103,6 +103,10 @@ public class DfFreeGenManager {
         return getBasicProperties().isTargetContainerLastaDi();
     }
 
+    public boolean isTargetContainerMicronaut() {
+        return getBasicProperties().isTargetContainerMicronaut();
+    }
+
     // ===================================================================================
     //                                                                           Copyright
     //                                                                           =========
