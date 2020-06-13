@@ -52,7 +52,7 @@ public class ${glDBFluteBeansFactory} {
     @Singleton
     @Named("${database.DBFluteInitializerComponentName}")
     public ${glDBFluteInitializer} createDBFluteInitializer() { // no lazy for initialize-only component
-        return new ${database.DBFluteInitializerClass}(_dataSource);
+        return new ${database.DBFluteInitializerClass}();
     }
 
     @Singleton
