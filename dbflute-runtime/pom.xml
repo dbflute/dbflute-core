@@ -13,7 +13,7 @@
 
 	<properties>
 		<slf4j.version>1.7.12</slf4j.version>
-		<junit.version>4.8.2</junit.version> <!-- latest version without hamcrest -->
+		<junit.version>4.13.1</junit.version> <!-- latest version without hamcrest -->
 	</properties>
 
 	<licenses>
