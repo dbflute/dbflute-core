@@ -7,7 +7,7 @@
 	<!-- Version -->
 	<property name="version" value="1.2.3" />
 	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.2.3" />
+	<property name="runtime.version" value="1.2.4-RC1-A-SNAPSHOT" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
