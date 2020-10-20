@@ -342,6 +342,25 @@ public class MapListStringTest extends RuntimeTestCase {
     }
 
     // -----------------------------------------------------
+    //                                                 Empty
+    //                                                 -----
+    public void test_fromMapString_empty_basic() {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+
+        // ## Act ##
+        // ## Assert ##
+        assertTrue(maplist.generateMap("map:{}").isEmpty());
+        assertTrue(maplist.generateMap("map:{} ").isEmpty());
+        assertTrue(maplist.generateMap("map:{}\n").isEmpty());
+        assertTrue(maplist.generateMap("map:{ }").isEmpty());
+        assertTrue(maplist.generateMap("map:{\n}").isEmpty());
+        assertTrue(maplist.generateMap(" map:{}").isEmpty());
+        assertTrue(maplist.generateMap("\nmap:{}").isEmpty());
+        assertTrue(maplist.generateMap("\nmap:{\n}\n").isEmpty());
+    }
+
+    // -----------------------------------------------------
     //                                                Quoted
     //                                                ------
     public void test_generateMap_quoted_basic() throws Exception {

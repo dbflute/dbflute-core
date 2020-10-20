@@ -1393,7 +1393,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     }
 
     protected boolean isRemainderOver() {
-        if (_remainderString.length() == _currentRemainderIndex + 1) { // may be almost here
+        if (_remainderString.length() == _currentRemainderIndex) { // may be almost here
             return true;
         }
         if (indexOfRemainderNonTrimmedChar() < 0) { // with loop so also check just-over before this
