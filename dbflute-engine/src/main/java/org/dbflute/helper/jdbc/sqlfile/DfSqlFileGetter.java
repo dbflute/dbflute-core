@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class DfSqlFileGetter {
         final List<File> fileList = new ArrayList<File>();
         final File fileDir = toFileDir(sqlDirectory);
         registerFile(fileList, fileDir);
+        Collections.sort(fileList);
         return fileList;
     }
 
