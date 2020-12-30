@@ -2722,10 +2722,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                        --------------
     public void specifySelectColumn(SpecifiedColumn specifiedColumn) {
         if (_specifiedSelectColumnMap == null) {
-            _specifiedSelectColumnMap = StringKeyMap.createAsFlexible(); // not needs order
+            // should not be flexible to avoid alias conflict (e.g. dfrel_10, dfrel_1_0) by jflute (2020/12/30)
+            _specifiedSelectColumnMap = StringKeyMap.createAsCaseInsensitive(); // not needs order
         }
         final String tableAliasName = specifiedColumn.getTableAliasName();
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
+            // flexible for column name, while may not need order...but no change for now by jflute (2020/12/30)
             final Map<String, SpecifiedColumn> elementMap = StringKeyMap.createAsFlexibleOrdered();
             _specifiedSelectColumnMap.put(tableAliasName, elementMap);
         }
