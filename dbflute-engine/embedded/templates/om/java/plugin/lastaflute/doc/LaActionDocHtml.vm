@@ -65,8 +65,8 @@
 #end
         </td>
         <td class="rowcellnum">$!{actionDocMeta.fieldTypeDocMetaList.size()}</td>
-        <td class="rowcellnum">$!{actionDocMeta.fileLineCount}</td>
-        <td class="rowcellnum">$!{actionDocMeta.methodLineCount}</td>
+        <td class="rowcellnum">$!{manager.toInteger($!{actionDocMeta.fileLineCount})}</td>
+        <td class="rowcellnum">$!{manager.toInteger($!{actionDocMeta.methodLineCount})}</td>
     </tr>
 #end
     </tbody>
