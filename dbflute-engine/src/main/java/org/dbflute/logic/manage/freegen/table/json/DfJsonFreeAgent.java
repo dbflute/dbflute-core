@@ -24,20 +24,15 @@ import java.net.URLConnection;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.Set;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
+import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgGsonJsonEngine;
+import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgJavaScriptJsonEngine;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -68,63 +63,32 @@ public class DfJsonFreeAgent {
         return fromJson(requestName, resourceFile, json);
     }
 
+    // -----------------------------------------------------
+    //                                             From JSON
+    //                                             ---------
     protected <RESULT> RESULT fromJson(String requestName, String resourceFile, String json) {
-        final ScriptEngineManager manager = new ScriptEngineManager();
-        final ScriptEngine engine = manager.getEngineByName("javascript");
-        try {
-            final String realExp;
-            if (json.startsWith("{") || json.startsWith("[")) { // map, list style
-                realExp = json;
-            } else { // map omitted?
-                realExp = "{" + json + "}";
-            }
-            engine.eval("var result = " + realExp);
-        } catch (ScriptException e) {
-            throwJsonParseFailureException(requestName, resourceFile, e);
-        }
-        @SuppressWarnings("unchecked")
-        final RESULT result = (RESULT) engine.get("result");
-        return filterJavaScriptObject(result);
+        return doFromJson(requestName, resourceFile, adjustJsonBraceToParse(json));
     }
 
-    @SuppressWarnings("unchecked")
-    protected <RESULT> RESULT filterJavaScriptObject(RESULT result) {
-        if (result instanceof List<?>) {
-            final List<Object> srcList = (List<Object>) result;
-            final List<Object> destList = new ArrayList<Object>(srcList.size());
-            for (Object element : srcList) {
-                destList.add(filterJavaScriptObject(element));
-            }
-            return (RESULT) destList;
-        } else if (result instanceof Map<?, ?>) {
-            final Map<Object, Object> srcMap = (Map<Object, Object>) result;
-            final List<Object> challengedList = challengeList(srcMap);
-            if (challengedList != null) {
-                return (RESULT) filterJavaScriptObject(challengedList);
-            } else {
-                final Map<Object, Object> destMap = new LinkedHashMap<Object, Object>(srcMap.size());
-                for (Entry<Object, Object> entry : srcMap.entrySet()) {
-                    destMap.put(entry.getKey(), filterJavaScriptObject(entry.getValue()));
-                }
-                return (RESULT) destMap;
-            }
-        } else {
-            return result;
+    protected <RESULT> RESULT doFromJson(String requestName, String resourceFile, String adjustedJson) {
+        final DfFrgGsonJsonEngine gsonJsonEngine = new DfFrgGsonJsonEngine();
+        if (gsonJsonEngine.determineFromJsonAvailable()) { // Gson first
+            return gsonJsonEngine.fromJson(requestName, resourceFile, adjustedJson);
+        } else { // e.g. sai or nashorn
+            final DfFrgJavaScriptJsonEngine scriptEngineJsonEngine = new DfFrgJavaScriptJsonEngine();
+            return scriptEngineJsonEngine.fromJson(requestName, resourceFile, adjustedJson);
         }
     }
 
-    protected List<Object> challengeList(Map<Object, Object> map) {
-        int index = 0;
-        final Set<Object> keySet = map.keySet();
-        for (Object key : keySet) {
-            final String strKey = key.toString();
-            if (Srl.isNumberHarfAll(strKey) && Integer.parseInt(strKey) == index) {
-                ++index;
-                continue;
-            }
-            return null;
+    protected String adjustJsonBraceToParse(String json) {
+        final String realExp;
+        if (json.startsWith("{") || json.startsWith("[")) { // map, list style
+            realExp = json;
+        } else { // map omitted?
+            // I forget specific pattern, so...needed? (keep compatible for now) by jflute (2020/12/31)
+            realExp = "{" + json + "}";
         }
-        return new ArrayList<Object>(map.values());
+        return realExp;
     }
 
     protected void throwJsonFileNotFoundException(String requestName, String resourceFile, IOException cause) {
@@ -141,17 +105,6 @@ public class DfJsonFreeAgent {
     protected void throwJsonFileCannotAccessException(String requestName, String resourceFile, IOException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Cannot access the JSON file for FreeGen.");
-        br.addItem("FreeGen Request");
-        br.addElement(requestName);
-        br.addItem("JSON File");
-        br.addElement(resourceFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg, cause);
-    }
-
-    protected void throwJsonParseFailureException(String requestName, String resourceFile, Exception cause) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to parse the JSON file for FreeGen.");
         br.addItem("FreeGen Request");
         br.addElement(requestName);
         br.addItem("JSON File");
@@ -262,7 +215,8 @@ public class DfJsonFreeAgent {
                     keyList = new ArrayList<String>();
                     for (Object element : currentList) {
                         if (!(element instanceof Map<?, ?>)) {
-                            throwKeyPathExpectedMapListButNotMapException(requestName, resource, keyPath, pathElement, currentList, element);
+                            throwKeyPathExpectedMapListButNotMapException(requestName, resource, keyPath, pathElement, currentList,
+                                    element);
                         }
                         @SuppressWarnings("unchecked")
                         final Map<String, Object> elementMap = (Map<String, Object>) element;

@@ -32,11 +32,6 @@ import org.dbflute.util.Srl;
 public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    protected static final String JSON_DECODER_NAME = "net.arnx.jsonic.JSON";
-
-    // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
