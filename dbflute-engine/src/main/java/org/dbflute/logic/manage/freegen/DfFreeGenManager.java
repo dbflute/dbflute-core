@@ -25,6 +25,7 @@ import javax.script.ScriptEngineManager;
 import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -177,8 +178,31 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                       Script Helper
     //                                                                       =============
-    public ScriptEngine createJavaScriptEngine() { // e.g. remote-api generate
-        return new ScriptEngineManager().getEngineByName("JavaScript");
+    public ScriptEngine createJavaScriptEngine() { // as public engine e.g. remote-api generate
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("sai");
+        if (engine == null) {
+            engine = manager.getEngineByName("JavaScript"); // original code until 1.2.3
+        }
+        if (engine == null) {
+            throwJsonScriptPublicEngineNotFoundException();
+        }
+        return engine;
+    }
+
+    protected void throwJsonScriptPublicEngineNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the public engine of JSON script for FreeGen template.");
+        br.addItem("Advice");
+        br.addElement("Nashorn (JavaScript engine) is removed since Java15.");
+        br.addElement("");
+        br.addElement("You can use 'sai' instead of Nashorn.");
+        br.addElement(" https://github.com/codelibs/sai");
+        br.addElement("");
+        br.addElement("Put the jar files (including dependencies)");
+        br.addElement("on 'extlib' directory of your DBFlute client.");
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
