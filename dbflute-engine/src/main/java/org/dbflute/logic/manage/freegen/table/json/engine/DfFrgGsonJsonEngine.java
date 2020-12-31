@@ -86,11 +86,13 @@ public class DfFrgGsonJsonEngine {
             } catch (ClassNotFoundException ignored) { // e.g. no jar file in 'extlib'
                 _log.info(" -> not found the Gson type: {}", gsonFqcn);
             }
-            try {
-                _gsonObj = DfReflectionUtil.newInstance(_gsonType);
-            } catch (RuntimeException continued) { // basically no way
-                _log.warn(" -> *cannot instantiate the Gson type: {}", _gsonType, continued);
-                _gsonType = null; // treated as not found
+            if (_gsonType != null) {
+                try {
+                    _gsonObj = DfReflectionUtil.newInstance(_gsonType);
+                } catch (RuntimeException continued) { // basically no way
+                    _log.warn(" -> *cannot instantiate the Gson type: {}", _gsonType, continued);
+                    _gsonType = null; // treated as not found
+                }
             }
             _typeInitialized = true;
         }
