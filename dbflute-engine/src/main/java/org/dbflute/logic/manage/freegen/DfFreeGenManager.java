@@ -30,6 +30,7 @@ import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,6 +160,9 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                      Convert Helper
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
     public String initCap(String decamelName) {
         return Srl.initCap(decamelName);
     }
@@ -173,6 +177,13 @@ public class DfFreeGenManager {
 
     public String decamelize(String camelName) {
         return Srl.decamelize(camelName);
+    }
+
+    // -----------------------------------------------------
+    //                                                Number
+    //                                                ------
+    public Integer toInteger(Object numberObj) { // e.g. 12.0 to 12 (for Gson headache)
+        return DfTypeUtil.toInteger(numberObj);
     }
 
     // ===================================================================================
