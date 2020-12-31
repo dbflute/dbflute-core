@@ -189,8 +189,12 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                       Script Helper
     //                                                                       =============
+    // #hope switch to simple JSON interface for FreeGen frameworks (e.g. KVSFlute) by jflute (2020/12/31)
     public ScriptEngine createJavaScriptEngine() { // as public engine e.g. remote-api generate
-        final ScriptEngineManager manager = new ScriptEngineManager();
+        // should use Ant class loader to find 'sai' engine in 'extlib' directory
+        // because default constructor of the manager uses only System class loader
+        // (also DfFrgJavaScriptJsonEngine)
+        final ScriptEngineManager manager = new ScriptEngineManager(getClass().getClassLoader());
         ScriptEngine engine = manager.getEngineByName("sai");
         if (engine == null) {
             engine = manager.getEngineByName("JavaScript"); // original code until 1.2.3

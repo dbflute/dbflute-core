@@ -52,7 +52,10 @@ public class DfFrgJavaScriptJsonEngine {
     }
 
     protected <RESULT> RESULT doFromJsonByScriptEngine(String requestName, String resourceFile, String json) {
-        final ScriptEngineManager manager = new ScriptEngineManager();
+        // should use Ant class loader to find 'sai' engine in 'extlib' directory
+        // because default constructor of the manager uses only System class loader
+        // (also DfFreeGenManager)
+        final ScriptEngineManager manager = new ScriptEngineManager(getClass().getClassLoader());
         final ScriptEngine engine = findScriptEngine(manager, requestName, resourceFile);
         try {
             // move to caller to share between engines
