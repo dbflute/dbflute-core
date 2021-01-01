@@ -1,0 +1,128 @@
+##
+## Copyright 2014-2019 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.sql.DataSource;
+
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.annotation.Factory;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.sql.DataSource;
+
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.InvokerAssistant;
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * The Java configuration of DBFlute beans for Micronaut Framework. <br>
+ * You can inject them by importing this class in your auto configuration class.
+ * @author ${database.classAuthor}
+ */
+@Factory
+public class ${glDBFluteBeansFactory} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    @Inject
+    protected ApplicationContext _container;
+
+    // Currently, DBFlute for Micronaut doesn't support multiple DB
+    @Inject
+    protected DataSource _dataSource;
+
+    // ===================================================================================
+    //                                                                   Runtime Component
+    //                                                                   =================
+    @Singleton
+    @Named("${database.DBFluteInitializerComponentName}")
+    public ${glDBFluteInitializer} createDBFluteInitializer() { // no lazy for initialize-only component
+        return new ${database.DBFluteInitializerClass}();
+    }
+
+    @Singleton
+    @Named("${database.invokerAssistantComponentName}")
+    public InvokerAssistant createImplementedInvokerAssistant() {
+        ${glImplementedInvokerAssistant} assistant = newImplementedInvokerAssistant();
+        assistant.setDataSource(_dataSource);
+        return assistant;
+    }
+
+    protected ${glImplementedInvokerAssistant} newImplementedInvokerAssistant() {
+        return new ${database.implementedInvokerAssistantClass}();
+    }
+
+    @Singleton
+    @Named("${database.behaviorCommandInvokerComponentName}")
+    public BehaviorCommandInvoker createBehaviorCommandInvoker() {
+        BehaviorCommandInvoker invoker = newBehaviorCommandInvoker();
+        invoker.setInvokerAssistant(createImplementedInvokerAssistant());
+        return invoker;
+    }
+
+    protected BehaviorCommandInvoker newBehaviorCommandInvoker() {
+        return new ${database.behaviorCommandInvokerSimpleIfPlainClass}();
+    }
+
+    @Singleton
+    @Named("${database.behaviorSelectorComponentName}")
+    public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
+        ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
+        selector.setContainer(_container);
+        return selector;
+    }
+
+    protected ${glImplementedBehaviorSelector} newImplementedBehaviorSelector() {
+        return new ${glImplementedBehaviorSelector}();
+    }
+
+    @Singleton
+    @Named("${database.commonColumnAutoSetupperComponentName}")
+    public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+        return newImplementedCommonColumnAutoSetupper();
+    }
+
+    protected ${glImplementedCommonColumnAutoSetupper} newImplementedCommonColumnAutoSetupper() {
+        return new ${glImplementedCommonColumnAutoSetupper}();
+    }
+#if (!$database.needsDBFluteBeansHybritScanConfig())
+
+#set ($behaviorLoopIndex = 0)
+#foreach ($table in $database.behaviorTableList)
+#if ($behaviorLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
+#else
+
+#end
+    @Singleton
+    @Named("${table.behaviorComponentName}")
+    public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
+        ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
+        bhv.setBehaviorCommandInvoker(createBehaviorCommandInvoker());
+        bhv.setBehaviorSelector(createImplementedBehaviorSelector());
+#if ($table.isWritable())
+        bhv.setCommonColumnAutoSetupper(createImplementedCommonColumnAutoSetupper());
+#end
+        return bhv;
+    }
+#set ($behaviorLoopIndex = $behaviorLoopIndex + 1)
+#end
+#end
+}

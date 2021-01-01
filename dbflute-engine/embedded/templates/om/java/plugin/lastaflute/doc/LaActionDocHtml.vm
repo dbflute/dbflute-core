@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2020 the original author or authors.
+## Copyright 2014-2021 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -65,8 +65,8 @@
 #end
         </td>
         <td class="rowcellnum">$!{actionDocMeta.fieldTypeDocMetaList.size()}</td>
-        <td class="rowcellnum">$!{actionDocMeta.fileLineCount}</td>
-        <td class="rowcellnum">$!{actionDocMeta.methodLineCount}</td>
+        <td class="rowcellnum">$!{manager.toInteger($!{actionDocMeta.fileLineCount})}</td>
+        <td class="rowcellnum">$!{manager.toInteger($!{actionDocMeta.methodLineCount})}</td>
     </tr>
 #end
     </tbody>

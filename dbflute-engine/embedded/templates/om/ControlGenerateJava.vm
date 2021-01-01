@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2020 the original author or authors.
+## Copyright 2014-2021 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ $database.checkProperties()
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 #set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}${glAllcommonPrefix}DBFluteBeansJavaConfig")
 #set ($glDBFluteModule = "${glProjectPrefix}${glAllcommonPrefix}DBFluteModule")
+#set ($glDBFluteBeansFactory = "${glProjectPrefix}${glAllcommonPrefix}DBFluteBeansFactory")
 #set ($glDBFluteDiXmlNamespace = "${database.DBFluteDiXmlNamespace}")
 #set ($glDBFluteDiXmlFileName = "${database.DBFluteDiXmlFileName}")
 #set ($glRdbDiXmlResourceName = "${database.RdbDiXmlResourceName}")
@@ -226,6 +227,11 @@ $database.info("public void parseContainerConfig() {")
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/lasta/DBFluteDiXml.${glTemplateFileExtension}", $path, "", "")
 #end
+#end
+#if ($database.isTargetContainerMicronaut())
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteBeansFactory}.${glClassFileExtension}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/micronaut/MicronautDBFluteBeansFactory.${glTemplateFileExtension}", $path, "", "")
 #end
 $database.info("}")
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@ import javax.script.ScriptEngineManager;
 import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +105,10 @@ public class DfFreeGenManager {
         return getBasicProperties().isTargetContainerLastaDi();
     }
 
+    public boolean isTargetContainerMicronaut() {
+        return getBasicProperties().isTargetContainerMicronaut();
+    }
+
     // ===================================================================================
     //                                                                           Copyright
     //                                                                           =========
@@ -154,6 +160,9 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                      Convert Helper
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
     public String initCap(String decamelName) {
         return Srl.initCap(decamelName);
     }
@@ -170,11 +179,45 @@ public class DfFreeGenManager {
         return Srl.decamelize(camelName);
     }
 
+    // -----------------------------------------------------
+    //                                                Number
+    //                                                ------
+    public Integer toInteger(Object numberObj) { // e.g. 12.0 to 12 (for Gson headache)
+        return DfTypeUtil.toInteger(numberObj);
+    }
+
     // ===================================================================================
     //                                                                       Script Helper
     //                                                                       =============
-    public ScriptEngine createJavaScriptEngine() { // e.g. remote-api generate
-        return new ScriptEngineManager().getEngineByName("JavaScript");
+    // #hope switch to simple JSON interface for FreeGen frameworks (e.g. KVSFlute) by jflute (2020/12/31)
+    public ScriptEngine createJavaScriptEngine() { // as public engine e.g. remote-api generate
+        // should use Ant class loader to find 'sai' engine in 'extlib' directory
+        // because default constructor of the manager uses only System class loader
+        // (also DfFrgJavaScriptJsonEngine)
+        final ScriptEngineManager manager = new ScriptEngineManager(getClass().getClassLoader());
+        ScriptEngine engine = manager.getEngineByName("sai");
+        if (engine == null) {
+            engine = manager.getEngineByName("JavaScript"); // original code until 1.2.3
+        }
+        if (engine == null) {
+            throwJsonScriptPublicEngineNotFoundException();
+        }
+        return engine;
+    }
+
+    protected void throwJsonScriptPublicEngineNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the public engine of JSON script for FreeGen template.");
+        br.addItem("Advice");
+        br.addElement("Nashorn (JavaScript engine) is removed since Java15.");
+        br.addElement("");
+        br.addElement("You can use 'sai' instead of Nashorn.");
+        br.addElement(" https://github.com/codelibs/sai");
+        br.addElement("");
+        br.addElement("Put the jar files (including dependencies)");
+        br.addElement("on 'extlib' directory of your DBFlute client.");
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

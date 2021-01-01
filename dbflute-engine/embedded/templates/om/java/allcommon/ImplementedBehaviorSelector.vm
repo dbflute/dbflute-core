@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2020 the original author or authors.
+## Copyright 2014-2021 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -52,6 +52,9 @@ import javax.enterprise.inject.spi.BeanManager;
 import org.lastaflute.di.core.LaContainer;
 import org.lastaflute.di.core.exception.ComponentNotFoundException;
 #end
+#if ($database.isTargetContainerMicronaut())
+import io.micronaut.context.ApplicationContext;
+#end
 
 /**
  * The implementation of behavior selector.
@@ -90,6 +93,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerLastaDi())
     /** The container of Lasta Di. */
     protected LaContainer _container;
+#end
+#if ($database.isTargetContainerMicronaut())
+    /** The container of Micronaut. */
+    protected ApplicationContext _container;
 #end
 
     // ===================================================================================
@@ -249,6 +256,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
             return component;
         }
 #end
+#if ($database.isTargetContainerMicronaut())
+        return _container.getBean(componentType);
+#end
     }
 
     // ===================================================================================
@@ -338,6 +348,11 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerLastaDi())
     @Resource
     public void setContainer(LaContainer container) {
+        this._container = container;
+    }
+#end
+#if ($database.isTargetContainerMicronaut())
+    public void setContainer(ApplicationContext container) {
         this._container = container;
     }
 #end

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * @author jflute
+ * @author pull request from little-forest, thank you!
  */
 public class DfSqlFileGetter {
 
@@ -41,7 +42,7 @@ public class DfSqlFileGetter {
         final List<File> fileList = new ArrayList<File>();
         final File fileDir = toFileDir(sqlDirectory);
         registerFile(fileList, fileDir);
-        Collections.sort(fileList);
+        Collections.sort(fileList); // avoid differences of generated codes, listFiles() is not fixed order
         return fileList;
     }
 

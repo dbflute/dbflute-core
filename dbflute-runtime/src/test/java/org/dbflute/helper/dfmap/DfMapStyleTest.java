@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.dbflute.helper.dfmap;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,6 +314,21 @@ public class DfMapStyleTest extends RuntimeTestCase {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                 Empty
+    //                                                 -----
+    public void test_toMapString_empty_basic() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+
+        // ## Act ##
+        String mapString = mapStyle.toMapString(new HashMap<>());
+
+        // ## Assert ##
+        log(mapString);
+        assertEquals("map:{}", mapString);
+    }
+
     // ===================================================================================
     //                                                                       to ListString
     //                                                                       =============
@@ -389,6 +405,25 @@ public class DfMapStyleTest extends RuntimeTestCase {
 
         // ## Assert ##
         showMap(generatedMap);
+    }
+
+    // -----------------------------------------------------
+    //                                                 Empty
+    //                                                 -----
+    public void test_fromMapString_empty_basic() {
+        // ## Arrange ##
+        final DfMapStyle mapStyle = new DfMapStyle();
+
+        // ## Act ##
+        // ## Assert ##
+        assertTrue(mapStyle.fromMapString("map:{}").isEmpty());
+        assertTrue(mapStyle.fromMapString("map:{} ").isEmpty());
+        assertTrue(mapStyle.fromMapString("map:{}\n").isEmpty());
+        assertTrue(mapStyle.fromMapString("map:{ }").isEmpty());
+        assertTrue(mapStyle.fromMapString("map:{\n}").isEmpty());
+        assertTrue(mapStyle.fromMapString(" map:{}").isEmpty());
+        assertTrue(mapStyle.fromMapString("\nmap:{}").isEmpty());
+        assertTrue(mapStyle.fromMapString("\nmap:{\n}\n").isEmpty());
     }
 
     // ===================================================================================

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -339,6 +339,25 @@ public class MapListStringTest extends RuntimeTestCase {
         // ## Assert ##
         showGeneratedMap(resultMap);
         assertEquals("\\{v;al}u=e}1;}", resultMap.get("{key1;"));
+    }
+
+    // -----------------------------------------------------
+    //                                                 Empty
+    //                                                 -----
+    public void test_fromMapString_empty_basic() {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+
+        // ## Act ##
+        // ## Assert ##
+        assertTrue(maplist.generateMap("map:{}").isEmpty());
+        assertTrue(maplist.generateMap("map:{} ").isEmpty());
+        assertTrue(maplist.generateMap("map:{}\n").isEmpty());
+        assertTrue(maplist.generateMap("map:{ }").isEmpty());
+        assertTrue(maplist.generateMap("map:{\n}").isEmpty());
+        assertTrue(maplist.generateMap(" map:{}").isEmpty());
+        assertTrue(maplist.generateMap("\nmap:{}").isEmpty());
+        assertTrue(maplist.generateMap("\nmap:{\n}\n").isEmpty());
     }
 
     // -----------------------------------------------------

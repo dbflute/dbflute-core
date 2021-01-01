@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -348,9 +348,13 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("lasta_di");
     }
 
+    public boolean isTargetContainerMicronaut() {
+        return getTargetContainerName().trim().equalsIgnoreCase("micronaut");
+    }
+
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi", "lasta_di")) {
+        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi", "lasta_di", "micronaut")) {
             return;
         }
         String msg = "The targetContainer is unknown: targetContainer=" + containerName;
