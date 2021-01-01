@@ -97,6 +97,14 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                               Class
     //                                                                               =====
+    /**
+     * Just easy facade method of forName(). <br>
+     * Find the type of the class by context class loader of current thread. <br>
+     * (attention: might not use system class loader)
+     * @param className The full-qualified name of class. (NotNull)
+     * @return The type of the class. (NotNull)
+     * @throws ReflectionFailureException When the class is not found.
+     */
     public static Class<?> forName(String className) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
