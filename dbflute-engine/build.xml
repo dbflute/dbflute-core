@@ -5,8 +5,8 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.2.4" />
-	<property name="build.version" value="${version}" />
+	<property name="version" value="1.2.5" />
+	<property name="build.version" value="${version}-RC1-A-SNAPSHOT" />
 	<property name="runtime.version" value="1.2.4" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
