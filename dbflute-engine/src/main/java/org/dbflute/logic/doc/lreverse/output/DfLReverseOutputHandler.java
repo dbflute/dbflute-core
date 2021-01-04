@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.lreverse;
+package org.dbflute.logic.doc.lreverse.output;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +41,7 @@ import org.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
 import org.dbflute.helper.token.file.FileMakingCallback;
 import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
+import org.dbflute.logic.doc.lreverse.DfLReverseOutputResource;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.slf4j.Logger;
@@ -358,7 +359,7 @@ public class DfLReverseOutputHandler {
         _cellLengthLimit = cellLengthLimit;
     }
 
-    public String getDelimiterDataDir() {
+    public String getDelimiterDataDir() { // used for e.g. delete
         return _delimiterDataDir;
     }
 
@@ -366,6 +367,9 @@ public class DfLReverseOutputHandler {
         _delimiterDataDir = delimiterDataDir;
     }
 
+    // -----------------------------------------------------
+    //                                            Saved Data
+    //                                            ----------
     public Map<String, Table> getTableNameMap() {
         return _tableNameMap;
     }

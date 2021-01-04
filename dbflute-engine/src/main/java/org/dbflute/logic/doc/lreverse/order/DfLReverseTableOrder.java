@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.lreverse;
+package org.dbflute.logic.doc.lreverse.order;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,9 +31,9 @@ import org.dbflute.util.Srl;
 
 /**
  * @author jflute
- * @since 0.9.8.3 (2011/04/23 Saturday)
+ * @since 1.2.5 as split (2021/01/04 Monday at roppongi japanese)
  */
-public class DfTableOrderAnalyzer {
+public class DfLReverseTableOrder {
 
     // ===================================================================================
     //                                                                          Definition

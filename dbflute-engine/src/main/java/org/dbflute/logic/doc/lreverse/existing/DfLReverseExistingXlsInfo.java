@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.lreverse;
+package org.dbflute.logic.doc.lreverse.existing;
 
 import java.io.File;
 import java.util.List;
