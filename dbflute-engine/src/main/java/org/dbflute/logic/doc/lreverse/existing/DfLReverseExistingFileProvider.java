@@ -29,7 +29,7 @@ import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfTableNameProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
