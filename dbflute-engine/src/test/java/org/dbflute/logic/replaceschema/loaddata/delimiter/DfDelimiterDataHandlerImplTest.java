@@ -15,7 +15,6 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.delimiter;
 
-import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataHandlerImpl;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -25,7 +24,7 @@ import org.dbflute.unit.EngineTestCase;
 public class DfDelimiterDataHandlerImplTest extends EngineTestCase {
 
     public void test_isUnsupportedEncodingDirectory() throws Exception {
-        final DfDelimiterDataHandlerImpl target = new DfDelimiterDataHandlerImpl();
+        final DfDelimiterDataHandlerImpl target = new DfDelimiterDataHandlerImpl(null, null);
         assertFalse(target.isUnsupportedEncodingDirectory("UTF-8"));
         assertFalse(target.isUnsupportedEncodingDirectory("Windows-31J"));
         assertTrue(target.isUnsupportedEncodingDirectory("UTF-8sss"));

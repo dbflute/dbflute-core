@@ -78,7 +78,7 @@ public class DfLoadingControlProp {
     //                                                                 Logging Insert Type
     //                                                                 ===================
     public LoggingInsertType getLoggingInsertType(String dataDirectory, boolean loggingInsertSql) {
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("loggingInsertType");
         if (isSpecifiedValidProperty(prop)) {
             final String trimmed = prop.trim();
@@ -105,7 +105,7 @@ public class DfLoadingControlProp {
     //                                                               Suppress Batch Update
     //                                                               =====================
     public boolean isMergedSuppressBatchUpdate(String dataDirectory, boolean suppressBatchUpdate) {
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isSuppressBatchUpdate");
         if (isSpecifiedValidProperty(prop)) {
             return prop.trim().equalsIgnoreCase("true");
@@ -117,7 +117,7 @@ public class DfLoadingControlProp {
     //                                                         Different ColumnValue Count
     //                                                         ===========================
     protected boolean isContinueDifferentColumnValueCount(String dataDirectory) { // basically delimiter file only
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isContinueDifferentColumnValueCount");
         if (isSpecifiedValidProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
             return true; // continue (warning only)
@@ -172,7 +172,7 @@ public class DfLoadingControlProp {
     //                                                             Column Definition Check
     //                                                             =======================
     public boolean isCheckColumnDef(String dataDirectory) {
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isSuppressColumnDefCheck");
         if (isSpecifiedValidProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
             return false; // suppress
@@ -513,7 +513,7 @@ public class DfLoadingControlProp {
 
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getDateAdjustmentMap(String dataDirectory) {
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         return (Map<String, Object>) loadingControlMap.get(PROP_DATE_ADJUSTMENT_MAP);
     }
 
@@ -521,7 +521,7 @@ public class DfLoadingControlProp {
     //                                                                    RTrim Cell Value
     //                                                                    ================
     public boolean isRTrimCellValue(String dataDirectory) { // basically for compatible
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isRTrimCellValue");
         if (isSpecifiedValidProperty(prop)) {
             return prop.trim().equalsIgnoreCase("true");
@@ -547,14 +547,14 @@ public class DfLoadingControlProp {
 
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getLargeTextFileMap(String dataDirectory) {
-        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         return (Map<String, Object>) loadingControlMap.get(PROP_LARGE_TEXT_FILE_MAP);
     }
 
     // ===================================================================================
     //                                                                 Loading Control Map
     //                                                                 ===================
-    protected Map<String, Object> getLoadingControlMap(String dataDirectory) {
+    protected Map<String, Object> findLoadingControlMap(String dataDirectory) {
         final Map<String, Object> cachedMap = _loadingControlMapMap.get(dataDirectory);
         if (cachedMap != null) {
             return cachedMap;

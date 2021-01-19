@@ -29,7 +29,7 @@ import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfTableNameProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -59,7 +59,7 @@ public class DfLReverseExistingFileProvider {
         final Map<File, List<String>> existingXlsTableListMap = DfCollectionUtil.newLinkedHashMap();
         final Map<String, File> tableExistingXlsMap = StringKeyMap.createAsFlexible();
         final String dataDirPath = resolvePath(baseDir);
-        final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(dataDirPath);
+        final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(dataDirPath);
         for (File existingXls : existingXlsList) {
             final DfTableXlsReader reader = createTableXlsReader(baseDir, existingXls, tableNameMap);
             final DfDataSet dataSet = reader.read();

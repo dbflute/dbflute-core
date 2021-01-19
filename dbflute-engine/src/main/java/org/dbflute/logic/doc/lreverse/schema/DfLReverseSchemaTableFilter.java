@@ -26,7 +26,7 @@ import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingFileProvider;
 import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingXlsInfo;
-import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfTableNameProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.util.DfCollectionUtil;

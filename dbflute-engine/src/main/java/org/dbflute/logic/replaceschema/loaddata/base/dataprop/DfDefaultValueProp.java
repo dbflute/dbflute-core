@@ -20,11 +20,41 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.properties.propreader.DfOutsideMapPropReader;
+import org.dbflute.util.DfCollectionUtil;
+
 /**
  * @author jflute
  * @since 1.0.4A (2013/03/09 Saturday)
  */
 public class DfDefaultValueProp {
+
+    protected Map<String, Map<String, String>> _defaultValueMapMap = DfCollectionUtil.newHashMap();
+
+    public Map<String, String> findDefaultValueMap(String dataDirectory) {
+        final Map<String, String> cachedMap = _defaultValueMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
+        final StringKeyMap<String> flmap = doGetDefaultValueMap(dataDirectory);
+        _defaultValueMapMap.put(dataDirectory, flmap);
+        return _defaultValueMapMap.get(dataDirectory);
+    }
+
+    protected StringKeyMap<String> doGetDefaultValueMap(String dataDirectory) { // recycle
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
+        String path = dataDirectory + "/defaultValueMap.dataprop";
+        Map<String, String> resultMap = reader.readMapAsStringValue(path);
+        if (resultMap == null || resultMap.isEmpty()) {
+            path = dataDirectory + "/default-value.txt"; // old style
+            resultMap = reader.readMapAsStringValue(path);
+        }
+        // ordered here because of columns added
+        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexibleOrdered();
+        flmap.putAll(resultMap);
+        return flmap;
+    }
 
     public Set<String> extractSysdateColumnSet(Map<String, Object> columnValueMap, Map<String, String> defaultValueMap) {
         // should be called before convert

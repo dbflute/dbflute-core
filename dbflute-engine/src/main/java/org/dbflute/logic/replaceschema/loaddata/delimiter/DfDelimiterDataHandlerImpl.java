@@ -34,12 +34,12 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedDataInfo;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfConvertValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
 import org.dbflute.logic.replaceschema.loaddata.base.interceptor.DfDataWritingInterceptor;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfLoadedClassificationLazyChecker;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataResultInfo.DfDelimiterDataLoadedMeta;
-import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataHandlerImpl;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -59,19 +59,31 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DataSource _dataSource;
+    protected final UnifiedSchema _unifiedSchema;
+
     protected boolean _loggingInsertSql;
-    protected DataSource _dataSource;
-    protected UnifiedSchema _unifiedSchema;
     protected boolean _suppressBatchUpdate;
     protected boolean _suppressCheckColumnDef;
     protected boolean _suppressCheckImplicitSet;
     protected DfDataWritingInterceptor _dataWritingInterceptor;
+
+    /** The data-prop of convert value map. (NotNull: after initialization) */
+    protected DfConvertValueProp _convertValueProp;
 
     /** The data-prop of default value map. (NotNull: after initialization) */
     protected DfDefaultValueProp _defaultValueProp;
 
     /** The data-prop of loading control map. (NotNull: after initialization) */
     protected DfLoadingControlProp _loadingControlProp;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfDelimiterDataHandlerImpl(DataSource dataSource, UnifiedSchema unifiedSchema) {
+        _dataSource = dataSource;
+        _unifiedSchema = unifiedSchema;
+    }
 
     // ===================================================================================
     //                                                                                Main
@@ -88,7 +100,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         if (dataDirectoryElements == null) {
             return resultInfo;
         }
-        final FilenameFilter filter = createFilenameFilter(resource.getFileType());
+        final FilenameFilter filter = createSpecifiedExtFilenameFilter(resource.getFileType());
 
         try {
             for (String encoding : dataDirectoryElements) {
@@ -126,6 +138,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setSuppressCheckColumnDef(isSuppressCheckColumnDef());
                     writer.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
                     writer.setDataWritingInterceptor(_dataWritingInterceptor);
+                    writer.setConvertValueProp(_convertValueProp);
                     writer.setDefaultValueProp(_defaultValueProp);
                     writer.setLoadingControlProp(_loadingControlProp);
                     writer.writeData(resultInfo);
@@ -156,15 +169,15 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
     protected Map<String, String> getDefaultValueMap(DfDelimiterDataResource res, String encoding) {
         final String dataDirectory = res.getBasePath() + "/" + encoding;
-        return DfXlsDataHandlerImpl.doGetDefaultValueMap(dataDirectory);
+        return _defaultValueProp.findDefaultValueMap(dataDirectory);
     }
 
     protected Map<String, Map<String, String>> getConvertValueMap(DfDelimiterDataResource res, String encoding) {
         final String dataDirectory = res.getBasePath() + "/" + encoding;
-        return DfXlsDataHandlerImpl.doGetConvertValueMap(dataDirectory);
+        return _convertValueProp.findConvertValueMap(dataDirectory);
     }
 
-    protected FilenameFilter createFilenameFilter(final String typeName) {
+    protected FilenameFilter createSpecifiedExtFilenameFilter(final String typeName) {
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith("." + typeName);
@@ -235,28 +248,20 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public boolean isLoggingInsertSql() {
-        return _loggingInsertSql;
-    }
-
-    public void setLoggingInsertSql(boolean loggingInsertSql) {
-        this._loggingInsertSql = loggingInsertSql;
-    }
-
     public DataSource getDataSource() {
         return _dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this._dataSource = dataSource;
     }
 
     public UnifiedSchema getUnifiedSchema() {
         return _unifiedSchema;
     }
 
-    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        this._unifiedSchema = unifiedSchema;
+    public boolean isLoggingInsertSql() {
+        return _loggingInsertSql;
+    }
+
+    public void setLoggingInsertSql(boolean loggingInsertSql) {
+        _loggingInsertSql = loggingInsertSql;
     }
 
     public boolean isSuppressBatchUpdate() {
@@ -264,7 +269,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
-        this._suppressBatchUpdate = suppressBatchUpdate;
+        _suppressBatchUpdate = suppressBatchUpdate;
     }
 
     public boolean isSuppressCheckColumnDef() {
@@ -272,7 +277,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     public void setSuppressCheckColumnDef(boolean suppressCheckColumnDef) {
-        this._suppressCheckColumnDef = suppressCheckColumnDef;
+        _suppressCheckColumnDef = suppressCheckColumnDef;
     }
 
     public boolean isSuppressCheckImplicitSet() {
@@ -280,7 +285,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     public void setSuppressCheckImplicitSet(boolean suppressCheckImplicitSet) {
-        this._suppressCheckImplicitSet = suppressCheckImplicitSet;
+        _suppressCheckImplicitSet = suppressCheckImplicitSet;
     }
 
     public DfDataWritingInterceptor getDataWritingInterceptor() {
@@ -288,7 +293,15 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
-        this._dataWritingInterceptor = dataWritingInterceptor;
+        _dataWritingInterceptor = dataWritingInterceptor;
+    }
+
+    public DfConvertValueProp getConvertValueProp() {
+        return _convertValueProp;
+    }
+
+    public void setConvertValueProp(DfConvertValueProp convertValueProp) {
+        _convertValueProp = convertValueProp;
     }
 
     public DfDefaultValueProp getDefaultValueProp() {
@@ -296,7 +309,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     public void setDefaultValueProp(DfDefaultValueProp defaultValueProp) {
-        this._defaultValueProp = defaultValueProp;
+        _defaultValueProp = defaultValueProp;
     }
 
     public DfLoadingControlProp getLoadingControlProp() {
@@ -304,6 +317,6 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     public void setLoadingControlProp(DfLoadingControlProp loadingControlProp) {
-        this._loadingControlProp = loadingControlProp;
+        _loadingControlProp = loadingControlProp;
     }
 }

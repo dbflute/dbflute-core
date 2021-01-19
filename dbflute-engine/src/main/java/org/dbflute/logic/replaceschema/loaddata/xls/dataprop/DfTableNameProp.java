@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.replaceschema.loaddata.base.dataprop;
+package org.dbflute.logic.replaceschema.loaddata.xls.dataprop;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +38,10 @@ public class DfTableNameProp {
 
     protected final Map<String, Map<String, String>> _tableNameMapMap = DfCollectionUtil.newHashMap();
 
-    public Map<String, String> getTableNameMap(String dataDirectory) {
+    // ===================================================================================
+    //                                                                            Find Map
+    //                                                                            ========
+    public Map<String, String> findTableNameMap(String dataDirectory) {
         final Map<String, String> cachedMap = _tableNameMapMap.get(dataDirectory);
         if (cachedMap != null) {
             return cachedMap;
@@ -56,6 +59,9 @@ public class DfTableNameProp {
         return _tableNameMapMap.get(dataDirectory);
     }
 
+    // ===================================================================================
+    //                                                                          Output Map
+    //                                                                          ==========
     public void outputTableNameMap(String baseDir, Map<String, Table> tableNameMap) {
         final Map<String, String> map = new LinkedHashMap<String, String>();
         for (Entry<String, Table> entry : tableNameMap.entrySet()) {

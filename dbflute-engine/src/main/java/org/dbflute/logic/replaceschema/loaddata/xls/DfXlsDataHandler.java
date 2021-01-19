@@ -15,9 +15,6 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.xls;
 
-import java.util.List;
-
-import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedDataInfo;
 
 /**
@@ -25,8 +22,6 @@ import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedDataInfo;
  * @author jflute
  */
 public interface DfXlsDataHandler {
-
-    List<DfDataSet> readSeveralData(DfXlsDataResource resource);
 
     /**
      * @param resource The resource of xls data handling. (NotNull)

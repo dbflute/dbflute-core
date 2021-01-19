@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
-import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataHandlerImpl;
+import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataHandlingWriter;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -39,7 +39,7 @@ public class DfAbstractDataWriterTest extends EngineTestCase {
     //                                     -----------------
     public void test_isNotNullNotString() { // via XlsData
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null, null);
+        final DfXlsDataHandlingWriter impl = new DfXlsDataHandlingWriter(null, null);
 
         // ## Act & Assert ##
         assertFalse(impl.isNotNullNotString(null));
@@ -53,7 +53,7 @@ public class DfAbstractDataWriterTest extends EngineTestCase {
     //                                               -------
     public void test_processBoolean() throws Exception { // via XlsData
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null, null) {
+        final DfXlsDataHandlingWriter impl = new DfXlsDataHandlingWriter(null, null) {
             @Override
             protected Class<?> getBindType(String tableName, DfColumnMeta columnMetaInfo) {
                 return BigDecimal.class;

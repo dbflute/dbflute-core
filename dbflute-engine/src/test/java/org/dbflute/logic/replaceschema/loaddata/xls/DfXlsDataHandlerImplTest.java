@@ -27,13 +27,13 @@ public class DfXlsDataHandlerImplTest extends EngineTestCase {
     // ===================================================================================
     //                                                                          Skip Sheet
     //                                                                          ==========
-    public void test_DfXlsDataHandlerImpl_setSkipSheet_SyntaxError() {
+    public void test_DfXlsDataHandlerImpl_acceptSkipSheet_SyntaxError() {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = createHandler();
+        final DfXlsDataHandlingWriter impl = createHandler();
 
         // ## Act & Assert ##
         try {
-            impl.setSkipSheet("MST.*+`*`+*P*`+*}+");
+            impl.acceptSkipSheet("MST.*+`*`+*P*`+*}+");
             fail();
         } catch (IllegalStateException e) {
             // OK
@@ -44,7 +44,7 @@ public class DfXlsDataHandlerImplTest extends EngineTestCase {
         }
     }
 
-    protected DfXlsDataHandlerImpl createHandler() {
-        return new DfXlsDataHandlerImpl(null, null);
+    protected DfXlsDataHandlingWriter createHandler() {
+        return new DfXlsDataHandlingWriter(null, null);
     }
 }

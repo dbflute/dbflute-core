@@ -47,6 +47,7 @@ import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfConvertValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp.LoggingInsertType;
@@ -145,6 +146,9 @@ public abstract class DfAbsractDataWriter {
     /** The list of lazy checker for loaded classification. (NotNull) */
     protected final List<DfLoadedClassificationLazyChecker> _implicitClassificationLazyCheckerList =
             new ArrayList<DfLoadedClassificationLazyChecker>();
+
+    /** The data-prop of column value map. (NotNull: after initialization) */
+    protected DfConvertValueProp _convertValueProp;
 
     /** The data-prop of default value map. (NotNull: after initialization) */
     protected DfDefaultValueProp _defaultValueProp;
@@ -1128,8 +1132,22 @@ public abstract class DfAbsractDataWriter {
     }
 
     // ===================================================================================
-    //                                                                     Loading Control
-    //                                                                     ===============
+    //                                                                       Data Property
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    protected Map<String, Map<String, String>> getConvertValueMap(String dataDirectory) {
+        return _convertValueProp.findConvertValueMap(dataDirectory);
+    }
+
+    protected Map<String, String> getDefaultValueMap(String dataDirectory) {
+        return _defaultValueProp.findDefaultValueMap(dataDirectory);
+    }
+
+    // -----------------------------------------------------
+    //                                       Loading Control
+    //                                       ---------------
     protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
         return _loadingControlProp.getLoggingInsertType(dataDirectory, _loggingInsertSql);
     }
@@ -1202,7 +1220,7 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setLoggingInsertSql(boolean loggingInsertSql) {
-        this._loggingInsertSql = loggingInsertSql;
+        _loggingInsertSql = loggingInsertSql;
     }
 
     public boolean isSuppressBatchUpdate() {
@@ -1210,7 +1228,7 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
-        this._suppressBatchUpdate = suppressBatchUpdate;
+        _suppressBatchUpdate = suppressBatchUpdate;
     }
 
     public boolean isSuppressCheckColumnDef() {
@@ -1218,7 +1236,7 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setSuppressCheckColumnDef(boolean suppressCheckColumnDef) {
-        this._suppressCheckColumnDef = suppressCheckColumnDef;
+        _suppressCheckColumnDef = suppressCheckColumnDef;
     }
 
     public boolean isSuppressCheckImplicitSet() {
@@ -1226,7 +1244,7 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setSuppressCheckImplicitSet(boolean suppressCheckImplicitSet) {
-        this._suppressCheckImplicitSet = suppressCheckImplicitSet;
+        _suppressCheckImplicitSet = suppressCheckImplicitSet;
     }
 
     public DfDataWritingInterceptor getDataWritingInterceptor() {
@@ -1234,11 +1252,19 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
-        this._dataWritingInterceptor = dataWritingInterceptor;
+        _dataWritingInterceptor = dataWritingInterceptor;
     }
 
     public List<DfLoadedClassificationLazyChecker> getImplicitClassificationLazyCheckerList() {
         return _implicitClassificationLazyCheckerList;
+    }
+
+    public DfConvertValueProp getConvertValueProp() {
+        return _convertValueProp;
+    }
+
+    public void setConvertValueProp(DfConvertValueProp convertValueProp) {
+        _convertValueProp = convertValueProp;
     }
 
     public DfDefaultValueProp getDefaultValueProp() {
@@ -1246,7 +1272,7 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setDefaultValueProp(DfDefaultValueProp defaultValueProp) {
-        this._defaultValueProp = defaultValueProp;
+        _defaultValueProp = defaultValueProp;
     }
 
     public DfLoadingControlProp getLoadingControlProp() {
@@ -1254,6 +1280,6 @@ public abstract class DfAbsractDataWriter {
     }
 
     public void setLoadingControlProp(DfLoadingControlProp loadingControlProp) {
-        this._loadingControlProp = loadingControlProp;
+        _loadingControlProp = loadingControlProp;
     }
 }

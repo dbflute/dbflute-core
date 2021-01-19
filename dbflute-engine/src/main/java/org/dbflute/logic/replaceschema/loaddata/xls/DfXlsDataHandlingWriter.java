@@ -15,12 +15,8 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.xls;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,14 +36,6 @@ import java.util.regex.PatternSyntaxException;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.dbflute.bhv.exception.SQLExceptionAdviser;
-import org.dbflute.dbway.DBDef;
-import org.dbflute.exception.DfJDBCException;
-import org.dbflute.exception.DfXlsDataEmptyColumnDefException;
-import org.dbflute.exception.DfXlsDataEmptyRowDataException;
-import org.dbflute.exception.DfXlsDataRegistrationFailureException;
-import org.dbflute.exception.DfXlsDataTableNotFoundException;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.dataset.DfDataColumn;
 import org.dbflute.helper.dataset.DfDataRow;
 import org.dbflute.helper.dataset.DfDataSet;
@@ -58,32 +46,32 @@ import org.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfXlsFactory;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfAbsractDataWriter;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedDataInfo;
-import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfTableNameProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnValueConverter;
-import org.dbflute.properties.propreader.DfOutsideMapPropReader;
-import org.dbflute.util.DfCollectionUtil;
-import org.dbflute.util.Srl;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfEmptyStringColumnProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfNotTrimTableColumnProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.secretary.DfXlsDataOutputResultMarker;
+import org.dbflute.logic.replaceschema.loaddata.xls.secretary.DfXlsDataWritingExceptionThrower;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The implementation of xls data handler. And also of writer.
+ * The XLS data writer with basic handling, which can be handler.
  * @author jflute
  * @author p1us2er0
  */
-public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDataHandler {
+public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXlsDataHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(DfXlsDataHandlerImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfXlsDataHandlingWriter.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -91,35 +79,50 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     /** The pattern of skip sheet. (NullAllowed) */
     protected Pattern _skipSheetPattern;
 
-    protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
+    protected final DfTableNameProp _tableNameProp = new DfTableNameProp(); // xls only
+    protected final DfNotTrimTableColumnProp _notTrimTableColumnProp = new DfNotTrimTableColumnProp(); // xls only
+    protected final DfEmptyStringColumnProp _emptyStringColumnProp = new DfEmptyStringColumnProp(); // xls only
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsDataHandlerImpl(DataSource dataSource, UnifiedSchema unifiedSchema) {
+    public DfXlsDataHandlingWriter(DataSource dataSource, UnifiedSchema unifiedSchema) {
         super(dataSource, unifiedSchema);
+    }
+
+    public void acceptSkipSheet(String skipSheet) {
+        if (skipSheet == null || skipSheet.trim().length() == 0) {
+            return;
+        }
+        try {
+            _skipSheetPattern = Pattern.compile(skipSheet);
+        } catch (PatternSyntaxException e) {
+            String msg = "The pattern syntax for skip-sheet was wrong: " + skipSheet;
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public List<DfDataSet> readSeveralData(DfXlsDataResource resource) {
-        final String dataDirectory = resource.getDataDirectory();
-        final List<File> xlsList = getXlsList(resource);
-        final List<DfDataSet> ls = new ArrayList<DfDataSet>();
-        for (File file : xlsList) {
-            final DfTableXlsReader xlsReader = createTableXlsReader(dataDirectory, file);
-            ls.add(xlsReader.read());
-        }
-        return ls;
-    }
+    // unused so comment out by jflute (2021/01/18)
+    //public List<DfDataSet> readSeveralData(DfXlsDataResource resource) {
+    //    final String dataDirectory = resource.getDataDirectory();
+    //    final List<File> xlsList = findXlsList(resource);
+    //    final List<DfDataSet> ls = new ArrayList<DfDataSet>();
+    //    for (File file : xlsList) {
+    //        final DfTableXlsReader xlsReader = createTableXlsReader(dataDirectory, file);
+    //        ls.add(xlsReader.read());
+    //    }
+    //    return ls;
+    //}
 
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
     public void writeSeveralData(DfXlsDataResource resource, DfLoadedDataInfo loadedDataInfo) {
         final String dataDirectory = resource.getDataDirectory();
-        final List<File> xlsList = getXlsList(resource);
+        final List<File> xlsList = findXlsList(resource);
         if (xlsList.isEmpty()) {
             return;
         }
@@ -137,7 +140,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             loadedDataInfo.addLoadedFile(resource.getEnvType(), "xls", null, file.getName(), warned);
         }
         prepareImplicitClassificationLazyCheck(loadedDataInfo);
-        outputResultMark(resource.getDataDirectory(), msgSb.toString());
+        markOutputResult(resource.getDataDirectory(), msgSb.toString());
     }
 
     protected void prepareImplicitClassificationLazyCheck(DfLoadedDataInfo info) {
@@ -258,10 +261,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             checkImplicitClassification(file, tableDbName, columnNameList);
             return loadedRowCount;
         } catch (RuntimeException e) {
-            handleXlsDataRegistartionFailureException(dataDirectory, file, tableDbName, e);
+            handleWriteTableFailureException(dataDirectory, file, tableDbName, e);
             return -1; // unreachable
         } catch (SQLException e) {
-            handleWriteTableException(dataDirectory, file, dataTable, e, retryEx, retryDataRow, columnNameList);
+            handleWriteTableSQLException(dataDirectory, file, dataTable, e, retryEx, retryDataRow, columnNameList);
             return -1; // unreachable
         } finally {
             closeResource(conn, ps);
@@ -272,17 +275,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void throwTableNotFoundException(File file, String tableDbName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table specified on the xls file was not found in the schema.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the name about its spelling.");
-        br.addElement("And confirm that whether the DLL executions have errors.");
-        br.addItem("Xls File");
-        br.addElement(file);
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        final String msg = br.buildExceptionMessage();
-        throw new DfXlsDataTableNotFoundException(msg);
+        createThrower().throwTableNotFoundException(file, tableDbName);
     }
 
     protected List<String> extractColumnNameList(DfDataTable dataTable) {
@@ -328,99 +321,19 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void throwXlsDataEmptyRowDataException(String dataDirectory, File file, DfDataTable dataTable, int rowNumber) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The empty row data on the xls file was found.");
-        br.addItem("Advice");
-        br.addElement("Please remove the empty row.");
-        br.addElement("ReplaceSchema does not allow empty row on xls data.");
-        // suppress duplicated info (show these elements in failure exception later)
-        //br.addItem("Data Directory");
-        //br.addElement(dataDirectory);
-        //br.addItem("Xls File");
-        //br.addElement(file);
-        br.addItem("Table");
-        br.addElement(dataTable.getTableDbName());
-        br.addItem("Row Number");
-        br.addElement(rowNumber);
-        final String msg = br.buildExceptionMessage();
-        throw new DfXlsDataEmptyRowDataException(msg);
+        createThrower().throwXlsDataEmptyRowDataException(dataDirectory, file, dataTable, rowNumber);
     }
 
-    protected void handleXlsDataRegistartionFailureException(String dataDirectory, File file, String tableDbName, RuntimeException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to register the xls data for ReplaceSchema.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the exception message.");
-        br.addItem("Data Directory");
-        br.addElement(dataDirectory);
-        br.addItem("Xls File");
-        br.addElement(file);
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        final String msg = br.buildExceptionMessage();
-        throw new DfXlsDataRegistrationFailureException(msg, e);
+    protected void handleWriteTableFailureException(String dataDirectory, File file, String tableDbName, RuntimeException e) {
+        createThrower().handleWriteTableFailureException(dataDirectory, file, tableDbName, e);
     }
 
-    protected void handleWriteTableException(String dataDirectory, File file, DfDataTable dataTable // basic
+    protected void handleWriteTableSQLException(String dataDirectory, File file, DfDataTable dataTable // basic
             , SQLException mainEx // an exception of main process
             , SQLException retryEx, DfDataRow retryDataRow // retry
             , List<String> columnNameList) { // supplement
-        final DfJDBCException wrappedEx = DfJDBCException.voice(mainEx);
-        final String tableDbName = dataTable.getTableDbName();
-        final String msg = buildWriteFailureMessage(dataDirectory, file, tableDbName, wrappedEx, retryEx, retryDataRow, columnNameList);
-        throw new DfXlsDataRegistrationFailureException(msg, wrappedEx);
-    }
-
-    protected String buildWriteFailureMessage(String dataDirectory, File file, String tableDbName // basic
-            , DfJDBCException mainEx // an exception of main process
-            , SQLException retryEx, DfDataRow retryDataRow // retry
-            , List<String> columnNameList) { // supplement
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to register the table data.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the SQLException message.");
-        final String advice = askAdvice(mainEx, getBasicProperties().getCurrentDBDef());
-        if (advice != null && advice.trim().length() > 0) {
-            br.addElement("*" + advice);
-        }
-        br.addItem("Data Directory");
-        br.addElement(dataDirectory);
-        br.addItem("Xls File");
-        br.addElement(file.getName());
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        br.addItem("SQLException");
-        br.addElement(mainEx.getClass().getName());
-        br.addElement(mainEx.getMessage());
-        if (retryEx != null) {
-            br.addItem("Non-Batch Retry");
-            br.addElement(retryEx.getClass().getName());
-            br.addElement(retryEx.getMessage());
-            br.addElement(columnNameList.toString());
-            br.addElement(retryDataRow.toString());
-            br.addElement("Row Number: " + retryDataRow.getRowNumber());
-        }
-        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
-        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
-        if (bindTypeCacheMap != null) {
-            br.addItem("Bind Type");
-            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
-            for (Entry<String, Class<?>> entry : entrySet) {
-                final String columnName = entry.getKey();
-                StringProcessor processor = null;
-                if (stringProcessorCacheMap != null) {
-                    processor = stringProcessorCacheMap.get(columnName);
-                }
-                final String bindType = entry.getValue().getName();
-                final String processorExp = (processor != null ? " (" + processor + ")" : "");
-                br.addElement(columnName + " = " + bindType + processorExp);
-            }
-        }
-        return br.buildExceptionMessage();
-    }
-
-    protected String askAdvice(SQLException sqlEx, DBDef dbdef) {
-        return _adviser.askAdvice(sqlEx, dbdef);
+        createThrower().handleWriteTableSQLException(dataDirectory, file, dataTable, mainEx, retryEx, retryDataRow, columnNameList,
+                _bindTypeCacheMap, _stringProcessorCacheMap);
     }
 
     protected void closeResource(Connection conn, PreparedStatement ps) {
@@ -479,30 +392,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void throwXlsDataColumnDefFailureException(String dataDirectory, File file, DfDataTable dataTable) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table specified on the xls file does not have (writable) columns.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the column names about their spellings.");
-        br.addElement("And confirm the column definition of the table.");
-        // suppress duplicated info (show these elements in failure exception later)
-        //br.addItem("Data Directory");
-        //br.addElement(dataDirectory);
-        //br.addItem("Xls File");
-        //br.addElement(file);
-        br.addItem("Table");
-        br.addElement(dataTable.getTableDbName());
-        br.addItem("Defined Column");
-        final int columnSize = dataTable.getColumnSize();
-        if (columnSize > 0) {
-            for (int i = 0; i < dataTable.getColumnSize(); i++) {
-                final DfDataColumn dataColumn = dataTable.getColumn(i);
-                br.addElement(dataColumn.getColumnDbName());
-            }
-        } else {
-            br.addElement("(no column)");
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new DfXlsDataEmptyColumnDefException(msg);
+        createThrower().throwXlsDataColumnDefFailureException(dataDirectory, file, dataTable);
     }
 
     protected Set<String> extractSysdateColumnSet(String dataDirectory, Map<String, Object> columnValueMap) { // should be called before convert
@@ -557,7 +447,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 rtrimCellValue);
     }
 
-    protected List<File> getXlsList(DfXlsDataResource resource) {
+    protected List<File> findXlsList(DfXlsDataResource resource) {
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -608,12 +498,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 && (defaultValueMap == null || defaultValueMap.isEmpty())) { // and no default
             return;
         }
-        final DfColumnValueConverter converter =
-                new DfColumnValueConverter(convertValueMap, defaultValueMap, new DfColumnBindTypeProvider() {
-                    public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
-                        return getBindType(tableName, columnMeta);
-                    }
-                });
+        final DfColumnBindTypeProvider bindTypeProvider = new DfColumnBindTypeProvider() {
+            public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
+                return getBindType(tableName, columnMeta);
+            }
+        };
+        final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap, bindTypeProvider);
         converter.convert(tableName, columnValueMap, columnMetaMap);
     }
 
@@ -645,156 +535,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
             }
         }
-    }
-
-    // ===================================================================================
-    //                                                              Convert Value Property
-    //                                                              ======================
-    protected Map<String, Map<String, Map<String, String>>> _convertValueMapMap = DfCollectionUtil.newHashMap();
-
-    protected Map<String, Map<String, String>> getConvertValueMap(String dataDirectory) {
-        final Map<String, Map<String, String>> cachedMap = _convertValueMapMap.get(dataDirectory);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
-        _convertValueMapMap.put(dataDirectory, doGetConvertValueMap(dataDirectory));
-        return _convertValueMapMap.get(dataDirectory);
-    }
-
-    public static Map<String, Map<String, String>> doGetConvertValueMap(String dataDirectory) {
-        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
-        String path = dataDirectory + "/convertValueMap.dataprop";
-        final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        Map<String, Map<String, String>> readMap = reader.readMapAsStringMapValue(path);
-        if (readMap != null && !readMap.isEmpty()) {
-            resultMap.putAll(readMap);
-        } else {
-            path = dataDirectory + "/convert-value.txt";
-            readMap = reader.readMapAsStringMapValue(path);
-            resultMap.putAll(readMap);
-        }
-        return resolveControlCharacter(resultMap);
-    }
-
-    protected static Map<String, Map<String, String>> resolveControlCharacter(Map<String, Map<String, String>> convertValueMap) {
-        final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        for (Entry<String, Map<String, String>> entry : convertValueMap.entrySet()) {
-            final Map<String, String> elementMap = DfCollectionUtil.newLinkedHashMap();
-            for (Entry<String, String> nextEntry : entry.getValue().entrySet()) {
-                final String key = resolveControlCharacter(nextEntry.getKey());
-                final String value = resolveControlCharacter(nextEntry.getValue());
-                elementMap.put(key, value);
-            }
-            resultMap.put(entry.getKey(), elementMap);
-        }
-        return resultMap;
-    }
-
-    protected static String resolveControlCharacter(String value) {
-        if (value == null) {
-            return null;
-        }
-        final String tmp = "${df:temporaryVariable}";
-        value = Srl.replace(value, "\\\\", tmp); // "\\" to "\" later
-
-        // e.g. pure string "\n" to (real) line separator
-        value = Srl.replace(value, "\\r", "\r");
-        value = Srl.replace(value, "\\n", "\n");
-        value = Srl.replace(value, "\\t", "\t");
-
-        value = Srl.replace(value, tmp, "\\");
-        return value;
-    }
-
-    // ===================================================================================
-    //                                                              Default Value Property
-    //                                                              ======================
-    // map for delimiter data is defined at the handler
-    protected Map<String, Map<String, String>> _defaultValueMapMap = DfCollectionUtil.newHashMap();
-
-    protected Map<String, String> getDefaultValueMap(String dataDirectory) {
-        final Map<String, String> cachedMap = _defaultValueMapMap.get(dataDirectory);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
-        final StringKeyMap<String> flmap = doGetDefaultValueMap(dataDirectory);
-        _defaultValueMapMap.put(dataDirectory, flmap);
-        return _defaultValueMapMap.get(dataDirectory);
-    }
-
-    public static StringKeyMap<String> doGetDefaultValueMap(String dataDirectory) { // recycle
-        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
-        String path = dataDirectory + "/defaultValueMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path);
-        if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/default-value.txt"; // old style
-            resultMap = reader.readMapAsStringValue(path);
-        }
-        // ordered here because of columns added
-        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexibleOrdered();
-        flmap.putAll(resultMap);
-        return flmap;
-    }
-
-    // ===================================================================================
-    //                                                                 Table Name Property
-    //                                                                 ===================
-    protected final DfTableNameProp _tableNameProp = new DfTableNameProp();
-
-    protected Map<String, String> getTableNameMap(String dataDirectory) {
-        return _tableNameProp.getTableNameMap(dataDirectory);
-    }
-
-    // ===================================================================================
-    //                                                                   Not Trim Property
-    //                                                                   =================
-    protected Map<String, Map<String, List<String>>> _notTrimTableColumnMapMap = DfCollectionUtil.newHashMap();
-
-    protected Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectory) {
-        final Map<String, List<String>> cachedMap = _notTrimTableColumnMapMap.get(dataDirectory);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
-        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
-        String path = dataDirectory + "/notTrimColumnMap.dataprop";
-        Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
-        if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/not-trim-column.txt"; // old style
-            resultMap = reader.readMapAsStringListValue(path);
-        }
-        final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
-        final StringKeyMap<List<String>> flmap = StringKeyMap.createAsFlexible();
-        for (Entry<String, List<String>> entry : entrySet) {
-            flmap.put(entry.getKey(), entry.getValue());
-        }
-        _notTrimTableColumnMapMap.put(dataDirectory, flmap);
-        return _notTrimTableColumnMapMap.get(dataDirectory);
-    }
-
-    // ===================================================================================
-    //                                                               Empty String Property
-    //                                                               =====================
-    protected Map<String, Map<String, List<String>>> _emptyStringColumnMapMap = DfCollectionUtil.newHashMap();
-
-    protected Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectory) {
-        final Map<String, List<String>> cachedMap = _emptyStringColumnMapMap.get(dataDirectory);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
-        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
-        String path = dataDirectory + "/emptyStringColumnMap.dataprop";
-        Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
-        if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/empty-string-column.txt"; // old style
-            resultMap = reader.readMapAsStringListValue(path);
-        }
-        final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
-        final StringKeyMap<List<String>> flmap = StringKeyMap.createAsFlexible();
-        for (Entry<String, List<String>> entry : entrySet) {
-            flmap.put(entry.getKey(), entry.getValue());
-        }
-        _emptyStringColumnMapMap.put(dataDirectory, flmap);
-        return _emptyStringColumnMapMap.get(dataDirectory);
     }
 
     // ===================================================================================
@@ -852,51 +592,31 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     // ===================================================================================
-    //                                                                         Result Mark
-    //                                                                         ===========
-    protected void outputResultMark(String outputDir, String outputMsg) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(ln()).append("* * * * * * * * * *");
-        sb.append(ln()).append("*                 *");
-        sb.append(ln()).append("* Xls Data Result *");
-        sb.append(ln()).append("*                 *");
-        sb.append(ln()).append("* * * * * * * * * *");
-        sb.append(ln()).append("data-directory: ").append(outputDir);
-        sb.append(ln());
-        sb.append(ln()).append(Srl.ltrim(outputMsg));
-        final File dataPropFile = new File(outputDir + "/xls-data-result.dfmark");
-        if (dataPropFile.exists()) {
-            dataPropFile.delete();
-        }
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
-            bw.write(sb.toString());
-            bw.flush();
-        } catch (IOException e) {
-            String msg = "Failed to write xls-data-result.dfmark: " + dataPropFile;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {}
-            }
-        }
+    //                                                                       Output Result
+    //                                                                       =============
+    protected void markOutputResult(String outputDir, String outputMsg) {
+        new DfXlsDataOutputResultMarker().markOutputResult(outputDir, outputMsg);
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setSkipSheet(String skipSheet) {
-        if (skipSheet == null || skipSheet.trim().length() == 0) {
-            return;
-        }
-        try {
-            _skipSheetPattern = Pattern.compile(skipSheet);
-        } catch (PatternSyntaxException e) {
-            String msg = "The pattern syntax for skip-sheet was wrong: " + skipSheet;
-            throw new IllegalStateException(msg, e);
-        }
+    //                                                                   Exception Thrower
+    //                                                                   =================
+    protected DfXlsDataWritingExceptionThrower createThrower() {
+        return new DfXlsDataWritingExceptionThrower();
+    }
+
+    // ===================================================================================
+    //                                                                       Data Property
+    //                                                                       =============
+    protected Map<String, String> getTableNameMap(String dataDirectory) {
+        return _tableNameProp.findTableNameMap(dataDirectory);
+    }
+
+    protected Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectory) {
+        return _notTrimTableColumnProp.findNotTrimTableColumnMap(dataDirectory);
+    }
+
+    protected Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectory) {
+        return _emptyStringColumnProp.findEmptyStringTableColumnMap(dataDirectory);
     }
 }

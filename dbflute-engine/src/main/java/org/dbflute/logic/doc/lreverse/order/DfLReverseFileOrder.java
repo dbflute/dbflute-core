@@ -31,7 +31,7 @@ import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.lreverse.DfLReverseOutputResource;
 import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingFileProvider;
 import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingXlsInfo;
-import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfTableNameProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -89,7 +89,7 @@ public class DfLReverseFileOrder {
         final DfLReverseExistingXlsInfo existingXlsInfo = extractExistingXlsInfo(baseDir);
         final Map<File, DfLReverseOutputResource> orderedMap = createOrderedMap();
         final String dataDirPath = resolvePath(baseDir);
-        final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(dataDirPath);
+        final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(dataDirPath);
         final Map<String, File> translatedXlsMap = prepareTranslatedXlsMap(existingXlsInfo, tableNameMap);
         final List<Table> addedTableList = DfCollectionUtil.newArrayList();
         int sectionNo = 1;

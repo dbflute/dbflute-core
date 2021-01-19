@@ -774,7 +774,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     public void setDelimiter(String delimiter) {
-        this._delimiter = delimiter;
+        _delimiter = delimiter;
     }
 
     public String getEncoding() {
@@ -782,7 +782,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     public void setEncoding(String encoding) {
-        this._encoding = encoding;
+        _encoding = encoding;
     }
 
     public String getFileName() {
@@ -790,7 +790,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     public void setFileName(String fileName) {
-        this._fileName = fileName;
+        _fileName = fileName;
     }
 
     public Map<String, Map<String, String>> getConvertValueMap() {
@@ -798,7 +798,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     public void setConvertValueMap(Map<String, Map<String, String>> convertValueMap) {
-        this._convertValueMap = convertValueMap;
+        _convertValueMap = convertValueMap;
     }
 
     public Map<String, String> getDefaultValueMap() {
@@ -806,6 +806,6 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     public void setDefaultValueMap(Map<String, String> defaultValueMap) {
-        this._defaultValueMap = defaultValueMap;
+        _defaultValueMap = defaultValueMap;
     }
 }

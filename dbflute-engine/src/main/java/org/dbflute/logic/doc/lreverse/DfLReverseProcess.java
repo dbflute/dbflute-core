@@ -37,7 +37,7 @@ import org.dbflute.logic.doc.lreverse.reverse.DfLReverseTableData;
 import org.dbflute.logic.doc.lreverse.schema.DfLReverseSchemaMetaProvider;
 import org.dbflute.logic.doc.lreverse.schema.DfLReverseSchemaTableFilter;
 import org.dbflute.logic.doc.lreverse.secretary.DfLReverseTitleSectionProvider;
-import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfTableNameProp;
+import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
