@@ -15,17 +15,11 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.delimiter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -38,10 +32,8 @@ import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfConvertValueProp
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
 import org.dbflute.logic.replaceschema.loaddata.base.interceptor.DfDataWritingInterceptor;
-import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfLoadedClassificationLazyChecker;
-import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataResultInfo.DfDelimiterDataLoadedMeta;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataOutputResultMarker;
 import org.dbflute.system.DBFluteSystem;
-import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,33 +84,22 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         final DfDelimiterDataResultInfo resultInfo = new DfDelimiterDataResultInfo();
         final String basePath = resource.getBasePath();
         final File baseDir = new File(basePath);
-        final String[] dataDirectoryElements = baseDir.list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return !name.startsWith(".");
-            }
-        });
-        if (dataDirectoryElements == null) {
+        final String[] dataDirElements = baseDir.list((dir, name) -> !name.startsWith("."));
+        if (dataDirElements == null) {
             return resultInfo;
         }
-        final FilenameFilter filter = createSpecifiedExtFilenameFilter(resource.getFileType());
-
         try {
-            for (String encoding : dataDirectoryElements) {
+            for (String encoding : dataDirElements) {
                 if (isUnsupportedEncodingDirectory(encoding)) {
                     _log.warn("The encoding(directory name) is unsupported: encoding=" + encoding);
                     continue;
                 }
 
-                final String dataDirectory = basePath + "/" + encoding;
-                final File encodingNameDirectory = new File(dataDirectory);
-                final String[] fileNameList = encodingNameDirectory.list(filter);
+                final String dataDirPath = basePath + "/" + encoding;
+                final File encodingNameDir = new File(dataDirPath);
+                final String[] fileNameList = encodingNameDir.list((dir, name) -> name.endsWith("." + resource.getFileType()));
 
-                final Comparator<String> fileNameAscComparator = new Comparator<String>() {
-                    public int compare(String o1, String o2) {
-                        return o1.compareTo(o2);
-                    }
-                };
-                final SortedSet<String> sortedFileNameSet = new TreeSet<String>(fileNameAscComparator);
+                final SortedSet<String> sortedFileNameSet = new TreeSet<String>((o1, o2) -> o1.compareTo(o2));
                 for (String fileName : fileNameList) {
                     sortedFileNameSet.add(fileName);
                 }
@@ -126,10 +107,10 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                 final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(resource, encoding);
                 final Map<String, String> defaultValueMap = getDefaultValueMap(resource, encoding);
                 for (String fileName : sortedFileNameSet) {
-                    final String fileNamePath = dataDirectory + "/" + fileName;
+                    final String filePath = dataDirPath + "/" + fileName;
                     final DfDelimiterDataWriterImpl writer = new DfDelimiterDataWriterImpl(_dataSource, _unifiedSchema);
                     writer.setLoggingInsertSql(isLoggingInsertSql());
-                    writer.setFileName(fileNamePath);
+                    writer.setFilePath(filePath);
                     writer.setEncoding(encoding);
                     writer.setDelimiter(resource.getDelimiter());
                     writer.setConvertValueMap(convertValueMap);
@@ -146,10 +127,10 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
                     final String loadType = resource.getLoadType();
                     final String fileType = resource.getFileType();
-                    final boolean warned = resultInfo.containsColumnCountDiff(fileNamePath);
+                    final boolean warned = resultInfo.containsColumnCountDiff(filePath);
                     loadedDataInfo.addLoadedFile(loadType, fileType, encoding, fileName, warned);
                 }
-                outputResultMark(resource, resultInfo, dataDirectory);
+                outputResultMark(resource, resultInfo, dataDirPath);
             }
         } catch (IOException e) {
             String msg = "Failed to register delimiter data: " + resource;
@@ -160,7 +141,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
     protected boolean isUnsupportedEncodingDirectory(String encoding) {
         try {
-            new String(new byte[0], 0, 0, encoding);
+            new String(new byte[0], 0, 0, encoding); // throw if unknown
             return false;
         } catch (UnsupportedEncodingException e) {
             return true;
@@ -178,64 +159,18 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     protected FilenameFilter createSpecifiedExtFilenameFilter(final String typeName) {
-        final FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith("." + typeName);
-            }
-        };
-        return filter;
+        return (dir, name) -> name.endsWith("." + typeName);
     }
 
     protected void prepareImplicitClassificationLazyCheck(DfLoadedDataInfo info, DfDelimiterDataWriterImpl writer) {
-        final List<DfLoadedClassificationLazyChecker> checkerList = writer.getImplicitClassificationLazyCheckerList();
-        info.acceptImplicitClassificationLazyCheck(checkerList);
+        info.acceptImplicitClassificationLazyCheck(writer.getImplicitClassificationLazyCheckerList());
     }
 
     // ===================================================================================
     //                                                                         Result Mark
     //                                                                         ===========
     protected void outputResultMark(DfDelimiterDataResource resource, DfDelimiterDataResultInfo resultInfo, String dataDirectory) {
-        final String fileType = resource.getFileType();
-        final StringBuilder sb = new StringBuilder();
-        final String title = Srl.initCap(fileType); // e.g. Tsv like Xls
-        sb.append(ln()).append("* * * * * * * * * *");
-        sb.append(ln()).append("*                 *");
-        sb.append(ln()).append("* " + title + " Data Result *");
-        sb.append(ln()).append("*                 *");
-        sb.append(ln()).append("* * * * * * * * * *");
-        sb.append(ln()).append("data-directory: ").append(dataDirectory);
-        sb.append(ln());
-        final Map<String, Map<String, DfDelimiterDataLoadedMeta>> loadedMetaMap = resultInfo.getLoadedMetaMap();
-        final Map<String, DfDelimiterDataLoadedMeta> elementMap = loadedMetaMap.get(dataDirectory);
-        if (elementMap == null) { // e.g. no delimiter file
-            return;
-        }
-        for (Entry<String, DfDelimiterDataLoadedMeta> entry : elementMap.entrySet()) {
-            final DfDelimiterDataLoadedMeta loadedMeta = entry.getValue();
-            final String delimiterFilePureName = Srl.substringLastRear(loadedMeta.getFileName(), "/");
-            final Integer successRowCount = loadedMeta.getSuccessRowCount();
-            sb.append(ln()).append(delimiterFilePureName).append(" (").append(successRowCount).append(")");
-        }
-        final String outputFilePureName = fileType.toLowerCase() + "-data-result.dfmark";
-        final File dataPropFile = new File(dataDirectory + "/" + outputFilePureName);
-        if (dataPropFile.exists()) {
-            dataPropFile.delete();
-        }
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
-            bw.write(sb.toString());
-            bw.flush();
-        } catch (IOException e) {
-            String msg = "Failed to write " + outputFilePureName + ": " + dataPropFile;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {}
-            }
-        }
+        new DfDelimiterDataOutputResultMarker().outputResultMark(resource, resultInfo, dataDirectory);
     }
 
     // ===================================================================================

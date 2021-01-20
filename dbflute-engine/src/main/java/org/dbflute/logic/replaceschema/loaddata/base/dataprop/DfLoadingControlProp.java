@@ -37,7 +37,7 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfRelativeDateResolver;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataResultInfo;
-import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataWriterImpl.FirstLineInfo;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.line.DfDelimiterDataFirstLineInfo;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
@@ -126,7 +126,7 @@ public class DfLoadingControlProp {
     }
 
     public void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, String dataDirectory, String fileName,
-            String tableDbName, FirstLineInfo firstLineInfo, List<String> valueList) {
+            String tableDbName, DfDelimiterDataFirstLineInfo firstLineInfo, List<String> valueList) {
         if (isContinueDifferentColumnValueCount(dataDirectory)) {
             String msg = "The count of values wasn't correct:";
             msg = msg + " column=" + firstLineInfo.getColumnNameList().size() + " value=" + valueList.size();
@@ -137,7 +137,7 @@ public class DfLoadingControlProp {
         }
     }
 
-    protected void throwLoadingControlDifferentColumnValueCountException(String fileName, String tableDbName, FirstLineInfo firstLineInfo,
+    protected void throwLoadingControlDifferentColumnValueCountException(String fileName, String tableDbName, DfDelimiterDataFirstLineInfo firstLineInfo,
             List<String> valueList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Different column and value count in your data file.");
