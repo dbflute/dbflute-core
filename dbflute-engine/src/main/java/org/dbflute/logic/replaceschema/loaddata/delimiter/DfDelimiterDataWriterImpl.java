@@ -18,7 +18,6 @@ package org.dbflute.logic.replaceschema.loaddata.delimiter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -34,6 +33,8 @@ import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
+import org.dbflute.exception.DfDelimiterDataRegistrationFailureException.DfDelimiterDataRegistrationRetryResource;
+import org.dbflute.exception.DfDelimiterDataRegistrationFailureException.DfDelimiterDataRegistrationRowSnapshot;
 import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
@@ -96,10 +97,64 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         _log.info("writeData(" + _filePath + ")");
         _log.info("= = = = = = =/");
-        FileInputStream fis = null;
-        InputStreamReader ir = null;
-        BufferedReader br = null;
+        try {
+            doWriteData(resultInfo, /*forcedlySuppressBatch*/false, /*offsetRowCount*/0);
+        } catch (DfDelimiterDataRegistrationFailureException e) {
+            if (needsRetry(e)) {
+                performNonBatchRetry(resultInfo, e);
+                throw e;
+            } else {
+                throw e;
+            }
+        }
+    }
 
+    // -----------------------------------------------------
+    //                                                 Retry
+    //                                                 -----
+    protected boolean needsRetry(DfDelimiterDataRegistrationFailureException failureEx) {
+        final DfDelimiterDataRegistrationRetryResource resource = failureEx.getRetryResource();
+        return resource != null && resource.canBatchUpdate() && failureEx.getCause() instanceof SQLException;
+    }
+
+    protected void performNonBatchRetry(DfDelimiterDataResultInfo resultInfo, DfDelimiterDataRegistrationFailureException failureEx) {
+        final int committedRowCount = failureEx.getRetryResource().getCommittedRowCount(); // as offsetRowCount
+        try {
+            _log.info("...Retrying as non-batch to derive target row");
+            doWriteData(resultInfo, /*forcedlySuppressBatch*/true, committedRowCount); // always throw
+            // basically no way here, however retry success might not be real success
+            // (e.g. error of retry itself) so throw it
+        } catch (Exception somethingEx) {
+            if (somethingEx instanceof DfDelimiterDataRegistrationFailureException) {
+                final DfDelimiterDataRegistrationFailureException retryEx = (DfDelimiterDataRegistrationFailureException) somethingEx;
+                final Throwable retryCause = retryEx.getCause();
+                if (retryCause instanceof SQLException) {
+                    handleRetryStory(failureEx, retryEx, retryCause);
+                }
+            }
+        }
+    }
+
+    protected void handleRetryStory(DfDelimiterDataRegistrationFailureException failureEx,
+            DfDelimiterDataRegistrationFailureException retryEx, Throwable retryCause) {
+        final StringBuilder sb = new StringBuilder();
+        final DfDelimiterDataRegistrationRowSnapshot retrySnapshot = retryEx.getRowSnapshot();
+        sb.append(retryCause.getClass().getName());
+        sb.append(ln()).append(retryCause.getMessage());
+        if (retrySnapshot != null) { // basically exists, but just in case
+            sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - -");
+            sb.append(ln()).append("Column Def: ").append(retrySnapshot.getColumnNameList());
+            sb.append(ln()).append("Row Values: ").append(retrySnapshot.getColumnValueList());
+            sb.append(ln()).append("Row Number: ").append(retrySnapshot.getCurrentRowNumber());
+            sb.append(ln()).append("- - - - - - - - - -/");
+        }
+        failureEx.tellRetryStory(sb.toString()); // reflect retry information to exception message
+    }
+
+    // -----------------------------------------------------
+    //                                            Write Data
+    //                                            ----------
+    protected void doWriteData(DfDelimiterDataResultInfo resultInfo, boolean forcedlySuppressBatch, int offsetRowCount) throws IOException {
         final String dataDirectory = Srl.substringLastFront(_filePath, "/");
         final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
         final String tableDbName = extractTableDbName();
@@ -111,14 +166,23 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         // process before handling table
         beforeHandlingTable(tableDbName, columnMetaMap);
 
+        final File dataFile = new File(_filePath);
+        final boolean canBatchUpdate = canBatchUpdate(forcedlySuppressBatch, dataDirectory);
+
         String lineString = null;
         String preContinueString = null;
-        String executedSql = null;
-        final List<String> columnNameList = new ArrayList<String>();
-        final List<String> valueList = new ArrayList<String>();
-        final boolean canBatchUpdate = !isMergedSuppressBatchUpdate(dataDirectory);
 
-        final File dataFile = new File(_filePath);
+        final List<String> columnNameList = new ArrayList<String>();
+        final List<String> columnValueList = new ArrayList<String>();
+        List<String> valueListSnapshot = null;
+
+        int rowNumber = 0; // not line on file, as registered record
+        String executedSql = null;
+        int committedRowCount = 0; // may committed per limit size, for skip in retry
+
+        FileInputStream fis = null;
+        InputStreamReader ir = null;
+        BufferedReader br = null;
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -128,8 +192,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
 
             DfDelimiterDataFirstLineInfo firstLineInfo = null;
             int loopIndex = -1;
-            int rowNumber = 0;
-            int addedBatchSize = 0;
+            int addedBatchSize = 0; // current registered size to prepared statement
             while (true) {
                 ++loopIndex;
 
@@ -161,32 +224,42 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     final List<String> ls = valueLineInfo.getValueList(); // empty string resolved later
                     if (valueLineInfo.isContinueNextLine()) {
                         preContinueString = ls.remove(ls.size() - 1);
-                        valueList.addAll(ls);
-                        continue;
+                        columnValueList.addAll(ls);
+                        continue; // keeping valueList that has previous values
                     }
-                    valueList.addAll(ls);
+                    columnValueList.addAll(ls);
                 }
                 // *one record is prepared here
 
                 // /- - - - - - - - - - - - - -
                 // check definition differences
                 // - - - - - - - - - -/
-                if (isDifferentColumnValueCount(firstLineInfo, valueList)) {
-                    handleDifferentColumnValueCount(resultInfo, dataDirectory, tableDbName, firstLineInfo, valueList);
+                if (isDifferentColumnValueCount(firstLineInfo, columnValueList)) {
+                    handleDifferentColumnValueCount(resultInfo, dataDirectory, tableDbName, firstLineInfo, columnValueList);
 
                     // clear temporary variables
-                    valueList.clear();
                     preContinueString = null;
+                    columnValueList.clear();
+                    valueListSnapshot = null;
                     continue;
                 }
                 // *valid record is prepared here
                 ++rowNumber;
+                valueListSnapshot = columnValueList;
+
+                if (rowNumber <= offsetRowCount) { // basically only when retry
+                    // clear temporary variables
+                    preContinueString = null;
+                    columnValueList.clear();
+                    valueListSnapshot = null;
+                    continue; // e.g. 1 ~ 100000 rows if 100000 already committed
+                }
 
                 // /- - - - - - - - - - - - - - - -
                 // process registration to database
                 // - - - - - - - - - -/
                 final DfDelimiterDataWriteSqlBuilder sqlBuilder =
-                        createSqlBuilder(resultInfo, tableDbName, columnMetaMap, columnNameList, valueList);
+                        createSqlBuilder(resultInfo, tableDbName, columnMetaMap, columnNameList, columnValueList);
                 if (conn == null) {
                     conn = _dataSource.getConnection();
                 }
@@ -238,13 +311,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     ps.execute();
                 }
                 ++addedBatchSize;
-                if (isBatchSizeLimit(addedBatchSize)) { // transaction scope
+                if (isBatchLimit(dataDirectory, addedBatchSize)) { // transaction scope
                     if (canBatchUpdate) { // mainly here
-                        // this is supported in only delimiter data writer
-                        // because delimiter data can treat large data
+                        // this is supported in only delimiter data writer because delimiter data can treat large data
+                        // (actually needed, GC overhead limit exceeded when 1000000 records to MySQL, 2021/01/20)
                         ps.executeBatch(); // to avoid OutOfMemory
                     }
                     commitTransaction(conn);
+                    committedRowCount = committedRowCount + addedBatchSize;
                     addedBatchSize = 0;
                     close(ps);
                     ps = null;
@@ -254,41 +328,62 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // clear temporary variables
                 // if an exception occurs from execute() or addBatch(),
                 // this valueList is to be information for debug
-                valueList.clear();
                 preContinueString = null;
+                columnValueList.clear();
+                // keep here for retry
+                //valueListSnapshot = null;
             }
             if (ps != null && addedBatchSize > 0) {
                 if (canBatchUpdate) { // mainly here
                     ps.executeBatch();
                 }
                 commitTransaction(conn);
+                committedRowCount = committedRowCount + addedBatchSize;
             }
             noticeLoadedRowSize(tableDbName, rowNumber);
             resultInfo.registerLoadedMeta(dataDirectory, _filePath, rowNumber);
             checkImplicitClassification(dataFile, tableDbName, columnNameList);
-        } catch (FileNotFoundException e) {
-            throw e;
-        } catch (IOException e) {
-            throw e;
         } catch (SQLException e) {
-            DfJDBCException wrapped = DfJDBCException.voice(e);
-            String msg = buildRegExpMessage(_filePath, tableDbName, executedSql, valueList, wrapped);
-            throw new DfDelimiterDataRegistrationFailureException(msg, wrapped.getNextException());
+            // request retry if it needs (e.g. execution exception of batch insert)
+            // the snapshot is used only when retry failure basically
+            final DfJDBCException wrapped = DfJDBCException.voice(e);
+            final String msg = buildFailureMessage(_filePath, tableDbName, executedSql, columnValueList, wrapped);
+            throw new DfDelimiterDataRegistrationFailureException(msg, wrapped.getNextException())
+                    .retryIfNeeds(createRetryResource(canBatchUpdate, committedRowCount))
+                    .snapshotRow(createRowSnapshot(columnNameList, valueListSnapshot, rowNumber));
         } catch (RuntimeException e) {
-            String msg = buildRegExpMessage(_filePath, tableDbName, executedSql, valueList, null);
-            throw new DfDelimiterDataRegistrationFailureException(msg, e);
+            // unneeded snapshot at this side but just in case (or changing determination future)
+            final String msg = buildFailureMessage(_filePath, tableDbName, executedSql, columnValueList, null);
+            throw new DfDelimiterDataRegistrationFailureException(msg, e)
+                    .snapshotRow(createRowSnapshot(columnNameList, valueListSnapshot, rowNumber));
         } finally {
             closeStream(fis, ir, br);
-            commitJustInCase(conn);
+            try {
+                rollbackTransaction(conn);
+            } catch (SQLException continued) {
+                _log.info("Failed to rollback the delimiter data transaction.", continued);
+            }
             close(ps);
             close(conn);
-            // process after (finally) handling table
-            finallyHandlingTable(tableDbName, columnMetaMap);
+            finallyHandlingTable(tableDbName, columnMetaMap); // process after (finally) handling table
         }
     }
 
     protected String extractTableDbName() {
         return new DfDelimiterDataTableDbNameExtractor(_filePath).extractTableDbName();
+    }
+
+    protected boolean canBatchUpdate(boolean forcedlySuppressBatch, String dataDirectory) {
+        return !forcedlySuppressBatch && !isMergedSuppressBatchUpdate(dataDirectory);
+    }
+
+    protected boolean isBatchLimit(String dataDirectory, int addedBatchSize) {
+        return addedBatchSize == getBatchLimit(dataDirectory);
+    }
+
+    protected int getBatchLimit(String dataDirectory) {
+        final Integer propLimit = _loadingControlProp.getDelimiterDataBatchLimit(dataDirectory);
+        return propLimit != null ? propLimit : 100000; // as default
     }
 
     protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, String tableDbName,
@@ -308,6 +403,15 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         });
         sqlBuilder.setDefaultValueProp(_defaultValueProp);
         return sqlBuilder;
+    }
+
+    protected DfDelimiterDataRegistrationRetryResource createRetryResource(final boolean canBatchUpdate, int committedRowCount) {
+        return new DfDelimiterDataRegistrationRetryResource(canBatchUpdate, committedRowCount);
+    }
+
+    protected DfDelimiterDataRegistrationRowSnapshot createRowSnapshot(List<String> columnNameList, List<String> valueSnapshot,
+            int rowNumber) {
+        return new DfDelimiterDataRegistrationRowSnapshot(columnNameList, valueSnapshot, rowNumber);
     }
 
     // ===================================================================================
@@ -386,16 +490,12 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return _jdbcHandler.prepareStatement(conn, executedSql);
     }
 
-    protected boolean isBatchSizeLimit(int addedBatchSize) {
-        return _jdbcHandler.isBatchSizeLimit(addedBatchSize);
-    }
-
     protected void commitTransaction(Connection conn) throws SQLException {
         _jdbcHandler.commitTransaction(conn);
     }
 
-    protected void commitJustInCase(Connection conn) {
-        _jdbcHandler.commitJustInCase(conn);
+    protected void rollbackTransaction(Connection conn) throws SQLException {
+        _jdbcHandler.rollbackTransaction(conn);
     }
 
     protected Boolean getAutoCommit(Connection conn) {
@@ -424,10 +524,10 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         new DfDelimiterDataWritingExceptionThrower().throwTableNotFoundException(fileName, tableDbName);
     }
 
-    protected String buildRegExpMessage(String fileName, String tableDbName, String executedSql, List<String> valueList,
+    protected String buildFailureMessage(String fileName, String tableDbName, String executedSql, List<String> valueList,
             SQLException sqlEx) {
         final DfDelimiterDataWritingExceptionThrower wer = new DfDelimiterDataWritingExceptionThrower();
-        return wer.buildRegExpMessage(fileName, tableDbName, executedSql, valueList, _bindTypeCacheMap, _stringProcessorCacheMap, sqlEx);
+        return wer.buildFailureMessage(fileName, tableDbName, executedSql, valueList, _bindTypeCacheMap, _stringProcessorCacheMap, sqlEx);
     }
 
     // ===================================================================================

@@ -21,15 +21,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.dbflute.DfBuildProperties;
+import org.dbflute.bhv.exception.SQLExceptionAdviser;
+import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.exception.DfDelimiterDataTableNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.loaddata.base.DfAbsractDataWriter.StringProcessor;
+import org.dbflute.properties.DfBasicProperties;
 
 /**
  * @author jflute
  * @since 1.2.5 extracted from DfDelimiterDataWriterImpl (2021/01/20 Wednesday at roppongi japanese)
  */
 public class DfDelimiterDataWritingExceptionThrower {
+
+    protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
 
     public void throwTableNotFoundException(String fileName, String tableDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -45,17 +51,22 @@ public class DfDelimiterDataWritingExceptionThrower {
         throw new DfDelimiterDataTableNotFoundException(msg);
     }
 
-    public String buildRegExpMessage(String fileName, String tableDbName, String executedSql, List<String> valueList,
+    public String buildFailureMessage(String fileName, String tableDbName, String executedSql, List<String> valueList,
             Map<String, Map<String, Class<?>>> bindTypeCacheMap, Map<String, Map<String, StringProcessor>> stringProcessorCacheMap,
             SQLException sqlEx) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
         br.addItem("Advice");
-        br.addElement("If you don't know the cause, suppress batch update and retry it.");
-        br.addElement("Change the property isSuppressBatchUpdate");
-        br.addElement("of loadingControlMap.dataprop to false temporarily,");
-        br.addElement("and loading process is executed per one record,");
-        br.addElement("and you can find a record that causes the exception with logs.");
+        if (sqlEx != null) {
+            br.addElement("Please confirm the SQLException message.");
+            final String advice = _adviser.askAdvice(sqlEx, getBasicProperties().getCurrentDBDef());
+            if (advice != null && advice.trim().length() > 0) {
+                br.addElement("*" + advice);
+            }
+        } else {
+            br.addElement("Please confirm the nested exception message.");
+            br.addElement("and your delimiter data file.");
+        }
         br.addItem("Delimiter File");
         br.addElement(fileName);
         br.addItem("Table");
@@ -65,7 +76,9 @@ public class DfDelimiterDataWritingExceptionThrower {
             br.addElement(sqlEx.getClass().getName());
             br.addElement(sqlEx.getMessage());
         }
-        // #hope show non-batch retry by jflute
+        br.addItem("Target Row");
+        br.addElement("(derived from non-batch retry)");
+        br.addElement(DfDelimiterDataRegistrationFailureException.RETRY_STORY_VARIABLE); // replaced at getMessage()
         br.addItem("Executed SQL");
         br.addElement(executedSql);
         if (!valueList.isEmpty()) { // basically when batch update is suppressed
@@ -89,5 +102,16 @@ public class DfDelimiterDataWritingExceptionThrower {
             }
         }
         return br.buildExceptionMessage();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
     }
 }

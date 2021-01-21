@@ -45,12 +45,12 @@ public class DfDelimiterDataJdbcHandler {
         return conn.prepareStatement(executedSql);
     }
 
-    public boolean isBatchSizeLimit(int addedBatchSize) {
-        return addedBatchSize == 100000;
-    }
-
     public void commitTransaction(Connection conn) throws SQLException {
         conn.commit();
+    }
+    
+    public void rollbackTransaction(Connection conn) throws SQLException {
+        conn.rollback();
     }
 
     public void commitJustInCase(Connection conn) {

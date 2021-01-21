@@ -137,8 +137,8 @@ public class DfLoadingControlProp {
         }
     }
 
-    protected void throwLoadingControlDifferentColumnValueCountException(String fileName, String tableDbName, DfDelimiterDataFirstLineInfo firstLineInfo,
-            List<String> valueList) {
+    protected void throwLoadingControlDifferentColumnValueCountException(String fileName, String tableDbName,
+            DfDelimiterDataFirstLineInfo firstLineInfo, List<String> valueList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Different column and value count in your data file.");
         br.addItem("Advice");
@@ -549,6 +549,19 @@ public class DfLoadingControlProp {
     protected Map<String, Object> getLargeTextFileMap(String dataDirectory) {
         final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
         return (Map<String, Object>) loadingControlMap.get(PROP_LARGE_TEXT_FILE_MAP);
+    }
+
+    // ===================================================================================
+    //                                                                         Batch Limit
+    //                                                                         ===========
+    public Integer getDelimiterDataBatchLimit(String dataDirectory) { // closet, basically for framework test
+        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
+        final String prop = (String) loadingControlMap.get("delimiterDataBatchLimit"); // since 1.2.5
+        try {
+            return DfTypeUtil.toInteger(prop); // null allowed, default is defined at caller
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Not number value for delimiterDataBatchLimit: " + prop, e);
+        }
     }
 
     // ===================================================================================

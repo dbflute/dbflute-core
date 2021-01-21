@@ -146,12 +146,15 @@ public class DfXlsDataWritingExceptionThrower {
         br.addElement(mainEx.getClass().getName());
         br.addElement(mainEx.getMessage());
         if (retryEx != null) {
-            br.addItem("Non-Batch Retry");
+            br.addItem("Target Row");
+            br.addElement("(derived from non-batch retry)");
             br.addElement(retryEx.getClass().getName());
             br.addElement(retryEx.getMessage());
-            br.addElement(columnNameList.toString());
-            br.addElement(retryDataRow.toString());
+            br.addElement("/- - - - - - - - - - - - - - - - - - - -");
+            br.addElement("Column Def: " + columnNameList);
+            br.addElement("Row Values: " + retryDataRow);
             br.addElement("Row Number: " + retryDataRow.getRowNumber());
+            br.addElement("- - - - - - - - - -/");
         }
         final Map<String, Class<?>> bindTypeMap = bindTypeCacheMap.get(tableDbName);
         final Map<String, StringProcessor> stringProcessorMap = stringProcessorCacheMap.get(tableDbName);
