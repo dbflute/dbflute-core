@@ -166,11 +166,12 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         // process before handling table
         beforeHandlingTable(tableDbName, columnMetaMap);
 
+        final String lineSeparatorInValue = "\n"; // fixedly
         final File dataFile = new File(_filePath);
         final boolean canBatchUpdate = canBatchUpdate(forcedlySuppressBatch, dataDirectory);
 
-        String lineString = null;
-        String preContinueString = null;
+        final StringBuilder lineStringSb = new StringBuilder();
+        final StringBuilder preContinuedSb = new StringBuilder();
 
         final List<String> columnNameList = new ArrayList<String>();
         final List<String> columnValueList = new ArrayList<String>();
@@ -196,16 +197,19 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             while (true) {
                 ++loopIndex;
 
-                lineString = br.readLine();
-                if (lineString == null) {
-                    break;
+                {
+                    final String readLine = br.readLine();
+                    if (readLine == null) {
+                        break;
+                    }
+                    clearAppend(lineStringSb, readLine);
                 }
 
                 // /- - - - - - - - - - - - - - - - - - - - - -
                 // initialize column definition from first line
                 // - - - - - - - - - -/
                 if (loopIndex == 0) {
-                    firstLineInfo = analyzeFirstLine(lineString, _delimiter);
+                    firstLineInfo = analyzeFirstLine(lineStringSb.toString(), _delimiter);
                     setupColumnNameList(columnNameList, dataDirectory, dataFile, tableDbName, firstLineInfo, columnMetaMap);
                     continue;
                 }
@@ -213,17 +217,21 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // /- - - - - - - - - - - - - - -
                 // analyze values in line strings
                 // - - - - - - - - - -/
-                lineString = filterLineString(lineString);
+                clearAppend(lineStringSb, filterLineString(lineStringSb.toString()));
                 {
-                    if (preContinueString != null && !preContinueString.equals("")) {
-                        // #hope performance tuning, suppress incremental strings from many line separators by jflute (2018/03/02)
+                    if (preContinuedSb.length() > 0) {
+                        // done performance tuning, suppress incremental strings from many line separators by jflute (2018/03/02)
                         // it needs to change lineString, preContinueString to StringBuilder type...
-                        lineString = preContinueString + "\n" + lineString;
+                        //lineString = preContinueString + "\n" + lineString; (2021/01/21)
+                        // and insert has array-copy so may not be fast
+                        //lineStringSb.insert(0, "\n").insert(0, preContinuedSb); (2021/01/21)
+                        preContinuedSb.append(lineSeparatorInValue).append(lineStringSb); // used only here so changing is no problem
+                        clearAppend(lineStringSb, preContinuedSb);
                     }
-                    final DfDelimiterDataValueLineInfo valueLineInfo = analyzeValueLine(lineString, _delimiter);
+                    final DfDelimiterDataValueLineInfo valueLineInfo = analyzeValueLine(lineStringSb.toString(), _delimiter);
                     final List<String> ls = valueLineInfo.getValueList(); // empty string resolved later
                     if (valueLineInfo.isContinueNextLine()) {
-                        preContinueString = ls.remove(ls.size() - 1);
+                        clearAppend(preContinuedSb, ls.remove(ls.size() - 1));
                         columnValueList.addAll(ls);
                         continue; // keeping valueList that has previous values
                     }
@@ -238,7 +246,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     handleDifferentColumnValueCount(resultInfo, dataDirectory, tableDbName, firstLineInfo, columnValueList);
 
                     // clear temporary variables
-                    preContinueString = null;
+                    clear(preContinuedSb);
                     columnValueList.clear();
                     valueListSnapshot = null;
                     continue;
@@ -249,7 +257,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
 
                 if (rowNumber <= offsetRowCount) { // basically only when retry
                     // clear temporary variables
-                    preContinueString = null;
+                    clear(preContinuedSb);
                     columnValueList.clear();
                     valueListSnapshot = null;
                     continue; // e.g. 1 ~ 100000 rows if 100000 already committed
@@ -328,7 +336,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // clear temporary variables
                 // if an exception occurs from execute() or addBatch(),
                 // this valueList is to be information for debug
-                preContinueString = null;
+                clear(preContinuedSb);
                 columnValueList.clear();
                 // keep here for retry
                 //valueListSnapshot = null;
@@ -384,6 +392,15 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     protected int getBatchLimit(String dataDirectory) {
         final Integer propLimit = _loadingControlProp.getDelimiterDataBatchLimit(dataDirectory);
         return propLimit != null ? propLimit : 100000; // as default
+    }
+
+    protected void clear(StringBuilder sb) {
+        sb.setLength(0);
+    }
+
+    protected void clearAppend(StringBuilder sb, CharSequence appended) {
+        sb.setLength(0);
+        sb.append(appended);
     }
 
     protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, String tableDbName,
