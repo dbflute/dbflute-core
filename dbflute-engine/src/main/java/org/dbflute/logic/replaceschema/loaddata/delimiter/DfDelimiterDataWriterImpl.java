@@ -217,7 +217,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // /- - - - - - - - - - - - - - -
                 // analyze values in line strings
                 // - - - - - - - - - -/
-                clearAppend(lineStringSb, filterLineString(lineStringSb.toString()));
+                filterLineStringIfNeeds(lineStringSb); // might be clear-appended
                 {
                     if (preContinuedSb.length() > 0) {
                         // done performance tuning, suppress incremental strings from many line separators by jflute (2018/03/02)
@@ -229,13 +229,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         clearAppend(lineStringSb, preContinuedSb);
                     }
                     final DfDelimiterDataValueLineInfo valueLineInfo = analyzeValueLine(lineStringSb.toString(), _delimiter);
-                    final List<String> ls = valueLineInfo.getValueList(); // empty string resolved later
+                    final List<String> extractedList = valueLineInfo.getValueList(); // empty string resolved later
                     if (valueLineInfo.isContinueNextLine()) {
-                        clearAppend(preContinuedSb, ls.remove(ls.size() - 1));
-                        columnValueList.addAll(ls);
+                        clearAppend(preContinuedSb, extractedList.remove(extractedList.size() - 1));
+                        columnValueList.addAll(extractedList);
                         continue; // keeping valueList that has previous values
                     }
-                    columnValueList.addAll(ls);
+                    columnValueList.addAll(extractedList);
                 }
                 // *one record is prepared here
 
@@ -492,8 +492,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                         Filter Line
     //                                                                         ===========
-    protected String filterLineString(String lineString) {
-        return _lineDirectFilter.filterLineString(lineString, _convertValueMap);
+    protected void filterLineStringIfNeeds(StringBuilder lineStringSb) {
+        _lineDirectFilter.filterLineString(lineStringSb, _convertValueMap);
     }
 
     // ===================================================================================

@@ -29,17 +29,21 @@ public class DfDelimiterDataLineDirectFilter {
 
     protected Map<String, String> _convertLineCacheMap;
 
-    public String filterLineString(String lineString, Map<String, Map<String, String>> convertValueMap) {
-        final Map<String, String> lineMapping = findConvertLineMapping(convertValueMap);
-        if (lineMapping != null) {
-            for (Entry<String, String> entry : lineMapping.entrySet()) {
-                lineString = Srl.replace(lineString, entry.getKey(), entry.getValue());
-            }
+    public void filterLineString(StringBuilder lineStringSb, Map<String, Map<String, String>> convertValueMap) {
+        final Map<String, String> convertLineMap = findConvertLineMap(convertValueMap);
+        if (convertLineMap.isEmpty()) {
+            return;
         }
-        return lineString;
+        String filtered = lineStringSb.toString();
+        for (Entry<String, String> entry : convertLineMap.entrySet()) {
+            // #hope should use StringBuilder replace for performance? by jflute (2021/01/22)
+            filtered = Srl.replace(filtered, entry.getKey(), entry.getValue());
+        }
+        lineStringSb.setLength(0);
+        lineStringSb.append(filtered);
     }
 
-    protected Map<String, String> findConvertLineMapping(Map<String, Map<String, String>> convertValueMap) {
+    protected Map<String, String> findConvertLineMap(Map<String, Map<String, String>> convertValueMap) {
         if (_convertLineCacheMap != null) {
             return _convertLineCacheMap;
         }
