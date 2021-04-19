@@ -29,27 +29,68 @@ public class OptionalEntityTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
-    public void test_empty_map() throws Exception {
-        assertNull(prepareOpt(null).map(obj -> "a").orElse(null));
-        assertNull(prepareOpt(null).map(obj -> null).orElse(null));
-        MockEntity entity = new MockEntity();
-        assertNull(prepareOpt(entity).map(obj -> null).orElse(null));
-        assertEquals("a", prepareOpt(entity).map(obj -> "a").get());
-        assertEquals(entity.hashCode(), prepareOpt(entity).map(obj -> obj).get().hashCode());
+    // -----------------------------------------------------
+    //                                             ifPresent
+    //                                             ---------
+    public void test_ifPresent_orElse_basic() throws Exception {
+        // ## Arrange ##
+
+        // ## Act ##
+        prepareOpt(new MockEntity()).ifPresent(table -> {
+            markHere("present");
+        }).orElse(() -> {
+            fail();
+        });
+
+        // ## Assert ##
+        assertMarked("present");
+
+        // ## Act ##
+        prepareOpt(null).ifPresent(table -> {
+            fail();
+        }).orElse(() -> {
+            markHere("none");
+        });
+
+        // ## Assert ##
+        assertMarked("none");
     }
 
-    public void test_empty_flatmap() throws Exception {
-        assertNull(prepareOpt(null).flatMap(OptionalEntity::of).orElse(null));
-        assertNull(prepareOpt(null).flatMap(obj -> null).orElse(null));
-        MockEntity entity = new MockEntity();
-        entity.setMemberId(3);
-        try {
-            prepareOpt(entity).flatMap(obj -> null);
+    public void test_ifPresentOrElse_basic() throws Exception {
+        // ## Arrange ##
+
+        // ## Act ##
+        prepareOpt(new MockEntity()).ifPresentOrElse(table -> {
+            markHere("present");
+        }, () -> {
             fail();
-        } catch (IllegalStateException e) {
-            log(e.getMessage());
-        }
-        assertEquals(entity.hashCode(), prepareOpt(entity).flatMap(OptionalEntity::of).get().hashCode());
+        });
+
+        // ## Assert ##
+        assertMarked("present");
+
+        // ## Act ##
+        prepareOpt(null).ifPresentOrElse(table -> {
+            fail();
+        }, () -> {
+            markHere("none");
+        });
+
+        // ## Assert ##
+        assertMarked("none");
+    }
+
+    // -----------------------------------------------------
+    //                                         isPresent/get
+    //                                         -------------
+    public void test_isPresent() throws Exception {
+        assertTrue(prepareOpt(new MockEntity()).isPresent());
+        assertFalse(prepareOpt(null).isPresent());
+    }
+
+    public void test_isEmpty() throws Exception {
+        assertFalse(prepareOpt(new MockEntity()).isEmpty());
+        assertTrue(prepareOpt(null).isEmpty());
     }
 
     public void test_get_basic() throws Exception {
@@ -80,21 +121,64 @@ public class OptionalEntityTest extends RuntimeTestCase {
         }
     }
 
-    public void test_isPresent() throws Exception {
-        assertTrue(prepareOpt(new MockEntity()).isPresent());
-        assertFalse(prepareOpt(null).isPresent());
-    }
-
-    public void test_empty() throws Exception {
+    public void test_get_with_empty() throws Exception {
+        // ## Arrange ##
         OptionalEntity<Entity> empty = OptionalEntity.empty();
         assertFalse(empty.isPresent());
+
+        // ## Act ##
         try {
             empty.get();
+            // ## Assert ##
             fail();
         } catch (EntityAlreadyDeletedException e) {
             log(e.getMessage());
         }
         assertEquals(OptionalEntity.empty(), empty);
+    }
+
+    // -----------------------------------------------------
+    //                                             or/orElse
+    //                                             ---------
+    public void test_or_basic() throws Exception {
+        MockEntity entity = new MockEntity();
+        OptionalThing<MockEntity> opt = prepareOpt(entity).or(() -> {
+            fail();
+            return OptionalEntity.of(new MockEntity());
+        });
+        assertSame(entity, opt.get());
+    }
+
+    public void test_or_empty() throws Exception {
+        MockEntity entity = new MockEntity();
+        OptionalThing<MockEntity> opt = prepareOpt(null).or(() -> {
+            markHere("called");
+            return OptionalEntity.of(entity);
+        });
+        assertMarked("called");
+        assertSame(entity, opt.get());
+    }
+
+    public void test_orElse_basic() throws Exception {
+        {
+            MockEntity entity = new MockEntity();
+            assertEquals(entity, prepareOpt(entity).orElse(null));
+        }
+        {
+            MockEntity entity = new MockEntity();
+            assertEquals(entity, prepareOpt(null).orElse(entity));
+        }
+    }
+
+    public void test_orElseGet_basic() throws Exception {
+        {
+            MockEntity entity = new MockEntity();
+            assertEquals(entity, prepareOpt(entity).orElseGet(() -> null));
+        }
+        {
+            MockEntity entity = new MockEntity();
+            assertEquals(entity, prepareOpt(null).orElseGet(() -> entity));
+        }
     }
 
     public void test_orElseThrow() throws Exception {
@@ -105,6 +189,61 @@ public class OptionalEntityTest extends RuntimeTestCase {
         }
         MockEntity entity = new MockEntity();
         assertEquals(entity, prepareOpt(entity).orElseThrow(() -> new IllegalStateException("sea")));
+    }
+
+    public void test_orElseTranslatingThrow() throws Exception {
+        assertNotNull(OptionalThing.of("sea").orElseTranslatingThrow(cause -> {
+            return new IllegalStateException("traslated", cause);
+        }));
+        assertException(IllegalStateException.class, () -> {
+            OptionalThing.ofNullable(null, () -> {
+                throw new IllegalArgumentException("cause");
+            }).orElseTranslatingThrow(cause -> {
+                assertEquals("cause", cause.getMessage());
+                markHere("cause");
+                return new IllegalStateException("traslated", cause);
+            });
+        });
+        assertMarked("cause");
+    }
+
+    // -----------------------------------------------------
+    //                                            filter/map
+    //                                            ----------
+    public void test_map() throws Exception {
+        assertNull(prepareOpt(null).map(obj -> "a").orElse(null));
+        assertNull(prepareOpt(null).map(obj -> null).orElse(null));
+        MockEntity entity = new MockEntity();
+        assertNull(prepareOpt(entity).map(obj -> null).orElse(null));
+        assertEquals("a", prepareOpt(entity).map(obj -> "a").get());
+        assertEquals(entity.hashCode(), prepareOpt(entity).map(obj -> obj).get().hashCode());
+    }
+
+    public void test_flatmap() throws Exception {
+        assertNull(prepareOpt(null).flatMap(OptionalEntity::of).orElse(null));
+        assertNull(prepareOpt(null).flatMap(obj -> null).orElse(null));
+        MockEntity entity = new MockEntity();
+        entity.setMemberId(3);
+        try {
+            prepareOpt(entity).flatMap(obj -> null);
+            fail();
+        } catch (IllegalStateException e) {
+            log(e.getMessage());
+        }
+        assertEquals(entity.hashCode(), prepareOpt(entity).flatMap(OptionalEntity::of).get().hashCode());
+    }
+
+    // -----------------------------------------------------
+    //                                                stream
+    //                                                ------
+    public void test_stream_basic() throws Exception {
+        {
+            MockEntity entity = new MockEntity();
+            assertEquals(entity, prepareOpt(entity).stream().findAny().get());
+        }
+        {
+            assertFalse(prepareOpt(null).stream().findAny().isPresent());
+        }
     }
 
     // ===================================================================================

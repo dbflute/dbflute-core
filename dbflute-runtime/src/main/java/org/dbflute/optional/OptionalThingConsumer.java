@@ -22,7 +22,7 @@ package org.dbflute.optional;
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     ... = member.getMemberName();
  * });
- * opt.<span style="color: #CC4747">required</span>(member -&gt; {
+ * opt.<span style="color: #CC4747">alwaysPresent</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
  *     ... = member.getMemberName();
  * });

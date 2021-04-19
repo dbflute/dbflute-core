@@ -15,6 +15,10 @@
  */
 package org.dbflute.optional;
 
+import java.util.stream.Stream;
+
+import org.dbflute.helper.function.IndependentProcessor;
+
 /**
  * @param <SCALAR> The type of scalar.
  * @author jflute
@@ -88,15 +92,33 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
     // ===================================================================================
     //                                                                   Standard Handling
     //                                                                   =================
+    // -----------------------------------------------------
+    //                                             ifPresent
+    //                                             ---------
     /** {@inheritDoc} */
-    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<SCALAR> oneArgLambda) {
+    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<? super SCALAR> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return callbackIfPresent(oneArgLambda);
     }
 
     /** {@inheritDoc} */
+    public void ifPresentOrElse(OptionalThingConsumer<? super SCALAR> oneArgLambda, IndependentProcessor noArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        assertNoArgLambdaNotNull(noArgLambda);
+        callbackIfPresentOrElse(oneArgLambda, noArgLambda);
+    }
+
+    // -----------------------------------------------------
+    //                                         isPresent/get
+    //                                         -------------
+    /** {@inheritDoc} */
     public boolean isPresent() {
-        return exists();
+        return determinePresent();
+    }
+
+    /** {@inheritDoc} */
+    public boolean isEmpty() {
+        return determineEmpty();
     }
 
     /** {@inheritDoc} */
@@ -104,8 +126,45 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
         return directlyGet();
     }
 
+    // -----------------------------------------------------
+    //                                             or/orElse
+    //                                             ---------
     /** {@inheritDoc} */
-    public OptionalScalar<SCALAR> filter(OptionalThingPredicate<SCALAR> oneArgLambda) {
+    public OptionalThing<SCALAR> or(OptionalThingSupplier<? extends OptionalThing<? extends SCALAR>> noArgLambda) {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackOr(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public SCALAR orElse(SCALAR other) {
+        return directlyGetOrElse(other);
+    }
+
+    /** {@inheritDoc} */
+    public SCALAR orElseGet(OptionalThingSupplier<? extends SCALAR> noArgLambda) {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackGetOrElseGet(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <CAUSE extends Throwable> SCALAR orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackGetOrElseThrow(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable, TRANSLATED extends Throwable> SCALAR orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> causeLambda) throws TRANSLATED {
+        assertCauseLambdaNotNull(causeLambda);
+        return callbackGetOrElseTranslatingThrow(causeLambda);
+    }
+
+    // -----------------------------------------------------
+    //                                            filter/map
+    //                                            ----------
+    /** {@inheritDoc} */
+    public OptionalScalar<SCALAR> filter(OptionalThingPredicate<? super SCALAR> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return (OptionalScalar<SCALAR>) callbackFilter(oneArgLambda);
     }
@@ -141,51 +200,20 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
         return new OptionalScalar<ARG>(obj, _thrower);
     }
 
+    // -----------------------------------------------------
+    //                                                stream
+    //                                                ------
     /** {@inheritDoc} */
-    public SCALAR orElse(SCALAR other) {
-        return directlyGetOrElse(other);
-    }
-
-    /** {@inheritDoc} */
-    public SCALAR orElseGet(OptionalThingSupplier<SCALAR> noArgLambda) {
-        return directlyGetOrElseGet(noArgLambda);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <CAUSE extends Throwable> SCALAR orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
-        return directlyGetOrElseThrow(noArgLambda);
-    }
-
-    /** {@inheritDoc} */
-    public <CAUSE extends Throwable, TRANSLATED extends Throwable> SCALAR orElseTranslatingThrow(
-            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED {
-        return directlyGetOrElseTranslatingThrow(oneArgLambda);
+    public Stream<SCALAR> stream() {
+        return convertToStream();
     }
 
     // ===================================================================================
     //                                                                   DBFlute Extension
     //                                                                   =================
     /** {@inheritDoc} */
-    public void alwaysPresent(OptionalThingConsumer<SCALAR> oneArgLambda) {
+    public void alwaysPresent(OptionalThingConsumer<? super SCALAR> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         callbackAlwaysPresent(oneArgLambda);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated basically use ifPresent() or use orElse(null)
-     */
-    public SCALAR orElseNull() {
-        return directlyGetOrElse(null);
-    }
-
-    // ===================================================================================
-    //                                                                       Assert Helper
-    //                                                                       =============
-    protected void assertOneArgLambdaNotNull(Object oneArgLambda) {
-        if (oneArgLambda == null) {
-            throw new IllegalArgumentException("The argument 'oneArgLambda' should not be null.");
-        }
     }
 }

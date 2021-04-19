@@ -17,6 +17,9 @@ package org.dbflute.optional;
 
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.dbflute.helper.function.IndependentProcessor;
 
 /**
  * The base class for optional object.
@@ -65,11 +68,11 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
     }
 
     // ===================================================================================
-    //                                                                     Object Handling
-    //                                                                     ===============
+    //                                                                   Standard Handling
+    //                                                                   =================
     // -----------------------------------------------------
-    //                                               Present
-    //                                               -------
+    //                                             ifPresent
+    //                                             ---------
     /**
      * Is the wrapped object present? (existing?)
      * @return The determination, true or false.
@@ -79,24 +82,10 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
     }
 
     /**
-     * @param objLambda The callback interface to consume the wrapped value. (NotNull)
-     */
-    protected void callbackAlwaysPresent(OptionalThingConsumer<OBJ> objLambda) {
-        if (objLambda == null) {
-            String msg = "The argument 'objLambda' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (_obj == null) {
-            _thrower.throwNotFoundException();
-        }
-        objLambda.accept(_obj);
-    }
-
-    /**
      * @param consumer The callback interface to consume the wrapped object. (NotNull)
      * @return The handler of after process when if not present. (NotNull)
      */
-    protected OptionalThingIfPresentAfter callbackIfPresent(OptionalThingConsumer<OBJ> consumer) {
+    protected OptionalThingIfPresentAfter callbackIfPresent(OptionalThingConsumer<? super OBJ> consumer) {
         if (consumer == null) {
             String msg = "The argument 'consumer' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -109,9 +98,39 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
         }
     }
 
+    protected void callbackIfPresentOrElse(OptionalThingConsumer<? super OBJ> presentAction, IndependentProcessor emptyAction) {
+        if (presentAction == null) {
+            String msg = "The argument 'presentAction' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (emptyAction == null) {
+            String msg = "The argument 'emptyAction' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (exists()) {
+            presentAction.accept(_obj);
+        } else {
+            emptyAction.process();
+        }
+    }
+
     // -----------------------------------------------------
-    //                                                 get()
-    //                                                 -----
+    //                                         isPresent/get
+    //                                         -------------
+    /**
+     * @return Is the optional object present?
+     */
+    protected boolean determinePresent() {
+        return exists();
+    }
+
+    /**
+     * @return Is the optional object empty (not present)?
+     */
+    protected boolean determineEmpty() {
+        return !exists();
+    }
+
     /**
      * @return The object instance wrapped in this optional object. (NotNull)
      */
@@ -122,8 +141,29 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
         return _obj;
     }
 
+    // -----------------------------------------------------
+    //                                             or/orElse
+    //                                             ---------
     /**
-     * @param other The other instance to be returned if null. (NullAllowed: if null, returns null when entity is null)
+     * @param supplier The supplier of other optional if not present. (NotNull)
+     * @return this or optional provided by supplier. (NotNull, EmptyAllowed: provided one may be empty)
+     */
+    protected OptionalThing<OBJ> callbackOr(OptionalThingSupplier<? extends OptionalThing<? extends OBJ>> supplier) {
+        if (supplier == null) {
+            String msg = "The argument 'supplier' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (exists()) {
+            return this;
+        } else {
+            @SuppressWarnings("unchecked")
+            OptionalThing<OBJ> other = (OptionalThing<OBJ>) supplier.get();
+            return other;
+        }
+    }
+
+    /**
+     * @param other The other instance to be returned if not present. (NullAllowed: if null, returns null when entity is null)
      * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
      */
     protected OBJ directlyGetOrElse(OBJ other) {
@@ -131,10 +171,10 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
     }
 
     /**
-     * @param supplier The supplier of other instance if null. (NotNull)
+     * @param supplier The supplier of other instance if not present. (NotNull)
      * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
      */
-    protected OBJ directlyGetOrElseGet(OptionalThingSupplier<OBJ> supplier) {
+    protected OBJ callbackGetOrElseGet(OptionalThingSupplier<? extends OBJ> supplier) {
         if (supplier == null) {
             String msg = "The argument 'supplier' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -144,11 +184,11 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
 
     /**
      * @param <CAUSE> The type of cause.
-     * @param supplier The supplier of exception if null. (NotNull)
+     * @param supplier The supplier of exception if not present. (NotNull)
      * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
      * @throws CAUSE When the value is null.
      */
-    protected <CAUSE extends Throwable> OBJ directlyGetOrElseThrow(OptionalThingSupplier<? extends CAUSE> supplier) throws CAUSE {
+    protected <CAUSE extends Throwable> OBJ callbackGetOrElseThrow(OptionalThingSupplier<? extends CAUSE> supplier) throws CAUSE {
         if (supplier == null) {
             String msg = "The argument 'supplier' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -163,11 +203,11 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
     /**
      * @param <CAUSE> The type of original cause.
      * @param <TRANSLATED> The type of translated cause.
-     * @param translator The translator function of exception if null. (NotNull)
+     * @param translator The translator function of exception if not present. (NotNull)
      * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
      * @throws TRANSLATED When the value is null.
      */
-    protected <CAUSE extends Throwable, TRANSLATED extends Throwable> OBJ directlyGetOrElseTranslatingThrow(
+    protected <CAUSE extends Throwable, TRANSLATED extends Throwable> OBJ callbackGetOrElseTranslatingThrow(
             OptionalThingFunction<CAUSE, TRANSLATED> translator) throws TRANSLATED {
         if (translator == null) {
             String msg = "The argument 'supplier' should not be null.";
@@ -183,13 +223,13 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
     }
 
     // -----------------------------------------------------
-    //                                              filter()
-    //                                              --------
+    //                                            filter/map
+    //                                            ----------
     /**
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected OptionalThing<OBJ> callbackFilter(OptionalThingPredicate<OBJ> mapper) {
+    protected OptionalThing<OBJ> callbackFilter(OptionalThingPredicate<? super OBJ> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -207,14 +247,11 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
 
     /**
      * @param <ARG> The type of value for optional thing.
-     * @param obj The plain object for the optional thing. (NullAllowed: if null, return s empty optional)
+     * @param obj The plain object for the optional thing. (NullAllowed: if null, returns empty optional)
      * @return The new-created instance of optional thing. (NotNull)
      */
     protected abstract <ARG> OptionalThing<ARG> createOptionalFilteredObject(ARG obj);
 
-    // -----------------------------------------------------
-    //                                                 map()
-    //                                                 -----
     /**
      * @param <RESULT> The type of mapping result.
      * @param mapper The callback interface to apply, null return allowed as empty. (NotNull)
@@ -231,7 +268,7 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
 
     /**
      * @param <ARG> The type of value for optional thing.
-     * @param obj The plain object for the optional thing. (NullAllowed: if null, return s empty optional)
+     * @param obj The plain object for the optional thing. (NullAllowed: if null, returns empty optional)
      * @return The new-created instance of optional thing. (NotNull)
      */
     protected abstract <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj);
@@ -262,17 +299,69 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
 
     /**
      * @param <ARG> The type of value for optional thing.
-     * @param obj The plain object for the optional thing. (NullAllowed: if null, return s empty optional)
+     * @param obj The plain object for the optional thing. (NullAllowed: if null, returns empty optional)
      * @return The new-created instance of optional thing. (NotNull)
      */
     protected abstract <ARG> OptionalThing<ARG> createOptionalFlatMappedObject(ARG obj);
 
+    // -----------------------------------------------------
+    //                                                stream
+    //                                                ------
+    /**
+     * @return The stream for the optional thing, may be empty (if not present). (NotNull, EmptyAllowed: if not present)
+     */
+    protected Stream<OBJ> convertToStream() {
+        if (isPresent()) {
+            return Stream.of(get());
+        } else {
+            return Stream.empty();
+        }
+    }
+
     // ===================================================================================
-    //                                                                   Standard Optional
+    //                                                                   DBFlute Extension
     //                                                                   =================
+    /**
+     * @param objLambda The callback interface to consume the wrapped value. (NotNull)
+     */
+    protected void callbackAlwaysPresent(OptionalThingConsumer<? super OBJ> objLambda) {
+        if (objLambda == null) {
+            String msg = "The argument 'objLambda' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (_obj == null) {
+            _thrower.throwNotFoundException();
+        }
+        objLambda.accept(_obj);
+    }
+
+    // ===================================================================================
+    //                                                                 Convert to Optional
+    //                                                                 ===================
     /** {@inheritDoc} */
     public Optional<OBJ> toOptional() {
         return Optional.ofNullable(directlyGetOrElse(null));
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertCauseLambdaNotNull(Object causeLambda) {
+        if (causeLambda == null) {
+            throw new IllegalArgumentException("The argument 'causeLambda' should not be null.");
+        }
+    }
+
+    protected void assertOneArgLambdaNotNull(Object oneArgLambda) {
+        if (oneArgLambda == null) {
+            throw new IllegalArgumentException("The argument 'oneArgLambda' should not be null.");
+        }
+    }
+
+    protected void assertNoArgLambdaNotNull(Object noArgLambda) {
+        if (noArgLambda == null) {
+            throw new IllegalArgumentException("The argument 'noArgLambda' should not be null.");
+        }
     }
 
     // ===================================================================================

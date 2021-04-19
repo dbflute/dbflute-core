@@ -15,6 +15,10 @@
  */
 package org.dbflute.optional;
 
+import java.util.stream.Stream;
+
+import org.dbflute.helper.function.IndependentProcessor;
+
 /**
  * @param <OBJ> The type of object.
  * @author jflute
@@ -88,15 +92,33 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
     // ===================================================================================
     //                                                                   Standard Handling
     //                                                                   =================
+    // -----------------------------------------------------
+    //                                             ifPresent
+    //                                             ---------
     /** {@inheritDoc} */
-    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<OBJ> oneArgLambda) {
+    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<? super OBJ> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return callbackIfPresent(oneArgLambda);
     }
 
     /** {@inheritDoc} */
+    public void ifPresentOrElse(OptionalThingConsumer<? super OBJ> oneArgLambda, IndependentProcessor noArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        assertNoArgLambdaNotNull(noArgLambda);
+        callbackIfPresentOrElse(oneArgLambda, noArgLambda);
+    }
+
+    // -----------------------------------------------------
+    //                                         isPresent/get
+    //                                         -------------
+    /** {@inheritDoc} */
     public boolean isPresent() {
-        return exists();
+        return determinePresent();
+    }
+
+    /** {@inheritDoc} */
+    public boolean isEmpty() {
+        return determineEmpty();
     }
 
     /** {@inheritDoc} */
@@ -104,8 +126,45 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
         return directlyGet();
     }
 
+    // -----------------------------------------------------
+    //                                             or/orElse
+    //                                             ---------
     /** {@inheritDoc} */
-    public OptionalObject<OBJ> filter(OptionalThingPredicate<OBJ> oneArgLambda) {
+    public OptionalThing<OBJ> or(OptionalThingSupplier<? extends OptionalThing<? extends OBJ>> noArgLambda) {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackOr(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public OBJ orElse(OBJ other) {
+        return directlyGetOrElse(other);
+    }
+
+    /** {@inheritDoc} */
+    public OBJ orElseGet(OptionalThingSupplier<? extends OBJ> noArgLambda) {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackGetOrElseGet(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <CAUSE extends Throwable> OBJ orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackGetOrElseThrow(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable, TRANSLATED extends Throwable> OBJ orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> causeLambda) throws TRANSLATED {
+        assertCauseLambdaNotNull(causeLambda);
+        return callbackGetOrElseTranslatingThrow(causeLambda);
+    }
+
+    // -----------------------------------------------------
+    //                                            filter/map
+    //                                            ----------
+    /** {@inheritDoc} */
+    public OptionalObject<OBJ> filter(OptionalThingPredicate<? super OBJ> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return (OptionalObject<OBJ>) callbackFilter(oneArgLambda);
     }
@@ -141,51 +200,20 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
         return new OptionalObject<ARG>(obj, _thrower);
     }
 
+    // -----------------------------------------------------
+    //                                                stream
+    //                                                ------
     /** {@inheritDoc} */
-    public OBJ orElse(OBJ other) {
-        return directlyGetOrElse(other);
-    }
-
-    /** {@inheritDoc} */
-    public OBJ orElseGet(OptionalThingSupplier<OBJ> noArgLambda) {
-        return directlyGetOrElseGet(noArgLambda);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <CAUSE extends Throwable> OBJ orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
-        return directlyGetOrElseThrow(noArgLambda);
-    }
-
-    /** {@inheritDoc} */
-    public <CAUSE extends Throwable, TRANSLATED extends Throwable> OBJ orElseTranslatingThrow(
-            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED {
-        return directlyGetOrElseTranslatingThrow(oneArgLambda);
+    public Stream<OBJ> stream() {
+        return convertToStream();
     }
 
     // ===================================================================================
     //                                                                   DBFlute Extension
     //                                                                   =================
     /** {@inheritDoc} */
-    public void alwaysPresent(OptionalThingConsumer<OBJ> oneArgLambda) {
+    public void alwaysPresent(OptionalThingConsumer<? super OBJ> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         callbackAlwaysPresent(oneArgLambda);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated basically use ifPresent() or use orElse(null)
-     */
-    public OBJ orElseNull() {
-        return directlyGetOrElse(null);
-    }
-
-    // ===================================================================================
-    //                                                                       Assert Helper
-    //                                                                       =============
-    protected void assertOneArgLambdaNotNull(Object oneArgLambda) {
-        if (oneArgLambda == null) {
-            throw new IllegalArgumentException("The argument 'oneArgLambda' should not be null.");
-        }
     }
 }
