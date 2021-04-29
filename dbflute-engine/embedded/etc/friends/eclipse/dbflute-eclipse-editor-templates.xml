@@ -11,7 +11,6 @@
 <template autoinsert="true" context="java" deleted="false" description="Java8: forEach()" enabled="true" name="_foreach">${var}.forEach(${newName} -&gt; {
     ${cursor}
 });</template>
-<template autoinsert="true" context="java" deleted="false" description="#hope comment" enabled="true" name="_hope">    // #hope ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Inline" enabled="true" name="_kvli">(key, value) -&gt; ${cursor}</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Linefeed" enabled="true" name="_kvll">(key, value) -&gt; {
     ${cursor}
@@ -95,6 +94,7 @@ public String toString() {
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: .addOrderBy_..." enabled="true" name="_order">.addOrderBy_${columnName}</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: cb.query()" enabled="true" name="_query">${var}.query()</template>
 <template autoinsert="true" context="java" deleted="false" description="(yyyy/MM/dd)" enabled="true" name="_reardate">// ${cursor}(${d:date('yyyy/MM/dd')})</template>
+<template autoinsert="true" context="java" deleted="false" description="by user" enabled="true" name="_rearuser">// ${cursor}by ${user}</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: collect toList()" enabled="true" name="_scolist">${:import(java.util.stream.Collectors)}.collect(Collectors.toList())</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: collect toMap()" enabled="true" name="_scomap">${:import(java.util.stream.Collectors)}.collect(Collectors.toMap(bean -&gt; bean.get${newName}, bean -&gt; bean))</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: cb.specify()" enabled="true" name="_specify">${var}.specify()</template>
@@ -169,7 +169,10 @@ public String toString() {
 
     // ## Assert ##
 }</template>
-<template autoinsert="true" context="java" deleted="false" description="#thinking comment" enabled="true" name="_thinking">    // #thinking ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
+<template autoinsert="true" context="java" deleted="false" description="#for_now comment" enabled="true" name="_cofornow">    // #for_now ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
+<template autoinsert="true" context="java" deleted="false" description="#hope comment" enabled="true" name="_cohope">    // #hope ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
+<template autoinsert="true" context="java" deleted="false" description="#needs_fix comment" enabled="true" name="_coneedsfix">    // #needs_fix ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
+<template autoinsert="true" context="java" deleted="false" description="#thinking comment" enabled="true" name="_cothinking">    // #thinking ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
 <template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor} (${d:date('yyyy/MM/dd')})</template>
 <template autoinsert="true" context="java" deleted="false" description="TODO review comment" enabled="true" name="_trev">    // TODO ${you} ${message} by ${user} (${d:date('yyyy/MM/dd')})</template>
 <template autoinsert="true" context="java-statements" deleted="false" description="throw new IllegalArgumentException(...)" enabled="true" name="_tharg">throw new IllegalArgumentException("The argument '${localVar}' should not be null.");</template>
