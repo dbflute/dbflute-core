@@ -260,7 +260,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
-     * Get the entity or (detail-message) exception if not present.
+     * Get the entity or (detail-message) exception if not present. <br>
+     * <span style="color: #AD4747; font-size: 120%">However the alwaysPresent() or the orElseThrow() is recommended instead this.</span>
      * <pre>
      * OptionalEntity&lt;Member&gt; <span style="color: #553000">optMember</span> = <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
@@ -302,6 +303,24 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     public ENTITY orElseGet(OptionalThingSupplier<? extends ENTITY> noArgLambda) {
         assertNoArgLambdaNotNull(noArgLambda);
         return callbackGetOrElseGet(noArgLambda);
+    }
+
+    /**
+     * Get the entity or (detail-message) exception if not present.
+     * <pre>
+     * OptionalEntity&lt;Member&gt; <span style="color: #553000">optMember</span> = <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
+     * });
+     *
+     * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
+     * Member member = <span style="color: #553000">optMember</span>.<span style="color: #CC4747">orElseThrow()</span>;
+     * </pre>
+     * @return The entity instance wrapped in this optional object. (NotNull)
+     * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public ENTITY orElseThrow() {
+        return directlyGet();
     }
 
     /** {@inheritDoc} */

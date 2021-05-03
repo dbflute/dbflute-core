@@ -147,6 +147,11 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
     }
 
     /** {@inheritDoc} */
+    public SCALAR orElseThrow() {
+        return directlyGet();
+    }
+
+    /** {@inheritDoc} */
     @Override
     public <CAUSE extends Throwable> SCALAR orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
         assertNoArgLambdaNotNull(noArgLambda);

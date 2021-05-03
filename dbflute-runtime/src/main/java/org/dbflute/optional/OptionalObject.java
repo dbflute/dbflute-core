@@ -147,6 +147,11 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
     }
 
     /** {@inheritDoc} */
+    public OBJ orElseThrow() {
+        return directlyGet();
+    }
+
+    /** {@inheritDoc} */
     @Override
     public <CAUSE extends Throwable> OBJ orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
         assertNoArgLambdaNotNull(noArgLambda);

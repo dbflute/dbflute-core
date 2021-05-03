@@ -181,7 +181,17 @@ public class OptionalEntityTest extends RuntimeTestCase {
         }
     }
 
-    public void test_orElseThrow() throws Exception {
+    public void test_orElseThrow_default() throws Exception {
+        try {
+            prepareOpt(null).orElseThrow();
+        } catch (IllegalStateException e) {
+            assertEquals("foo", e.getMessage());
+        }
+        MockEntity entity = new MockEntity();
+        assertEquals(entity, prepareOpt(entity).orElseThrow());
+    }
+
+    public void test_orElseThrow_lambda() throws Exception {
         try {
             prepareOpt(null).orElseThrow(() -> new IllegalStateException("sea"));
         } catch (IllegalStateException e) {
