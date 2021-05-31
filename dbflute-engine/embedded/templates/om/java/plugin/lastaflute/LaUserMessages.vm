@@ -16,7 +16,8 @@
 ${manager.allClassCopyright}package ${request.package};
 
 #if ($request.tableMap.superClassPackage)
-import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
+## unneeded for package scope, so comment it out to avoid Eclipse warning
+##import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
 #else
 import org.lastaflute.core.message.UserMessages;
 #end

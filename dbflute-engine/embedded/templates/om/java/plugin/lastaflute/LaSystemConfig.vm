@@ -16,7 +16,8 @@
 ${manager.allClassCopyright}package ${request.package};
 
 #if ($request.tableMap.interfaceSimpleName)
-import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};
+## unneeded for package scope, so comment it out to avoid Eclipse warning
+##import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};
 #else
 import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
 #end
