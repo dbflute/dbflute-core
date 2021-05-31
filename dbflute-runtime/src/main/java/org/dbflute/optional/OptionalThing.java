@@ -18,7 +18,6 @@ package org.dbflute.optional;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.helper.function.IndependentProcessor;
 
 /**
@@ -119,7 +118,7 @@ public interface OptionalThing<THING> {
     /**
      * Get the thing or (detail message) exception if not present.
      * @return The instance of the wrapped thing. (NotNull)
-     * @throws (exception from thrower) When the object instance wrapped in this optional thing is null, which means object has already been deleted (point is not found).
+     * @throws RuntimeException When not present, which means object is already deleted (not found).
      */
     THING get();
 
@@ -151,7 +150,7 @@ public interface OptionalThing<THING> {
      * Get the thing or throw the embedded exception. <br>
      * <span style="color: #AD4747; font-size: 120%">Actually same as get(), similar to alwaysPresent().</span>
      * @return The object instance wrapped in this optional object. (NotNull: if not present, exception)
-     * @throws (exception from thrower) When the value is null.
+     * @throws RuntimeException When not present, which means object is already deleted (not found).
      */
     THING orElseThrow(); // as java10
 
@@ -234,7 +233,7 @@ public interface OptionalThing<THING> {
      * });
      * </pre>
      * @param oneArgLambda The callback interface to consume the optional thing. (NotNull)
-     * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional thing is null, which means object has already been deleted (point is not found).
+     * @throws RuntimeException When not present, which means object is already deleted (not found).
      */
     void alwaysPresent(OptionalThingConsumer<? super THING> oneArgLambda);
 
