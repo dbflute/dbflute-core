@@ -15,11 +15,13 @@
 ##
 ${manager.allClassCopyright}package ${request.package};
 
+## import statement to same package classes are warned by new Eclipse
+#if ($request.package != $request.tableMap.superClassPackage)
 #if ($request.tableMap.interfaceSimpleName)
-## unneeded for package scope, so comment it out to avoid Eclipse warning
-##import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};
+import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};
 #else
 import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
+#end
 #end
 import org.lastaflute.core.direction.exception.ConfigPropertyNotFoundException;
 
