@@ -24,18 +24,18 @@ import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
-#if ($tableMap.hasRefCls && !$tableMap.isSuppressDBClsCollaboration)
-import ${tableMap.allcommonPackage}.*;
+#if ($optionMap.hasRefCls && !$optionMap.isSuppressDBClsCollaboration)
+import ${optionMap.allcommonPackage}.*;
 #end
 
 #set ($glCDef = "${request.className}")
 /**
- * The definition of ${tableMap.clsTitle} classification.
+ * The definition of ${optionMap.clsTitle} classification.
  * @author FreeGen
  */
 public interface ${glCDef} extends Classification {
 
-#foreach ($classificationTop in $tableMap.classificationTopList)
+#foreach ($classificationTop in $optionMap.classificationTopList)
 #set ($classificationName = $classificationTop.classificationName)
 #if ($classificationTop.hasTopComment())
     /**
@@ -241,7 +241,7 @@ public interface ${glCDef} extends Classification {
 #end
             return new ArrayList<${classificationName}>(4);
         }
-#if (!$tableMap.isSuppressDBClsCollaboration)
+#if (!$optionMap.isSuppressDBClsCollaboration)
 #foreach ($refClsElement in $classificationTop.refClsElementList)
 
         /**
@@ -273,7 +273,7 @@ public interface ${glCDef} extends Classification {
 #end
     public enum DefMeta implements ClassificationMeta {
 #set ($count = 0)
-#foreach ($classificationTop in $tableMap.classificationTopList)
+#foreach ($classificationTop in $optionMap.classificationTopList)
 #set ($classificationName = $classificationTop.classificationName)
 #if ($count != 0)
         ,
@@ -290,62 +290,62 @@ public interface ${glCDef} extends Classification {
         }
 
         public OptionalThing<? extends Classification> of(Object code) {
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.of(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public OptionalThing<? extends Classification> byName(String name) {
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.byName(name); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public Classification codeOf(Object code) { // null if not found, old style so use of(code)
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public Classification nameOf(String name) { // null if not found, old style so use byName(name)
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.valueOf(name); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> listAll() {
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listAll()); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> listByGroup(String groupName) { // exception if not found
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listByGroup(groupName)); }
 #end
             throw new IllegalStateException("Unknown groupName: " + groupName + ", " + this); // basically unreachable
         }
 
         public List<Classification> listOf(Collection<String> codeList) {
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listOf(codeList)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> groupOf(String groupName) { // old style
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.groupOf(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 ## because empty class is generated when no classification
-#if (!$tableMap.classificationNameList.isEmpty())
+#if (!$optionMap.classificationNameList.isEmpty())
 
         @SuppressWarnings("unchecked")
         private List<Classification> toClsList(List<?> clsList) {
@@ -354,7 +354,7 @@ public interface ${glCDef} extends Classification {
 #end
 
         public ClassificationCodeType codeType() {
-#foreach ($classificationTop in $tableMap.classificationTopList)
+#foreach ($classificationTop in $optionMap.classificationTopList)
 #set ($classificationName = $classificationTop.classificationName)
 #if ($classificationTop.hasCodeType())
             if (${classificationName}.name().equals(name())) { return ClassificationCodeType.${classificationTop.codeType}; }
@@ -364,7 +364,7 @@ public interface ${glCDef} extends Classification {
         }
 
         public ClassificationUndefinedHandlingType undefinedHandlingType() {
-#foreach ($classificationTop in $tableMap.classificationTopList)
+#foreach ($classificationTop in $optionMap.classificationTopList)
 #set ($classificationName = $classificationTop.classificationName)
             if (${classificationName}.name().equals(name())) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
 #end
@@ -373,7 +373,7 @@ public interface ${glCDef} extends Classification {
 
         public static OptionalThing<${glCDef}.DefMeta> find(String classificationName) { // instead of valueOf()
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return OptionalThing.of(${glCDef}.DefMeta.${classificationName}); }
 #end
             return OptionalThing.ofNullable(null, () -> {
@@ -383,7 +383,7 @@ public interface ${glCDef} extends Classification {
 
         public static ${glCDef}.DefMeta meta(String classificationName) { // old style so use find(name)
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
-#foreach ($classificationName in $tableMap.classificationNameList)
+#foreach ($classificationName in $optionMap.classificationNameList)
 #set ($classificationName = $classificationTop.classificationName)
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
 #end

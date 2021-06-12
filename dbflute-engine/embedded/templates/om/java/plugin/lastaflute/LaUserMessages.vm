@@ -15,10 +15,10 @@
 ##
 ${manager.allClassCopyright}package ${request.package};
 
-#if ($request.tableMap.superClassPackage)
+#if ($request.optionMap.superClassPackage)
 ## import statement to same package classes are warned by new Eclipse
-#if ($request.package != $request.tableMap.superClassPackage)
-import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
+#if ($request.package != $request.optionMap.superClassPackage)
+import ${request.optionMap.superClassPackage}.${request.optionMap.superClassSimpleName};
 #end
 #else
 import org.lastaflute.core.message.UserMessages;
@@ -39,8 +39,8 @@ import org.lastaflute.core.message.UserMessage;
  * The keys for message.
  * @author FreeGen
  */
-#if ($request.tableMap.superClassPackage)
-public class ${request.className} extends ${request.tableMap.superClassSimpleName} {
+#if ($request.optionMap.superClassPackage)
+public class ${request.className} extends ${request.optionMap.superClassSimpleName} {
 #else
 public class ${request.className} extends UserMessages {
 #end
@@ -107,7 +107,7 @@ public class ${request.className} extends UserMessages {
 #end
 #end
 #end
-#if (!$request.tableMap.superClassPackage)
+#if (!$request.optionMap.superClassPackage)
 
     /**
      * Assert the property is not null.

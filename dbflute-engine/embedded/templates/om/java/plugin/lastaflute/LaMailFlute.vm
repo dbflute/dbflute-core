@@ -20,8 +20,8 @@ import org.lastaflute.core.mail.MPCall;
 import org.lastaflute.core.mail.Postbox;
 
 #set ($pluginDef = "")
-#if ($request.tableMap.pluginInterface)
-#set ($pluginDef = " implements ${request.tableMap.pluginInterface}")
+#if ($request.optionMap.pluginInterface)
+#set ($pluginDef = " implements ${request.optionMap.pluginInterface}")
 #end
 /**
  * The postcard for MailFlute on LastaFlute.
