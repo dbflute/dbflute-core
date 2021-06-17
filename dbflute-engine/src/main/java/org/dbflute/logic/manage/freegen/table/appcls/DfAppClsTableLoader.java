@@ -127,6 +127,8 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         optionMap.put("hasRefCls", hasRefCls);
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
 
+        stopRedundantCommentIfNeeds(requestName, resourceFile, topList, optionMap);
+
         // #for_now can be flexible? (table name is unused?)
         return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList());
     }
@@ -206,22 +208,27 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             DfFreeGenResource resource) {
         final DfClassificationTop refTop = dbClsMap.get(refClsName);
         if (refTop == null) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Not found the DB classification for app classification.");
-            br.addItem("Advice");
-            br.addElement("Make sure your DB classification name.");
-            br.addItem("AppCls");
-            br.addElement(classificationName);
-            br.addItem("NotFound DBCls");
-            br.addElement(refClsName);
-            br.addItem("Existing DBCls");
-            br.addElement(dbClsMap.keySet());
-            br.addItem("dfprop File");
-            br.addElement(resource.getResourceFile());
-            final String msg = br.buildExceptionMessage();
-            throw new DfIllegalPropertySettingException(msg);
+            throwAppClsReferredDBClsNotFoundException(classificationName, refClsName, dbClsMap, resource);
         }
         return refTop;
+    }
+
+    protected void throwAppClsReferredDBClsNotFoundException(String classificationName, String refClsName,
+            Map<String, DfClassificationTop> dbClsMap, DfFreeGenResource resource) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the DB classification for app classification.");
+        br.addItem("Advice");
+        br.addElement("Make sure your DB classification name.");
+        br.addItem("AppCls");
+        br.addElement(classificationName);
+        br.addItem("NotFound DBCls");
+        br.addElement(refClsName);
+        br.addItem("Existing DBCls");
+        br.addElement(dbClsMap.keySet());
+        br.addItem("dfprop File");
+        br.addElement(resource.getResourceFile());
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     protected void handleRefCls(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
@@ -244,6 +251,77 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 classificationTop.acceptGroupList(dbClsTop.getGroupList());
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                   Redundant Comment
+    //                                                                   =================
+    protected void stopRedundantCommentIfNeeds(String requestName, String resourceFile, List<DfClassificationTop> topList,
+            Map<String, Object> optionMap) {
+        if (isSuppressRedundantCommentStop(optionMap)) {
+            return;
+        }
+        for (DfClassificationTop top : topList) {
+            final List<DfClassificationElement> elementList = top.getClassificationElementList();
+            for (DfClassificationElement element : elementList) {
+                if (element.hasComment()) {
+                    final String comment = element.getComment();
+                    if (Srl.equalsPlain(comment, element.getCode(), element.getName(), element.getAlias())) {
+                        throwAppClsRedundantCommentException(requestName, resourceFile, top, element, comment);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void throwAppClsRedundantCommentException(String requestName, String resourceFile, DfClassificationTop top,
+            DfClassificationElement element, String comment) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the redundant comment in the app classification.");
+        br.addItem("Advice");
+        br.addElement("Comment should not be same as code, name, alias.");
+        br.addElement("Write description for the element or remove comment definition.");
+        br.addElement("(Many redundant comments are noise to watch valueable comments)");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    code=ONE ; name=OneMan ; alias=Showbase ; comment=ONE // *Bad");
+        br.addElement("    code=ONE ; name=OneMan ; alias=Showbase ; comment=OneMan // *Bad");
+        br.addElement("    code=ONE ; name=OneMan ; alias=Showbase ; comment=Showbase // *Bad");
+        br.addElement("  (o):");
+        br.addElement("    code=ONE ; ... ; comment=beautiful show at the showbase // Good");
+        br.addElement("    code=ONE ; name=OneMan ; alias=ShowBase // Good");
+        br.addElement("");
+        br.addElement("However if you need to suppress this stop, set the property as followings.");
+        br.addElement("When lastaFluteMap.dfprop:");
+        br.addElement(" e.g. appName is sea, freeGen title is appcls");
+        br.addElement("  ; overrideMap = map:{");
+        br.addElement("      ; sea.freeGen.appcls.isSuppressRedundantCommentStop = true");
+        br.addElement("  }");
+        br.addElement(" e.g. appName is hangar, freeGen title is land_cls (namedcls)");
+        br.addElement("  ; overrideMap = map:{");
+        br.addElement("      ; hangar.freeGen.land_cls.isSuppressRedundantCommentStop = true");
+        br.addElement("  }");
+        br.addElement("When freeGenMap.dfprop:");
+        br.addElement("  ; optionMap = map:{");
+        br.addElement("      ; isSuppressRedundantCommentStop = true");
+        br.addElement("  }");
+        br.addItem("FreeGen Request");
+        br.addElement(requestName);
+        br.addItem("Resource File");
+        br.addElement(resourceFile);
+        br.addItem("Classification");
+        br.addElement(top.toString());
+        br.addItem("Element");
+        br.addElement(element.toString());
+        br.addItem("Redundant Comment");
+        br.addElement(comment);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    protected boolean isSuppressRedundantCommentStop(final Map<String, Object> optionMap) {
+        final Object stop = optionMap.get("isSuppressRedundantCommentStop");
+        return stop != null && "true".equalsIgnoreCase(stop.toString());
     }
 
     // ===================================================================================

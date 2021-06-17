@@ -191,14 +191,14 @@ public final class DfLastaFluteFreeGenReflector {
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), elementMap);
         doSetupResourceMap(appName, path, elementMap, theme);
         doSetupOutputConfigMap(appName, elementMap, theme);
-        final Map<String, Object> tableMap = createTableMap();
-        elementMap.put("tableMap", tableMap);
+        final Map<String, Object> optionMap = createOptionMap();
+        elementMap.put("optionMap", optionMap);
         if (!hasCommonEnv && !hasCommonConfig) { // root
-            doSetupConfigTableMapRoot(tableMap);
+            doSetupConfigTableMapRoot(optionMap);
         } else {
             final String parentName = _uncapServiceName;
             final String parentTheme = hasCommonConfig ? "config" : "env";
-            doSetupConfigTableMapInheritance(tableMap, parentName, parentTheme);
+            doSetupConfigTableMapInheritance(optionMap, parentName, parentTheme);
         }
     }
 
@@ -210,17 +210,17 @@ public final class DfLastaFluteFreeGenReflector {
         registerFreeGen(capAppName + buildTitleSuffix(theme), elementMap);
         doSetupResourceMap(appName, path, elementMap, theme);
         doSetupOutputConfigMap(appName, elementMap, theme);
-        final Map<String, Object> tableMap = createTableMap();
-        elementMap.put("tableMap", tableMap);
+        final Map<String, Object> optionMap = createOptionMap();
+        elementMap.put("optionMap", optionMap);
         if (pluginInterface != null) {
-            tableMap.put("pluginInterface", pluginInterface);
+            optionMap.put("pluginInterface", pluginInterface);
         }
         if (!hasCommonEnv && !hasCommonConfig && !hasAppEnv) { // root
-            doSetupConfigTableMapRoot(tableMap);
+            doSetupConfigTableMapRoot(optionMap);
         } else {
             final String parentName = hasAppEnv ? appName : _uncapServiceName;
             final String parentTheme = hasAppEnv ? "env" : (hasCommonConfig ? "config" : "env");
-            doSetupConfigTableMapInheritance(tableMap, parentName, parentTheme);
+            doSetupConfigTableMapInheritance(optionMap, parentName, parentTheme);
         }
     }
 
@@ -233,24 +233,24 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", initCap(appName) + initCap(theme));
     }
 
-    protected void doSetupConfigTableMapRoot(Map<String, Object> tableMap) {
-        doSetupConfigTableMapBasic(tableMap);
-        tableMap.put("superClassPackage", "org.lastaflute.core.direction");
-        tableMap.put("superClassSimpleName", "ObjectiveConfig");
+    protected void doSetupConfigTableMapRoot(Map<String, Object> optionMap) {
+        doSetupConfigTableMapBasic(optionMap);
+        optionMap.put("superClassPackage", "org.lastaflute.core.direction");
+        optionMap.put("superClassSimpleName", "ObjectiveConfig");
     }
 
-    protected void doSetupConfigTableMapInheritance(Map<String, Object> tableMap, String appName, String theme) {
-        doSetupConfigTableMapBasic(tableMap);
-        tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
-        tableMap.put("isCheckImplicitOverride", getTrueLiteral());
-        tableMap.put("interfacePackage", _mylastaPackage + ".direction");
-        tableMap.put("interfaceSimpleName", initCap(appName) + initCap(theme));
-        tableMap.put("superClassPackage", _mylastaPackage + ".direction");
-        tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + ".SimpleImpl");
+    protected void doSetupConfigTableMapInheritance(Map<String, Object> optionMap, String appName, String theme) {
+        doSetupConfigTableMapBasic(optionMap);
+        optionMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
+        optionMap.put("isCheckImplicitOverride", getTrueLiteral());
+        optionMap.put("interfacePackage", _mylastaPackage + ".direction");
+        optionMap.put("interfaceSimpleName", initCap(appName) + initCap(theme));
+        optionMap.put("superClassPackage", _mylastaPackage + ".direction");
+        optionMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + ".SimpleImpl");
     }
 
-    protected void doSetupConfigTableMapBasic(Map<String, Object> tableMap) {
-        tableMap.put("isUseDefaultConfigAtGeneration", _useDefaultConfigAtGeneration); // direct use so not literal
+    protected void doSetupConfigTableMapBasic(Map<String, Object> optionMap) {
+        optionMap.put("isUseDefaultConfigAtGeneration", _useDefaultConfigAtGeneration); // direct use so not literal
     }
 
     // ===================================================================================
@@ -263,13 +263,13 @@ public final class DfLastaFluteFreeGenReflector {
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), elementMap);
         doSetupResourceMap(appName, path, elementMap, theme);
         doSetupMessageOutputMap(appName, elementMap, theme, lastafluteMap);
-        final Map<String, Object> tableMap = createTableMap();
-        elementMap.put("tableMap", tableMap);
-        tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap(theme, "prefix:labels."));
+        final Map<String, Object> optionMap = createOptionMap();
+        elementMap.put("optionMap", optionMap);
+        optionMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap(theme, "prefix:labels."));
         if (hasCommonLabel || hasCommonMessage) {
             final String parentName = _uncapServiceName;
             final String parentTheme = hasCommonMessage ? "message" : "label";
-            doSetupMessageTableMapInheritance(tableMap, parentName, parentTheme, lastafluteMap);
+            doSetupMessageTableMapInheritance(optionMap, parentName, parentTheme, lastafluteMap);
         }
     }
 
@@ -280,13 +280,13 @@ public final class DfLastaFluteFreeGenReflector {
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), elementMap);
         doSetupResourceMap(appName, path, elementMap, theme);
         doSetupMessageOutputMap(appName, elementMap, theme, lastafluteMap);
-        final Map<String, Object> tableMap = createTableMap();
-        elementMap.put("tableMap", tableMap);
-        tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
+        final Map<String, Object> optionMap = createOptionMap();
+        elementMap.put("optionMap", optionMap);
+        optionMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
         if (hasCommonLabel || hasCommonMessage || hasAppLabel) {
             final String parentName = hasAppLabel ? appName : _uncapServiceName;
             final String parentTheme = hasAppLabel ? "label" : (hasCommonMessage ? "message" : "label");
-            doSetupMessageTableMapInheritance(tableMap, parentName, parentTheme, lastafluteMap);
+            doSetupMessageTableMapInheritance(optionMap, parentName, parentTheme, lastafluteMap);
         }
     }
 
@@ -300,17 +300,17 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", initCap(appName) + initCap(theme) + "s");
     }
 
-    protected void doSetupMessageTableMapInheritance(Map<String, Object> tableMap, String appName, String theme,
+    protected void doSetupMessageTableMapInheritance(Map<String, Object> optionMap, String appName, String theme,
             Map<String, Object> lastafluteMap) {
-        tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
-        tableMap.put("isCheckImplicitOverride", getTrueLiteral());
-        tableMap.put("isUseNonNumberVariable", getTrueLiteral());
-        tableMap.put("variableExceptList", DfCollectionUtil.newArrayList("item")); // e.g. {item} (is subject)
+        optionMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
+        optionMap.put("isCheckImplicitOverride", getTrueLiteral());
+        optionMap.put("isUseNonNumberVariable", getTrueLiteral());
+        optionMap.put("variableExceptList", DfCollectionUtil.newArrayList("item")); // e.g. {item} (is subject)
         if (getLittleAdjustmentProperties().isCompatibleUserMessagesVariableNotOrdered()) { // emergency option
-            tableMap.put("isSuppressVariableOrder", getTrueLiteral());
+            optionMap.put("isSuppressVariableOrder", getTrueLiteral());
         }
-        tableMap.put("superClassPackage", buildMessagesPackage(appName, lastafluteMap));
-        tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + "s");
+        optionMap.put("superClassPackage", buildMessagesPackage(appName, lastafluteMap));
+        optionMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + "s");
     }
 
     protected String buildMessagesPackage(String appName, Map<String, Object> lastafluteMap) {
@@ -340,14 +340,14 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("package", buildMailPostcardPackage(capAppName, lastafluteMap));
         outputMap.put("templateFile", "LaMailFlute.vm");
         outputMap.put("className", initCap(appName) + "Postcard");
-        final Map<String, Object> tableMap = createTableMap();
-        pathMap.put("tableMap", tableMap);
-        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "mail", "targetDir"));
-        tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "mail", "targetExt"));
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "mail", "targetDir"));
+        optionMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "mail", "targetExt"));
         final List<String> exceptPathList = DfCollectionUtil.newArrayList("contain:/mail/common/");
-        tableMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
+        optionMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
         if (pluginInterface != null) {
-            tableMap.put("pluginInterface", pluginInterface);
+            optionMap.put("pluginInterface", pluginInterface);
         }
     }
 
@@ -377,12 +377,12 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("package", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
         outputMap.put("templateFile", "LaPmTemplate.vm");
         outputMap.put("className", "unused");
-        final Map<String, Object> tableMap = createTableMap();
-        pathMap.put("tableMap", tableMap);
-        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "template", "targetDir"));
-        tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "template", "targetExt"));
-        tableMap.put("isConventionSuffix", getTrueLiteral());
-        tableMap.put("isLastaTemplate", getTrueLiteral());
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "template", "targetDir"));
+        optionMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "template", "targetExt"));
+        optionMap.put("isConventionSuffix", getTrueLiteral());
+        optionMap.put("isLastaTemplate", getTrueLiteral());
     }
 
     protected String buildPmTemplateBeanPackage(String appName, Map<String, Object> lastafluteMap) {
@@ -420,13 +420,13 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("package", buildHtmlTemplatePackage(capAppName, lastafluteMap, ext));
         outputMap.put("templateFile", "LaHtmlPath.vm");
         outputMap.put("className", initCap(appName) + "HtmlPath");
-        final Map<String, Object> tableMap = createTableMap();
-        pathMap.put("tableMap", tableMap);
-        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, ext, "targetDir"));
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, ext, "targetDir"));
         final String targetExt = ext.equals("html") ? ".html" : ("." + ext + "|.html");
-        tableMap.put("targetExt", filterOverridden(targetExt, lastafluteMap, appName, ext, "targetExt"));
+        optionMap.put("targetExt", filterOverridden(targetExt, lastafluteMap, appName, ext, "targetExt"));
         final List<String> exceptPathList = DfCollectionUtil.newArrayList("contain:/view/common/");
-        tableMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, ext, "exceptPathList"));
+        optionMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, ext, "exceptPathList"));
     }
 
     protected String buildHtmlTemplatePackage(String appName, Map<String, Object> lastafluteMap, String ext) {
@@ -457,51 +457,51 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("templateFile", "LaDocHtml.vm");
         outputMap.put("className", "lastadoc-" + appName);
         outputMap.put("fileExt", "html");
-        final Map<String, Object> tableMap = createTableMap();
-        docMap.put("tableMap", tableMap);
-        tableMap.put("path", path);
-        tableMap.put("targetDir", "$$baseDir$$/java");
-        tableMap.put("appName", appName);
+        final Map<String, Object> optionMap = createOptionMap();
+        docMap.put("optionMap", optionMap);
+        optionMap.put("path", path);
+        optionMap.put("targetDir", "$$baseDir$$/java");
+        optionMap.put("appName", appName);
 
         if (freeGenList.contains("mail")) {
-            tableMap.put("mailPackage", buildMailPostcardPackage(capAppName, lastafluteMap));
-            tableMap.put("mailTargetDir", filterOverridden("$$baseDir$$/resources/mail", lastafluteMap, appName, "mail", "targetDir"));
-            tableMap.put("mailTargetExt", filterOverridden(".dfmail", lastafluteMap, appName, "mail", "targetExt"));
+            optionMap.put("mailPackage", buildMailPostcardPackage(capAppName, lastafluteMap));
+            optionMap.put("mailTargetDir", filterOverridden("$$baseDir$$/resources/mail", lastafluteMap, appName, "mail", "targetDir"));
+            optionMap.put("mailTargetExt", filterOverridden(".dfmail", lastafluteMap, appName, "mail", "targetExt"));
             final List<String> mailExceptPathList = DfCollectionUtil.newArrayList("contain:/mail/common/");
-            tableMap.put("mailExceptPathList", filterOverridden(mailExceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
+            optionMap.put("mailExceptPathList", filterOverridden(mailExceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
             if (mailPluginInterface != null) {
-                tableMap.put("mailPluginInterface", mailPluginInterface);
+                optionMap.put("mailPluginInterface", mailPluginInterface);
             }
         }
 
         if (freeGenList.contains("template")) {
-            tableMap.put("templatePackage", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
-            tableMap.put("templateTargetDir", filterOverridden("$$baseDir$$/resources", lastafluteMap, appName, "template", "targetDir"));
-            tableMap.put("templateTargetExt", filterOverridden("." + "dfpm", lastafluteMap, appName, "template", "targetExt"));
-            tableMap.put("templateIsConventionSuffix", getTrueLiteral());
-            tableMap.put("templateIsLastaTemplate", getTrueLiteral());
+            optionMap.put("templatePackage", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
+            optionMap.put("templateTargetDir", filterOverridden("$$baseDir$$/resources", lastafluteMap, appName, "template", "targetDir"));
+            optionMap.put("templateTargetExt", filterOverridden("." + "dfpm", lastafluteMap, appName, "template", "targetExt"));
+            optionMap.put("templateIsConventionSuffix", getTrueLiteral());
+            optionMap.put("templateIsLastaTemplate", getTrueLiteral());
         }
 
         if (freeGenList.contains("appcls")) {
             final String appClsResourceFile = path + "/src/main/resources/" + appName + "_appcls.dfprop";
-            tableMap.put("appclsResourceFile", filterOverridden(appClsResourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
-            tableMap.put("appclsPackage", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+            optionMap.put("appclsResourceFile", filterOverridden(appClsResourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
+            optionMap.put("appclsPackage", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
         }
 
         if (freeGenList.contains("webcls")) {
             final String webclsResourceFile = path + "/src/main/resources/" + appName + "_webcls.dfprop";
-            tableMap.put("webclsResourceFile", filterOverridden(webclsResourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
-            tableMap.put("webclsPackage", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+            optionMap.put("webclsResourceFile", filterOverridden(webclsResourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
+            optionMap.put("webclsPackage", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
         }
 
         if (freeGenList.contains("namedcls")) {
-            doSetupDocNamedClsGen(appName, path, lastafluteMap, tableMap);
+            doSetupDocNamedClsGen(appName, path, lastafluteMap, optionMap);
         }
     }
 
-    protected void doSetupDocNamedClsGen(String appName, String path, Map<String, Object> lastafluteMap, Map<String, Object> tableMap) {
+    protected void doSetupDocNamedClsGen(String appName, String path, Map<String, Object> lastafluteMap, Map<String, Object> optionMap) {
         final List<Map<String, Object>> namedclsList = new ArrayList<Map<String, Object>>();
-        tableMap.put("namedclsList", namedclsList);
+        optionMap.put("namedclsList", namedclsList);
         final String baseDir = path + "/src/main";
         final String middlePath = "resources/namedcls";
         final String namedclsPath = baseDir + "/" + middlePath;
@@ -549,19 +549,21 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
         final String resourceFile = "$$baseDir$$/resources/" + appName + "_appcls.dfprop";
-        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
+        final String clsTheme = "appcls";
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
         resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+        outputMap.put("package", filterOverridden(_mylastaPackage + "." + clsTheme, lastafluteMap, appName, clsTheme, "package"));
         outputMap.put("templateFile", "LaAppCDef.vm");
-        outputMap.put("className", filterOverridden("AppCDef", lastafluteMap, appName, "appcls", "className"));
-        final Map<String, Object> tableMap = createTableMap();
-        pathMap.put("tableMap", tableMap);
-        tableMap.put("clsDomain", "app");
-        tableMap.put("clsTitle", "application"); // same as old javadoc
-        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, "appcls", tableMap);
+        outputMap.put("className", filterOverridden("AppCDef", lastafluteMap, appName, clsTheme, "className"));
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("clsDomain", "app");
+        optionMap.put("clsTitle", "application"); // same as old javadoc
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -576,19 +578,21 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
         final String resourceFile = "$$baseDir$$/resources/" + appName + "_webcls.dfprop";
-        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
+        final String clsTheme = "webcls";
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
         resourceMap.put("resourceType", DfFreeGenResourceType.WEB_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+        outputMap.put("package", filterOverridden(_mylastaPackage + "." + clsTheme, lastafluteMap, appName, clsTheme, "package"));
         outputMap.put("templateFile", "LaAppCDef.vm");
-        outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, "webcls", "className"));
-        final Map<String, Object> tableMap = createTableMap();
-        pathMap.put("tableMap", tableMap);
-        tableMap.put("clsDomain", "web");
-        tableMap.put("clsTitle", "web");
-        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, "webcls", tableMap);
+        outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, clsTheme, "className"));
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("clsDomain", "web");
+        optionMap.put("clsTitle", "web");
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -637,21 +641,32 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("package", filterOverridden(_mylastaPackage + ".namedcls", lastafluteMap, appName, clsTheme, "package"));
         outputMap.put("templateFile", "LaAppCDef.vm"); // borrow application classification's template
         outputMap.put("className", filterOverridden(initCap(clsDomain) + "CDef", lastafluteMap, appName, clsTheme, "className"));
-        final Map<String, Object> tableMap = createTableMap();
-        pathMap.put("tableMap", tableMap);
-        tableMap.put("clsDomain", clsDomain);
-        tableMap.put("clsTitle", clsDomain); // same as domain
-        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, tableMap);
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("clsDomain", clsDomain);
+        optionMap.put("clsTitle", clsDomain); // same as domain
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
     //                                   DBCls Collaboration
     //                                   -------------------
     protected void doSetupSuppressDBClsCollaboration(Map<String, Object> lastafluteMap, String appName, String clsTheme,
-            Map<String, Object> tableMap) {
+            Map<String, Object> optionMap) {
         final String key = "isSuppressDBClsCollaboration";
         final boolean overriddenValue = false; // used in template so you can use boolean directly
-        tableMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
+        optionMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
+    }
+
+    // -----------------------------------------------------
+    //                                 RedundantComment Stop
+    //                                 ---------------------
+    protected void doSetupSuppressRedundantCommentStop(Map<String, Object> lastafluteMap, String appName, String clsTheme,
+            Map<String, Object> optionMap) {
+        final String key = "isSuppressRedundantCommentStop";
+        final boolean overriddenValue = false; // used in template so you can use boolean directly
+        optionMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
     }
 
     // ===================================================================================
@@ -674,7 +689,7 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceFile", "$$baseDir$$/resources/" + appName + "_" + theme + ".properties");
     }
 
-    protected Map<String, Object> createTableMap() {
+    protected Map<String, Object> createOptionMap() {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("isLastaFlute", true); // direct use so not literal
         return map;
@@ -685,6 +700,10 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                          ==========
     protected <VALUE> VALUE filterOverridden(VALUE overriddenValue, Map<String, Object> lastafluteMap, String appName, String title,
             String key) {
+        // e.g. lastafluteMap.dfprop
+        //  ; overrideMap = map:{
+        //      ; hangar.freeGen.appcls.isSuppressRedundantCommentStop = true
+        //  }
         @SuppressWarnings("unchecked")
         final Map<String, VALUE> overrideMap = (Map<String, VALUE>) lastafluteMap.get("overrideMap");
         if (overrideMap == null) {

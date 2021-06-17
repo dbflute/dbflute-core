@@ -457,7 +457,8 @@ public class DfClassificationTop {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _classificationName + ", " + _topComment + ", " + _codeType + ", " + _relatedColumnName + ", " + _elementList + "}";
+        return "{" + _classificationName + ", " + _topComment + ", " + _codeType + ", " + _relatedColumnName + ", elements="
+                + _elementList.size() + "}";
     }
 
     // ===================================================================================
