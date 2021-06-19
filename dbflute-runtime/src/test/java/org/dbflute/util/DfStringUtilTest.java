@@ -1470,7 +1470,8 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO", DfStringUtil.decamelize("FOO"));
         assertEquals("F", DfStringUtil.decamelize("f"));
 
-        // same as FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES
+        // same as FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES since 1.2.5 (2021/06/20)
+        // RESTful Action of LastaFlute needs it if hyphenate e.g. ...ADancers to .../a-dancers/
         assertEquals("F_GOO_NAME", DfStringUtil.decamelize("FGooName"));
         assertEquals("F_G_HOO_NAME", DfStringUtil.decamelize("FGHooName")); // before FG_HOO_NAME
         assertEquals("FOO_D_NAME", DfStringUtil.decamelize("fooDName")); // before FOOD_NAME
