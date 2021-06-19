@@ -1421,11 +1421,23 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FooName", DfStringUtil.camelize("foo_name"));
         assertEquals("FooNameBar", DfStringUtil.camelize("foo_nameBar"));
         assertEquals("FooBar", DfStringUtil.camelize("foo_Bar"));
-        assertEquals("FooNBar", camelize("foo_nBar"));
-        assertEquals("FooNBar", DfStringUtil.camelize("FOO_nBar"));
         assertEquals("Foo", DfStringUtil.camelize("FOO"));
+        assertEquals("Foo", DfStringUtil.camelize("foo"));
+        assertEquals("F", DfStringUtil.camelize("f"));
+        assertEquals("FooNBar", DfStringUtil.camelize("foo_nBar"));
+        assertEquals("FooNBar", DfStringUtil.camelize("FOO_nBar"));
+        assertEquals("FooABar", DfStringUtil.camelize("foo_a_bar"));
+        assertEquals("FooABCBar", DfStringUtil.camelize("foo_a_b_c_bar"));
+        assertEquals("FooDDD", DfStringUtil.camelize("FOO_D_D_D"));
+        assertEquals("FooDDName", DfStringUtil.camelize("FOO_D_D_NAME"));
+        assertEquals("FooAbcBar", DfStringUtil.camelize("foo_abcBar"));
+        assertEquals("FooABar", DfStringUtil.camelize("foo_aBar"));
+        assertEquals("FFooName", DfStringUtil.camelize("F_FOO_NAME"));
+        assertEquals("FFooName", DfStringUtil.camelize("f_foo_name"));
+        assertEquals("FfooName", DfStringUtil.camelize("FFOO_NAME"));
         assertEquals("FooName", DfStringUtil.camelize("FooName"));
         assertEquals("FName", DfStringUtil.camelize("FName"));
+        assertEquals("FFName", DfStringUtil.camelize("FFName"));
         assertEquals("FooName", DfStringUtil.camelize("foo__name"));
         assertEquals("FooName", DfStringUtil.camelize("FOO _ NAME"));
         assertEquals("FooNa me", DfStringUtil.camelize("FOO _ NA ME"));
@@ -1444,16 +1456,37 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FooNameBarId", DfStringUtil.camelize("FOO NAME BAR ID", " "));
     }
 
+    public void test_decamelize_demo() {
+        assertEquals("FOO_NAME", DfStringUtil.decamelize("FOO_NAME"));
+    }
+
     public void test_decamelize_basic() {
-        assertEquals("FOO_NAME", DfStringUtil.doDecamelize("FooName", "_"));
-        assertEquals("FOO_NAME", DfStringUtil.doDecamelize("fooName", "_"));
-        assertEquals("FOO_BAR_NAME", DfStringUtil.doDecamelize("FooBarName", "_"));
-        assertEquals("FOO_BAR_NAME", DfStringUtil.doDecamelize("fooBarName", "_"));
+        assertEquals("FOO_NAME", DfStringUtil.decamelize("FooName"));
+        assertEquals("FOO_NAME", DfStringUtil.decamelize("fooName"));
+        assertEquals("FOO_BAR_NAME", DfStringUtil.decamelize("FooBarName"));
+        assertEquals("FOO_BAR_NAME", DfStringUtil.decamelize("fooBarName"));
+        assertEquals("FOO", DfStringUtil.decamelize("foo"));
+        assertEquals("FOO", DfStringUtil.decamelize("Foo"));
+        assertEquals("FOO", DfStringUtil.decamelize("FOO"));
         assertEquals("F", DfStringUtil.decamelize("f"));
-        assertEquals("FOO_NAME_BAR", DfStringUtil.decamelize("FOO_NameBar"));
-        assertEquals("FOO_NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
+
+        // same as FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES
+        assertEquals("F_GOO_NAME", DfStringUtil.decamelize("FGooName"));
+        assertEquals("F_G_HOO_NAME", DfStringUtil.decamelize("FGHooName")); // before FG_HOO_NAME
+        assertEquals("FOO_D_NAME", DfStringUtil.decamelize("fooDName")); // before FOOD_NAME
+        assertEquals("FOO_D_NAME", DfStringUtil.decamelize("FooDName")); // before FOOD_NAME
+        assertEquals("FOO_D_D_NAME", DfStringUtil.decamelize("fooDDName")); // before FOODD_NAME
+        assertEquals("FOO_D", DfStringUtil.decamelize("fooD")); // before FOOD
+        assertEquals("FOO_D_D", DfStringUtil.decamelize("fooDD")); // before FOODD
+        assertEquals("FOO_D_D_D", DfStringUtil.decamelize("fooDDD")); // before FOODDD
+        assertEquals("FOO_D_D_NAME", DfStringUtil.decamelize("fooDDName")); // before FOODD_Name
+        assertEquals("FOO_D_D_NAME", DfStringUtil.decamelize("FooDDName")); // before FOODD_Name
+
+        // DBFlute special care
         assertEquals("FOO_NAME", DfStringUtil.decamelize("FOO_NAME"));
         assertEquals("FOO_NAME", DfStringUtil.decamelize("foo_name"));
+        assertEquals("FOO_NAME_BAR", DfStringUtil.decamelize("FOO_NameBar"));
+        assertEquals("FOO_NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
     }
 
     public void test_decamelize_delimiter() {
@@ -1461,7 +1494,7 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO@NAME", DfStringUtil.decamelize("fooName", "@"));
         assertEquals("FOO@BAR@NAME", DfStringUtil.decamelize("fooBarName", "@"));
         assertEquals("F", DfStringUtil.decamelize("f", "_"));
-        assertEquals("FOO_*NAME*BAR", DfStringUtil.decamelize("FOO_NameBar", "*"));
+        assertEquals("F*O*O_*NAME*BAR", DfStringUtil.decamelize("FOO_NameBar", "*")); // before FOO_*NAME*BAR
     }
 
     // ===================================================================================

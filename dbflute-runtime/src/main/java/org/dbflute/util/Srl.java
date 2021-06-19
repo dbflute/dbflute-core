@@ -2038,6 +2038,22 @@ public class Srl {
     // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
+    /**
+     * Camelize the decamel name using underscore '_'.
+     * <pre>
+     * o FOO_NAME to FooName
+     * o foo_name to FooName
+     * o f to F
+     * o foo to Foo
+     * o foo_nameBar to FooNameBar
+     * o foo_a_bar to FooABar
+     * o foo_aBar to FooABar
+     * o f_foo_name to FFooName
+     * o FFOO_NAME to FfooName
+     * </pre>
+     * @param decamelName The name decamelized by underscore '_'. (NotNull)
+     * @return The name camelized as upper first character. (NotNull)
+     */
     public static String camelize(String decamelName) {
         assertDecamelNameNotNull(decamelName);
         return doCamelize(decamelName, "_");
@@ -2077,6 +2093,30 @@ public class Srl {
 
     // *DBFlute doesn't decamelize a table and column name
     // (allowed to convert decamel name to a camel name in this world)
+    //
+    // *While LastaFlute uses this to derive action URL and for RESTful logic
+    // so very important method after all
+    /**
+     * Decamelize the camel name by underscore '_' as UPPER case:
+     * <pre>
+     * o FooName to FOO_NAME
+     * o FooBarName to FOO_BAR_NAME
+     * o f to F
+     * o Foo to FOO
+     * o FFooName to F_FOO_NAME
+     * o FFFooName to F_F_FOO_NAME
+     * o fooDName to FOO_D_NAME
+     * o FOO_NAME to FOO_NAME
+     * o foo_name to FOO_NAME
+     * o FOO_NameBar to FOO_NAME_BAR
+     * </pre>
+     * 
+     * <p>Returning as upper case is traditional rule for database naming.
+     * So already it cannot change it. Call toLowerCase() later if you need.</p>
+     * 
+     * @param camelName The camelized name. (NotNull)
+     * @return The name decamelized by underscore '_' as UPPER case. (NotNull)
+     */
     public static String decamelize(String camelName) {
         assertCamelNameNotNull(camelName);
         return doDecamelize(camelName, "_");
@@ -2090,34 +2130,46 @@ public class Srl {
 
     protected static String doDecamelize(String camelName, String delimiter) {
         assertCamelNameNotNull(camelName);
+        assertDelimiterNotNull(delimiter);
+        final StringBuilder sb = new StringBuilder();
+        final List<String> splitList = splitList(camelName, delimiter); // one element if no delimiter
+        for (String element : splitList) { // to separate e.g. FOO_NameBar (to FOO_NAME_BAR)
+            if (sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(actuallyDecamelize(element, delimiter));
+        }
+        final String generated = sb.toString();
+        return replace(generated, delimiter + delimiter, delimiter); // final adjustment
+    }
+
+    protected static String actuallyDecamelize(String camelName, String delimiter) {
         if (is_Null_or_TrimmedEmpty(camelName)) {
             return camelName;
         }
-        if (camelName.length() == 1) {
-            return camelName.toUpperCase();
+        if (camelName.length() == 1) { // e.g. f
+            return camelName.toUpperCase(); // e.g. F
+        }
+        if (isAlphabetNumberHarfUpperAll(camelName)) { // to avoid e.g. FOO to F_O_O
+            return camelName; // e.g. FOO
         }
         final StringBuilder sb = new StringBuilder();
-        boolean previousLower = false;
         int pos = 0;
         for (int i = 1; i < camelName.length(); i++) {
             final char currentChar = camelName.charAt(i);
             if (isUpperCase(currentChar)) {
-                if (sb.length() > 0 && previousLower) { // check target length not to be FOO -> F_O_O
+                if (sb.length() > 0) {
                     sb.append(delimiter);
                 }
                 sb.append(camelName.substring(pos, i).toUpperCase());
                 pos = i;
-                previousLower = false;
-            } else if (isLowerCase(currentChar)) {
-                previousLower = true;
             }
         }
-        if (sb.length() > 0 && previousLower) {
+        if (sb.length() > 0) {
             sb.append(delimiter);
         }
         sb.append(camelName.substring(pos, camelName.length()).toUpperCase());
-        final String generated = sb.toString();
-        return replace(generated, delimiter + delimiter, delimiter); // final adjustment
+        return sb.toString();
     }
 
     // ===================================================================================
