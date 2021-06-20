@@ -1320,6 +1320,34 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("(showbase)oneman", second.substringScopeToNext());
     }
 
+    public void test_extractScopeList_crossed() {
+        // ## Arrange ##
+        String str = "sea(hangar)mystic):land(showbase)oneman)";
+
+        // ## Act ##
+        List<ScopeInfo> scopeList = extractScopeList(str, "(", ")");
+
+        // ## Assert ##
+        ScopeInfo first = scopeList.get(0);
+        ScopeInfo second = scopeList.get(1);
+        assertEquals("hangar", first.getContent());
+        assertEquals("showbase", second.getContent());
+    }
+
+    public void test_extractScopeList_nested() {
+        // ## Arrange ##
+        String str = "sea(hangar(mystic)stage):land(showbase(oneman)stage)";
+
+        // ## Act ##
+        List<ScopeInfo> scopeList = extractScopeList(str, "(", ")");
+
+        // ## Assert ##
+        ScopeInfo first = scopeList.get(0);
+        ScopeInfo second = scopeList.get(1);
+        assertEquals("hangar(mystic", first.getContent());
+        assertEquals("showbase(oneman", second.getContent());
+    }
+
     public void test_extractScopeList_outsideSql() {
         // ## Arrange ##
         String str = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
@@ -1444,7 +1472,32 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("bar", list.get(4).substringInterspaceToNext());
     }
 
+    // -----------------------------------------------------
+    //                                            Scope Wide
+    //                                            ----------
     public void test_extractScopeWide_content() {
+        {
+            ScopeInfo scopeInfo = extractScopeWide("sea(hangar(mystic)choucho):land", "(", ")");
+            assertEquals("hangar(mystic)choucho", scopeInfo.getContent());
+            assertEquals("(hangar(mystic)choucho)", scopeInfo.getScope());
+            assertEquals(3, scopeInfo.getBeginIndex());
+            assertEquals(26, scopeInfo.getEndIndex());
+            assertEquals("sea", scopeInfo.substringInterspaceToPrevious());
+            assertEquals(":land", scopeInfo.substringInterspaceToNext()); // before ):land (until 1.2.4)
+            assertEquals("sea(over):land", scopeInfo.replaceContentOnBaseString("over"));
+            assertEquals("sea(hbngbr(mystic)choucho):land", scopeInfo.replaceContentOnBaseString("a", "b"));
+            assertEquals("seb(hangar(mystic)choucho):lbnd", scopeInfo.replaceInterspaceOnBaseString("a", "b"));
+            assertNull(scopeInfo.getPrevious());
+            assertNull(scopeInfo.getNext());
+        }
+        {
+            ScopeInfo scopeInfo = extractScopeWide("sea(hangar(mystic)", "(", ")");
+            assertEquals("hangar(mystic", scopeInfo.getContent());
+            assertEquals("(hangar(mystic)", scopeInfo.getScope());
+            assertEquals("sea", scopeInfo.substringInterspaceToPrevious());
+            assertNull(scopeInfo.getPrevious());
+            assertNull(scopeInfo.getNext());
+        }
         assertEquals("BAR", extractScopeWide("FOObeginBARendDODO", "begin", "end").getContent());
         assertEquals("BAR", extractScopeWide("FOObeginBARend", "begin", "end").getContent());
         assertEquals("BAR", extractScopeWide("beginBARendDODO", "begin", "end").getContent());

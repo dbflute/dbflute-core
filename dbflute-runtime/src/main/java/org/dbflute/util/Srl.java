@@ -1647,7 +1647,16 @@ public class Srl {
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                           Basic Scope
+    //                                           -----------
     /**
+     * Extract first scope object by the begin/end mark from the string.
+     * <pre>
+     * e.g. sea:(hangar)mystic, land:(showbase)oneman
+     *  first: content=hangar, scope=(hangar), without next
+     *  second: none
+     * </pre>
      * @param str The target string that may have scopes. (NotNull)
      * @param beginMark The mark string for beginning. (NotNull)
      * @param endMark The mark string for ending. (NotNull)
@@ -1666,6 +1675,11 @@ public class Srl {
     }
 
     /**
+     * Extract last scope object by the begin/end mark from the string.
+     * <pre>
+     * e.g. sea:(hangar)mystic, land:(showbase)oneman
+     *  last: content=showbase, scope=(showbase), has previous
+     * </pre>
      * @param str The target string that may have scopes. (NotNull)
      * @param beginMark The mark string for beginning. (NotNull)
      * @param endMark The mark string for ending. (NotNull)
@@ -1681,6 +1695,21 @@ public class Srl {
     }
 
     /**
+     * Extract list of scope object by the begin/end mark from the string.
+     * <pre>
+     * e.g. "sea:(hangar)mystic, land:(showbase)oneman"
+     *  first: content=hangar, scope=(hangar)
+     *  second: content=showbase, scope=(showbase)
+     * 
+     * e.g. "sea(hangar)mystic):land(showbase)oneman)"
+     *  first: content=hangar, scope=(hangar)
+     *  second: content=showbase, scope=(showbase)
+     * 
+     * e.g. "sea(hangar(mystic)stage):land(showbase(oneman)stage)"
+     *  first: content=hangar(mystic, scope=(hangar(mystic)
+     *  second: content=showbase(oneman, scope=(showbase(oneman)
+     *  *cannot nested handling
+     * </pre>
      * @param str The target string that may have scopes. (NotNull)
      * @param beginMark The mark string for beginning. (NotNull)
      * @param endMark The mark string for ending. (NotNull)
@@ -1740,6 +1769,19 @@ public class Srl {
         return resultList; // nullable if not found to suppress unneeded ArrayList creation
     }
 
+    // -----------------------------------------------------
+    //                                            Scope Wide
+    //                                            ----------
+    /**
+     * Extract wide scope by the begin/end mark from the string. <br>
+     * <pre>
+     * e.g. if "sea(hangar(mystic)choucho):land", content="hangar(mystic)choucho"
+     * </pre>
+     * @param str The target string that may have scopes. (NotNull)
+     * @param beginMark The mark string for beginning. (NotNull)
+     * @param endMark The mark string for ending. (NotNull)
+     * @return The single object for wide scope (without previous/next). (NotNull, NullAllowed: not found)
+     */
     public static final ScopeInfo extractScopeWide(final String str, final String beginMark, final String endMark) {
         assertStringNotNull(str);
         assertBeginMarkNotNull(beginMark);
@@ -1756,7 +1798,7 @@ public class Srl {
         final ScopeInfo info = new ScopeInfo();
         info.setBaseString(str);
         info.setBeginIndex(first.getIndex());
-        info.setEndIndex(last.getIndex());
+        info.setEndIndex(last.getIndex() + endMark.length());
         info.setBeginMark(beginMark);
         info.setEndMark(endMark);
         info.setContent(content);
@@ -1764,6 +1806,9 @@ public class Srl {
         return info;
     }
 
+    // -----------------------------------------------------
+    //                                            Scope Info
+    //                                            ----------
     /**
      * @author jflute
      */
