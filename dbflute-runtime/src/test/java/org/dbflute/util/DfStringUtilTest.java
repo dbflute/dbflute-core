@@ -356,6 +356,11 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
+
+        assertEquals(Arrays.asList("aaa", "bbb", "ccc"), splitList("aaa/bbb/ccc", "/"));
+        assertEquals(Arrays.asList("aaa", "", "bbb", "ccc"), splitList("aaa//bbb/ccc", "/"));
+        assertEquals(Arrays.asList("", "aaa", "bbb", "ccc", ""), splitList("/aaa/bbb/ccc/", "/"));
+        assertEquals(Arrays.asList("aaa"), splitList("aaa", "/"));
     }
 
     public void test_splitList_empty() {
@@ -379,6 +384,8 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
+
+        assertEquals(Arrays.asList("aaa", "bbb", "ccc"), splitListTrimmed(" aaa/ bbb/ ccc ", "/"));
     }
 
     // ===================================================================================
@@ -1137,7 +1144,7 @@ public class DfStringUtilTest extends RuntimeTestCase {
     //                                                                  ==================
     public void test_extractDelimiterList_basic() {
         // ## Arrange ##
-        String str = "foo--bar--baz--and";
+        String str = "sea--land--piari--bonvo";
 
         // ## Act ##
         List<DelimiterInfo> list = extractDelimiterList(str, "--");
@@ -1145,17 +1152,17 @@ public class DfStringUtilTest extends RuntimeTestCase {
         // ## Assert ##
         assertEquals(3, list.size());
         assertEquals(3, list.get(0).getBeginIndex());
-        assertEquals(8, list.get(1).getBeginIndex());
-        assertEquals(13, list.get(2).getBeginIndex());
+        assertEquals(9, list.get(1).getBeginIndex());
+        assertEquals(16, list.get(2).getBeginIndex());
         assertEquals(5, list.get(0).getEndIndex());
-        assertEquals(10, list.get(1).getEndIndex());
-        assertEquals(15, list.get(2).getEndIndex());
-        assertEquals("foo", list.get(0).substringInterspaceToPrevious());
-        assertEquals("bar", list.get(1).substringInterspaceToPrevious());
-        assertEquals("baz", list.get(2).substringInterspaceToPrevious());
-        assertEquals("bar", list.get(0).substringInterspaceToNext());
-        assertEquals("baz", list.get(1).substringInterspaceToNext());
-        assertEquals("and", list.get(2).substringInterspaceToNext());
+        assertEquals(11, list.get(1).getEndIndex());
+        assertEquals(18, list.get(2).getEndIndex());
+        assertEquals("sea", list.get(0).substringInterspaceToPrevious());
+        assertEquals("land", list.get(1).substringInterspaceToPrevious());
+        assertEquals("piari", list.get(2).substringInterspaceToPrevious());
+        assertEquals("land", list.get(0).substringInterspaceToNext());
+        assertEquals("piari", list.get(1).substringInterspaceToNext());
+        assertEquals("bonvo", list.get(2).substringInterspaceToNext());
     }
 
     public void test_extractDelimiterList_bothSide() {
@@ -1233,6 +1240,10 @@ public class DfStringUtilTest extends RuntimeTestCase {
     public void test_extractScopeFirst_various() {
         ScopeInfo scope = extractScopeFirst("FOObeginBARendDODO", "begin", "end");
         log("baseString: " + scope.getBaseString());
+        log("beginIndex: " + scope.getBeginIndex());
+        log("endIndex: " + scope.getEndIndex());
+        log("beginMark: " + scope.getBeginMark());
+        log("endMark: " + scope.getEndMark());
         log("scope: " + scope.getScope());
         log("content: " + scope.getContent());
         log("previous: " + scope.getPrevious());
@@ -1259,6 +1270,57 @@ public class DfStringUtilTest extends RuntimeTestCase {
     }
 
     public void test_extractScopeList_basic() {
+        // ## Arrange ##
+        String str = "sea:(hangar)mystic, land:(showbase)oneman";
+
+        // ## Act ##
+        List<ScopeInfo> list = extractScopeList(str, "(", ")");
+
+        // ## Assert ##
+        for (ScopeInfo scope : list) {
+            log("scope:");
+            log(" baseString: " + scope.getBaseString());
+            log(" beginIndex: " + scope.getBeginIndex());
+            log(" endIndex: " + scope.getEndIndex());
+            log(" beginMark: " + scope.getBeginMark());
+            log(" endMark: " + scope.getEndMark());
+            log(" content: " + scope.getContent());
+            log(" scope: " + scope.getScope());
+            log(" previous: " + scope.getPrevious());
+            log(" next: " + scope.getNext());
+        }
+        assertEquals(2, list.size());
+        ScopeInfo first = list.get(0);
+        ScopeInfo second = list.get(1);
+
+        assertEquals("hangar", first.getContent());
+        assertEquals("(hangar)", first.getScope());
+        assertNull(first.getPrevious());
+        assertEquals(second, first.getNext());
+
+        assertEquals("showbase", second.getContent());
+        assertEquals("(showbase)", second.getScope());
+        assertEquals(first, second.getPrevious());
+        assertNull(second.getNext());
+
+        assertEquals("sea:(stage)mystic, land:(stage)oneman", first.replaceContentOnBaseString("stage"));
+        assertEquals("sea:(hbngbr)mystic, land:(showbbse)oneman", first.replaceContentOnBaseString("a", "b"));
+        assertEquals("seb:(hangar)mystic, lbnd:(showbase)onembn", first.replaceInterspaceOnBaseString("a", "b"));
+        assertEquals("sea:", first.substringInterspaceToPrevious());
+        assertEquals("mystic, land:", first.substringInterspaceToNext());
+        assertEquals("sea:(hangar)", first.substringScopeToPrevious());
+        assertEquals("(hangar)mystic, land:(showbase)", first.substringScopeToNext());
+
+        assertEquals("sea:(stage)mystic, land:(stage)oneman", second.replaceContentOnBaseString("stage"));
+        assertEquals("sea:(hbngbr)mystic, land:(showbbse)oneman", second.replaceContentOnBaseString("a", "b"));
+        assertEquals("seb:(hangar)mystic, lbnd:(showbase)onembn", second.replaceInterspaceOnBaseString("a", "b"));
+        assertEquals("mystic, land:", second.substringInterspaceToPrevious());
+        assertEquals("oneman", second.substringInterspaceToNext());
+        assertEquals("(hangar)mystic, land:(showbase)", second.substringScopeToPrevious());
+        assertEquals("(showbase)oneman", second.substringScopeToNext());
+    }
+
+    public void test_extractScopeList_outsideSql() {
         // ## Arrange ##
         String str = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
 
@@ -1417,85 +1479,85 @@ public class DfStringUtilTest extends RuntimeTestCase {
     //                                                                       Name Handling
     //                                                                       =============
     public void test_camelize_basic() {
-        assertEquals("FooName", DfStringUtil.camelize("FOO_NAME"));
-        assertEquals("FooName", DfStringUtil.camelize("foo_name"));
-        assertEquals("FooNameBar", DfStringUtil.camelize("foo_nameBar"));
-        assertEquals("FooBar", DfStringUtil.camelize("foo_Bar"));
-        assertEquals("Foo", DfStringUtil.camelize("FOO"));
-        assertEquals("Foo", DfStringUtil.camelize("foo"));
-        assertEquals("F", DfStringUtil.camelize("f"));
-        assertEquals("FooNBar", DfStringUtil.camelize("foo_nBar"));
-        assertEquals("FooNBar", DfStringUtil.camelize("FOO_nBar"));
-        assertEquals("FooABar", DfStringUtil.camelize("foo_a_bar"));
-        assertEquals("FooABCBar", DfStringUtil.camelize("foo_a_b_c_bar"));
-        assertEquals("FooDDD", DfStringUtil.camelize("FOO_D_D_D"));
-        assertEquals("FooDDName", DfStringUtil.camelize("FOO_D_D_NAME"));
-        assertEquals("FooAbcBar", DfStringUtil.camelize("foo_abcBar"));
-        assertEquals("FooABar", DfStringUtil.camelize("foo_aBar"));
-        assertEquals("FFooName", DfStringUtil.camelize("F_FOO_NAME"));
-        assertEquals("FFooName", DfStringUtil.camelize("f_foo_name"));
-        assertEquals("FfooName", DfStringUtil.camelize("FFOO_NAME"));
-        assertEquals("FooName", DfStringUtil.camelize("FooName"));
-        assertEquals("FName", DfStringUtil.camelize("FName"));
-        assertEquals("FFName", DfStringUtil.camelize("FFName"));
-        assertEquals("FooName", DfStringUtil.camelize("foo__name"));
-        assertEquals("FooName", DfStringUtil.camelize("FOO _ NAME"));
-        assertEquals("FooNa me", DfStringUtil.camelize("FOO _ NA ME"));
+        assertEquals("FooName", camelize("FOO_NAME"));
+        assertEquals("FooName", camelize("foo_name"));
+        assertEquals("FooNameBar", camelize("foo_nameBar"));
+        assertEquals("FooBar", camelize("foo_Bar"));
+        assertEquals("Foo", camelize("FOO"));
+        assertEquals("Foo", camelize("foo"));
+        assertEquals("F", camelize("f"));
+        assertEquals("FooNBar", camelize("foo_nBar"));
+        assertEquals("FooNBar", camelize("FOO_nBar"));
+        assertEquals("FooABar", camelize("foo_a_bar"));
+        assertEquals("FooABCBar", camelize("foo_a_b_c_bar"));
+        assertEquals("FooDDD", camelize("FOO_D_D_D"));
+        assertEquals("FooDDName", camelize("FOO_D_D_NAME"));
+        assertEquals("FooAbcBar", camelize("foo_abcBar"));
+        assertEquals("FooABar", camelize("foo_aBar"));
+        assertEquals("FFooName", camelize("F_FOO_NAME"));
+        assertEquals("FFooName", camelize("f_foo_name"));
+        assertEquals("FfooName", camelize("FFOO_NAME"));
+        assertEquals("FooName", camelize("FooName"));
+        assertEquals("FName", camelize("FName"));
+        assertEquals("FFName", camelize("FFName"));
+        assertEquals("FooName", camelize("foo__name"));
+        assertEquals("FooName", camelize("FOO _ NAME"));
+        assertEquals("FooNa me", camelize("FOO _ NA ME"));
     }
 
     public void test_camelize_delimiters() {
-        assertEquals("FooName", DfStringUtil.camelize("FOO_NAME", "_"));
-        assertEquals("FooNaMe", DfStringUtil.camelize("foo_na-me", "_", "-"));
-        assertEquals("FooNaMeBarId", DfStringUtil.camelize("foo_na-me_bar@id", "_", "-", "@"));
-        assertEquals("FooNaMeBId", DfStringUtil.camelize("foo_na-me_b@id", "_", "-", "@"));
-        assertEquals("FooNaMeBarId", DfStringUtil.camelize("FOO_NA-ME_BAR@ID", "_", "-", "@"));
-        assertEquals("FooName", DfStringUtil.camelize("foo--name", "-"));
-        assertEquals("FooName", DfStringUtil.camelize("foo-_@name", "-", "_", "@"));
-        assertEquals("FooNaMe", DfStringUtil.camelize("FOO _ NA - ME", "_", "-"));
-        assertEquals("FooNa - me", DfStringUtil.camelize("FOO _ NA - ME", "_"));
-        assertEquals("FooNameBarId", DfStringUtil.camelize("FOO NAME BAR ID", " "));
+        assertEquals("FooName", camelize("FOO_NAME", "_"));
+        assertEquals("FooNaMe", camelize("foo_na-me", "_", "-"));
+        assertEquals("FooNaMeBarId", camelize("foo_na-me_bar@id", "_", "-", "@"));
+        assertEquals("FooNaMeBId", camelize("foo_na-me_b@id", "_", "-", "@"));
+        assertEquals("FooNaMeBarId", camelize("FOO_NA-ME_BAR@ID", "_", "-", "@"));
+        assertEquals("FooName", camelize("foo--name", "-"));
+        assertEquals("FooName", camelize("foo-_@name", "-", "_", "@"));
+        assertEquals("FooNaMe", camelize("FOO _ NA - ME", "_", "-"));
+        assertEquals("FooNa - me", camelize("FOO _ NA - ME", "_"));
+        assertEquals("FooNameBarId", camelize("FOO NAME BAR ID", " "));
     }
 
     public void test_decamelize_demo() {
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("FOO_NAME"));
+        assertEquals("FOO_NAME", decamelize("FOO_NAME"));
     }
 
     public void test_decamelize_basic() {
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("FooName"));
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("fooName"));
-        assertEquals("FOO_BAR_NAME", DfStringUtil.decamelize("FooBarName"));
-        assertEquals("FOO_BAR_NAME", DfStringUtil.decamelize("fooBarName"));
-        assertEquals("FOO", DfStringUtil.decamelize("foo"));
-        assertEquals("FOO", DfStringUtil.decamelize("Foo"));
-        assertEquals("FOO", DfStringUtil.decamelize("FOO"));
-        assertEquals("F", DfStringUtil.decamelize("f"));
+        assertEquals("FOO_NAME", decamelize("FooName"));
+        assertEquals("FOO_NAME", decamelize("fooName"));
+        assertEquals("FOO_BAR_NAME", decamelize("FooBarName"));
+        assertEquals("FOO_BAR_NAME", decamelize("fooBarName"));
+        assertEquals("FOO", decamelize("foo"));
+        assertEquals("FOO", decamelize("Foo"));
+        assertEquals("FOO", decamelize("FOO"));
+        assertEquals("F", decamelize("f"));
 
         // same as FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES since 1.2.5 (2021/06/20)
         // RESTful Action of LastaFlute needs it if hyphenate e.g. ...ADancers to .../a-dancers/
-        assertEquals("F_GOO_NAME", DfStringUtil.decamelize("FGooName"));
-        assertEquals("F_G_HOO_NAME", DfStringUtil.decamelize("FGHooName")); // before FG_HOO_NAME
-        assertEquals("FOO_D_NAME", DfStringUtil.decamelize("fooDName")); // before FOOD_NAME
-        assertEquals("FOO_D_NAME", DfStringUtil.decamelize("FooDName")); // before FOOD_NAME
-        assertEquals("FOO_D_D_NAME", DfStringUtil.decamelize("fooDDName")); // before FOODD_NAME
-        assertEquals("FOO_D", DfStringUtil.decamelize("fooD")); // before FOOD
-        assertEquals("FOO_D_D", DfStringUtil.decamelize("fooDD")); // before FOODD
-        assertEquals("FOO_D_D_D", DfStringUtil.decamelize("fooDDD")); // before FOODDD
-        assertEquals("FOO_D_D_NAME", DfStringUtil.decamelize("fooDDName")); // before FOODD_Name
-        assertEquals("FOO_D_D_NAME", DfStringUtil.decamelize("FooDDName")); // before FOODD_Name
+        assertEquals("F_GOO_NAME", decamelize("FGooName"));
+        assertEquals("F_G_HOO_NAME", decamelize("FGHooName")); // before FG_HOO_NAME
+        assertEquals("FOO_D_NAME", decamelize("fooDName")); // before FOOD_NAME
+        assertEquals("FOO_D_NAME", decamelize("FooDName")); // before FOOD_NAME
+        assertEquals("FOO_D_D_NAME", decamelize("fooDDName")); // before FOODD_NAME
+        assertEquals("FOO_D", decamelize("fooD")); // before FOOD
+        assertEquals("FOO_D_D", decamelize("fooDD")); // before FOODD
+        assertEquals("FOO_D_D_D", decamelize("fooDDD")); // before FOODDD
+        assertEquals("FOO_D_D_NAME", decamelize("fooDDName")); // before FOODD_Name
+        assertEquals("FOO_D_D_NAME", decamelize("FooDDName")); // before FOODD_Name
 
         // DBFlute special care
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("FOO_NAME"));
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("foo_name"));
-        assertEquals("FOO_NAME_BAR", DfStringUtil.decamelize("FOO_NameBar"));
-        assertEquals("FOO_NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
+        assertEquals("FOO_NAME", decamelize("FOO_NAME"));
+        assertEquals("FOO_NAME", decamelize("foo_name"));
+        assertEquals("FOO_NAME_BAR", decamelize("FOO_NameBar"));
+        assertEquals("FOO_NAME_BAR", decamelize("foo_NameBar"));
     }
 
     public void test_decamelize_delimiter() {
-        assertEquals("FOO-NAME", DfStringUtil.decamelize("FooName", "-"));
-        assertEquals("FOO@NAME", DfStringUtil.decamelize("fooName", "@"));
-        assertEquals("FOO@BAR@NAME", DfStringUtil.decamelize("fooBarName", "@"));
-        assertEquals("F", DfStringUtil.decamelize("f", "_"));
-        assertEquals("F*O*O_*NAME*BAR", DfStringUtil.decamelize("FOO_NameBar", "*")); // before FOO_*NAME*BAR
+        assertEquals("FOO-NAME", decamelize("FooName", "-"));
+        assertEquals("FOO@NAME", decamelize("fooName", "@"));
+        assertEquals("FOO@BAR@NAME", decamelize("fooBarName", "@"));
+        assertEquals("F", decamelize("f", "_"));
+        assertEquals("F*O*O_*NAME*BAR", decamelize("FOO_NameBar", "*")); // before FOO_*NAME*BAR
     }
 
     // ===================================================================================

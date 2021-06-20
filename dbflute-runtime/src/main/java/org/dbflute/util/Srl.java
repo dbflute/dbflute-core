@@ -318,6 +318,14 @@ public class Srl {
     //                                                                               Split
     //                                                                               =====
     /**
+     * Split the string to list by delimiter.
+     * <pre>
+     * e.g. delimiter is slash
+     *  o "aaa/bbb/ccc" to ["aaa", "bbb", "ccc"]
+     *  o "aaa//bbb/ccc" to ["aaa", "", "bbb", "ccc"]
+     *  o "/aaa/bbb/ccc/" to ["", "aaa", "bbb", "ccc", ""]
+     *  o "aaa" to ["aaa"]
+     * </pre>
      * @param str The split target string. (NotNull)
      * @param delimiter The delimiter for split. (NotNull)
      * @return The split list. (NotNull)
@@ -327,6 +335,11 @@ public class Srl {
     }
 
     /**
+     * Split the string to list by delimiter, trimming elements.
+     * <pre>
+     * e.g. delimiter is slash
+     *  o " aaa/ bbb/ ccc " to ["aaa", "bbb", "ccc"]
+     * </pre>
      * @param str The split target string. (NotNull)
      * @param delimiter The delimiter for split. (NotNull)
      * @return The split list that their elements is trimmed. (NotNull)
@@ -1474,6 +1487,13 @@ public class Srl {
     // ===================================================================================
     //                                                                  Delimiter Handling
     //                                                                  ==================
+    /**
+     * Extract list of delimiter information objects. <br>
+     * e.g. sea--land--piari--bonvo, it returns three objects.
+     * @param str The target string that may have delimiters. (NotNull)
+     * @param delimiter The string of delimiter to split the string. (NotNull)
+     * @return The mutable list of delimiter information objects. (NotNull)
+     */
     public static final List<DelimiterInfo> extractDelimiterList(final String str, final String delimiter) {
         assertStringNotNull(str);
         assertDelimiterNotNull(delimiter);
@@ -1503,14 +1523,27 @@ public class Srl {
         return delimiterList;
     }
 
+    /**
+     * @author jflute
+     */
     public static class DelimiterInfo {
-        protected String _baseString;
-        protected int _beginIndex;
-        protected int _endIndex;
-        protected String _delimiter;
-        protected DelimiterInfo _previous;
-        protected DelimiterInfo _next;
 
+        protected String _baseString; // e.g. sea--land--piari--bonvo
+        protected int _beginIndex; // e.g. 3
+        protected int _endIndex; // e.g. 5
+        protected String _delimiter; // e.g. --
+        protected DelimiterInfo _previous; // null if first
+        protected DelimiterInfo _next; // null if last
+
+        /**
+         * Cut string of previous interspace.
+         * <pre>
+         * e.g. base-string: "sea--land--piari--bonvo"
+         *  if first scope, returns "sea"
+         *  if second scope, returns "land"
+         * <pre>
+         * @return The cut substring. (NotNull, EmptyAllowed: no previous string)
+         */
         public String substringInterspaceToPrevious() {
             int previousIndex = -1;
             if (_previous != null) {
@@ -1523,6 +1556,15 @@ public class Srl {
             }
         }
 
+        /**
+         * Cut string of next interspace.
+         * <pre>
+         * e.g. base-string: "sea--land--piari--bonvo"
+         *  if first scope, returns "land"
+         *  if second scope, returns "piari"
+         * <pre>
+         * @return The cut substring. (NotNull, EmptyAllowed: no next string)
+         */
         public String substringInterspaceToNext() {
             int nextIndex = -1;
             if (_next != null) {
@@ -1605,6 +1647,12 @@ public class Srl {
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
+    /**
+     * @param str The target string that may have scopes. (NotNull)
+     * @param beginMark The mark string for beginning. (NotNull)
+     * @param endMark The mark string for ending. (NotNull)
+     * @return The information object of first scope without next scopes. (NullAllowed: scope not found)
+     */
     public static final ScopeInfo extractScopeFirst(final String str, final String beginMark, final String endMark) {
         final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, true);
         if (scopeList == null || scopeList.isEmpty()) {
@@ -1617,14 +1665,27 @@ public class Srl {
         return scopeList.get(0);
     }
 
+    /**
+     * @param str The target string that may have scopes. (NotNull)
+     * @param beginMark The mark string for beginning. (NotNull)
+     * @param endMark The mark string for ending. (NotNull)
+     * @return The information object of last scope with previous scopes. (NullAllowed: scope not found)
+     */
     public static final ScopeInfo extractScopeLast(final String str, final String beginMark, final String endMark) {
         final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, false);
         if (scopeList == null || scopeList.isEmpty()) {
             return null;
         }
+        // originally should be last only but related to previous scopes... too late
         return scopeList.get(scopeList.size() - 1);
     }
 
+    /**
+     * @param str The target string that may have scopes. (NotNull)
+     * @param beginMark The mark string for beginning. (NotNull)
+     * @param endMark The mark string for ending. (NotNull)
+     * @return The mutable list of found scopes. (NotNull, EmptyAllowed: not found)
+     */
     public static final List<ScopeInfo> extractScopeList(final String str, final String beginMark, final String endMark) {
         final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, false);
         return scopeList != null ? scopeList : new ArrayList<ScopeInfo>();
@@ -1703,25 +1764,46 @@ public class Srl {
         return info;
     }
 
+    /**
+     * @author jflute
+     */
     public static class ScopeInfo {
-        protected String _baseString;
-        protected int _beginIndex;
-        protected int _endIndex;
-        protected String beginMark;
-        protected String endMark;
-        protected String _content;
-        protected String _scope;
-        protected ScopeInfo _previous;
-        protected ScopeInfo _next;
 
+        protected String _baseString; // e.g. "sea:(hangar)mystic, land:(showbase)oneman"
+        protected int _beginIndex; // e.g. 4
+        protected int _endIndex; // e.g. 12
+        protected String beginMark; // (
+        protected String endMark; // )
+        protected String _content; // e.g. hangar
+        protected String _scope; // e.g. (hangar)
+        protected ScopeInfo _previous; // null if first
+        protected ScopeInfo _next; // null if last
+
+        /**
+         * @param index The index to be determined, 0 origin.
+         * @return Is the specified index before begin index?
+         */
         public boolean isBeforeScope(int index) {
             return index < _beginIndex;
         }
 
+        /**
+         * @param index The index to be determined, 0 origin.
+         * @return Is the specified index between begin index and end index?
+         */
         public boolean isInScope(int index) {
             return index >= _beginIndex && index <= _endIndex;
         }
 
+        /**
+         * Replace all contents with the replacement on base string.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if "stage", returns "sea:(stage)mystic, land:(stage)oneman"
+         * <pre>
+         * @param toStr The string as replacement. (NotNull)
+         * @return The whole string replaced with the replacement. (NotNull)
+         */
         public String replaceContentOnBaseString(String toStr) {
             final List<ScopeInfo> scopeList = takeScopeList();
             final StringBuilder sb = new StringBuilder();
@@ -1737,6 +1819,16 @@ public class Srl {
             return sb.toString();
         }
 
+        /**
+         * Replace keywords in contents with the replacement on base string.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if "a", "b", returns "sea:(hbngbr)mystic, land:(showbbse)oneman"
+         * <pre>
+         * @param fromStr The string replaced keyword. (NotNull)
+         * @param toStr The string as replacement. (NotNull)
+         * @return The whole string replaced with the replacement. (NotNull)
+         */
         public String replaceContentOnBaseString(String fromStr, String toStr) {
             final List<ScopeInfo> scopeList = takeScopeList();
             final StringBuilder sb = new StringBuilder();
@@ -1752,6 +1844,16 @@ public class Srl {
             return sb.toString();
         }
 
+        /**
+         * Replace keywords in interspaces with the replacement on base string.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if "a", "b", returns "seb:(hangar)mystic, lbnd:(showbase)onembn"
+         * <pre>
+         * @param fromStr The string replaced keyword. (NotNull)
+         * @param toStr The string as replacement. (NotNull)
+         * @return The whole string replaced with the replacement. (NotNull)
+         */
         public String replaceInterspaceOnBaseString(String fromStr, String toStr) {
             final List<ScopeInfo> scopeList = takeScopeList();
             final StringBuilder sb = new StringBuilder();
@@ -1787,6 +1889,15 @@ public class Srl {
             return scopeList;
         }
 
+        /**
+         * Cut string of previous interspace.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if first scope, returns "sea"
+         *  if second scope, returns "mystic, land:"
+         * <pre>
+         * @return The cut substring. (NotNull, EmptyAllowed: no previous interspace)
+         */
         public String substringInterspaceToPrevious() {
             int previousEndIndex = -1;
             if (_previous != null) {
@@ -1799,6 +1910,15 @@ public class Srl {
             }
         }
 
+        /**
+         * Cut string of next interspace.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if first scope, returns "mystic, land:"
+         *  if second scope, returns "oneman"
+         * <pre>
+         * @return The cut substring. (NotNull, EmptyAllowed: no next interspace)
+         */
         public String substringInterspaceToNext() {
             int nextBeginIndex = -1;
             if (_next != null) {
@@ -1811,6 +1931,15 @@ public class Srl {
             }
         }
 
+        /**
+         * Cut string of previous interspace with scope.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if first scope, returns "sea:(hangar)"
+         *  if second scope, returns "(hangar)mystic, land:(showbase)"
+         * <pre>
+         * @return The cut substring. (NotNull, NotEmpty: at least scope exists)
+         */
         public String substringScopeToPrevious() {
             int previousBeginIndex = -1;
             if (_previous != null) {
@@ -1823,6 +1952,15 @@ public class Srl {
             }
         }
 
+        /**
+         * Cut string of next interspace with scope.
+         * <pre>
+         * e.g. base-string: "sea:(hangar)mystic, land:(showbase)oneman"
+         *  if first scope, returns "(hangar)mystic, land:(showbase)"
+         *  if second scope, returns "(showbase)oneman"
+         * <pre>
+         * @return The cut substring. (NotNull, NotEmpty: at least scope exists)
+         */
         public String substringScopeToNext() {
             int nextEndIndex = -1;
             if (_next != null) {
@@ -2041,15 +2179,16 @@ public class Srl {
     /**
      * Camelize the decamel name using underscore '_'.
      * <pre>
-     * o FOO_NAME to FooName
-     * o foo_name to FooName
-     * o f to F
-     * o foo to Foo
-     * o foo_nameBar to FooNameBar
-     * o foo_a_bar to FooABar
-     * o foo_aBar to FooABar
-     * o f_foo_name to FFooName
-     * o FFOO_NAME to FfooName
+     * e.g.
+     *  o FOO_NAME to FooName
+     *  o foo_name to FooName
+     *  o f to F
+     *  o foo to Foo
+     *  o foo_nameBar to FooNameBar
+     *  o foo_a_bar to FooABar
+     *  o foo_aBar to FooABar
+     *  o f_foo_name to FFooName
+     *  o FFOO_NAME to FfooName
      * </pre>
      * @param decamelName The name decamelized by underscore '_'. (NotNull)
      * @return The name camelized as upper first character. (NotNull)
@@ -2059,6 +2198,13 @@ public class Srl {
         return doCamelize(decamelName, "_");
     }
 
+    /**
+     * Camelize the decamel name using specified delimiter(s). <br>
+     * See the java-doc of default-delimiter method for the detail.
+     * @param decamelName The name decamelized by underscore '_'. (NotNull)
+     * @param delimiters The your own delimiter(s) to camelize. (NotNull, EmptyAllowed: then ono change)
+     * @return The name camelized as upper first character. (NotNull)
+     */
     public static String camelize(String decamelName, String... delimiters) {
         assertDecamelNameNotNull(decamelName);
         String name = decamelName;
@@ -2099,16 +2245,17 @@ public class Srl {
     /**
      * Decamelize the camel name by underscore '_' as UPPER case:
      * <pre>
-     * o FooName to FOO_NAME
-     * o FooBarName to FOO_BAR_NAME
-     * o f to F
-     * o Foo to FOO
-     * o FFooName to F_FOO_NAME
-     * o FFFooName to F_F_FOO_NAME
-     * o fooDName to FOO_D_NAME
-     * o FOO_NAME to FOO_NAME
-     * o foo_name to FOO_NAME
-     * o FOO_NameBar to FOO_NAME_BAR
+     * e.g.
+     *  o FooName to FOO_NAME
+     *  o FooBarName to FOO_BAR_NAME
+     *  o f to F
+     *  o Foo to FOO
+     *  o FFooName to F_FOO_NAME
+     *  o FFFooName to F_F_FOO_NAME
+     *  o fooDName to FOO_D_NAME
+     *  o FOO_NAME to FOO_NAME
+     *  o foo_name to FOO_NAME
+     *  o FOO_NameBar to FOO_NAME_BAR
      * </pre>
      * 
      * <p>Returning as upper case is traditional rule for database naming.
@@ -2122,6 +2269,13 @@ public class Srl {
         return doDecamelize(camelName, "_");
     }
 
+    /**
+     * Decamelize the camel name by specified delimiter as UPPER case. <br>
+     * See the java-doc of default-delimiter method for the detail.
+     * @param camelName The camelized name. (NotNull)
+     * @param delimiter The your own delimiter to decamelize. (NotNull)
+     * @return The name decamelized by specified delimiter as UPPER case. (NotNull)
+     */
     public static String decamelize(String camelName, String delimiter) {
         assertCamelNameNotNull(camelName);
         assertDelimiterNotNull(delimiter);
