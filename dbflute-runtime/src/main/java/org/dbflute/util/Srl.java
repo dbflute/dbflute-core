@@ -106,7 +106,7 @@ public class Srl {
     //                                                                        Null & Empty
     //                                                                        ============
     /**
-     * Is the string null or empty string? 
+     * Is the string null or empty string?
      * @param str A judged string. (NullAllowed)
      * @return The determination.
      */
@@ -115,7 +115,7 @@ public class Srl {
     }
 
     /**
-     * Is the string null or trimmed-empty string? 
+     * Is the string null or trimmed-empty string?
      * @param str A judged string. (NullAllowed)
      * @return The determination.
      */
@@ -124,7 +124,7 @@ public class Srl {
     }
 
     /**
-     * Is the string not null and not empty string? 
+     * Is the string not null and not empty string?
      * @param str A judged string. (NullAllowed)
      * @return The determination.
      */
@@ -133,7 +133,7 @@ public class Srl {
     }
 
     /**
-     * Is the string not null and not trimmed-empty string? 
+     * Is the string not null and not trimmed-empty string?
      * @param str A judged string. (NullAllowed)
      * @return The determination.
      */
@@ -142,7 +142,7 @@ public class Srl {
     }
 
     /**
-     * Is the string empty string? 
+     * Is the string empty string?
      * @param str A judged string. (NullAllowed)
      * @return The determination.
      */
@@ -151,7 +151,7 @@ public class Srl {
     }
 
     /**
-     * Is the string trimmed-empty string? 
+     * Is the string trimmed-empty string?
      * @param str A judged string. (NullAllowed)
      * @return The determination.
      */
