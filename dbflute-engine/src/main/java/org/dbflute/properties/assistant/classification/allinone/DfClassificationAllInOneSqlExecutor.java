@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification;
+package org.dbflute.properties.assistant.classification.allinone;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.exception.SQLFailureException;
+import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.properties.assistant.classification.coins.DfClassificationJdbcCloser;
 import org.dbflute.system.DBFluteSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +88,7 @@ public class DfClassificationAllInOneSqlExecutor {
         } catch (SQLException e) {
             throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
-            new DfClassificationSqlResourceCloser().closeStatement(st, rs);
+            new DfClassificationJdbcCloser().closeStatement(st, rs);
         }
         return elementList;
     }

@@ -30,6 +30,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.classification.top.refcls.DfRefClsElement;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.util.Srl;
 
@@ -38,7 +39,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.2 (2008/10/22 Wednesday)
  */
-public class DfClassificationTop {
+public class DfClassificationTop { // directly used in template
 
     // ===================================================================================
     //                                                                          Definition

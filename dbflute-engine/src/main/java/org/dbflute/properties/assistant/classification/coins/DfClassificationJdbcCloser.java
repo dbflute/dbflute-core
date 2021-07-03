@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification;
+package org.dbflute.properties.assistant.classification.coins;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
  */
-public class DfClassificationSqlResourceCloser {
+public class DfClassificationJdbcCloser {
 
     // ===================================================================================
     //                                                                          Definition

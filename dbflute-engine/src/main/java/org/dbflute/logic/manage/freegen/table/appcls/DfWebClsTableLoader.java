@@ -37,9 +37,9 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationGroup;
-import org.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.properties.assistant.classification.DfRefClsElement;
+import org.dbflute.properties.assistant.classification.element.literal.DfClassificationLiteralArranger;
+import org.dbflute.properties.assistant.classification.top.refcls.DfRefClsElement;
 import org.dbflute.util.Srl;
 
 /**
@@ -118,7 +118,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
                 }
             }
             if (refClsElement != null) {
-                refClsElement.checkRelationshipByRefTypeIfNeeds(classificationTop);
+                refClsElement.verifyRelationshipByRefTypeIfNeeds(classificationTop);
                 hasRefCls = true;
             }
         }
@@ -228,7 +228,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void handleRefCls(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
-        refClsElement.checkFormalRefType(classificationTop);
+        refClsElement.verifyFormalRefType(classificationTop);
         classificationTop.addRefClsElement(refClsElement);
         if (refClsElement.isRefTypeIncluded()) {
             final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();

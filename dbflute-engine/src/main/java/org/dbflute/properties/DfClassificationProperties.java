@@ -40,13 +40,13 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
-import org.dbflute.properties.assistant.classification.DfClassificationJavaNameFilter;
-import org.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
-import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
-import org.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.properties.assistant.classification.allinone.DfClassificationAllInOneSqlExecutor;
+import org.dbflute.properties.assistant.classification.coins.DfClassificationJavaNameFilter;
+import org.dbflute.properties.assistant.classification.coins.DfClassificationJdbcCloser;
+import org.dbflute.properties.assistant.classification.element.literal.DfClassificationLiteralArranger;
+import org.dbflute.properties.assistant.classification.resource.DfClassificationResourceAnalyzer;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -217,7 +217,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
             checkClassificationConstraintsIfNeeds();
             prepareSuppressedDBAccessClassTableSet();
         } finally {
-            new DfClassificationSqlResourceCloser().closeConnection(conn);
+            new DfClassificationJdbcCloser().closeConnection(conn);
         }
         return _classificationTopMap;
     }
@@ -741,7 +741,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
             throwTableClassificationSelectSQLFailureException(classificationName, sql, e);
             throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
-            new DfClassificationSqlResourceCloser().closeStatement(st, rs);
+            new DfClassificationJdbcCloser().closeStatement(st, rs);
         }
     }
 
@@ -962,22 +962,6 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
             codeList.add(element.getCode());
         }
         return codeList;
-    }
-
-    public String buildClassificationApplicationComment(DfClassificationElement classificationElement) {
-        final StringBuilder sb = new StringBuilder();
-        if (classificationElement.hasAlias()) {
-            sb.append(classificationElement.getAlias());
-        }
-        if (classificationElement.hasCommentDisp()) {
-            if (sb.length() > 0) {
-                sb.append(": ");
-            }
-            final String comment = classificationElement.getCommentDisp();
-            final String filtered = Srl.replace(comment, "\n", comment); // just in case (basically one line)
-            sb.append(filtered);
-        }
-        return sb.toString();
     }
 
     public String buildClassificationApplicationCommentForJavaDoc(DfClassificationElement classificationElement) {

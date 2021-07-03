@@ -13,13 +13,16 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification;
+package org.dbflute.properties.assistant.classification.resource;
 
-import static org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
+import static org.dbflute.properties.assistant.classification.resource.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.properties.assistant.classification.resource.DfClassificationResourceAnalyzer;
 import org.dbflute.unit.EngineTestCase;
 
 /**

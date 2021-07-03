@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification;
+package org.dbflute.properties.assistant.classification.resource;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,6 +28,8 @@ import java.util.List;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.token.line.LineToken;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;

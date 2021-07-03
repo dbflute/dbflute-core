@@ -13,64 +13,51 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification;
+package org.dbflute.properties.assistant.classification.top.refcls;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationTop;
 
 /**
  * @author jflute
- * @since 1.1.1 (2016/01/11 Monday)
+ * @since 1.2.5 split from DfRefClsElement (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfRefClsElement { // for webCls
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    public static final String KEY_REFCLS = "refCls";
-    public static final String KEY_REFTYPE = "refType";
+public class DfRefClsRefTypeVerifier {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _projectName;
-    protected final String _classificationName;
-    protected final String _classificationType;
-    protected final String _groupName; // null allowed
-    protected final String _refType;
+    protected final DfRefClsRefType _refType;
     protected final DfClassificationTop _dbClsTop;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRefClsElement(String projectName, String classificationName, String classificationType, String groupName, String refType,
-            DfClassificationTop dbClsTop) {
-        _projectName = projectName;
-        _classificationName = classificationName;
-        _classificationType = classificationType;
-        _groupName = groupName;
+    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop dbClsTop) {
         _refType = refType;
         _dbClsTop = dbClsTop;
     }
 
     // ===================================================================================
-    //                                                                    Check by RefType
-    //                                                                    ================
-    public void checkFormalRefType(DfClassificationTop classificationTop) {
-        if (isRefTypeIncluded() || isRefTypeExists() || isRefTypeMatches()) {
+    //                                                               Verify Formal RefType
+    //                                                               =====================
+    public void verifyFormalRefType(DfClassificationTop classificationTop) {
+        if (_refType.isFormalRefType()) {
             return;
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unknown refType to DB classification in the web classification.");
+        br.addNotice("Unknown refType to DB classification in the app classification.");
         br.addItem("Advice");
         br.addElement("refType can be set: 'included', 'exists', 'matches'");
-        br.addElement("  included : DB classification codes are included as web classification");
-        br.addElement("  exists   : web classification codes should exist in DB classification");
-        br.addElement("  matches  : web classification codes matches with DB classification");
-        br.addItem("WebCls");
+        br.addElement("  included : DB classification codes are included as app classification");
+        br.addElement("  exists   : app classification codes should exist in DB classification");
+        br.addElement("  matches  : app classification codes matches with DB classification");
+        br.addItem("AppCls");
         br.addElement(classificationTop.getClassificationName());
         br.addItem("Unknown refType");
         br.addElement(_refType);
@@ -78,15 +65,18 @@ public class DfRefClsElement { // for webCls
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    public void checkRelationshipByRefTypeIfNeeds(DfClassificationTop classificationTop) {
-        if (isRefTypeExists()) {
-            checkRefExists(classificationTop);
-        } else if (isRefTypeMatches()) {
-            checkRefMatches(classificationTop);
+    // ===================================================================================
+    //                                                                 Verify Relationship
+    //                                                                 ===================
+    public void verifyRelationshipByRefTypeIfNeeds(DfClassificationTop classificationTop) {
+        if (_refType.isRefTypeExists()) {
+            doVerifyRefExists(classificationTop);
+        } else if (_refType.isRefTypeMatches()) {
+            doVerifyRefMatches(classificationTop);
         }
     }
 
-    protected void checkRefExists(DfClassificationTop classificationTop) {
+    protected void doVerifyRefExists(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> webElementList = classificationTop.getClassificationElementList();
         final List<DfClassificationElement> dbElementList = _dbClsTop.getClassificationElementList();
         final List<DfClassificationElement> nonExistingList = webElementList.stream().filter(webElement -> {
@@ -128,7 +118,7 @@ public class DfRefClsElement { // for webCls
         }
     }
 
-    protected void checkRefMatches(DfClassificationTop classificationTop) {
+    protected void doVerifyRefMatches(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> webElementList = classificationTop.getClassificationElementList();
         final List<DfClassificationElement> dbElementList = _dbClsTop.getClassificationElementList();
         final boolean hasNonExisting = webElementList.stream().anyMatch(webElement -> {
@@ -164,53 +154,5 @@ public class DfRefClsElement { // for webCls
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public String toString() {
-        final String projectExp = _projectName != null ? "(" + _projectName + ")" : "";
-        return "{" + projectExp + _classificationName + ", " + _refType + "}";
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public String getProjectName() {
-        return _projectName;
-    }
-
-    public String getClassificationName() {
-        return _classificationName;
-    }
-
-    public String getClassificationType() {
-        return _classificationType;
-    }
-
-    public String getGroupName() {
-        return _groupName;
-    }
-
-    public boolean isRefTypeExists() {
-        return _refType.equals("exists");
-    }
-
-    public boolean isRefTypeMatches() {
-        return _refType.equals("matches");
-    }
-
-    public boolean isRefTypeIncluded() {
-        return _refType.equals("included");
-    }
-
-    public String getRefType() {
-        return _refType;
-    }
-
-    public DfClassificationTop getDBClsTop() {
-        return _dbClsTop;
     }
 }

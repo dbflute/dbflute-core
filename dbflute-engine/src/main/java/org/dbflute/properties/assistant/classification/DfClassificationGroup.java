@@ -15,27 +15,28 @@
  */
 package org.dbflute.properties.assistant.classification;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dbflute.DfBuildProperties;
-import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.classification.top.group.DfClsGroupCodingExpression;
+import org.dbflute.properties.assistant.classification.top.group.DfClsGroupDocumentExpression;
+import org.dbflute.properties.assistant.classification.top.group.DfClsGroupElementHandling;
+import org.dbflute.properties.assistant.classification.top.group.DfClsGroupGroupCommentDisp;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfClassificationGroup {
+public class DfClassificationGroup { // directly used in template
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfClassificationTop _classificationTop;
-    protected final String _groupName;
-    protected String _groupComment;
-    protected List<String> _elementNameList;
+    protected final DfClassificationTop _classificationTop; // not null
+    protected final String _groupName; // not null
+    protected String _groupComment; // null allowed (not required)
+    protected List<String> _elementNameList; // basically not null (is set immediately after initialization)
     protected boolean _useDocumentOnly;
 
     // ===================================================================================
@@ -47,104 +48,82 @@ public class DfClassificationGroup {
     }
 
     // ===================================================================================
-    //                                                                          Expression
+    //                                                                          Basic Name
     //                                                                          ==========
+    public String getClassificationName() {
+        return _classificationTop.getClassificationName();
+    }
+
     public String getGroupNameInitCap() {
         return Srl.initCap(_groupName);
     }
 
+    // ===================================================================================
+    //                                                                       Group Comment
+    //                                                                       =============
     public boolean hasGroupComment() {
         return _groupComment != null;
     }
 
-    public String buildReturnExpThis() {
-        return doBuildReturnExp("this");
+    public String getGroupCommentForJavaDoc() {
+        return createClsGroupGroupCommentDisp().getGroupCommentForJavaDoc();
     }
 
-    protected String doBuildReturnExp(String target) {
-        final StringBuilder sb = new StringBuilder();
-        int index = 0;
-        for (String elementName : _elementNameList) {
-            if (index > 0) {
-                sb.append(" || ");
-            }
-            sb.append(elementName).append(".equals(").append(target).append(")");
-            ++index;
-        }
-        return sb.toString();
+    public String getGroupCommentForJavaDocNest() {
+        return createClsGroupGroupCommentDisp().getGroupCommentForJavaDocNest();
+    }
+
+    public String getGroupCommentDisp() { // unused in template (e.g. forJavaDoc used instead) (2021/07/03)
+        return createClsGroupGroupCommentDisp().getGroupCommentDisp();
+    }
+
+    protected DfClsGroupGroupCommentDisp createClsGroupGroupCommentDisp() {
+        return new DfClsGroupGroupCommentDisp(_groupComment);
+    }
+
+    // ===================================================================================
+    //                                                                   Coding Expression
+    //                                                                   =================
+    public String buildReturnExpThis() {
+        return createClsGroupCodingExpression().buildReturnExpThis();
     }
 
     public String buildCDefArgExp() {
-        return buildCDefArgExp(null);
+        return createClsGroupCodingExpression().buildCDefArgExp();
     }
 
     public String buildCDefArgExp(String cdefClassName) {
-        final StringBuilder sb = new StringBuilder();
-        int index = 0;
-        for (String elementName : _elementNameList) {
-            if (index > 0) {
-                sb.append(", ");
-            }
-            if (cdefClassName != null) {
-                sb.append(cdefClassName).append(".");
-                sb.append(_classificationTop.getClassificationName()).append(".");
-            }
-            sb.append(elementName);
-            ++index;
-        }
-        return sb.toString();
+        return createClsGroupCodingExpression().buildCDefArgExp(cdefClassName);
     }
 
+    protected DfClsGroupCodingExpression createClsGroupCodingExpression() {
+        return new DfClsGroupCodingExpression(_classificationTop, _elementNameList);
+    }
+
+    // ===================================================================================
+    //                                                                 Document Expression
+    //                                                                 ===================
     public String getGroupTitleForSchemaHtml() {
-        final StringBuilder sb = new StringBuilder();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_groupComment)) {
-            sb.append(_groupComment);
-        } else {
-            sb.append("(no comment)");
-        }
-        sb.append(" :: ");
-        sb.append(_elementNameList);
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
-        return title != null ? " title=\"" + title + "\"" : "";
+        return createClsGroupDocumentExpression().buildGroupTitleForSchemaHtml();
     }
 
     public String buildElementDisp() {
-        return "The group elements:" + _elementNameList;
+        return createClsGroupDocumentExpression().buildElementDisp();
     }
 
+    protected DfClsGroupDocumentExpression createClsGroupDocumentExpression() {
+        return new DfClsGroupDocumentExpression(_groupComment, _elementNameList);
+    }
+
+    // ===================================================================================
+    //                                                             Element Object Handling
+    //                                                             =======-===============
     public List<DfClassificationElement> getElementList() {
-        if (_elementNameList == null) {
-            return new ArrayList<DfClassificationElement>();
-        }
-        final int size = _elementNameList.size();
-        final List<DfClassificationElement> elementList = new ArrayList<DfClassificationElement>(size);
-        for (String elementName : _elementNameList) {
-            final DfClassificationElement element = _classificationTop.findClassificationElementByName(elementName);
-            if (element == null) {
-                throwClassificationGroupingMapElementNotFoundException(elementName);
-            }
-            elementList.add(element);
-        }
-        return elementList;
+        return createClsGroupElementHandling().toElementList();
     }
 
-    protected void throwClassificationGroupingMapElementNotFoundException(String elementName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the classification element in the grouping map.");
-        br.addItem("Classification Name");
-        br.addElement(_classificationTop.getClassificationName());
-        br.addItem("Group Name");
-        br.addElement(_groupName);
-        br.addItem("NotFound Name");
-        br.addElement(elementName);
-        br.addItem("Defined Element");
-        final List<DfClassificationElement> elementList = _classificationTop.getClassificationElementList();
-        for (DfClassificationElement element : elementList) {
-            br.addElement(element);
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
+    protected DfClsGroupElementHandling createClsGroupElementHandling() {
+        return new DfClsGroupElementHandling(_classificationTop, _groupName, _groupComment, _elementNameList);
     }
 
     // ===================================================================================
@@ -176,42 +155,15 @@ public class DfClassificationGroup {
     //                                                                            Accessor
     //                                                                            ========
     public DfClassificationTop getClassificationTop() {
-        return _classificationTop;
-    }
-
-    public String getClassificationName() {
-        return _classificationTop.getClassificationName();
+        return _classificationTop; // not null
     }
 
     public String getGroupName() {
-        return _groupName;
+        return _groupName; // not null
     }
 
     public String getGroupComment() {
         return _groupComment;
-    }
-
-    public String getGroupCommentDisp() {
-        return buildGroupCommentDisp();
-    }
-
-    protected String buildGroupCommentDisp() {
-        if (_groupComment == null) {
-            return "";
-        }
-        return Srl.replace(_groupComment, "\n", ""); // basically one line
-    }
-
-    public String getGroupCommentForJavaDoc() {
-        return buildGroupCommentForJavaDoc("    "); // basically indent unused
-    }
-
-    public String getGroupCommentForJavaDocNest() {
-        return buildGroupCommentForJavaDoc("        "); // basically indent unused
-    }
-
-    protected String buildGroupCommentForJavaDoc(String indent) {
-        return resolveTextForJavaDoc(getGroupCommentDisp(), indent);
     }
 
     public void setGroupComment(String groupComment) {
