@@ -13,41 +13,41 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification.element.tophandling;
+package org.dbflute.properties.assistant.classification.element.topoption;
 
-import java.util.List;
-
-import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 1.2.5 split from DfClassificationElement (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsElementGroupHandling {
+public class DfClsElementDeprecatedHandling {
 
     protected final DfClassificationTop _classificationTop; // null allowed
     protected final String _name; // null allowed, empty allowed
 
-    public DfClsElementGroupHandling(DfClassificationTop classificationTop, String name) {
+    public DfClsElementDeprecatedHandling(DfClassificationTop classificationTop, String name) {
         _classificationTop = classificationTop;
         _name = name;
     }
 
-    public boolean isGroup(String groupName) {
-        if (_classificationTop == null) {
+    public boolean isDeprecated() {
+        if (_classificationTop == null) { // just in case
             return false;
         }
-        final List<DfClassificationGroup> groupList = _classificationTop.getGroupList();
-        for (DfClassificationGroup group : groupList) {
-            if (groupName.equals(group.getGroupName())) {
-                final List<String> elementNameList = group.getElementNameList();
-                if (_name != null && elementNameList.contains(_name)) {
-                    return true;
-                }
-                break;
-            }
+        return _name != null && _classificationTop.getDeprecatedMap().containsKey(_name);
+    }
+
+    public String getDeprecatedComment() {
+        if (!isDeprecated()) {
+            return "";
         }
-        return false;
+        final String comment = _name != null ? _classificationTop.getDeprecatedMap().get(_name) : null;
+        return comment != null ? removeLineSeparator(comment) : "";
+    }
+
+    protected String removeLineSeparator(String str) {
+        return Srl.replace(Srl.replace(str, "\r\n", "\n"), "\n", "");
     }
 }

@@ -38,7 +38,7 @@ import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.properties.assistant.classification.element.literal.DfClassificationLiteralArranger;
+import org.dbflute.properties.assistant.classification.element.proploading.DfClassificationLiteralArranger;
 import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
 import org.dbflute.util.Srl;
 
@@ -87,9 +87,8 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         final List<DfClassificationTop> topList = new ArrayList<DfClassificationTop>();
         for (Entry<String, Object> entry : webclsMap.entrySet()) {
             final String classificationName = entry.getKey();
-            final DfClassificationTop classificationTop = new DfClassificationTop();
+            final DfClassificationTop classificationTop = new DfClassificationTop(classificationName);
             topList.add(classificationTop);
-            classificationTop.setClassificationName(classificationName);
             DfRefClsElement refClsElement = null;
             @SuppressWarnings("unchecked")
             final List<Map<String, Object>> elementMapList = (List<Map<String, Object>>) entry.getValue();

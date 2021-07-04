@@ -25,10 +25,10 @@ import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
 import org.dbflute.properties.assistant.classification.top.acceptor.DfClsTopBasicItemAcceptor;
 import org.dbflute.properties.assistant.classification.top.comment.DfClsTopCommentDisp;
 import org.dbflute.properties.assistant.classification.top.deprecated.DfClsTopDeprecatedExistenceVerifier;
+import org.dbflute.properties.assistant.classification.top.elementoption.sistercode.DfClsTopSisterCodeHandler;
+import org.dbflute.properties.assistant.classification.top.elementoption.subitem.DfClsTopRegularSubItem;
+import org.dbflute.properties.assistant.classification.top.elementoption.subitem.DfClsTopSubItemHandler;
 import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupListArranger;
-import org.dbflute.properties.assistant.classification.top.sistercode.DfClsTopSisterCodeHandler;
-import org.dbflute.properties.assistant.classification.top.subitem.DfClsTopRegularSubItem;
-import org.dbflute.properties.assistant.classification.top.subitem.DfClsTopSubItemHandler;
 import org.dbflute.util.Srl;
 
 /**
@@ -75,7 +75,7 @@ public class DfClassificationTop { // directly used in template
     // -----------------------------------------------------
     //                               Classification Identity
     //                               -----------------------
-    protected String _classificationName; // not null after initial set (required)
+    protected final String _classificationName; // not null (required)
 
     // -----------------------------------------------------
     //                                            Basic Item
@@ -130,6 +130,13 @@ public class DfClassificationTop { // directly used in template
     //                               -----------------------
     // normally unused, only for e.g. classification resource
     protected String _relatedColumnName;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfClassificationTop(String classificationName) {
+        _classificationName = classificationName;
+    }
 
     // ===================================================================================
     //                                                                              Accept
@@ -294,10 +301,6 @@ public class DfClassificationTop { // directly used in template
     //                               -----------------------
     public String getClassificationName() {
         return _classificationName;
-    }
-
-    public void setClassificationName(String classificationName) {
-        _classificationName = classificationName;
     }
 
     // -----------------------------------------------------

@@ -23,8 +23,8 @@ import org.dbflute.properties.assistant.classification.element.attribute.DfClsEl
 import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementCommentDisp;
 import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementSisterCodeExp;
 import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementSubItemExp;
-import org.dbflute.properties.assistant.classification.element.tophandling.DfClsElementDeprecatedHandling;
-import org.dbflute.properties.assistant.classification.element.tophandling.DfClsElementGroupHandling;
+import org.dbflute.properties.assistant.classification.element.topoption.DfClsElementDeprecatedHandling;
+import org.dbflute.properties.assistant.classification.element.topoption.DfClsElementGroupHandling;
 import org.dbflute.util.Srl;
 
 /**

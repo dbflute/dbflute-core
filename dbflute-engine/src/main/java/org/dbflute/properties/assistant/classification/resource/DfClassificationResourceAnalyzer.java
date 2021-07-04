@@ -391,8 +391,7 @@ public class DfClassificationResourceAnalyzer {
             classificationName = line.trim();
             topDesc = null;
         }
-        final DfClassificationTop classificationTop = new DfClassificationTop();
-        classificationTop.setClassificationName(classificationName);
+        final DfClassificationTop classificationTop = new DfClassificationTop(classificationName);
         final String title = titleLine != null ? titleLine.getTitle() : null;
         final String topComment;
         if (topDesc != null) {
