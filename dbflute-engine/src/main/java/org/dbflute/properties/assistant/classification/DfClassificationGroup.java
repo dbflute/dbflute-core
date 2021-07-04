@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupCodingExpression;
-import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupCommentDisp;
-import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupDocumentExpression;
-import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupElementHandling;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupCodingExpression;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupCommentDisp;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupDocumentExpression;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupElementHandling;
 import org.dbflute.util.Srl;
 
 /**
@@ -77,8 +77,8 @@ public class DfClassificationGroup { // directly used in template
         return createClsGroupGroupCommentDisp().getGroupCommentDisp();
     }
 
-    protected DfClsGroupCommentDisp createClsGroupGroupCommentDisp() {
-        return new DfClsGroupCommentDisp(_groupComment);
+    protected DfClsTopGroupCommentDisp createClsGroupGroupCommentDisp() {
+        return new DfClsTopGroupCommentDisp(_groupComment);
     }
 
     // ===================================================================================
@@ -96,8 +96,8 @@ public class DfClassificationGroup { // directly used in template
         return createClsGroupCodingExpression().buildCDefArgExp(cdefClassName);
     }
 
-    protected DfClsGroupCodingExpression createClsGroupCodingExpression() {
-        return new DfClsGroupCodingExpression(_classificationTop, _elementNameList);
+    protected DfClsTopGroupCodingExpression createClsGroupCodingExpression() {
+        return new DfClsTopGroupCodingExpression(_classificationTop, _elementNameList);
     }
 
     // ===================================================================================
@@ -111,8 +111,8 @@ public class DfClassificationGroup { // directly used in template
         return createClsGroupDocumentExpression().buildElementDisp();
     }
 
-    protected DfClsGroupDocumentExpression createClsGroupDocumentExpression() {
-        return new DfClsGroupDocumentExpression(_groupComment, _elementNameList);
+    protected DfClsTopGroupDocumentExpression createClsGroupDocumentExpression() {
+        return new DfClsTopGroupDocumentExpression(_groupComment, _elementNameList);
     }
 
     // ===================================================================================
@@ -122,8 +122,8 @@ public class DfClassificationGroup { // directly used in template
         return createClsGroupElementHandling().toElementList();
     }
 
-    protected DfClsGroupElementHandling createClsGroupElementHandling() {
-        return new DfClsGroupElementHandling(_classificationTop, _groupName, _groupComment, _elementNameList);
+    protected DfClsTopGroupElementHandling createClsGroupElementHandling() {
+        return new DfClsTopGroupElementHandling(_classificationTop, _groupName, _groupComment, _elementNameList);
     }
 
     // ===================================================================================

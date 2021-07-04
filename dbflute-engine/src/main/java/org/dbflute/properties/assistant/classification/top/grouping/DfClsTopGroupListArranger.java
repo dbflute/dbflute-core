@@ -35,7 +35,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 1.2.5 split from DfClassificationTop (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsGroupArranger {
+public class DfClsTopGroupListArranger {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -46,7 +46,7 @@ public class DfClsGroupArranger {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsGroupArranger(DfClassificationTop classificationTop, Map<String, Map<String, Object>> groupingMap) {
+    public DfClsTopGroupListArranger(DfClassificationTop classificationTop, Map<String, Map<String, Object>> groupingMap) {
         _classificationTop = classificationTop;
         _groupingMap = groupingMap;
     }
@@ -144,7 +144,7 @@ public class DfClsGroupArranger {
         return realList;
     }
 
-    public boolean isDocOnlyTaskNow() {
+    protected boolean isDocOnlyTaskNow() {
         final DfDBFluteTaskStatus instance = DfDBFluteTaskStatus.getInstance();
         return instance.isDocTask() || instance.isReplaceSchema();
     }

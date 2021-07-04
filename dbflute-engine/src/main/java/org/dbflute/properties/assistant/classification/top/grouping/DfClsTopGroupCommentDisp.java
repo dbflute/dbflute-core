@@ -23,7 +23,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 1.2.5 split from DfClassificationGroup (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsGroupCommentDisp {
+public class DfClsTopGroupCommentDisp {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -33,7 +33,7 @@ public class DfClsGroupCommentDisp {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsGroupCommentDisp(String groupComment) {
+    public DfClsTopGroupCommentDisp(String groupComment) {
         _groupComment = groupComment;
     }
 

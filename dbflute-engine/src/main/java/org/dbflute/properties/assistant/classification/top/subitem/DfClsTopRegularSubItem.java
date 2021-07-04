@@ -19,7 +19,7 @@ package org.dbflute.properties.assistant.classification.top.subitem;
  * @author jflute
  * @since 1.2.5 split from DfClassificationTop (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsRegularSubItem { // directly used in templates
+public class DfClsTopRegularSubItem { // directly used in templates
 
     // Object or String only supported
     public static final String TYPE_OBJECT = "Object";
@@ -28,7 +28,7 @@ public class DfClsRegularSubItem { // directly used in templates
     protected final String _subItemName;
     protected final String _subItemType;
 
-    public DfClsRegularSubItem(String subItemName, String subItemType) {
+    public DfClsTopRegularSubItem(String subItemName, String subItemType) {
         _subItemName = subItemName;
         _subItemType = subItemType;
     }

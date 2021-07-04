@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification.top.refcls;
+package org.dbflute.properties.assistant.classification.refcls;
 
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 

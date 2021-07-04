@@ -25,7 +25,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 1.2.5 split from DfClassificationGroup (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsGroupDocumentExpression {
+public class DfClsTopGroupDocumentExpression {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,7 +36,7 @@ public class DfClsGroupDocumentExpression {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsGroupDocumentExpression(String groupComment, List<String> elementNameList) {
+    public DfClsTopGroupDocumentExpression(String groupComment, List<String> elementNameList) {
         _groupComment = groupComment;
         _elementNameList = elementNameList;
     }

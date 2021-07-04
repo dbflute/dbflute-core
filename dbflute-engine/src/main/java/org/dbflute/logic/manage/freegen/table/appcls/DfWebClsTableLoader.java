@@ -39,7 +39,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.classification.element.literal.DfClassificationLiteralArranger;
-import org.dbflute.properties.assistant.classification.top.refcls.DfRefClsElement;
+import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
 import org.dbflute.util.Srl;
 
 /**

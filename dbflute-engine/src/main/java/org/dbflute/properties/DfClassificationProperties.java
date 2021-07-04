@@ -214,7 +214,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
 
             reflectClassificationResourceToDefinition(); // *Classification Resource Point!
             filterUseDocumentOnly();
-            checkClassificationConstraintsIfNeeds();
+            verifyClassificationConstraintsIfNeeds();
             prepareSuppressedDBAccessClassTableSet();
         } finally {
             new DfClassificationJdbcCloser().closeConnection(conn);
@@ -222,7 +222,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
         return _classificationTopMap;
     }
 
-    protected void checkClassificationConstraintsIfNeeds() {
+    protected void verifyClassificationConstraintsIfNeeds() {
         if (DfDBFluteTaskStatus.getInstance().isReplaceSchema()) {
             // SchemaPolicyCheck may use classification in ReplaceSchema by dfprop option,
             // but no data for table classification yet so no check here #for_now by jflute (2017/01/12)
@@ -231,7 +231,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
         for (DfClassificationTop classificationTop : _classificationTopMap.values()) {
             // only check one that is not compile-safe
             // (e.g. groupingMap gives us compile error if no-existence element)
-            classificationTop.checkDeprecatedElementExistence();
+            classificationTop.verifyDeprecatedElementExistence();
         }
     }
 

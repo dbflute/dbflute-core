@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
 import org.dbflute.properties.assistant.classification.top.acceptor.DfClsTopBasicItemAcceptor;
 import org.dbflute.properties.assistant.classification.top.comment.DfClsTopCommentDisp;
-import org.dbflute.properties.assistant.classification.top.deprecated.DfClsDeprecatedArranger;
-import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupArranger;
-import org.dbflute.properties.assistant.classification.top.refcls.DfRefClsElement;
-import org.dbflute.properties.assistant.classification.top.sistercode.DfClsSisterCodeArranger;
-import org.dbflute.properties.assistant.classification.top.subitem.DfClsRegularSubItem;
-import org.dbflute.properties.assistant.classification.top.subitem.DfClsSubItemArranger;
+import org.dbflute.properties.assistant.classification.top.deprecated.DfClsTopDeprecatedExistenceVerifier;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupListArranger;
+import org.dbflute.properties.assistant.classification.top.sistercode.DfClsTopSisterCodeHandler;
+import org.dbflute.properties.assistant.classification.top.subitem.DfClsTopRegularSubItem;
+import org.dbflute.properties.assistant.classification.top.subitem.DfClsTopSubItemHandler;
 import org.dbflute.util.Srl;
 
 /**
@@ -229,22 +229,22 @@ public class DfClassificationTop { // directly used in template
     //                                           Sister Code
     //                                           -----------
     public boolean hasSisterCode() {
-        return new DfClsSisterCodeArranger(_elementList).hasSisterCode();
+        return new DfClsTopSisterCodeHandler(_elementList).hasSisterCode();
     }
 
     public boolean isSisterBooleanHandling() {
-        return new DfClsSisterCodeArranger(_elementList).isSisterBooleanHandling();
+        return new DfClsTopSisterCodeHandler(_elementList).isSisterBooleanHandling();
     }
 
     // -----------------------------------------------------
     //                                           SubItem Map
     //                                           -----------
     public boolean hasSubItem() {
-        return new DfClsSubItemArranger(this).hasSubItem();
+        return new DfClsTopSubItemHandler(this).hasSubItem();
     }
 
-    public List<DfClsRegularSubItem> getRegularSubItemList() {
-        return new DfClsSubItemArranger(this).arrangeRegularSubItemList();
+    public List<DfClsTopRegularSubItem> getRegularSubItemList() {
+        return new DfClsTopSubItemHandler(this).arrangeRegularSubItemList();
     }
 
     // ===================================================================================
@@ -263,7 +263,7 @@ public class DfClassificationTop { // directly used in template
         if (_cachedGroupList != null) {
             return _cachedGroupList;
         }
-        _cachedGroupList = new DfClsGroupArranger(this, _groupingMap).arrangeGroupList();
+        _cachedGroupList = new DfClsTopGroupListArranger(this, _groupingMap).arrangeGroupList();
         return _cachedGroupList;
     }
 
@@ -274,8 +274,8 @@ public class DfClassificationTop { // directly used in template
     // -----------------------------------------------------
     //                                        Deprecated Map
     //                                        --------------
-    public void checkDeprecatedElementExistence() {
-        new DfClsDeprecatedArranger(this, _deprecatedMap).checkDeprecatedElementExistence();
+    public void verifyDeprecatedElementExistence() {
+        new DfClsTopDeprecatedExistenceVerifier(this, _deprecatedMap).verifyDeprecatedElementExistence();
     }
 
     // ===================================================================================

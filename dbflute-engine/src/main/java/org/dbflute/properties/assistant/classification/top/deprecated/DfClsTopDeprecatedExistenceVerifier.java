@@ -27,7 +27,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationTop;
  * @author jflute
  * @since 1.2.5 split from DfClassificationTop (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsDeprecatedArranger {
+public class DfClsTopDeprecatedExistenceVerifier {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -38,15 +38,15 @@ public class DfClsDeprecatedArranger {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsDeprecatedArranger(DfClassificationTop classificationTop, Map<String, String> deprecatedMap) {
+    public DfClsTopDeprecatedExistenceVerifier(DfClassificationTop classificationTop, Map<String, String> deprecatedMap) {
         _classificationTop = classificationTop;
         _deprecatedMap = deprecatedMap;
     }
 
     // ===================================================================================
-    //                                                                          Group List
-    //                                                                          ==========
-    public void checkDeprecatedElementExistence() {
+    //                                                                    Verify Existence
+    //                                                                    ================
+    public void verifyDeprecatedElementExistence() {
         final List<DfClassificationElement> elementList = _classificationTop.getClassificationElementList();
         for (String deprecated : _deprecatedMap.keySet()) {
             boolean found = false;

@@ -23,7 +23,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationTop;
  * @author jflute
  * @since 1.2.5 split from DfClassificationGroup (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsGroupCodingExpression {
+public class DfClsTopGroupCodingExpression {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -34,7 +34,7 @@ public class DfClsGroupCodingExpression {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsGroupCodingExpression(DfClassificationTop classificationTop, List<String> elementNameList) {
+    public DfClsTopGroupCodingExpression(DfClassificationTop classificationTop, List<String> elementNameList) {
         _classificationTop = classificationTop;
         _elementNameList = elementNameList;
     }

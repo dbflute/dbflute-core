@@ -27,7 +27,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationTop;
  * @author jflute
  * @since 1.2.5 split from DfClassificationGroup (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsGroupElementHandling {
+public class DfClsTopGroupElementHandling {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -40,7 +40,7 @@ public class DfClsGroupElementHandling {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsGroupElementHandling(DfClassificationTop classificationTop, String groupName, String groupComment,
+    public DfClsTopGroupElementHandling(DfClassificationTop classificationTop, String groupName, String groupComment,
             List<String> elementNameList) {
         _classificationTop = classificationTop;
         _groupName = groupName;

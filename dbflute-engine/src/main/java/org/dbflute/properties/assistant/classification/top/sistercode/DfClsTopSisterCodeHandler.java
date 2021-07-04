@@ -25,7 +25,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationElement;
  * @author jflute
  * @since 1.2.5 split from DfClassificationTop (2021/07/04 Sunday at roppongi japanese)
  */
-public class DfClsSisterCodeArranger {
+public class DfClsTopSisterCodeHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -35,7 +35,7 @@ public class DfClsSisterCodeArranger {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsSisterCodeArranger(List<DfClassificationElement> elementList) {
+    public DfClsTopSisterCodeHandler(List<DfClassificationElement> elementList) {
         _elementList = elementList;
     }
 

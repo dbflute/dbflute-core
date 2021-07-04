@@ -29,7 +29,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 1.2.5 split from DfClassificationTop (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsSubItemArranger {
+public class DfClsTopSubItemHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -39,7 +39,7 @@ public class DfClsSubItemArranger {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsSubItemArranger(DfClassificationTop classificationTop) {
+    public DfClsTopSubItemHandler(DfClassificationTop classificationTop) {
         _classificationTop = classificationTop;
     }
 
@@ -61,7 +61,7 @@ public class DfClsSubItemArranger {
     //                                                                     Regular SubItem
     //                                                                     ===============
     // Regular SubItem means existing in all elements
-    public List<DfClsRegularSubItem> arrangeRegularSubItemList() {
+    public List<DfClsTopRegularSubItem> arrangeRegularSubItemList() {
         final List<DfClassificationElement> elementList = _classificationTop.getClassificationElementList();
         final Map<String, List<Object>> subItemListMap = new LinkedHashMap<String, List<Object>>();
         for (DfClassificationElement element : elementList) {
@@ -80,9 +80,9 @@ public class DfClsSubItemArranger {
                 subItemList.add(subItemValue);
             }
         }
-        final String typeObject = DfClsRegularSubItem.TYPE_OBJECT;
-        final String typeString = DfClsRegularSubItem.TYPE_STRING;
-        final List<DfClsRegularSubItem> regularSubItemList = new ArrayList<DfClsRegularSubItem>();
+        final String typeObject = DfClsTopRegularSubItem.TYPE_OBJECT;
+        final String typeString = DfClsTopRegularSubItem.TYPE_STRING;
+        final List<DfClsTopRegularSubItem> regularSubItemList = new ArrayList<DfClsTopRegularSubItem>();
         final int elementSize = elementList.size();
         for (Entry<String, List<Object>> entry : subItemListMap.entrySet()) {
             final String subItemKey = entry.getKey();
@@ -104,7 +104,7 @@ public class DfClsSubItemArranger {
                 if (subItemType == null) {
                     subItemType = typeString;
                 }
-                regularSubItemList.add(new DfClsRegularSubItem(subItemKey, subItemType));
+                regularSubItemList.add(new DfClsTopRegularSubItem(subItemKey, subItemType));
             }
         }
         return regularSubItemList;
