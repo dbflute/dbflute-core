@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification.top.group;
+package org.dbflute.properties.assistant.classification.top.grouping;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -23,7 +23,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 1.2.5 split from DfClassificationGroup (2021/07/03 Saturday at roppongi japanese)
  */
-public class DfClsGroupGroupCommentDisp {
+public class DfClsGroupCommentDisp {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -33,7 +33,7 @@ public class DfClsGroupGroupCommentDisp {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsGroupGroupCommentDisp(String groupComment) {
+    public DfClsGroupCommentDisp(String groupComment) {
         _groupComment = groupComment;
     }
 

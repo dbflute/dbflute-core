@@ -15,12 +15,9 @@
  */
 package org.dbflute.properties.assistant.classification;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.properties.assistant.classification.element.acceptor.DfClsElementBasicItemAcceptor;
 import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementApplicationComment;
 import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementCodeAliasVariables;
 import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementCommentDisp;
@@ -73,61 +70,13 @@ public class DfClassificationElement { // directly used in template
     //                                                                              Accept
     //                                                                              ======
     public void acceptBasicItemMap(Map<?, ?> elementMap) {
-        doAcceptBasicItemMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT, KEY_SISTER_CODE, KEY_SUB_ITEM_MAP);
-    }
-
-    protected void doAcceptBasicItemMap(Map<?, ?> elementMap, String codeKey, String nameKey, String aliasKey, String commentKey,
-            String sisterCodeKey, String subItemMapKey) {
-        final String code = (String) elementMap.get(codeKey);
-        if (code == null) {
-            throwClassificationRequiredAttributeNotFoundException(elementMap);
-        }
-        _code = code;
-
-        final String name = (String) elementMap.get(nameKey);
-        _name = (name != null ? name : code); // same as code if null
-
-        final String alias = (String) elementMap.get(aliasKey);
-        _alias = (alias != null ? alias : name); // same as name if null
-
-        _comment = (String) elementMap.get(commentKey);
-
-        final Object sisterCodeObj = elementMap.get(sisterCodeKey);
-        if (sisterCodeObj != null) {
-            if (sisterCodeObj instanceof List<?>) {
-                @SuppressWarnings("unchecked")
-                final List<String> sisterCodeList = (List<String>) sisterCodeObj;
-                _sisters = sisterCodeList.toArray(new String[sisterCodeList.size()]);
-            } else {
-                _sisters = new String[] { (String) sisterCodeObj };
-            }
-        } else {
-            _sisters = new String[] {};
-        }
-
-        // initialize by dummy when no definition for velocity trap
-        // (if null, variable in for-each is not overridden so previous loop's value is used)
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> subItemMap = (Map<String, Object>) elementMap.get(subItemMapKey);
-        _subItemMap = subItemMap != null ? subItemMap : new HashMap<String, Object>(2);
-    }
-
-    protected void throwClassificationRequiredAttributeNotFoundException(Map<?, ?> elementMap) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The element map did not have a 'code' attribute.");
-        br.addItem("Advice");
-        br.addElement("An element map requires 'code' attribute like this:");
-        br.addElement("  (o): map:{table=MEMBER_STATUS; code=MEMBER_STATUS_CODE; ...}");
-        br.addItem("Classification");
-        br.addElement(_classificationName);
-        if (_table != null) {
-            br.addItem("Table");
-            br.addElement(_table);
-        }
-        br.addItem("ElementMap");
-        br.addElement(elementMap);
-        final String msg = br.buildExceptionMessage();
-        throw new DfClassificationRequiredAttributeNotFoundException(msg);
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
+        _code = acceptor.acceptCode();
+        _name = acceptor.acceptName(_code); // same as code if null (not required)
+        _alias = acceptor.acceptAlias(_name); // same as name if null (not required)
+        _comment = acceptor.acceptComment(); // null allowed (not required)
+        _sisters = acceptor.acceptSisters(); // not null, empty allowed (not required)
+        _subItemMap = acceptor.acceptSubItemMap(); // not null, empty allowed (not required)
     }
 
     // ===================================================================================
@@ -137,11 +86,11 @@ public class DfClassificationElement { // directly used in template
         return Srl.is_NotNull_and_NotTrimmedEmpty(_alias);
     }
 
-    public boolean hasComment() {
+    public boolean hasComment() { // means plain comment
         return Srl.is_NotNull_and_NotTrimmedEmpty(_comment);
     }
 
-    public boolean hasCommentDisp() {
+    public boolean hasCommentDisp() { // e.g. with deprecated comment
         return Srl.is_NotNull_and_NotTrimmedEmpty(getCommentDisp());
     }
 

@@ -331,7 +331,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
     //                                        Process Method
     //                                        --------------
     protected void processClassificationTopFromLiteralIfNeeds(DfClassificationTop classificationTop, Map<?, ?> elementMap) {
-        classificationTop.acceptClassificationTopBasicItemMap(elementMap);
+        classificationTop.acceptBasicItem(elementMap);
         classificationTop.setCheckClassificationCode(isElementMapCheckClassificationCode(elementMap));
         classificationTop.setUndefinedHandlingType(getElementMapUndefinedHandlingType(elementMap));
         classificationTop.setCheckImplicitSet(isElementMapCheckImplicitSet(elementMap));
@@ -362,10 +362,10 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
     protected boolean isElementMapCheckClassificationCode(Map<?, ?> elementMap) {
         final boolean checked = getElementMapUndefinedHandlingType(elementMap).isChecked();
         if (hasElementMapUndefinedHandlingTypeProperty(elementMap)) {
-            return checked;
+            return checked; // e.g. explicitly undefinedHandlingType=[something]
         }
         if (hasElementMapCheckImplicitSetProperty(elementMap) && !isElementMapCheckImplicitSet(elementMap)) {
-            return false;
+            return false; // explicitly isCheckImplicitSet=false
         }
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isSuppressDefaultCheckClassificationCode()) {

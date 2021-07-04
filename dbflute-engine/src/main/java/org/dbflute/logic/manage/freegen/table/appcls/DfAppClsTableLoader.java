@@ -90,7 +90,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             final List<Map<String, Object>> elementMapList = (List<Map<String, Object>>) entry.getValue();
             for (Map<String, Object> elementMap : elementMapList) {
                 if (isElementMapClassificationTop(elementMap)) {
-                    classificationTop.acceptClassificationTopBasicItemMap(elementMap);
+                    classificationTop.acceptBasicItem(elementMap);
 
                     // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeeds()
                     classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
@@ -248,7 +248,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             } else {
                 final List<DfClassificationElement> dbElementList = dbClsTop.getClassificationElementList();
                 classificationTop.addClassificationElementAll(dbElementList);
-                classificationTop.acceptGroupList(dbClsTop.getGroupList());
+                classificationTop.acceptOutsideGrouping(dbClsTop.getGroupList());
             }
         }
     }

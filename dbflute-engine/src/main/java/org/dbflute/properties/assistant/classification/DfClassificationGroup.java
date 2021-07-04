@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.properties.assistant.classification.top.group.DfClsGroupCodingExpression;
-import org.dbflute.properties.assistant.classification.top.group.DfClsGroupDocumentExpression;
-import org.dbflute.properties.assistant.classification.top.group.DfClsGroupElementHandling;
-import org.dbflute.properties.assistant.classification.top.group.DfClsGroupGroupCommentDisp;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupCodingExpression;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupCommentDisp;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupDocumentExpression;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsGroupElementHandling;
 import org.dbflute.util.Srl;
 
 /**
@@ -77,8 +77,8 @@ public class DfClassificationGroup { // directly used in template
         return createClsGroupGroupCommentDisp().getGroupCommentDisp();
     }
 
-    protected DfClsGroupGroupCommentDisp createClsGroupGroupCommentDisp() {
-        return new DfClsGroupGroupCommentDisp(_groupComment);
+    protected DfClsGroupCommentDisp createClsGroupGroupCommentDisp() {
+        return new DfClsGroupCommentDisp(_groupComment);
     }
 
     // ===================================================================================

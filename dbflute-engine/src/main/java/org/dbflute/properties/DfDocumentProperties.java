@@ -196,50 +196,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // ===================================================================================
-    //                                                                       Escape Facade
-    //                                                                       =============
-    // these are facade as utilities (for compatible)
-    // -----------------------------------------------------
-    //                                            SchemaHTML
-    //                                            ----------
-    public String resolveSchemaHtmlContent(String text) {
-        return _documentTextResolver.resolveSchemaHtmlContent(text);
-    }
-
-    public String resolveSchemaHtmlPreText(String text) {
-        return _documentTextResolver.resolveSchemaHtmlPreText(text);
-    }
-
-    public String resolveSchemaHtmlTagAttr(String text) {
-        return _documentTextResolver.resolveSchemaHtmlTagAttr(text);
-    }
-
-    // -----------------------------------------------------
-    //                                               JavaDoc
-    //                                               -------
-    public String resolveJavaDocContent(String comment, String indent) {
-        return _documentTextResolver.resolveJavaDocContent(comment, indent);
-    }
-
-    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
-        return _documentTextResolver.resolveJavaDocContentIndentDirectly(comment, indent);
-    }
-
-    // -----------------------------------------------------
-    //                                               JavaDoc
-    //                                               -------
-    public String resolveSimpleLineHtmlContent(String text) {
-        return _documentTextResolver.resolveSimpleLineHtmlContent(text);
-    }
-
-    // -----------------------------------------------------
-    //                                           DBMeta code
-    //                                           -----------
-    public String resolveDBMetaCodeSettingText(String text) { // C# same as Java
-        return _documentTextResolver.resolveDBMetaCodeSettingText(text);
-    }
-
-    // ===================================================================================
     //                                                                          SchemaHtml
     //                                                                          ==========
     public String getSchemaHtmlFileName(String projectName) {
@@ -1302,6 +1258,51 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected String getPropertiesHtmlJavaScript() { // closet
         return getPropertiesHtmlHeaderJavaScript();
+    }
+
+    // ===================================================================================
+    //                                                                       Escape Facade
+    //                                                                       =============
+    // these are facade as utilities (for compatible)
+    // #hope jflute move Escape Facade to formal class (2021/07/04)
+    // -----------------------------------------------------
+    //                                               JavaDoc
+    //                                               -------
+    public String resolveJavaDocContent(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocContent(comment, indent);
+    }
+
+    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocContentIndentDirectly(comment, indent);
+    }
+
+    // -----------------------------------------------------
+    //                                            SchemaHTML
+    //                                            ----------
+    public String resolveSchemaHtmlContent(String text) {
+        return _documentTextResolver.resolveSchemaHtmlContent(text);
+    }
+
+    public String resolveSchemaHtmlPreText(String text) {
+        return _documentTextResolver.resolveSchemaHtmlPreText(text);
+    }
+
+    public String resolveSchemaHtmlTagAttr(String text) {
+        return _documentTextResolver.resolveSchemaHtmlTagAttr(text);
+    }
+
+    // -----------------------------------------------------
+    //                                      Simple Line HTML
+    //                                      ----------------
+    public String resolveSimpleLineHtmlContent(String text) {
+        return _documentTextResolver.resolveSimpleLineHtmlContent(text);
+    }
+
+    // -----------------------------------------------------
+    //                                           DBMeta code
+    //                                           -----------
+    public String resolveDBMetaCodeSettingText(String text) { // C# same as Java
+        return _documentTextResolver.resolveDBMetaCodeSettingText(text);
     }
 
     // ===================================================================================
