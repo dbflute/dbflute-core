@@ -15,7 +15,7 @@
  */
 package org.dbflute.logic.doc.arrqy;
 
-import org.dbflute.logic.doc.supplement.escape.DfDocumentTextResolver;
+import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 
 /**
  * @author jflute

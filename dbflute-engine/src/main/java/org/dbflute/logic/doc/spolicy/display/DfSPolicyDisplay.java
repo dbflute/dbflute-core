@@ -16,7 +16,7 @@
 package org.dbflute.logic.doc.spolicy.display;
 
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
-import org.dbflute.logic.doc.supplement.escape.DfDocumentTextResolver;
+import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 
 /**
  * @author jflute

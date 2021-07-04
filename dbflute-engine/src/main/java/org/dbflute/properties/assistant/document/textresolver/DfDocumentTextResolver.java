@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.supplement.escape;
+package org.dbflute.properties.assistant.document.textresolver;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
