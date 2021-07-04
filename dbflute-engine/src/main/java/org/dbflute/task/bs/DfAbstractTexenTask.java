@@ -41,7 +41,6 @@ import org.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.dbflute.logic.DfDBFluteTaskUtil;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
@@ -53,6 +52,7 @@ import org.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.dbflute.task.bs.assistant.DfTaskControlLogic;
 import org.dbflute.task.bs.assistant.DfTaskDatabaseResource;
+import org.dbflute.task.util.DfDBFluteTaskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
