@@ -31,8 +31,8 @@ public class DfClsTopBasicItemAcceptor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _classificationName;
-    protected final Map<?, ?> _topElementMap;
+    protected final String _classificationName; // not null
+    protected final Map<?, ?> _topElementMap; // not null, topComment key existence already checked here
 
     // ===================================================================================
     //                                                                         Constructor
@@ -47,7 +47,10 @@ public class DfClsTopBasicItemAcceptor {
     //                                                                         ===========
     public String acceptTopComment() { // not null
         final String topComment = (String) _topElementMap.get(DfClassificationTop.KEY_TOP_COMMENT);
-        if (topComment == null) {
+
+        // always not null because the key existence already checked here (but just in case)
+        // so this exception is only for empty value
+        if (topComment == null || topComment.trim().isEmpty()) { // e.g. topComment=[empty]
             throwClassificationLiteralCommentNotFoundException();
         }
         return topComment;
@@ -55,9 +58,13 @@ public class DfClsTopBasicItemAcceptor {
 
     protected void throwClassificationLiteralCommentNotFoundException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The comment attribute of the classification was not found.");
+        br.addNotice("The required topComment value is empty.");
         br.addItem("Advice");
-        br.addElement("The classification should have the comment attribute.");
+        br.addElement("The classification should have the topComment value.");
+        br.addElement("For example:");
+        br.addElement("  (x): topComment= // *Bad: empty");
+        br.addElement("  (o): topComment=sea is blue... // Good");
+        br.addElement("");
         br.addElement("See the document for the DBFlute property.");
         br.addItem("Classification");
         br.addElement(_classificationName);

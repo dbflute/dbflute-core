@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.junit.Assert;
@@ -160,13 +159,13 @@ public class DfClassificationPropertiesTest {
         final Map<String, String> elementMap = new HashMap<String, String>();
 
         // ## Act & Assert ##
-        assertFalse(prop.isElementMapSuppressAutoDeploy(elementMap));
+        assertFalse(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
         elementMap.put("suppressAutoDeploy", "false");
-        assertFalse(prop.isElementMapSuppressAutoDeploy(elementMap));
+        assertFalse(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
         elementMap.put("suppressAutoDeploy", "true");
-        assertTrue(prop.isElementMapSuppressAutoDeploy(elementMap));
+        assertTrue(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
         elementMap.put("suppressAutoDeploy", "True");
-        assertTrue(prop.isElementMapSuppressAutoDeploy(elementMap));
+        assertTrue(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
     }
 
     protected DfClassificationProperties createClassificationProperties(Map<String, Map<String, String>> deploymentMap) {

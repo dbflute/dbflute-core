@@ -55,9 +55,9 @@ public class DfClassificationTop { // directly used in template
     public static final String KEY_UNDEFINED_HANDLING_TYPE = "undefinedHandlingType"; // related to checkClassificationCode
     public static final String KEY_MAKE_NATIVE_TYPE_SETTER = "isMakeNativeTypeSetter"; // related to forceClassificationSetting
 
-    // mapping settings
-    public static final String KEY_GROUPING_MAP = "groupingMap";
-    public static final String KEY_DEPRECATED_MAP = "deprecatedMap";
+    // (elements) mapping settings
+    public static final String KEY_GROUPING_MAP = "groupingMap"; // grouping elements
+    public static final String KEY_DEPRECATED_MAP = "deprecatedMap"; // deprecated elements
 
     // primitive control, closet
     public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet"; // old style, for compatibility
@@ -67,7 +67,7 @@ public class DfClassificationTop { // directly used in template
     public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
     public static final String KEY_SUPPRESS_DBACCESS_CLASS = "isSuppressDBAccessClass";
     public static final String KEY_SUPPRESS_NAME_CAMELIZING = "isSuppressNameCamelizing";
-    public static final String KEY_DEPRECATED = "isDeprecated";
+    public static final String KEY_DEPRECATED = "isDeprecated"; // deprecated option for classification itsself
 
     // ===================================================================================
     //                                                                           Attribute
@@ -101,10 +101,10 @@ public class DfClassificationTop { // directly used in template
     // -----------------------------------------------------
     //                                        Mapping Option
     //                                        --------------
-    // getGroupList() is used in template instead of this plain map
+    // means grouping elements, getGroupList() is used in template instead of this plain map
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
 
-    // used in classification element object, this is plain map
+    // means deprecated elements, used in classification element object, this is plain map
     protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
 
     // -----------------------------------------------------
@@ -123,7 +123,7 @@ public class DfClassificationTop { // directly used in template
     protected boolean _suppressAutoDeploy; // no automatic classification deployment
     protected boolean _suppressDBAccessClass; // no DB-access class (e.g. behavior) for table classification
     protected boolean _suppressNameCamelizing; // use plain name, to avoid Japanese and English headache 
-    protected boolean _deprecated;
+    protected boolean _deprecated; // deprecated option for classification itsself
 
     // -----------------------------------------------------
     //                               Manually-Related Column
