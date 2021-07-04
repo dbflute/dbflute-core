@@ -29,7 +29,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
  */
-public class DfClassificationLiteralArranger {
+public class DfClsElementLiteralArranger {
 
     public void arrange(String classificationName, Map<String, Object> elementMap) {
         final String codeKey = DfClassificationElement.KEY_CODE;

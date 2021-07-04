@@ -44,7 +44,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.classification.allinone.DfClassificationAllInOneSqlExecutor;
 import org.dbflute.properties.assistant.classification.coins.DfClassificationJavaNameFilter;
 import org.dbflute.properties.assistant.classification.coins.DfClassificationJdbcCloser;
-import org.dbflute.properties.assistant.classification.element.proploading.DfClassificationLiteralArranger;
+import org.dbflute.properties.assistant.classification.element.proploading.DfClsElementLiteralArranger;
 import org.dbflute.properties.assistant.classification.resource.DfClassificationResourceAnalyzer;
 import org.dbflute.properties.assistant.classification.top.proploading.DfClsTopLiteralArranger;
 import org.dbflute.task.DfDBFluteTaskStatus;
@@ -139,7 +139,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
             final String propKey = "torque." + mapName;
             plainDefinitionMap = resolveSplit(mapName, mapProp(propKey, DEFAULT_EMPTY_MAP));
         }
-        final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
+        final DfClsElementLiteralArranger literalArranger = new DfClsElementLiteralArranger();
         String allInOneSql = null;
         Connection conn = null;
         try {
