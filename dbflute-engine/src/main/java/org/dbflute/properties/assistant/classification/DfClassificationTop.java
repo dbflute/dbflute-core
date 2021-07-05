@@ -80,7 +80,10 @@ public class DfClassificationTop { // directly used in template
     // -----------------------------------------------------
     //                                            Basic Item
     //                                            ----------
-    protected String _topComment; // not null after accept (required)
+    // basically not null after accept (required)
+    // but null allowed only when no topElementMap (then cannot use e.g. groupingMap)
+    protected String _topComment;
+
     protected String _codeType = DEFAULT_CODE_TYPE; // not null with default
 
     // -----------------------------------------------------
@@ -143,8 +146,8 @@ public class DfClassificationTop { // directly used in template
     //                                                                              ======
     public void acceptBasicItem(Map<?, ?> topElementMap) {
         final DfClsTopBasicItemAcceptor acceptor = new DfClsTopBasicItemAcceptor(_classificationName, topElementMap);
-        _topComment = acceptor.acceptTopComment();
-        _codeType = acceptor.acceptCodeType(_codeType);
+        _topComment = acceptor.acceptTopComment(); // not null
+        _codeType = acceptor.acceptCodeType(_codeType); // not null with default
     }
 
     // ===================================================================================
@@ -153,7 +156,7 @@ public class DfClassificationTop { // directly used in template
     // -----------------------------------------------------
     //                                           Top Comment
     //                                           -----------
-    public boolean hasTopComment() {
+    public boolean hasTopComment() { // almost true but may be false in rare case (no topElementMap)
         return Srl.is_NotNull_and_NotTrimmedEmpty(_topComment);
     }
 
@@ -169,8 +172,12 @@ public class DfClassificationTop { // directly used in template
         return createClsTopCommentDisp().buildTopCommentForJavaDocNest();
     }
 
-    public String getTopCommentForSchemaHtml() {
+    public String getTopCommentForSchemaHtml() { // used by just SchemaHTML
         return createClsTopCommentDisp().buildTopCommentForSchemaHtml();
+    }
+
+    public String getTopCommentPlainlyForDfpropMap() { // used by e.g. Client NamedCls
+        return createClsTopCommentDisp().buildTopCommentPlainlyForDfpropMap();
     }
 
     protected DfClsTopCommentDisp createClsTopCommentDisp() {
@@ -360,7 +367,7 @@ public class DfClassificationTop { // directly used in template
     //                                        Mapping Option
     //                                        --------------
     protected Map<String, Map<String, Object>> getGroupingMap() { // not public to use resolved group list
-        return _groupingMap;
+        return _groupingMap; // not null
     }
 
     public void putGroupingAll(Map<String, Map<String, Object>> groupingMap) {
@@ -368,7 +375,7 @@ public class DfClassificationTop { // directly used in template
     }
 
     public Map<String, String> getDeprecatedMap() {
-        return _deprecatedMap;
+        return _deprecatedMap; // not null
     }
 
     public void putDeprecatedAll(Map<String, String> deprecatedMap) {

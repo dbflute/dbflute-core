@@ -15,6 +15,11 @@
  */
 package org.dbflute.properties.assistant.classification.element.attribute;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.dbflute.helper.dfmap.DfMapStyle;
+
 /**
  * @author jflute
  * @since 1.2.5 split from DfClassificationElement (2021/07/03 Saturday at roppongi japanese)
@@ -41,5 +46,17 @@ public class DfClsElementSisterCodeExp {
             ++index;
         }
         return sb.toString();
+    }
+
+    public String buildSisterCodeExpForDfpropMap() { // e.g. "sea, land"
+        final String listPrefix = DfMapStyle.LIST_PREFIX;
+        final String beginBrace = DfMapStyle.BEGIN_BRACE;
+        final String endBrace = DfMapStyle.END_BRACE;
+        final String delimiter = DfMapStyle.ELEMENT_DELIMITER;
+        if (_sisters == null || _sisters.length == 0) {
+            return listPrefix + beginBrace + endBrace;
+        }
+        final String contentExp = Stream.of(_sisters).collect(Collectors.joining(" " + delimiter + " "));
+        return listPrefix + beginBrace + contentExp + endBrace;
     }
 }

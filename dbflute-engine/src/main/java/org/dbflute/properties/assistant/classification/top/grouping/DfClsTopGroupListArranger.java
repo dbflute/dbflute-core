@@ -59,7 +59,10 @@ public class DfClsTopGroupListArranger {
         for (Entry<String, Map<String, Object>> entry : _groupingMap.entrySet()) {
             final String groupName = entry.getKey();
             final Map<String, Object> attrMap = entry.getValue();
+
+            // #for_now jflute not required for a long time but required better? (2021/07/05)
             final String groupComment = (String) attrMap.get("groupComment");
+
             @SuppressWarnings("unchecked")
             final List<String> elementList = (List<String>) attrMap.get("elementList");
             if (elementList == null) {

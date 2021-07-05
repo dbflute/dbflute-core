@@ -80,7 +80,7 @@ public class DfClassificationElement { // directly used in template
     }
 
     // ===================================================================================
-    //                                                                       Alias/Comment
+    //                                                                       Determination
     //                                                                       =============
     public boolean hasAlias() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_alias);
@@ -94,9 +94,18 @@ public class DfClassificationElement { // directly used in template
         return Srl.is_NotNull_and_NotTrimmedEmpty(getCommentDisp());
     }
 
+    public boolean hasSiserCode() {
+        return _sisters != null && _sisters.length >= 1;
+    }
+
+    public boolean hasSubItem() {
+        return _subItemMap != null && !_subItemMap.isEmpty();
+    }
+
     // ===================================================================================
     //                                                                    Basic Expression
     //                                                                    ================
+    // #hope jflute resolve "get" or "build" problem of methods for template (2021/07/05)
     // -----------------------------------------------------
     //                                           Sister Code
     //                                           -----------
@@ -104,11 +113,19 @@ public class DfClassificationElement { // directly used in template
         return new DfClsElementSisterCodeExp(_sisters).buildSisterCodeExpForSchemaHtml();
     }
 
+    public String buildSisterCodeExpForDfpropMap() { // e.g. list:{ sea ; land }
+        return new DfClsElementSisterCodeExp(_sisters).buildSisterCodeExpForDfpropMap();
+    }
+
     // -----------------------------------------------------
     //                                           SubItem Map
     //                                           -----------
-    public String buildSubItemExpForSchemaHtml() { // key-value expression
+    public String buildSubItemExpForSchemaHtml() { // key-value expression for HTML display
         return new DfClsElementSubItemExp(_subItemMap).buildSubItemExpForSchemaHtml();
+    }
+
+    public String buildSubItemExpForDfpropMap() { // e.g. map:{ order=1 ; desc=... }
+        return new DfClsElementSubItemExp(_subItemMap).buildSubItemExpForDfpropMap();
     }
 
     // -----------------------------------------------------
@@ -192,6 +209,10 @@ public class DfClassificationElement { // directly used in template
 
     public String getCommentForSchemaHtml() { // used by just SchemaHTML
         return createClsElementCommentDisp().buildCommentForSchemaHtml();
+    }
+
+    public String getCommentPlainlyForDfpropMap() { // used by e.g. Client NamedCls
+        return createClsElementCommentDisp().buildCommentPlainlyForDfpropMap();
     }
 
     // ===================================================================================

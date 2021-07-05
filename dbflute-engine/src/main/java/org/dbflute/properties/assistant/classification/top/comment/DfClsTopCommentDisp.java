@@ -15,8 +15,7 @@
  */
 package org.dbflute.properties.assistant.classification.top.comment;
 
-import org.dbflute.DfBuildProperties;
-import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.Srl;
 
 /**
@@ -30,6 +29,8 @@ public class DfClsTopCommentDisp {
     //                                                                           =========
     protected final String _topComment; // not null (required)
     protected final boolean _useDocumentOnly;
+
+    protected final DfDocumentTextResolver _documentTextResolver = new DfDocumentTextResolver();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -71,28 +72,20 @@ public class DfClsTopCommentDisp {
     }
 
     protected String doBuildTopCommentForJavaDoc(String indent) {
-        return resolveTextForJavaDoc(buildTopCommentDisp(), indent);
+        return _documentTextResolver.resolveJavaDocContent(buildTopCommentDisp(), indent);
     }
 
     // ===================================================================================
     //                                                                      for SchemaHtml
     //                                                                      ==============
     public String buildTopCommentForSchemaHtml() {
-        return resolveTextForSchemaHtml(buildTopCommentDisp());
+        return _documentTextResolver.resolveSchemaHtmlContent(buildTopCommentDisp());
     }
 
     // ===================================================================================
-    //                                                                         Escape Text
-    //                                                                         ===========
-    protected String resolveTextForJavaDoc(String comment, String indent) {
-        return getDocumentProperties().resolveJavaDocContent(comment, indent);
-    }
-
-    protected String resolveTextForSchemaHtml(String comment) {
-        return getDocumentProperties().resolveSchemaHtmlContent(comment);
-    }
-
-    protected DfDocumentProperties getDocumentProperties() {
-        return DfBuildProperties.getInstance().getDocumentProperties();
+    //                                                                          for dfprop
+    //                                                                          ==========
+    public String buildTopCommentPlainlyForDfpropMap() {
+        return _documentTextResolver.resolveDfpropMapContent(_topComment != null ? _topComment : "");
     }
 }

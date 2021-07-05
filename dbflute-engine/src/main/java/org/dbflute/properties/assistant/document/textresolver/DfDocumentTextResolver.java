@@ -16,6 +16,7 @@
 package org.dbflute.properties.assistant.document.textresolver;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.Srl;
@@ -32,6 +33,42 @@ public class DfDocumentTextResolver {
     // here fixed line separator (simplified)
     protected static final String BASIC_LINE_SEPARATOR = "\n";
     protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
+
+    // ===================================================================================
+    //                                                                             JavaDoc
+    //                                                                             =======
+    public String resolveJavaDocContent(String comment, String indent) {
+        return doResolveJavaDocContent(comment, indent, false);
+    }
+
+    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
+        return doResolveJavaDocContent(comment, indent, true);
+    }
+
+    protected String doResolveJavaDocContent(String comment, String indent, boolean directIndent) {
+        if (comment == null || comment.trim().length() == 0) {
+            return null;
+        }
+        String work = comment;
+        final DfBasicProperties basicProp = getBasicProperties();
+        final DfLanguageGrammar grammar = basicProp.getLanguageDependency().getLanguageGrammar();
+        work = grammar.escapeJavaDocString(work);
+        work = removeCR(work);
+        final String sourceCodeLineSeparator = basicProp.getSourceCodeLineSeparator();
+        final String javaDocLineSeparator;
+        if (directIndent) {
+            javaDocLineSeparator = grammar.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, indent);
+        } else {
+            javaDocLineSeparator = grammar.buildJavaDocLineAndIndent(sourceCodeLineSeparator, indent);
+        }
+        if (work.contains(BASIC_LINE_SEPARATOR)) {
+            work = work.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        if (work.contains(SPECIAL_LINE_SEPARATOR)) {
+            work = work.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        return work;
+    }
 
     // ===================================================================================
     //                                                                          SchemaHTML
@@ -90,42 +127,6 @@ public class DfDocumentTextResolver {
     }
 
     // ===================================================================================
-    //                                                                             JavaDoc
-    //                                                                             =======
-    public String resolveJavaDocContent(String comment, String indent) {
-        return doResolveJavaDocContent(comment, indent, false);
-    }
-
-    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
-        return doResolveJavaDocContent(comment, indent, true);
-    }
-
-    protected String doResolveJavaDocContent(String comment, String indent, boolean directIndent) {
-        if (comment == null || comment.trim().length() == 0) {
-            return null;
-        }
-        String work = comment;
-        final DfBasicProperties basicProp = getBasicProperties();
-        final DfLanguageGrammar grammar = basicProp.getLanguageDependency().getLanguageGrammar();
-        work = grammar.escapeJavaDocString(work);
-        work = removeCR(work);
-        final String sourceCodeLineSeparator = basicProp.getSourceCodeLineSeparator();
-        final String javaDocLineSeparator;
-        if (directIndent) {
-            javaDocLineSeparator = grammar.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, indent);
-        } else {
-            javaDocLineSeparator = grammar.buildJavaDocLineAndIndent(sourceCodeLineSeparator, indent);
-        }
-        if (work.contains(BASIC_LINE_SEPARATOR)) {
-            work = work.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
-        }
-        if (work.contains(SPECIAL_LINE_SEPARATOR)) {
-            work = work.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
-        }
-        return work;
-    }
-
-    // ===================================================================================
     //                                                                     SimpleLine HTML
     //                                                                     ===============
     public String resolveSimpleLineHtmlContent(String text) {
@@ -158,6 +159,16 @@ public class DfDocumentTextResolver {
             text = text.replaceAll(SPECIAL_LINE_SEPARATOR, literalLineSeparator);
         }
         return text;
+    }
+
+    // ===================================================================================
+    //                                                                     dfprop Settings
+    //                                                                     ===============
+    public String resolveDfpropMapContent(String text) {
+        if (text == null || text.trim().length() == 0) {
+            return null;
+        }
+        return new DfMapStyle().escapeControlMarkAsMap(text);
     }
 
     // ===================================================================================

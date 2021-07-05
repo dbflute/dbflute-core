@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
 
@@ -55,5 +56,30 @@ public class DfClsElementSubItemExp {
     protected String filterSubItemForSchemaHtml(String str) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         return prop.resolveSchemaHtmlContent(Srl.replace(str, "\\n", "\n"));
+    }
+
+    public String buildSubItemExpForDfpropMap() {
+        final String mapPrefix = DfMapStyle.MAP_PREFIX;
+        final String beginBrace = DfMapStyle.BEGIN_BRACE;
+        final String endBrace = DfMapStyle.END_BRACE;
+        final String delimiter = DfMapStyle.ELEMENT_DELIMITER;
+        final String valueEqual = DfMapStyle.VALUE_EQUAL;
+        if (_subItemMap == null || _subItemMap.isEmpty()) {
+            return mapPrefix + beginBrace + endBrace;
+        }
+        final StringBuilder sb = new StringBuilder();
+        sb.append(mapPrefix).append(beginBrace);
+        int index = 0;
+        for (Entry<String, Object> entry : _subItemMap.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (index > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(key).append(valueEqual).append(value);
+            ++index;
+        }
+        sb.append(endBrace);
+        return sb.toString();
     }
 }

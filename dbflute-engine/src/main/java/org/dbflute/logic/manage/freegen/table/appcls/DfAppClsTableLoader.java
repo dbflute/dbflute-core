@@ -196,7 +196,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             throw new DfIllegalPropertySettingException(msg);
         }
         final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap, resource);
-        return new DfRefClsElement(projectName, refClsName, classificationType, groupName, refType, dbClsTop);
+        return new DfRefClsElement(projectName, refClsName, classificationType, groupName, refType, dbClsTop, resource.getResourceFile());
     }
 
     protected String buildClassificationType(String refClsName) {

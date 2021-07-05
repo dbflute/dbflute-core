@@ -16,6 +16,7 @@
 package org.dbflute.properties.assistant.classification;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -65,16 +66,24 @@ public class DfClassificationGroup { // directly used in template
         return _groupComment != null;
     }
 
+    public String getGroupCommentDisp() { // unused in template (e.g. forJavaDoc used instead) (2021/07/03)
+        return createClsGroupGroupCommentDisp().buildGroupCommentDisp();
+    }
+
     public String getGroupCommentForJavaDoc() {
-        return createClsGroupGroupCommentDisp().getGroupCommentForJavaDoc();
+        return createClsGroupGroupCommentDisp().buildGroupCommentForJavaDoc();
     }
 
     public String getGroupCommentForJavaDocNest() {
-        return createClsGroupGroupCommentDisp().getGroupCommentForJavaDocNest();
+        return createClsGroupGroupCommentDisp().buildGroupCommentForJavaDocNest();
     }
 
-    public String getGroupCommentDisp() { // unused in template (e.g. forJavaDoc used instead) (2021/07/03)
-        return createClsGroupGroupCommentDisp().getGroupCommentDisp();
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // forSchemaHtml is treated as groupTitle
+    // _/_/_/_/_/_/_/_/_/_/
+
+    public String getGroupCommentForDfpropMap() {
+        return createClsGroupGroupCommentDisp().buildGroupCommentForDfpropMap();
     }
 
     protected DfClsTopGroupCommentDisp createClsGroupGroupCommentDisp() {
@@ -117,9 +126,13 @@ public class DfClassificationGroup { // directly used in template
 
     // ===================================================================================
     //                                                             Element Object Handling
-    //                                                             =======-===============
+    //                                                             =======================
     public List<DfClassificationElement> getElementList() {
         return createClsGroupElementHandling().toElementList();
+    }
+
+    public String getElementNameExpForDfpropMap() { // e.g. "Formalized ; Provisional"
+        return getElementList().stream().map(el -> el.getName()).collect(Collectors.joining(" ; "));
     }
 
     protected DfClsTopGroupElementHandling createClsGroupElementHandling() {

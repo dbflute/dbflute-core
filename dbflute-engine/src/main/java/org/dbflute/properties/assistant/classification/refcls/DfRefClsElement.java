@@ -38,18 +38,20 @@ public class DfRefClsElement { // directly used in template
     protected final String _groupName; // null allowed
     protected final DfRefClsRefType _refType; // not null
     protected final DfClassificationTop _dbClsTop; // not null
+    protected final String _resourceFile; // for e.g. exception message, not null
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfRefClsElement(String projectName, String classificationName, String classificationType, String groupName, String refType,
-            DfClassificationTop dbClsTop) {
+            DfClassificationTop dbClsTop, String resourceFile) {
         _projectName = projectName;
         _classificationName = classificationName;
         _classificationType = classificationType;
         _groupName = groupName;
         _refType = new DfRefClsRefType(refType);
         _dbClsTop = dbClsTop;
+        _resourceFile = resourceFile;
     }
 
     // ===================================================================================
@@ -79,7 +81,7 @@ public class DfRefClsElement { // directly used in template
     }
 
     protected DfRefClsRefTypeVerifier createRefClsRefTypeVerifier() {
-        return new DfRefClsRefTypeVerifier(_refType, _dbClsTop);
+        return new DfRefClsRefTypeVerifier(_refType, _dbClsTop, _resourceFile);
     }
 
     // ===================================================================================

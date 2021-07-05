@@ -43,6 +43,7 @@ public class DfClsElementDeprecatedHandling {
         if (!isDeprecated()) {
             return "";
         }
+        // #for_now jflute needs to escape for e.g. JavaDoc, SchemaHTML? (2021/07/05)
         final String comment = _name != null ? _classificationTop.getDeprecatedMap().get(_name) : null;
         return comment != null ? removeLineSeparator(comment) : "";
     }

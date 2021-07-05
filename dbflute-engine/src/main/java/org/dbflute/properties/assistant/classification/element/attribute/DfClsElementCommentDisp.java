@@ -15,8 +15,7 @@
  */
 package org.dbflute.properties.assistant.classification.element.attribute;
 
-import org.dbflute.DfBuildProperties;
-import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.Srl;
 
 /**
@@ -30,6 +29,8 @@ public class DfClsElementCommentDisp {
     //                                                                           =========
     protected final String _comment; // null allowed
     protected final String _deprecatedComment; // not null, empty allowed
+
+    protected final DfDocumentTextResolver _documentTextResolver = new DfDocumentTextResolver();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -67,28 +68,20 @@ public class DfClsElementCommentDisp {
     }
 
     protected String doBuildCommentForJavaDoc(String indent) {
-        return resolveTextForJavaDoc(buildCommentDisp(), indent);
+        return _documentTextResolver.resolveJavaDocContent(buildCommentDisp(), indent);
     }
 
     // ===================================================================================
     //                                                                      for SchemaHtml
     //                                                                      ==============
     public String buildCommentForSchemaHtml() {
-        return resolveTextForSchemaHtml(buildCommentDisp());
+        return _documentTextResolver.resolveSchemaHtmlContent(buildCommentDisp());
     }
 
     // ===================================================================================
-    //                                                                         Escape Text
-    //                                                                         ===========
-    protected String resolveTextForJavaDoc(String comment, String indent) {
-        return getDocumentProperties().resolveJavaDocContent(comment, indent);
-    }
-
-    protected String resolveTextForSchemaHtml(String comment) {
-        return getDocumentProperties().resolveSchemaHtmlContent(comment);
-    }
-
-    protected DfDocumentProperties getDocumentProperties() {
-        return DfBuildProperties.getInstance().getDocumentProperties();
+    //                                                                          for dfprop
+    //                                                                          ==========
+    public String buildCommentPlainlyForDfpropMap() {
+        return _documentTextResolver.resolveDfpropMapContent(_comment != null ? _comment : "");
     }
 }

@@ -22,6 +22,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -34,13 +35,15 @@ public class DfRefClsRefTypeVerifier {
     //                                                                           =========
     protected final DfRefClsRefType _refType;
     protected final DfClassificationTop _dbClsTop;
+    protected final String _resourceFile;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop dbClsTop) {
+    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop dbClsTop, String resourceFile) {
         _refType = refType;
         _dbClsTop = dbClsTop;
+        _resourceFile = resourceFile;
     }
 
     // ===================================================================================
@@ -57,6 +60,8 @@ public class DfRefClsRefTypeVerifier {
         br.addElement("  included : DB classification codes are included as app classification");
         br.addElement("  exists   : app classification codes should exist in DB classification");
         br.addElement("  matches  : app classification codes matches with DB classification");
+        br.addItem("dfprop File");
+        br.addElement(_resourceFile);
         br.addItem("AppCls");
         br.addElement(classificationTop.getClassificationName());
         br.addItem("Unknown refType");
@@ -86,27 +91,23 @@ public class DfRefClsRefTypeVerifier {
         }).collect(Collectors.toList());
         if (!nonExistingList.isEmpty()) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Not found the web classification code in the DB classification");
+            br.addNotice("Not found the app classification code in the DB classification");
             br.addItem("Advice");
-            br.addElement("The codes of the web classification should be included");
+            br.addElement("The codes of the app classification should be included");
             br.addElement("in the DB classification because of refType='exists'.");
             br.addElement("For example:");
-            br.addElement("  (x): web(A), db(B, C)");
-            br.addElement("  (x): web(A, B), db(A, C)");
-            br.addElement("  (x): web(A, B, C), db(A, B)");
-            br.addElement("  (o): web(A), db(A, B)");
-            br.addElement("  (o): web(A, B), db(A, B, C)");
-            br.addElement("  (o): web(A, B, C), db(A, B, C)");
-            br.addItem("WebCls");
-            final String webCodes = classificationTop.getClassificationElementList().stream().map(element -> {
-                return element.getCode();
-            }).collect(Collectors.joining(", "));
-            br.addElement(classificationTop.getClassificationName() + ": " + webCodes);
+            br.addElement("  (x): app(A), db(B, C)");
+            br.addElement("  (x): app(A, B), db(A, C)");
+            br.addElement("  (x): app(A, B, C), db(A, B)");
+            br.addElement("  (o): app(A), db(A, B)");
+            br.addElement("  (o): app(A, B), db(A, B, C)");
+            br.addElement("  (o): app(A, B, C), db(A, B, C)");
+            br.addItem("dfprop File");
+            br.addElement(_resourceFile);
+            br.addItem("AppCls");
+            br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(classificationTop));
             br.addItem("DBCls");
-            final String dbCodes = _dbClsTop.getClassificationElementList().stream().map(element -> {
-                return element.getCode();
-            }).collect(Collectors.joining(", "));
-            br.addElement(_dbClsTop.getClassificationName() + ": " + dbCodes);
+            br.addElement(_dbClsTop.getClassificationName() + ": " + buildClsCodesExp(_dbClsTop));
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Non-Existing Code");
@@ -137,16 +138,12 @@ public class DfRefClsRefTypeVerifier {
             br.addElement("  (x): web(A, B), db(A, C)");
             br.addElement("  (o): web(A, B), db(A, B)");
             br.addElement("  (o): web(A, B, C), db(A, B, C)");
-            br.addItem("WebCls");
-            final String webCodes = classificationTop.getClassificationElementList().stream().map(element -> {
-                return element.getCode();
-            }).collect(Collectors.joining(", "));
-            br.addElement(classificationTop.getClassificationName() + ": " + webCodes);
+            br.addItem("dfprop File");
+            br.addElement(_resourceFile);
+            br.addItem("AppCls");
+            br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(classificationTop));
             br.addItem("DBCls");
-            final String dbCodes = _dbClsTop.getClassificationElementList().stream().map(element -> {
-                return element.getCode();
-            }).collect(Collectors.joining(", "));
-            br.addElement(_dbClsTop.getClassificationName() + ": " + dbCodes);
+            br.addElement(_dbClsTop.getClassificationName() + ": " + buildClsCodesExp(_dbClsTop));
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Code Count");
@@ -154,5 +151,12 @@ public class DfRefClsRefTypeVerifier {
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
+    }
+
+    protected String buildClsCodesExp(DfClassificationTop top) {
+        final String dbCodes = top.getClassificationElementList().stream().map(element -> {
+            return element.getCode();
+        }).collect(Collectors.joining(", "));
+        return Srl.is_NotNull_and_NotTrimmedEmpty(dbCodes) ? dbCodes : "(no elements)";
     }
 }

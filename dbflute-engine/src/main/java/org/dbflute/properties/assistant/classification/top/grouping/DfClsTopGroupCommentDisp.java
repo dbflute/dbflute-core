@@ -15,8 +15,7 @@
  */
 package org.dbflute.properties.assistant.classification.top.grouping;
 
-import org.dbflute.DfBuildProperties;
-import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.Srl;
 
 /**
@@ -30,6 +29,8 @@ public class DfClsTopGroupCommentDisp {
     //                                                                           =========
     protected final String _groupComment; // null allowed (not required)
 
+    protected final DfDocumentTextResolver _documentTextResolver = new DfDocumentTextResolver();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -38,25 +39,13 @@ public class DfClsTopGroupCommentDisp {
     }
 
     // ===================================================================================
-    //                                                                       Group Comment
-    //                                                                       =============
-    public String getGroupCommentForJavaDoc() {
-        return buildGroupCommentForJavaDoc("    ");
+    //                                                                     Comment Display
+    //                                                                     ===============
+    public String buildGroupCommentDisp() {
+        return doBuildGroupCommentDisp();
     }
 
-    public String getGroupCommentForJavaDocNest() {
-        return buildGroupCommentForJavaDoc("        ");
-    }
-
-    protected String buildGroupCommentForJavaDoc(String indent) {
-        return resolveTextForJavaDoc(getGroupCommentDisp(), indent);
-    }
-
-    public String getGroupCommentDisp() {
-        return buildGroupCommentDisp();
-    }
-
-    protected String buildGroupCommentDisp() {
+    protected String doBuildGroupCommentDisp() {
         if (_groupComment == null) {
             return "";
         }
@@ -64,13 +53,24 @@ public class DfClsTopGroupCommentDisp {
     }
 
     // ===================================================================================
-    //                                                                         Escape Text
+    //                                                                         for JavaDoc
     //                                                                         ===========
-    protected String resolveTextForJavaDoc(String comment, String indent) {
-        return getDocumentProperties().resolveJavaDocContent(comment, indent);
+    public String buildGroupCommentForJavaDoc() {
+        return doBuildGroupCommentForJavaDoc("    ");
     }
 
-    protected DfDocumentProperties getDocumentProperties() {
-        return DfBuildProperties.getInstance().getDocumentProperties();
+    public String buildGroupCommentForJavaDocNest() {
+        return doBuildGroupCommentForJavaDoc("        ");
+    }
+
+    protected String doBuildGroupCommentForJavaDoc(String indent) {
+        return _documentTextResolver.resolveJavaDocContent(buildGroupCommentDisp(), indent);
+    }
+
+    // ===================================================================================
+    //                                                                          for dfprop
+    //                                                                          ==========
+    public String buildGroupCommentForDfpropMap() {
+        return _documentTextResolver.resolveDfpropMapContent(buildGroupCommentDisp());
     }
 }
