@@ -564,6 +564,7 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("optionMap", optionMap);
         optionMap.put("clsDomain", "app");
         optionMap.put("clsTitle", "application"); // same as old javadoc
+        optionMap.put("clsTheme", clsTheme);
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
     }
@@ -593,6 +594,7 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("optionMap", optionMap);
         optionMap.put("clsDomain", "web");
         optionMap.put("clsTitle", "web");
+        optionMap.put("clsTheme", clsTheme);
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
     }
@@ -647,6 +649,7 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("optionMap", optionMap);
         optionMap.put("clsDomain", clsDomain);
         optionMap.put("clsTitle", clsDomain); // same as domain
+        optionMap.put("clsTheme", clsTheme);
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
     }

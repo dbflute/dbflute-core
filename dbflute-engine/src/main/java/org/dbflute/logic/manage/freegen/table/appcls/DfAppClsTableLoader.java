@@ -67,14 +67,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final String resourceFile = resource.getResourceFile();
-        final Map<String, Object> appClsMap;
-        try {
-            appClsMap = new DfMapFile().readMap(new FileInputStream(resourceFile));
-        } catch (FileNotFoundException e) {
-            throw new DfIllegalPropertySettingException("Not found the dfprop file: " + resourceFile, e);
-        } catch (IOException e) {
-            throw new DfIllegalPropertySettingException("Cannot read the the dfprop file: " + resourceFile, e);
-        }
+        final Map<String, Object> appClsMap = readAppClsMap(resourceFile);
         Map<String, DfClassificationTop> dbClsMap = null; // lazy load because it might be unused
         boolean hasRefCls = false;
         final DfClassificationProperties clsProp = getClassificationProperties();
@@ -88,7 +81,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             @SuppressWarnings("unchecked")
             final List<Map<String, Object>> elementMapList = (List<Map<String, Object>>) entry.getValue();
             for (Map<String, Object> elementMap : elementMapList) {
-                if (isElementMapClassificationTop(elementMap)) {
+                if (isElementMapTop(elementMap)) {
                     // e.g. map:{ topComment=... ; codeType=String }
                     classificationTop.acceptBasicItem(elementMap);
                     classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
@@ -101,6 +94,8 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                             dbClsMap = clsProp.getClassificationTopMap(); // lazy load
                         }
                         refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap, resource);
+                        refClsElement.verifyFormalRefType(classificationTop);
+                        classificationTop.addRefClsElement(refClsElement);
                         includeRefClsElement(classificationTop, refClsElement);
                     } else {
                         // e.g. map:{ code=FML ; name=OneMan ; alias=ShowBase ; comment=Formalized }
@@ -119,23 +114,51 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             }
         }
         final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls");
-        optionMap.put("clsTheme", clsTheme);
-        optionMap.put("classificationTopList", topList);
-        optionMap.put("classificationNameList", topList.stream().map(top -> {
-            return top.getClassificationName();
-        }).collect(Collectors.toList()));
-        optionMap.put("hasRefCls", hasRefCls);
-        optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
+        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls"); // basically exists
+        setupOptionMap(optionMap, topList, hasRefCls, clsTheme);
 
+        // @since 1.2.5
         stopRedundantCommentIfNeeds(requestName, resourceFile, topList, optionMap);
 
         // #for_now can be flexible? (table name is unused?)
         return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList());
     }
 
-    protected boolean isElementMapClassificationTop(Map<String, Object> elementMap) {
+    // -----------------------------------------------------
+    //                                              Read Map
+    //                                              --------
+    protected Map<String, Object> readAppClsMap(String resourceFile) {
+        final Map<String, Object> appClsMap;
+        try {
+            appClsMap = new DfMapFile().readMap(new FileInputStream(resourceFile));
+        } catch (FileNotFoundException e) {
+            throw new DfIllegalPropertySettingException("Not found the dfprop file: " + resourceFile, e);
+        } catch (IOException e) {
+            throw new DfIllegalPropertySettingException("Cannot read the the dfprop file: " + resourceFile, e);
+        }
+        return appClsMap;
+    }
+
+    // -----------------------------------------------------
+    //                                      Element Map Type
+    //                                      ----------------
+    protected boolean isElementMapTop(Map<String, Object> elementMap) {
         return elementMap.get(DfClassificationTop.KEY_TOP_COMMENT) != null;
+    }
+
+    protected boolean isElementMapRefCls(Map<String, Object> elementMap) {
+        return elementMap.get(DfRefClsElement.KEY_REFCLS) != null;
+    }
+
+    // -----------------------------------------------------
+    //                                            Option Map
+    //                                            ----------
+    protected void setupOptionMap(Map<String, Object> optionMap, List<DfClassificationTop> topList, boolean hasRefCls, String clsTheme) {
+        optionMap.put("clsTheme", clsTheme); // unused for now (2021/07/07)
+        optionMap.put("classificationTopList", topList);
+        optionMap.put("classificationNameList", topList.stream().map(top -> top.getClassificationName()).collect(Collectors.toList()));
+        optionMap.put("hasRefCls", hasRefCls);
+        optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
     }
 
     // ===================================================================================
@@ -144,10 +167,6 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // -----------------------------------------------------
     //                                        Prepare refCls
     //                                        --------------
-    protected boolean isElementMapRefCls(Map<String, Object> elementMap) {
-        return elementMap.get(DfRefClsElement.KEY_REFCLS) != null;
-    }
-
     protected void assertRefClsOnlyOne(String classificationName, DfRefClsElement refClsElement, Map<String, Object> elementMap,
             DfFreeGenResource resource) {
         if (refClsElement != null) { // only-one refCls is supported #for_now
@@ -239,8 +258,6 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     //                                        Include refCls
     //                                        --------------
     protected void includeRefClsElement(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
-        refClsElement.verifyFormalRefType(classificationTop);
-        classificationTop.addRefClsElement(refClsElement);
         final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
         if (refClsElement.isRefTypeIncluded()) {
             final String groupName = refClsElement.getGroupName();
