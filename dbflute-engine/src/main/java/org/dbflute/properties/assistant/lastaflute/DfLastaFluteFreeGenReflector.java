@@ -163,6 +163,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupWebClsGen(appName, path, lastafluteMap);
                     } else if ("namedcls".equals(freeGen)) {
                         setupNamedClsGen(appName, path, lastafluteMap);
+                    } else if ("clientcls".equals(freeGen)) {
+                        setupClientClsGen(appName, path, lastafluteMap);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -667,6 +669,42 @@ public final class DfLastaFluteFreeGenReflector {
         final String key = "isSuppressRedundantCommentStop";
         final boolean overriddenValue = false; // used in template so you can use boolean directly
         optionMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
+    }
+
+    // -----------------------------------------------------
+    //                                             ClientCls
+    //                                             ---------
+    // @since 1.2.5
+    // cannot use in common, application project only, depending on appcls that is generation resource
+    protected void setupClientClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        registerFreeGen(initCap(appName) + "ClientCls", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        final String clsTheme = "clientcls";
+        final String resourceFile = prepareClientClsResourceFile(appName, lastafluteMap, clsTheme);
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
+        resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("outputDirectory", "./output/shared"); // as default
+        outputMap.put("package", filterOverridden("clientcls", lastafluteMap, appName, clsTheme, "package"));
+        outputMap.put("templateFile", "./shared/LaClientClsDfProp.vm");
+        outputMap.put("className", filterOverridden("clientnamehere_" + appName + "_cls", lastafluteMap, appName, clsTheme, "className"));
+        outputMap.put("fileExt", "dfprop");
+        final Map<String, Object> optionMap = createOptionMap();
+        pathMap.put("optionMap", optionMap);
+        optionMap.put("serverServiceName", appName); // for comment
+        doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+    }
+
+    protected String prepareClientClsResourceFile(String appName, Map<String, Object> lastafluteMap, final String clsTheme) {
+        // #hope jflute also DB cls (action when requested from application) (2021/07/06)
+        final String defaultResourceCls = "appcls"; // as default
+        final String resourceClsTheme = filterOverridden(defaultResourceCls, lastafluteMap, appName, clsTheme, "resourceClsTheme");
+        return "$$baseDir$$/resources/" + appName + "_" + resourceClsTheme + ".dfprop"; // e.g. hangar_appcls.dfprop
     }
 
     // ===================================================================================

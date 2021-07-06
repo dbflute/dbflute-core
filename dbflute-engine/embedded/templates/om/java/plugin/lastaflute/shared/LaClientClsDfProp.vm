@@ -1,0 +1,91 @@
+##
+## Copyright 2014-2021 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+# /---------------------------------------------------------------------------
+# appcls: (NotRequired - Default map:{})
+#
+# The definition of application classification.
+#
+# Specification:
+# map: {
+#     [classification-name] = list:{
+#         ; map:{ topComment=[comment]; codeType=[String(default) or Number or Boolean] }
+#         ; map:{ refCls=[projectName]@[DB classification name] ; refType=[included or exists or matches] }
+#         ; map:{ code=[code]; name=[name]; alias=[alias]; comment=[comment] }
+#     }
+# }
+#
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    # Auto-generated dfprop for classification in client project of ${optionMap.serverServiceName}
+    #
+    # (Don't fix this file manually)
+    #
+#foreach ($classificationTop in $optionMap.classificationTopList)
+#set ($classificationName = $classificationTop.classificationName)
+    # ${classificationName}: ${classificationTop.topCommentDisp}
+#end
+    # _/_/_/_/_/_/_/_/_/_/
+#foreach ($classificationTop in $optionMap.classificationTopList)
+#set ($classificationName = $classificationTop.classificationName)
+    ; ${classificationName} = list:{
+        ; map:{
+#if ($classificationTop.hasTopComment())
+            ; topComment=${classificationTop.topCommentPlainlyForDfpropMap}
+#end
+            ; codeType=${classificationTop.codeType}
+#if ($classificationTop.isDeprecated())
+            ; isDeprecated=true
+#end
+#if ($classificationTop.hasGroup())
+            ; groupingMap = map:{
+#foreach ($group in $classificationTop.groupList)
+                ; ${group.groupName} = map:{
+#if ($classificationTop.hasGroupComment())
+                    groupComment = ${group.groupCommentForDfpropMap}
+#end
+                    elementList = list:{ ${group.elementNameExpForDfpropMap} }
+                }
+#end
+            }
+#end
+#if (!$classificationTop.deprecatedMap.isEmpty())
+            ; deprecatedMap = map:{
+#foreach ($entry in $classificationTop.deprecatedMap.entrySet())
+                ; ${entry.key} = ${entry.value}
+#end
+            }
+#end
+        }
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+        ; map:{
+            ; code=${classificationElement.code} ; name=${classificationElement.name} ; alias=${classificationElement.alias}
+#if ($classificationElement.hasComment())
+            ; comment=${classificationElement.commentPlainlyForDfpropMap}
+#end
+#if ($classificationElement.hasSiserCode())
+            ; sisterCode=${classificationElement.buildSisterCodeExpForDfpropMap()}
+#end
+#if ($classificationElement.hasSubItem())
+            ; subItemMap=${classificationElement.buildSubItemExpForDfpropMap()}
+#end
+        }
+#end
+    }
+#end
+}
+# ----------------/
