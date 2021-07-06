@@ -176,7 +176,7 @@ public class DfClassificationGroup { // directly used in template
     }
 
     public String getGroupComment() {
-        return _groupComment;
+        return _groupComment; // null allowed (not required)
     }
 
     public void setGroupComment(String groupComment) {

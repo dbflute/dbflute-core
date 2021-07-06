@@ -221,7 +221,7 @@ public class DfClsTopLiteralArranger {
     // ===================================================================================
     //                                                                    Mapping Settings
     //                                                                    ================
-    // called by e.g. appcls loader
+    // also called by e.g. appcls loader so public
     public Map<String, Map<String, Object>> getElementMapGroupingMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_GROUPING_MAP);
         if (obj == null) {
@@ -238,8 +238,8 @@ public class DfClsTopLiteralArranger {
             return DfCollectionUtil.emptyMap();
         }
         @SuppressWarnings("unchecked")
-        final Map<String, String> deprecatedList = (Map<String, String>) obj;
-        return deprecatedList;
+        final Map<String, String> deprecatedMap = (Map<String, String>) obj;
+        return deprecatedMap;
     }
 
     // ===================================================================================

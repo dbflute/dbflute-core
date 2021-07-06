@@ -89,20 +89,21 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             final List<Map<String, Object>> elementMapList = (List<Map<String, Object>>) entry.getValue();
             for (Map<String, Object> elementMap : elementMapList) {
                 if (isElementMapClassificationTop(elementMap)) {
+                    // e.g. map:{ topComment=... ; codeType=String }
                     classificationTop.acceptBasicItem(elementMap);
-
-                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeeds()
                     classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
                     classificationTop.putDeprecatedAll(clsProp.getElementMapDeprecatedMap(elementMap));
                 } else {
                     if (isElementMapRefCls(elementMap)) {
+                        // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
                         assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
                         if (dbClsMap == null) {
-                            dbClsMap = clsProp.getClassificationTopMap();
+                            dbClsMap = clsProp.getClassificationTopMap(); // lazy load
                         }
                         refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap, resource);
-                        handleRefCls(classificationTop, refClsElement);
+                        includeRefClsElement(classificationTop, refClsElement);
                     } else {
+                        // e.g. map:{ code=FML ; name=OneMan ; alias=ShowBase ; comment=Formalized }
                         literalArranger.arrange(classificationName, elementMap);
                         final DfClassificationElement element = new DfClassificationElement();
                         element.setClassificationName(classificationName);
@@ -112,6 +113,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 }
             }
             if (refClsElement != null) {
+                inheritRefClsGroup(classificationTop, refClsElement); // should be after all literal evaluation
                 refClsElement.verifyRelationshipByRefTypeIfNeeds(classificationTop);
                 hasRefCls = true;
             }
@@ -139,6 +141,9 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // ===================================================================================
     //                                                                              refCls
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                        Prepare refCls
+    //                                        --------------
     protected boolean isElementMapRefCls(Map<String, Object> elementMap) {
         return elementMap.get(DfRefClsElement.KEY_REFCLS) != null;
     }
@@ -230,26 +235,50 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void handleRefCls(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
+    // -----------------------------------------------------
+    //                                        Include refCls
+    //                                        --------------
+    protected void includeRefClsElement(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
         refClsElement.verifyFormalRefType(classificationTop);
         classificationTop.addRefClsElement(refClsElement);
+        final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
         if (refClsElement.isRefTypeIncluded()) {
-            final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
             final String groupName = refClsElement.getGroupName();
+            final List<DfClassificationElement> dbElementList;
             if (groupName != null) {
-                final DfClassificationGroup group = dbClsTop.getGroupList().stream().filter(gr -> {
-                    return gr.getGroupName().equals(groupName);
-                }).findFirst().orElseThrow(() -> {
-                    String msg = "Not found the group name: " + refClsElement.getClassificationName() + "." + groupName;
-                    return new DfIllegalPropertySettingException(msg);
-                });
-                classificationTop.addClassificationElementAll(group.getElementList());
+                // e.g. map:{ refCls=maihamadb@MemberStatus.serviceAvailable ; refType=included }
+                dbElementList = findDbGroup(refClsElement, dbClsTop, groupName).getElementList();
             } else {
-                final List<DfClassificationElement> dbElementList = dbClsTop.getClassificationElementList();
-                classificationTop.addClassificationElementAll(dbElementList);
-                classificationTop.acceptOutsideGrouping(dbClsTop.getGroupList());
+                // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
+                dbElementList = dbClsTop.getClassificationElementList();
             }
+            classificationTop.addClassificationElementAll(copyElementList(classificationTop, dbElementList));
         }
+        // later, literal elements are not evaluated yet here
+        //classificationTop.inheritRefClsGroup(dbClsTop);
+    }
+
+    protected DfClassificationGroup findDbGroup(DfRefClsElement refClsElement, DfClassificationTop dbClsTop, String groupName) {
+        return dbClsTop.getGroupList().stream().filter(gr -> {
+            return gr.getGroupName().equals(groupName);
+        }).findFirst().orElseThrow(() -> {
+            String msg = "Not found the group name: " + refClsElement.getClassificationName() + "." + groupName;
+            return new DfIllegalPropertySettingException(msg);
+        });
+    }
+
+    protected List<DfClassificationElement> copyElementList(DfClassificationTop classificationTop,
+            List<DfClassificationElement> dbElementList) {
+        return dbElementList.stream().map(el -> el.copyElement(classificationTop)).collect(Collectors.toList());
+    }
+
+    // -----------------------------------------------------
+    //                                  Inherit refCls Group
+    //                                  --------------------
+    protected void inheritRefClsGroup(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
+        // all types are inheritable, considering short grouping elements @since 1.2.5
+        final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
+        classificationTop.inheritRefClsGroup(dbClsTop);
     }
 
     // ===================================================================================

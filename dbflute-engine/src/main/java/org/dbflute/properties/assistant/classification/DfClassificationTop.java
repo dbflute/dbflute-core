@@ -28,6 +28,7 @@ import org.dbflute.properties.assistant.classification.top.deprecated.DfClsTopDe
 import org.dbflute.properties.assistant.classification.top.elementoption.sistercode.DfClsTopSisterCodeHandler;
 import org.dbflute.properties.assistant.classification.top.elementoption.subitem.DfClsTopRegularSubItem;
 import org.dbflute.properties.assistant.classification.top.elementoption.subitem.DfClsTopSubItemHandler;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupInheritanceArranger;
 import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupListArranger;
 import org.dbflute.util.Srl;
 
@@ -267,11 +268,15 @@ public class DfClassificationTop { // directly used in template
     // -----------------------------------------------------
     //                                          Grouping Map
     //                                          ------------
-    protected List<DfClassificationGroup> _cachedGroupList;
-
-    public void acceptOutsideGrouping(List<DfClassificationGroup> groupList) { // for e.g. appcls
-        _cachedGroupList = groupList;
+    public void inheritRefClsGroup(DfClassificationTop referredClsTop) { // for e.g. appcls
+        new DfClsTopGroupInheritanceArranger(this, referredClsTop).inheritRefClsGroup(_groupingMap);
     }
+
+    public boolean isAlreadyGroupArranged() { // for e.g. inheritance process
+        return _cachedGroupList != null; // means already arranged
+    }
+
+    protected List<DfClassificationGroup> _cachedGroupList; // null means before arrangement
 
     public List<DfClassificationGroup> getGroupList() {
         if (_cachedGroupList != null) {

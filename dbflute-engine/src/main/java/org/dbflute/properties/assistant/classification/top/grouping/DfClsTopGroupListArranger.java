@@ -38,6 +38,13 @@ import org.dbflute.util.Srl;
 public class DfClsTopGroupListArranger {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String KEY_GROUP_COMMENT = "groupComment";
+    public static final String KEY_ELEMENT_LIST = "elementList";
+    public static final String KEY_USE_DOCUMENT_ONLY = "isUseDocumentOnly";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final DfClassificationTop _classificationTop; // not null, mutable
@@ -61,15 +68,15 @@ public class DfClsTopGroupListArranger {
             final Map<String, Object> attrMap = entry.getValue();
 
             // #for_now jflute not required for a long time but required better? (2021/07/05)
-            final String groupComment = (String) attrMap.get("groupComment");
+            final String groupComment = (String) attrMap.get(KEY_GROUP_COMMENT);
 
             @SuppressWarnings("unchecked")
-            final List<String> elementList = (List<String>) attrMap.get("elementList");
+            final List<String> elementList = (List<String>) attrMap.get(KEY_ELEMENT_LIST);
             if (elementList == null) {
                 String msg = "The elementList in grouping map is required: " + _classificationTop.getClassificationName();
                 throw new DfClassificationRequiredAttributeNotFoundException(msg);
             }
-            final String docOnly = (String) attrMap.get("isUseDocumentOnly");
+            final String docOnly = (String) attrMap.get(KEY_USE_DOCUMENT_ONLY);
             final DfClassificationGroup group = new DfClassificationGroup(_classificationTop, groupName);
             group.setGroupComment(groupComment);
             group.setElementNameList(elementList);

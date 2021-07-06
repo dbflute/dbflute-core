@@ -80,6 +80,23 @@ public class DfClassificationElement { // directly used in template
     }
 
     // ===================================================================================
+    //                                                                               Copy
+    //                                                                              ======
+    public DfClassificationElement copyElement(DfClassificationTop newTop) { // for e.g. appcls
+        final DfClassificationElement element = new DfClassificationElement();
+        element._classificationName = newTop.getClassificationName();
+        element._classificationTop = newTop;
+        element._table = _table;
+        element._code = _code;
+        element._name = _name;
+        element._alias = _alias;
+        element._comment = _comment;
+        element._sisters = _sisters;
+        element._subItemMap = _subItemMap;
+        return element;
+    }
+
+    // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean hasAlias() {

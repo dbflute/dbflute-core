@@ -95,6 +95,9 @@ public class DfFreeGenInitializer {
             } catch (DfFreeGenCancelException continued) {
                 showCancelledRequest(requestName, continued);
                 continue;
+            } catch (RuntimeException e) {
+                throwFreeGenRequestLoadingFailureException(requestName, resource, tableLoader, e);
+                break; // unreachacle
             }
             request.setMetaData(metaData);
             request.setPackagePathHandler(new DfPackagePathHandler(getBasicProperties()));
@@ -164,7 +167,7 @@ public class DfFreeGenInitializer {
         br.addItem("Resource Type");
         br.addElement(resource.getResourceType());
         final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     protected void showCancelledRequest(final String requestName, DfFreeGenCancelException continued) {
@@ -183,6 +186,20 @@ public class DfFreeGenInitializer {
                 _log.info("          |-" + more.getClass().getSimpleName() + ": " + more.getMessage());
             }
         }
+    }
+
+    protected void throwFreeGenRequestLoadingFailureException(String requestName, DfFreeGenResource resource,
+            DfFreeGenTableLoader tableLoader, RuntimeException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to load the FreeGen request.");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("Resource");
+        br.addElement(resource);
+        br.addItem("Table Loader");
+        br.addElement(tableLoader);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg, e);
     }
 
     // ===================================================================================
