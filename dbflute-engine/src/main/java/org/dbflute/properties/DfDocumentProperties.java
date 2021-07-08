@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -97,7 +98,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                                                    Output Directory
     //                                                                    ================
     public String getDocumentOutputDirectory() {
-        final String defaultValue = "./output/doc";
+        final String defaultValue = DfEngineWorkDir.toPath("./output/doc");
         return getProperty("documentOutputDirectory", defaultValue, getDocumentMap());
     }
 
@@ -472,14 +473,14 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        return getProperty("basicCraftSqlDir", BASIC_CRAFT_DIFF_DIR, getDocumentMap());
+        return getProperty("basicCraftSqlDir", DfEngineWorkDir.toPath(BASIC_CRAFT_DIFF_DIR), getDocumentMap());
     }
 
     public String getCoreCraftMetaDir() {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        final String defaultDir = CORE_CRAFT_META_DIR;
+        final String defaultDir = DfEngineWorkDir.toPath(CORE_CRAFT_META_DIR);
         final String property = getProperty("coreCraftMetaDirPath", defaultDir, getDocumentMap());
         return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
@@ -680,7 +681,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public String getLoadDataReverseSchemaXml() {
         final String projectName = getBasicProperties().getProjectName();
-        return "./schema/lreverse-schema-" + projectName + ".xml";
+        return DfEngineWorkDir.toPath("./schema/lreverse-schema-" + projectName + ".xml");
     }
 
     // -----------------------------------------------------
@@ -883,11 +884,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     public String getSchemaSyncCheckSchemaXml() {
-        return SCHEMA_SYNC_CHECK_SCHEMA_XML;
+        return DfEngineWorkDir.toPath(SCHEMA_SYNC_CHECK_SCHEMA_XML);
     }
 
     public String getSchemaSyncCheckDiffMapFile() {
-        return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
+        return DfEngineWorkDir.toPath(SCHEMA_SYNC_CHECK_DIFF_MAP_FILE);
     }
 
     public boolean isSchemaSyncCheckSuppressCraftDiff() { // closet

@@ -70,6 +70,14 @@ public final class DfBuildProperties {
     /** The version of DBFlute. */
     private Integer _version;
 
+    /**
+     * The work dir of DBFlute Engine. <br>
+     * Basically unused in official DBFlute process. <br>
+     * This is for caller of DBFlute Engine, e.g. outer tools. <br>
+     * (NullAllowed: default value is provided by getter)
+     */
+    private String _workDir;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -332,5 +340,13 @@ public final class DfBuildProperties {
 
     public void setVersion(Integer version) {
         this._version = version;
+    }
+
+    public String getWorkDir() {
+        return _workDir; // null allowed
+    }
+
+    public void setWorkDir(String workDir) {
+        this._workDir = workDir;
     }
 }

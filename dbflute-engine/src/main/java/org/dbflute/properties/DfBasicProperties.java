@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -382,7 +383,7 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
         sb.append("./schema/project-schema-").append(projectName).append(".xml");
-        return sb.toString();
+        return DfEngineWorkDir.toPath(sb.toString());
     }
 
     public String getProejctSchemaXMLEncoding() { // closet
@@ -397,7 +398,7 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
         sb.append("./schema/project-history-").append(projectName).append(".diffmap");
-        return sb.toString();
+        return DfEngineWorkDir.toPath(sb.toString());
     }
 
     // ===================================================================================

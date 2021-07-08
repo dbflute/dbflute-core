@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -156,7 +157,7 @@ public final class DfSimpleDtoProperties extends DfAbstractDBFluteProperties {
         final String baseDir = getBasicProperties().getGenerateOutputDirectory();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
             if (value.startsWith("~/")) {
-                return "./" + Srl.substringFirstRear(value, "~/");
+                return DfEngineWorkDir.toPath("./" + Srl.substringFirstRear(value, "~/"));
             } else {
                 return baseDir + "/" + value;
             }

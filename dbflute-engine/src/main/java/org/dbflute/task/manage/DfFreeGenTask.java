@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -196,7 +197,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                 Application FreeGen
     //                                                                 ===================
     protected void processApplicationFreeGen() {
-        final String freeSpace = "./freegen";
+        final String freeSpace = DfEngineWorkDir.toPath("./freegen");
         try {
             final File freeGenDir = new File(freeSpace);
             if (!freeGenDir.exists()) {

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.properties.assistant.esflute.DfESFluteFreeGenReflector;
 import org.dbflute.properties.assistant.esflute.DfESFluteFreeGenReflector.DfESFluteSupportContainer;
 import org.dbflute.util.Srl;
@@ -82,7 +83,7 @@ public final class DfESFluteProperties extends DfAbstractDBFluteProperties {
     //                                                                         Core Option
     //                                                                         ===========
     protected String getOutputDirectory(Map<String, Object> esfluteMap) {
-        return (String) esfluteMap.getOrDefault("outputDirectory", "../src/main/java");
+        return (String) esfluteMap.getOrDefault("outputDirectory", DfEngineWorkDir.toPath("../src/main/java"));
     }
 
     protected String getBasePackage(Map<String, Object> esfluteMap) {

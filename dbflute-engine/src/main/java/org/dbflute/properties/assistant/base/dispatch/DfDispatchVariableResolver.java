@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
@@ -214,7 +215,7 @@ public class DfDispatchVariableResolver {
                 defaultValue = null;
             }
         }
-        final File dispatchFile = new File("./dfprop/" + fileName);
+        final File dispatchFile = new File(DfEngineWorkDir.toPath("./dfprop/" + fileName));
         final DfOutsideFileVariableInfo variableInfo = new DfOutsideFileVariableInfo();
         variableInfo.setDispatchFile(dispatchFile);
         variableInfo.setNofileDefaultValue(defaultValue);

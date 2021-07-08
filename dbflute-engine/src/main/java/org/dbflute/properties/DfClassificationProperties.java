@@ -32,6 +32,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfClassificationIllegalPropertyTypeException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -1116,7 +1117,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
 
     protected List<DfClassificationTop> extractClassificationResource() {
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
-        final String dirBaseName = "./dfprop";
+        final String dirBaseName = DfEngineWorkDir.toPath("./dfprop");
         final String resource = NAME_CLASSIFICATION_RESOURCE;
         final String extension = "dfprop";
         if (isSpecifiedEnvironmentType()) {

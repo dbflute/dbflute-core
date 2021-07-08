@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.DfEngineWorkDir;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
@@ -1190,7 +1191,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     }
 
     public String getSchemaPolicyInRepsSchemaXml() {
-        return SCHEMA_POLICY_CHECK_SCHEMA_XML;
+        return DfEngineWorkDir.toPath(SCHEMA_POLICY_CHECK_SCHEMA_XML);
     }
 
     // ===================================================================================
