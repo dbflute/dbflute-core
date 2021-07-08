@@ -36,6 +36,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -421,6 +422,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 }
 
                 if (sql.trim().endsWith(_runInfo.getDelimiter())) {
+                    // Is block comment in the middle?
+                    if (DfStringUtil.count(sql, "/*") != DfStringUtil.count(sql, "*/")) {
+                        continue;
+                    }
                     // = = = = = = = =
                     // End of the SQL
                     // = = = = = = = =
@@ -461,6 +466,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         if (isSqlLineCommentOnly(sql)) {
             return;
         }
+        if (isSqlBlockCommentOnly(sql)) {
+            return;
+        }
         sqlList.add(removeCR(sql));
     }
 
@@ -479,6 +487,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         _log.info("The SQL has line comments only so skip it:" + ln() + sql);
         return true;
+    }
+
+    protected boolean isSqlBlockCommentOnly(String sql) {
+        sql = sql.trim();
+        if (sql.startsWith("/*") && sql.endsWith("*/")) {
+            _log.info("The SQL has block comments only so skip it:" + ln() + sql);
+            return true;
+        }
+        return false;
     }
 
     protected boolean isDbCommentLine(String line) {
