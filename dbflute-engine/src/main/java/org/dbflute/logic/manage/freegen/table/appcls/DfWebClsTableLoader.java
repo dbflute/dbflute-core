@@ -50,6 +50,10 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         // old comment: very similar to AppCls but no recycle because of silent maintenance
         // _/_/_/_/_/_/_/_/_/_/
         // done jflute let's recycle now (2021/07/05)
-        return new DfAppClsTableLoader().loadTable(requestName, resource, mapProp);
+        return new DfAppClsTableLoader() {
+            protected String getDefaultClsTheme() {
+                return "webcls"; // for LastaDoc (2021/07/10)
+            };
+        }.loadTable(requestName, resource, mapProp);
     }
 }

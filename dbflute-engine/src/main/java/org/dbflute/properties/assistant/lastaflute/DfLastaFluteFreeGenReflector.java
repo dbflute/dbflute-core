@@ -530,15 +530,13 @@ public final class DfLastaFluteFreeGenReflector {
         if (freeGenList.contains("appcls")) {
             final String appClsResourceFile = path + "/src/main/resources/" + appName + "_appcls.dfprop";
             optionMap.put("appclsResourceFile", filterOverridden(appClsResourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
-            optionMap.put("appclsPackage", buildCDefPackage("appcls", lastafluteMap, "appcls", "appcls"));
-            optionMap.put("appclsClassName", buildCDefClassName("AppCDef", "appcls", lastafluteMap, "appcls"));
+            optionMap.put("appclsPackage", buildCDefPackage("appcls", appName, lastafluteMap, "appcls"));
         }
 
         if (freeGenList.contains("webcls")) {
             final String webclsResourceFile = path + "/src/main/resources/" + appName + "_webcls.dfprop";
             optionMap.put("webclsResourceFile", filterOverridden(webclsResourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
-            optionMap.put("webclsPackage", buildCDefPackage(appName, lastafluteMap, "webcls", "webcls"));
-            optionMap.put("webclsClassName", buildCDefClassName("AppCDef", "appcls", lastafluteMap, "appcls"));
+            optionMap.put("webclsPackage", buildCDefPackage("webcls", appName, lastafluteMap, "webcls"));
         }
 
         if (freeGenList.contains("namedcls")) {
@@ -574,7 +572,7 @@ public final class DfLastaFluteFreeGenReflector {
 
             final String clsResourceFile = namedclsPath + "/" + dfpropName;
             namedclsMap.put(clsTheme + "ResourceFile", filterOverridden(clsResourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
-            namedclsMap.put(clsTheme + "Package", buildCDefPackage(appName, lastafluteMap, "namedcls", clsTheme));
+            namedclsMap.put(clsTheme + "Package", buildCDefPackage("namedcls", appName, lastafluteMap, clsTheme));
 
             namedclsList.add(namedclsMap);
         }
@@ -600,7 +598,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        final String cdefPackage = buildCDefPackage(appName, lastafluteMap, clsTheme, clsTheme);
+        final String cdefPackage = buildCDefPackage(clsTheme, appName, lastafluteMap, clsTheme);
         outputMap.put("package", cdefPackage);
         outputMap.put("templateFile", "LaAppCDef.vm");
         final String cdefClassName = buildCDefClassName("AppCDef", appName, lastafluteMap, clsTheme);
@@ -634,7 +632,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        final String cdefPackage = buildCDefPackage(appName, lastafluteMap, clsTheme, clsTheme);
+        final String cdefPackage = buildCDefPackage(clsTheme, appName, lastafluteMap, clsTheme);
         outputMap.put("package", cdefPackage);
         outputMap.put("templateFile", "LaAppCDef.vm");
         final String cdefClassName = buildCDefClassName("WebCDef", capAppName, lastafluteMap, clsTheme);
@@ -693,7 +691,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", filterOverridden("$$baseDir$$/java", lastafluteMap, appName, clsTheme, "outputDirectory"));
-        final String cdefPackage = buildCDefPackage(appName, lastafluteMap, "namedcls", clsTheme);
+        final String cdefPackage = buildCDefPackage("namedcls", appName, lastafluteMap, clsTheme);
         outputMap.put("package", cdefPackage);
         outputMap.put("templateFile", "LaAppCDef.vm"); // borrow application classification's template
         final String cdefClassName = buildCDefClassName(initCap(clsDomain) + "CDef", appName, lastafluteMap, clsTheme);
@@ -712,7 +710,7 @@ public final class DfLastaFluteFreeGenReflector {
     // -----------------------------------------------------
     //                                    CDef Package/Class
     //                                    ------------------
-    private String buildCDefPackage(String appName, Map<String, Object> lastafluteMap, String nearPackage, String clsTheme) {
+    private String buildCDefPackage(String nearPackage, String appName, Map<String, Object> lastafluteMap, String clsTheme) {
         return filterOverridden(_mylastaPackage + "." + nearPackage, lastafluteMap, appName, clsTheme, "package");
     }
 

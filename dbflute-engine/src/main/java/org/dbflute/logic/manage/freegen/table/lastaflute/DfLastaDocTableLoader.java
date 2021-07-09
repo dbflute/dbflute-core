@@ -160,9 +160,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         if (resourceFile == null) { // no way
             throw new IllegalStateException("Not found the resource file for clsTheme: " + clsTheme + ", " + optionMap.keySet());
         }
-        final DfFreeGenResource docResource =
-                new DfFreeGenResource(resource.getBaseDir(), resource.getResourceType(), resourceFile, resource.getEncoding());
-        return docResource;
+        return new DfFreeGenResource(resource.getBaseDir(), resource.getResourceType(), resourceFile, resource.getEncoding());
     }
 
     protected DfFreeGenMapProp createDocMapProp(DfFreeGenMapProp mapProp, Map<String, Object> optionMap) {

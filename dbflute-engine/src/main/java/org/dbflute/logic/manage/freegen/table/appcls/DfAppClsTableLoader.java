@@ -114,12 +114,16 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             }
         }
         final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls"); // basically exists
+        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", getDefaultClsTheme()); // basically exists
         setupOptionMap(optionMap, topList, hasRefCls, clsTheme);
 
         stopRedundantCommentIfNeeds(requestName, resourceFile, topList, optionMap); // @since 1.2.5
         registerRefClsReference(requestName, clsTheme, topList, optionMap); // for next appcls's refCls @since 1.2.5
         return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList()); // #for_now can be flexible? (table name is unused?)
+    }
+
+    protected String getDefaultClsTheme() { // you can override for e.g. webcls in LastaDoc (2021/07/10)
+        return "appcls"; // used in LastaDoc (which does not have clsTheme in optionMap)
     }
 
     // -----------------------------------------------------
