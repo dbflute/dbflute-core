@@ -134,7 +134,7 @@ public final class DfLastaFluteFreeGenReflector {
                 final List<String> freeGenList = extractAppFreeGenList(lastafluteMap, defMap);
                 for (String freeGen : freeGenList) {
                     _log.info("...Reflecting application freeGen settigs: " + appName + "." + freeGen);
-                    if ("env".equals(freeGen)) {
+                    if ("env".equals(freeGen)) { // should be before config, related each other
                         setupEnvGen(appName, path, hasCommonEnv, hasCommonConfig);
                         hasAppEnv = true;
                     } else if ("config".equals(freeGen)) {
@@ -199,8 +199,8 @@ public final class DfLastaFluteFreeGenReflector {
         if (freeGenList == null) {
             return freeGenList;
         }
-        final List<String> idList = DfCollectionUtil.newArrayList("config", "label", "message", "mail", "template", "jsp", "html");
-        idList.add("namedcls");
+        final List<String> idList = newBaseFreeGenList();
+        idList.add("namedcls"); // should be before appcls, webcls for refCls
         idList.add("appcls");
         idList.add("webcls");
         idList.add("clientcls");
@@ -210,6 +210,11 @@ public final class DfLastaFluteFreeGenReflector {
         resource.setupResource(idList, el -> el);
         DfCollectionUtil.orderAccordingTo(orderedList, resource);
         return orderedList;
+    }
+
+    protected List<String> newBaseFreeGenList() {
+        // env should be before config, related each other
+        return DfCollectionUtil.newArrayList("env", "config", "label", "message", "mail", "template", "jsp", "html");
     }
 
     protected void showFreeGenSettings() {
