@@ -9,20 +9,31 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen;
+package org.dbflute.properties.assistant.classification.refcls;
 
 /**
  * @author jflute
+ * @since 1.2.5 (2021/07/09 Friday)
  */
-public interface DfFreeGenTableLoader {
+public class DfRefClsReferredCDef {
 
-    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-    // #for_now jflute table means DB table but already non-DB resources exist so tranditional name (2021/07/09)
-    // _/_/_/_/_/_/_/_/_/_/
+    protected final String _cdefPackage;
+    protected final String _cdefClassName;
 
-    DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp);
+    public DfRefClsReferredCDef(String cdefPackage, String cdefClassName) {
+        _cdefPackage = cdefPackage;
+        _cdefClassName = cdefClassName;
+    }
+
+    public String getCDefPackage() {
+        return _cdefPackage;
+    }
+
+    public String getCDefClassName() {
+        return _cdefClassName;
+    }
 }

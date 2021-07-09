@@ -32,31 +32,46 @@ public class DfRefClsElement { // directly used in template
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _projectName; // not null
-    protected final String _classificationName; // not null
-    protected final String _classificationType; // not null
+    protected final String _refClsTheme; // e.g. maihamadb, not null
+    protected final String _classificationName; // e.g. MemberStatus, not null
     protected final String _groupName; // null allowed
     protected final DfRefClsRefType _refType; // not null
-    protected final DfClassificationTop _dbClsTop; // not null
+    protected final DfClassificationTop _referredClsTop; // not null
+    protected final DfRefClsReferredCDef _referredCDef; // not null
     protected final String _resourceFile; // for e.g. exception message, not null
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRefClsElement(String projectName, String classificationName, String classificationType, String groupName, String refType,
-            DfClassificationTop dbClsTop, String resourceFile) {
-        _projectName = projectName;
+    public DfRefClsElement(String refClsTheme, String classificationName, String groupName, String refType,
+            DfClassificationTop referredClsTop, DfRefClsReferredCDef referredCDef, String resourceFile) {
+        _refClsTheme = refClsTheme;
         _classificationName = classificationName;
-        _classificationType = classificationType;
         _groupName = groupName;
         _refType = new DfRefClsRefType(refType);
-        _dbClsTop = dbClsTop;
+        _referredClsTop = referredClsTop;
+        _referredCDef = referredCDef;
         _resourceFile = resourceFile;
     }
 
     // ===================================================================================
-    //                                                                   Determine RefType
-    //                                                                   =================
+    //                                                               Determine refClsTheme
+    //                                                               =====================
+    public boolean isRefClsThemeAppCls() {
+        return _refClsTheme.equals("appcls");
+    }
+
+    public boolean isRefClsThemeWebCls() {
+        return _refClsTheme.equals("webcls");
+    }
+
+    public boolean isRefClsThemeNamedCls() {
+        return _refClsTheme.endsWith("_cls");
+    }
+
+    // ===================================================================================
+    //                                                                    Determine refTyp
+    //                                                                    ================
     public boolean isRefTypeIncluded() {
         return _refType.isRefTypeIncluded();
     }
@@ -70,7 +85,7 @@ public class DfRefClsElement { // directly used in template
     }
 
     // ===================================================================================
-    //                                                                      Verify RefType
+    //                                                                      Verify refType
     //                                                                      ==============
     public void verifyFormalRefType(DfClassificationTop classificationTop) {
         createRefClsRefTypeVerifier().verifyFormalRefType(classificationTop);
@@ -81,7 +96,45 @@ public class DfRefClsElement { // directly used in template
     }
 
     protected DfRefClsRefTypeVerifier createRefClsRefTypeVerifier() {
-        return new DfRefClsRefTypeVerifier(_refType, _dbClsTop, _resourceFile);
+        return new DfRefClsRefTypeVerifier(_refType, _referredClsTop, _resourceFile);
+    }
+
+    // ===================================================================================
+    //                                                                       Referred CDef
+    //                                                                       =============
+    public String getReferredCDefPackage() {
+        return _referredCDef.getCDefPackage();
+    }
+
+    public String getReferredCDefClassName() {
+        return _referredCDef.getCDefClassName();
+    }
+
+    public String getReferredCDefType() {
+        return _referredCDef.getCDefClassName() + "." + _classificationName;
+    }
+
+    // ===================================================================================
+    //                                                                       Collaboration
+    //                                                                       =============
+    public String getCollaborationAdjective() { // in e.g. text
+        if (isUseRefExp()) {
+            return "referred";
+        } else { // as default
+            return "DB"; // to keep compatible
+        }
+    }
+
+    public String getCollaborationWord() { // in e.g. method
+        if (isUseRefExp()) {
+            return "Ref";
+        } else { // as default
+            return "DB"; // to keep compatible
+        }
+    }
+
+    protected boolean isUseRefExp() {
+        return isRefClsThemeAppCls() || isRefClsThemeWebCls() || isRefClsThemeNamedCls();
     }
 
     // ===================================================================================
@@ -89,23 +142,23 @@ public class DfRefClsElement { // directly used in template
     //                                                                      ==============
     @Override
     public String toString() {
-        final String projectExp = _projectName != null ? "(" + _projectName + ")" : "";
+        final String projectExp = _refClsTheme != null ? "(" + _refClsTheme + ")" : "";
         return "{" + projectExp + _classificationName + ", " + _refType + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getProjectName() {
-        return _projectName;
+    public String getRefClsTheme() {
+        return _refClsTheme;
     }
 
     public String getClassificationName() {
         return _classificationName;
     }
 
-    public String getClassificationType() {
-        return _classificationType;
+    public String getClassificationType() { // compatible for plain freegen, just in case
+        return getReferredCDefType();
     }
 
     public String getGroupName() {
@@ -116,7 +169,7 @@ public class DfRefClsElement { // directly used in template
         return _refType.getRefTypeValue();
     }
 
-    public DfClassificationTop getDBClsTop() {
-        return _dbClsTop;
+    public DfClassificationTop getReferredClsTop() {
+        return _referredClsTop;
     }
 }

@@ -25,7 +25,9 @@ import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
 #if ($optionMap.hasRefCls && !$optionMap.isSuppressDBClsCollaboration)
-import ${optionMap.allcommonPackage}.*;
+#foreach ($referredCDefFqcn in $optionMap.referredCDefFqcnList)
+import ${referredCDefFqcn};
+#end
 #end
 
 #set ($glCDef = "${request.className}")
@@ -245,22 +247,22 @@ public interface ${glCDef} extends Classification {
 #foreach ($refClsElement in $classificationTop.refClsElementList)
 
         /**
-         * @param dbCls The DB classification to find. (NullAllowed: if null, returns empty)
+         * @param refCls The ${refClsElement.collaborationAdjective} classification to find. (NullAllowed: if null, returns empty)
          * @return The the app classification corresponding to the DB classification. (NotNull, EmptyAllowed: when null specified, not found)
          */
-        public static OptionalThing<${classificationName}> fromDBCls(${refClsElement.classificationType} dbCls) {
-            String dbCode = dbCls != null ? dbCls.code() : null;
-            return OptionalThing.ofNullable(codeOf(dbCode), () -> {
-                throw new IllegalStateException("Cannot convert ${refClsElement.classificationType} to ${classificationName} by the DB code: " + dbCode);
+        public static OptionalThing<${classificationName}> from${refClsElement.collaborationWord}Cls(${refClsElement.referredCDefType} refCls) {
+            String refCode = refCls != null ? refCls.code() : null;
+            return OptionalThing.ofNullable(codeOf(refCode), () -> {
+                throw new IllegalStateException("Cannot convert ${refClsElement.referredCDefType} to ${classificationName} by the referred code: " + refCode);
             });
         }
 
         /**
-         * @return The DB classification corresponding to the app classification. (NotNull, EmptyAllowed: when no-related to DB)
+         * @return The ${refClsElement.collaborationAdjective} classification corresponding to the app classification. (NotNull, EmptyAllowed: when no-related to DB)
          */
-        public OptionalThing<${refClsElement.classificationType}> toDBCls() {
+        public OptionalThing<${refClsElement.referredCDefType}> to${refClsElement.collaborationWord}Cls() {
             String appCode = code();
-            return OptionalThing.ofNullable(${refClsElement.classificationType}.codeOf(appCode), () -> {
+            return OptionalThing.ofNullable(${refClsElement.referredCDefType}.codeOf(appCode), () -> {
                 throw new IllegalStateException("Cannot convert ${classificationName} to ${refClsElement.classificationName} by the app code: " + appCode);
             });
         }

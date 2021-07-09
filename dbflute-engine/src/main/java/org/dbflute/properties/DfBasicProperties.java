@@ -578,7 +578,7 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         return "Bs"; // for generation gap
     }
 
-    public String getCDefPureName() {
+    public String getCDefPureName() { // e.g. CDef
         final String projectPrefix = getProjectPrefix();
         final String allcommonPrefix = getAllcommonPrefix();
         final DfLanguageClassPackage classPackage = getLanguageDependency().getLanguageClassPackage();

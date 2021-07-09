@@ -70,30 +70,22 @@ public class DfFreeGenInitializer {
             if (!requestDeterminer.test(requestName)) {
                 continue;
             }
-            final Object obj = entry.getValue();
-            if (!(obj instanceof Map<?, ?>)) {
-                String msg = "The property 'freeGenDefinitionMap.value' should be Map: " + obj.getClass();
-                throw new DfIllegalPropertyTypeException(msg);
-            }
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> elementMap = (Map<String, Object>) obj;
-            final DfFreeGenRequest request = createFreeGenerateRequest(requestName, elementMap);
-
+            final Map<String, Object> elementMap = extractFreeGenElementMap(entry);
+            final DfFreeGenRequest request = createFreeGenRequest(requestName, elementMap);
             final Map<String, Object> optionMap = extractOptionMap(elementMap);
             setupReservedOption(requestName, optionMap);
-            final Map<String, Map<String, String>> mappingMap = extractMappingMap(optionMap);
-            final DfFreeGenMapProp mapProp = new DfFreeGenMapProp(optionMap, mappingMap, requestMap);
+
+            final DfFreeGenMapProp mapProp = createFreeGenMapProp(requestMap, optionMap);
             final DfFreeGenResource resource = request.getResource();
 
-            final DfFreeGenTableLoader tableLoader = DfFreeGenResourceType.tableLoaderMap.get(request.getResource().getResourceType());
-            if (tableLoader == null) {
-                throwFreeGenResourceTypeUnknownException(requestName, resource);
-            }
+            final DfFreeGenTableLoader tableLoader = findTableLoader(requestName, request, resource);
+            requestMap.put(requestName, request); // may be used in loader process so here
             final DfFreeGenMetaData metaData;
             try {
                 metaData = tableLoader.loadTable(requestName, resource, mapProp);
             } catch (DfFreeGenCancelException continued) {
                 showCancelledRequest(requestName, continued);
+                requestMap.remove(requestName);
                 continue;
             } catch (RuntimeException e) {
                 throwFreeGenRequestLoadingFailureException(requestName, resource, tableLoader, e);
@@ -102,33 +94,28 @@ public class DfFreeGenInitializer {
             request.setMetaData(metaData);
             request.setPackagePathHandler(new DfPackagePathHandler(getBasicProperties()));
             _freeGenRequestList.add(request);
-            requestMap.put(requestName, request);
         }
         return _freeGenRequestList;
     }
 
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> extractOptionMap(Map<String, Object> elementMap) {
-        Object obj = elementMap.get("optionMap");
-        if (obj == null) {
-            obj = elementMap.get("tableMap"); // for compatible
-            if (obj == null) {
-                return new LinkedHashMap<String, Object>(); // may be put later
-            }
+    // -----------------------------------------------------
+    //                                           Element Map
+    //                                           -----------
+    protected Map<String, Object> extractFreeGenElementMap(Entry<String, Object> entry) {
+        final Object obj = entry.getValue();
+        if (!(obj instanceof Map<?, ?>)) {
+            String msg = "The property 'freeGenDefinitionMap.value' should be Map: " + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
         }
-        return (Map<String, Object>) obj;
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> elementMap = (Map<String, Object>) obj;
+        return elementMap;
     }
 
-    @SuppressWarnings("unchecked")
-    protected Map<String, Map<String, String>> extractMappingMap(Map<String, Object> tableMap) {
-        final Object obj = tableMap.get("mappingMap");
-        if (obj == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        return (Map<String, Map<String, String>>) obj;
-    }
-
-    protected DfFreeGenRequest createFreeGenerateRequest(String requestName, Map<String, Object> elementMap) {
+    // -----------------------------------------------------
+    //                                       FreeGen Request
+    //                                       ---------------
+    protected DfFreeGenRequest createFreeGenRequest(String requestName, Map<String, Object> elementMap) {
         final DfFreeGenResource resource;
         {
             @SuppressWarnings("unchecked")
@@ -159,6 +146,51 @@ public class DfFreeGenInitializer {
         return basicProp.getLanguageDependency().getLanguageGrammar().getClassFileExtension();
     }
 
+    // -----------------------------------------------------
+    //                                            Option Map
+    //                                            ----------
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> extractOptionMap(Map<String, Object> elementMap) {
+        Object obj = elementMap.get("optionMap");
+        if (obj == null) {
+            obj = elementMap.get("tableMap"); // for compatible
+            if (obj == null) {
+                return new LinkedHashMap<String, Object>(); // may be put later
+            }
+        }
+        return (Map<String, Object>) obj;
+    }
+
+    // -----------------------------------------------------
+    //                                       FreeGen MapProp
+    //                                       ---------------
+    protected DfFreeGenMapProp createFreeGenMapProp(Map<String, DfFreeGenRequest> requestMap, Map<String, Object> optionMap) {
+        return new DfFreeGenMapProp(optionMap, extractMappingMap(optionMap), requestMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Map<String, String>> extractMappingMap(Map<String, Object> optionMap) {
+        final Object obj = optionMap.get("mappingMap");
+        if (obj == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        return (Map<String, Map<String, String>>) obj;
+    }
+
+    // -----------------------------------------------------
+    //                                          Table Loader
+    //                                          ------------
+    protected DfFreeGenTableLoader findTableLoader(String requestName, DfFreeGenRequest request, DfFreeGenResource resource) {
+        final DfFreeGenTableLoader tableLoader = DfFreeGenResourceType.tableLoaderMap.get(request.getResource().getResourceType());
+        if (tableLoader == null) {
+            throwFreeGenResourceTypeUnknownException(requestName, resource);
+        }
+        return tableLoader;
+    }
+
+    // -----------------------------------------------------
+    //                                  ResourceType Unknown
+    //                                  --------------------
     protected void throwFreeGenResourceTypeUnknownException(String requestName, DfFreeGenResource resource) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown resource type for FreeGen.");
@@ -170,6 +202,9 @@ public class DfFreeGenInitializer {
         throw new DfIllegalPropertySettingException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                     Cancelled Request
+    //                                     -----------------
     protected void showCancelledRequest(final String requestName, DfFreeGenCancelException continued) {
         // e.g.
         // - *Cancelled the freeGen request: ESFluteFessConfig
@@ -188,6 +223,9 @@ public class DfFreeGenInitializer {
         }
     }
 
+    // -----------------------------------------------------
+    //                                       Loading Failure
+    //                                       ---------------
     protected void throwFreeGenRequestLoadingFailureException(String requestName, DfFreeGenResource resource,
             DfFreeGenTableLoader tableLoader, RuntimeException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();

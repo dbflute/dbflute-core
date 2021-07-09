@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +34,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.refcls.DfRefClsReferenceRegistry;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
@@ -40,6 +42,8 @@ import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.classification.element.proploading.DfClsElementLiteralArranger;
 import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
+import org.dbflute.properties.assistant.classification.refcls.DfRefClsReference;
+import org.dbflute.properties.assistant.classification.refcls.DfRefClsReferredCDef;
 import org.dbflute.util.Srl;
 
 /**
@@ -68,7 +72,6 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final String resourceFile = resource.getResourceFile();
         final Map<String, Object> appClsMap = readAppClsMap(resourceFile);
-        Map<String, DfClassificationTop> dbClsMap = null; // lazy load because it might be unused
         boolean hasRefCls = false;
         final DfClassificationProperties clsProp = getClassificationProperties();
         final DfClsElementLiteralArranger literalArranger = new DfClsElementLiteralArranger();
@@ -90,10 +93,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                     if (isElementMapRefCls(elementMap)) {
                         // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
                         assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
-                        if (dbClsMap == null) {
-                            dbClsMap = clsProp.getClassificationTopMap(); // lazy load
-                        }
-                        refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap, resource);
+                        refClsElement = createRefClsElement(classificationName, elementMap, resource);
                         refClsElement.verifyFormalRefType(classificationTop);
                         classificationTop.addRefClsElement(refClsElement);
                         includeRefClsElement(classificationTop, refClsElement);
@@ -117,11 +117,9 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls"); // basically exists
         setupOptionMap(optionMap, topList, hasRefCls, clsTheme);
 
-        // @since 1.2.5
-        stopRedundantCommentIfNeeds(requestName, resourceFile, topList, optionMap);
-
-        // #for_now can be flexible? (table name is unused?)
-        return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList());
+        stopRedundantCommentIfNeeds(requestName, resourceFile, topList, optionMap); // @since 1.2.5
+        registerRefClsReference(requestName, clsTheme, topList, optionMap); // for next appcls's refCls @since 1.2.5
+        return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList()); // #for_now can be flexible? (table name is unused?)
     }
 
     // -----------------------------------------------------
@@ -158,6 +156,9 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         optionMap.put("classificationTopList", topList);
         optionMap.put("classificationNameList", topList.stream().map(top -> top.getClassificationName()).collect(Collectors.toList()));
         optionMap.put("hasRefCls", hasRefCls);
+        optionMap.put("referredCDefFqcnList", prepareReferredCDefFqcnList(topList)); // @since 1.2.5
+
+        // already unused @since 1.2.5 but compatible for plain freegen just in case
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
     }
 
@@ -187,15 +188,15 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         }
     }
 
-    protected DfRefClsElement createRefClsElement(String classificationName, Map<String, Object> elementMap,
-            Map<String, DfClassificationTop> dbClsMap, DfFreeGenResource resource) {
-        final String refCls = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
-        final String projectName;
-        final String refClsName;
+    protected DfRefClsElement createRefClsElement(String classificationName, Map<String, Object> elementMap, DfFreeGenResource resource) {
+        // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
+        final String refAttr = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
+        final String refClsTheme; // of e.g. DB or "appcls" or namedcls's name
+        final String refClsName; // classification name
         final String groupName;
-        if (refCls.contains("@")) { // #hope other schema's reference
-            projectName = Srl.substringFirstFront(refCls, "@");
-            final String rearName = Srl.substringFirstRear(refCls, "@");
+        if (refAttr.contains("@")) { // #hope other schema's reference
+            refClsTheme = Srl.substringFirstFront(refAttr, "@");
+            final String rearName = Srl.substringFirstRear(refAttr, "@");
             if (rearName.contains(".")) {
                 refClsName = Srl.substringFirstFront(rearName, ".");
                 groupName = Srl.substringFirstRear(rearName, ".");
@@ -204,50 +205,110 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 groupName = null;
             }
         } else {
-            projectName = null;
-            if (refCls.contains(".")) {
-                refClsName = Srl.substringFirstFront(refCls, ".");
-                groupName = Srl.substringFirstRear(refCls, ".");
+            refClsTheme = getBasicProperties().getProjectName(); // current DB as default
+            if (refAttr.contains(".")) {
+                refClsName = Srl.substringFirstFront(refAttr, ".");
+                groupName = Srl.substringFirstRear(refAttr, ".");
             } else {
-                refClsName = refCls;
+                refClsName = refAttr;
                 groupName = null;
             }
         }
-        final String classificationType = buildClassificationType(refClsName);
+        final String refType = extractRefType(classificationName, elementMap);
+        final DfClassificationTop referredClsTop = findReferredClsTop(classificationName, refAttr, refClsTheme, refClsName, resource);
+        final DfRefClsReferredCDef referredCDef = findReferredCDef(classificationName, refAttr, refClsTheme, refClsName, resource);
+        final String resourceFile = resource.getResourceFile();
+        return new DfRefClsElement(refClsTheme, refClsName, groupName, refType, referredClsTop, referredCDef, resourceFile);
+    }
+
+    protected String extractRefType(String classificationName, Map<String, Object> elementMap) {
         final String refType = (String) elementMap.get(DfRefClsElement.KEY_REFTYPE);
         if (refType == null) {
             String msg = "Not found the refType in refCls elementMap: " + classificationName + " " + elementMap;
             throw new DfIllegalPropertySettingException(msg);
         }
-        final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap, resource);
-        return new DfRefClsElement(projectName, refClsName, classificationType, groupName, refType, dbClsTop, resource.getResourceFile());
+        return refType;
     }
 
-    protected String buildClassificationType(String refClsName) {
-        return getBasicProperties().getCDefPureName() + "." + refClsName;
-    }
-
-    protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap,
+    // -----------------------------------------------------
+    //                                        Find Reference
+    //                                        --------------
+    protected DfClassificationTop findReferredClsTop(String classificationName, String refAttr, String refClsTheme, String refClsName,
             DfFreeGenResource resource) {
-        final DfClassificationTop refTop = dbClsMap.get(refClsName);
-        if (refTop == null) {
-            throwAppClsReferredDBClsNotFoundException(classificationName, refClsName, dbClsMap, resource);
+        final DfRefClsReference reference = findReference(classificationName, refAttr, refClsTheme, refClsName, resource);
+        final Map<String, DfClassificationTop> clsTopMap = reference.getReferredClsTopMap();
+        final DfClassificationTop referredClsTop = clsTopMap.get(refClsName);
+        if (referredClsTop == null) {
+            throwAppClsReferredClsNotFoundException(classificationName, refAttr, refClsTheme, refClsName, clsTopMap, resource);
         }
-        return refTop;
+        return referredClsTop;
     }
 
-    protected void throwAppClsReferredDBClsNotFoundException(String classificationName, String refClsName,
-            Map<String, DfClassificationTop> dbClsMap, DfFreeGenResource resource) {
+    protected DfRefClsReferredCDef findReferredCDef(String classificationName, String refAttr, String refClsTheme, String refClsName,
+            DfFreeGenResource resource) {
+        final DfRefClsReference reference = findReference(classificationName, refAttr, refClsTheme, refClsName, resource);
+        return reference.getReferredCDef();
+    }
+
+    protected DfRefClsReference findReference(String classificationName, String refAttr, String refClsTheme, String refClsName,
+            DfFreeGenResource resource) {
+        final DfRefClsReference reference = DfRefClsReferenceRegistry.getInstance().findReference(refClsTheme);
+        if (reference == null) {
+            throwAppClsReferredClsThemeNotFoundException(classificationName, refAttr, refClsTheme, refClsName, resource);
+        }
+        return reference;
+    }
+
+    protected void throwAppClsReferredClsThemeNotFoundException(String classificationName, String refAttr, String refClsTheme,
+            String refClsName, DfFreeGenResource resource) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the DB classification for app classification.");
+        br.addNotice("Not found the referred cls-theme from the app classification.");
         br.addItem("Advice");
-        br.addElement("Make sure your DB classification name.");
+        br.addElement("Make sure your cls-theme value of refCls attribute.");
+        br.addElement("And refCls attribute depends on loading order.");
+        br.addElement("For example, appcls can refers namedcls, but reverse cannot.");
+        br.addElement("  (o):");
+        br.addElement("    appcls to namedcls");
+        br.addElement("    appcls to DB cls");
+        br.addElement("    namedcls to DB cls");
+        br.addElement("  (?):");
+        br.addElement("    appcls to appcls (depending on FreeGen definition order)");
+        br.addElement("");
+        br.addElement("In case of reference to DB, if dbflute_maihamadb:");
+        br.addElement("  refType=maihamadb@MemberStatus");
+        br.addElement("");
+        br.addElement("In case of reference to namedcls, if hangar_leonardo_cls.dfprop:");
+        br.addElement("  refType=leonardo_cls@MemberStatus");
         br.addItem("AppCls");
         br.addElement(classificationName);
-        br.addItem("NotFound DBCls");
+        br.addItem("RefCls Attribute");
+        br.addElement(refAttr);
+        br.addItem("NotFound Theme");
+        br.addElement(refClsTheme);
+        br.addItem("Existing Theme");
+        br.addElement(DfRefClsReferenceRegistry.getInstance().getThemeClsTopMap().keySet());
+        br.addItem("dfprop File");
+        br.addElement(resource.getResourceFile());
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    protected void throwAppClsReferredClsNotFoundException(String classificationName, String refAttr, String refClsTheme, String refClsName,
+            Map<String, DfClassificationTop> clsTopMap, DfFreeGenResource resource) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the referred classification from the app classification.");
+        br.addItem("Advice");
+        br.addElement("Make sure your classification name of refCls attribute.");
+        br.addItem("AppCls");
+        br.addElement(classificationName);
+        br.addItem("RefCls Attribute");
+        br.addElement(refAttr);
+        br.addItem("RefCls Theme");
+        br.addElement(refClsTheme);
+        br.addItem("NotFound Cls");
         br.addElement(refClsName);
-        br.addItem("Existing DBCls");
-        br.addElement(dbClsMap.keySet());
+        br.addItem("Existing Cls");
+        br.addElement(clsTopMap.keySet());
         br.addItem("dfprop File");
         br.addElement(resource.getResourceFile());
         final String msg = br.buildExceptionMessage();
@@ -258,16 +319,16 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     //                                        Include refCls
     //                                        --------------
     protected void includeRefClsElement(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
-        final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
+        final DfClassificationTop refClsTop = refClsElement.getReferredClsTop();
         if (refClsElement.isRefTypeIncluded()) {
             final String groupName = refClsElement.getGroupName();
             final List<DfClassificationElement> dbElementList;
             if (groupName != null) {
                 // e.g. map:{ refCls=maihamadb@MemberStatus.serviceAvailable ; refType=included }
-                dbElementList = findDbGroup(refClsElement, dbClsTop, groupName).getElementList();
+                dbElementList = findRefGroup(refClsElement, refClsTop, groupName).getElementList();
             } else {
                 // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
-                dbElementList = dbClsTop.getClassificationElementList();
+                dbElementList = refClsTop.getClassificationElementList();
             }
             classificationTop.addClassificationElementAll(copyElementList(classificationTop, dbElementList));
         }
@@ -275,8 +336,8 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         //classificationTop.inheritRefClsGroup(dbClsTop);
     }
 
-    protected DfClassificationGroup findDbGroup(DfRefClsElement refClsElement, DfClassificationTop dbClsTop, String groupName) {
-        return dbClsTop.getGroupList().stream().filter(gr -> {
+    protected DfClassificationGroup findRefGroup(DfRefClsElement refClsElement, DfClassificationTop refClsTop, String groupName) {
+        return refClsTop.getGroupList().stream().filter(gr -> {
             return gr.getGroupName().equals(groupName);
         }).findFirst().orElseThrow(() -> {
             String msg = "Not found the group name: " + refClsElement.getClassificationName() + "." + groupName;
@@ -294,8 +355,83 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     //                                  --------------------
     protected void inheritRefClsGroup(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
         // all types are inheritable, considering short grouping elements @since 1.2.5
-        final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
-        classificationTop.inheritRefClsGroup(dbClsTop);
+        final DfClassificationTop refClsTop = refClsElement.getReferredClsTop();
+        classificationTop.inheritRefClsGroup(refClsTop);
+    }
+
+    // -----------------------------------------------------
+    //                                         Referred CDef
+    //                                         -------------
+    protected List<String> prepareReferredCDefFqcnList(List<DfClassificationTop> topList) {
+        final Map<String, String> refThemeCDefFqcnMap = new LinkedHashMap<String, String>();
+        for (DfClassificationTop top : topList) {
+            final List<DfRefClsElement> refClsElementList = top.getRefClsElementList();
+            for (DfRefClsElement refClsElement : refClsElementList) {
+                final String refClsTheme = refClsElement.getRefClsTheme();
+                final String existingImportExp = refThemeCDefFqcnMap.get(refClsTheme);
+                if (existingImportExp != null) {
+                    break;
+                }
+                final String referredCDefPackage = refClsElement.getReferredCDefPackage();
+                final String referredCDefClassName = refClsElement.getReferredCDefClassName();
+                final String refThemeCDefFqcn = referredCDefPackage + "." + referredCDefClassName;
+                refThemeCDefFqcnMap.put(refClsTheme, refThemeCDefFqcn);
+            }
+        }
+        return new ArrayList<>(refThemeCDefFqcnMap.values());
+    }
+
+    // -----------------------------------------------------
+    //                                    Register Reference
+    //                                    ------------------
+    protected void registerRefClsReference(String requestName, String clsTheme, List<DfClassificationTop> topList,
+            Map<String, Object> optionMap) {
+        if (!isOptionLastaFlute(optionMap)) {
+            return; // only LastaFlute classifications can be referred (to be simple logic)
+        }
+        if (isOptionLastaDoc(optionMap)) {
+            return; // LastaDoc uses real loader's registration (to avoid unexpected data use)
+        }
+        final Map<String, DfClassificationTop> clsTopMap =
+                topList.stream().collect(Collectors.toMap(top -> top.getClassificationName(), top -> top));
+
+        final String cdefPackage = (String) optionMap.get("cdefPackage"); // not null
+        final String cdefClassName = (String) optionMap.get("cdefClassName"); // not null
+        if (cdefPackage == null || cdefClassName == null) { // just in case
+            throwRefClsReferenceCDefInfoNotFoundException(requestName, clsTheme, optionMap, cdefPackage, cdefClassName);
+        }
+        final DfRefClsReferredCDef referredCDef = new DfRefClsReferredCDef(cdefPackage, cdefClassName);
+        DfRefClsReferenceRegistry.getInstance().registerReference(clsTheme, clsTopMap, referredCDef);
+    }
+
+    protected boolean isOptionLastaFlute(Map<String, Object> optionMap) {
+        final Boolean isLastaFlute = (Boolean) optionMap.get("isLastaFlute");
+        return isLastaFlute != null && isLastaFlute;
+    }
+
+    protected boolean isOptionLastaDoc(Map<String, Object> optionMap) {
+        final Boolean isLastaFlute = (Boolean) optionMap.get("isLastaDoc");
+        return isLastaFlute != null && isLastaFlute;
+    }
+
+    protected void throwRefClsReferenceCDefInfoNotFoundException(String requestName, String clsTheme, Map<String, Object> optionMap,
+            String cdefPackage, String cdefClassName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Both cdefPackage and cdefClassName are required here.");
+        br.addItem("FreeGen Request");
+        br.addElement(requestName);
+        br.addItem("clsTheme");
+        br.addElement(clsTheme);
+        br.addItem("cdefPackage");
+        br.addElement(cdefPackage);
+        br.addItem("cdefClassName");
+        br.addElement(cdefClassName);
+        br.addItem("optionMap");
+        optionMap.forEach((key, value) -> {
+            br.addElement(key + " = " + value);
+        });
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

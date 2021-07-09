@@ -34,15 +34,15 @@ public class DfRefClsRefTypeVerifier {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfRefClsRefType _refType;
-    protected final DfClassificationTop _dbClsTop;
+    protected final DfClassificationTop _referredClsTop;
     protected final String _resourceFile;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop dbClsTop, String resourceFile) {
+    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop referredClsTop, String resourceFile) {
         _refType = refType;
-        _dbClsTop = dbClsTop;
+        _referredClsTop = referredClsTop;
         _resourceFile = resourceFile;
     }
 
@@ -82,11 +82,11 @@ public class DfRefClsRefTypeVerifier {
     }
 
     protected void doVerifyRefExists(DfClassificationTop classificationTop) {
-        final List<DfClassificationElement> webElementList = classificationTop.getClassificationElementList();
-        final List<DfClassificationElement> dbElementList = _dbClsTop.getClassificationElementList();
-        final List<DfClassificationElement> nonExistingList = webElementList.stream().filter(webElement -> {
-            return !dbElementList.stream().anyMatch(dbElement -> {
-                return webElement.getCode().equals(dbElement.getCode());
+        final List<DfClassificationElement> appElementList = classificationTop.getClassificationElementList();
+        final List<DfClassificationElement> referredElementList = _referredClsTop.getClassificationElementList();
+        final List<DfClassificationElement> nonExistingList = appElementList.stream().filter(appElement -> {
+            return !referredElementList.stream().anyMatch(referredElement -> {
+                return appElement.getCode().equals(referredElement.getCode());
             });
         }).collect(Collectors.toList());
         if (!nonExistingList.isEmpty()) {
@@ -106,8 +106,8 @@ public class DfRefClsRefTypeVerifier {
             br.addElement(_resourceFile);
             br.addItem("AppCls");
             br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(classificationTop));
-            br.addItem("DBCls");
-            br.addElement(_dbClsTop.getClassificationName() + ": " + buildClsCodesExp(_dbClsTop));
+            br.addItem("ReferredCls");
+            br.addElement(_referredClsTop.getClassificationName() + ": " + buildClsCodesExp(_referredClsTop));
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Non-Existing Code");
@@ -121,7 +121,7 @@ public class DfRefClsRefTypeVerifier {
 
     protected void doVerifyRefMatches(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> webElementList = classificationTop.getClassificationElementList();
-        final List<DfClassificationElement> dbElementList = _dbClsTop.getClassificationElementList();
+        final List<DfClassificationElement> dbElementList = _referredClsTop.getClassificationElementList();
         final boolean hasNonExisting = webElementList.stream().anyMatch(webElement -> {
             return !dbElementList.stream().anyMatch(dbElement -> {
                 return webElement.getCode().equals(dbElement.getCode());
@@ -143,7 +143,7 @@ public class DfRefClsRefTypeVerifier {
             br.addItem("AppCls");
             br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(classificationTop));
             br.addItem("DBCls");
-            br.addElement(_dbClsTop.getClassificationName() + ": " + buildClsCodesExp(_dbClsTop));
+            br.addElement(_referredClsTop.getClassificationName() + ": " + buildClsCodesExp(_referredClsTop));
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Code Count");
