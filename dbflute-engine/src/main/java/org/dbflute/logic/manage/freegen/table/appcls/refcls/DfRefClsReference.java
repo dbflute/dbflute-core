@@ -13,12 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.classification.refcls;
+package org.dbflute.logic.manage.freegen.table.appcls.refcls;
 
 import java.util.Collections;
 import java.util.Map;
 
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.properties.assistant.classification.refcls.DfRefClsReferredCDef;
 
 /**
  * @author jflute

@@ -23,7 +23,6 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.properties.assistant.classification.refcls.DfRefClsReference;
 import org.dbflute.properties.assistant.classification.refcls.DfRefClsReferredCDef;
 
 /**

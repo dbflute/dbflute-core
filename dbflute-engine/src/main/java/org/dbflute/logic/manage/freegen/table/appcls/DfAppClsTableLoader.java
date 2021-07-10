@@ -34,6 +34,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.refcls.DfRefClsReference;
 import org.dbflute.logic.manage.freegen.table.appcls.refcls.DfRefClsReferenceRegistry;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
@@ -42,7 +43,6 @@ import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.classification.element.proploading.DfClsElementLiteralArranger;
 import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
-import org.dbflute.properties.assistant.classification.refcls.DfRefClsReference;
 import org.dbflute.properties.assistant.classification.refcls.DfRefClsReferredCDef;
 import org.dbflute.util.Srl;
 
