@@ -41,12 +41,12 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.8.2 (2008/10/22 Wednesday)
  */
-public class DfClassificationResourceAnalyzer {
+public class DfClassificationResourceFileAnalyzer {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfClassificationResourceAnalyzer.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfClassificationResourceFileAnalyzer.class);
 
     protected static final String DEFAULT_ENCODING = "UTF-8";
     protected static final String LN_MARK_PLAIN = "\\n";
@@ -76,7 +76,7 @@ public class DfClassificationResourceAnalyzer {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClassificationResourceAnalyzer() {
+    public DfClassificationResourceFileAnalyzer() {
     }
 
     // ===================================================================================

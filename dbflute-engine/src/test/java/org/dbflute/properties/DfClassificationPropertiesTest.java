@@ -152,22 +152,6 @@ public class DfClassificationPropertiesTest {
         assertTrue(prop.isElementMapClassificationTop(elementMap));
     }
 
-    public void test_isTableClassificationSuppressAutoDeploy() {
-        // ## Arrange ##
-        final Map<String, Map<String, String>> deploymentMap = new LinkedHashMap<String, Map<String, String>>();
-        final DfClassificationProperties prop = createClassificationProperties(deploymentMap);
-        final Map<String, String> elementMap = new HashMap<String, String>();
-
-        // ## Act & Assert ##
-        assertFalse(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
-        elementMap.put("suppressAutoDeploy", "false");
-        assertFalse(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
-        elementMap.put("suppressAutoDeploy", "true");
-        assertTrue(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
-        elementMap.put("suppressAutoDeploy", "True");
-        assertTrue(prop.isCompatibleElementMapSuppressAutoDeploy(elementMap));
-    }
-
     protected DfClassificationProperties createClassificationProperties(Map<String, Map<String, String>> deploymentMap) {
         final DfClassificationProperties prop = new DfClassificationProperties(new Properties());
         prop._classificationDeploymentMap = deploymentMap;

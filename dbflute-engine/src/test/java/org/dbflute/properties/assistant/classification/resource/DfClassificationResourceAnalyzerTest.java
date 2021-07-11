@@ -15,14 +15,14 @@
  */
 package org.dbflute.properties.assistant.classification.resource;
 
-import static org.dbflute.properties.assistant.classification.resource.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
+import static org.dbflute.properties.assistant.classification.resource.DfClassificationResourceFileAnalyzer.LN_MARK_PLAIN;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.properties.assistant.classification.resource.DfClassificationResourceAnalyzer;
+import org.dbflute.properties.assistant.classification.resource.DfClassificationResourceFileAnalyzer;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -33,7 +33,7 @@ public class DfClassificationResourceAnalyzerTest extends EngineTestCase {
 
     public void test_analyze_by_lineList() {
         // ## Arrange ##
-        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer() {
+        final DfClassificationResourceFileAnalyzer analyzer = new DfClassificationResourceFileAnalyzer() {
             @Override
             protected void setupClassificationTopOption(DfClassificationTop classificationTop) {
                 // because of little adjustment properties
@@ -152,7 +152,7 @@ public class DfClassificationResourceAnalyzerTest extends EngineTestCase {
 
     public void test_containsLineSeparatorMark() {
         // ## Arrange ##
-        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final DfClassificationResourceFileAnalyzer analyzer = new DfClassificationResourceFileAnalyzer();
 
         // ## Act & Assert ##
         assertFalse(analyzer.containsLineSeparatorMark("foobar"));
@@ -164,7 +164,7 @@ public class DfClassificationResourceAnalyzerTest extends EngineTestCase {
 
     public void test_tokenizedLineSeparatorMark_base16() {
         // ## Arrange ##
-        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final DfClassificationResourceFileAnalyzer analyzer = new DfClassificationResourceFileAnalyzer();
         final String plain = LN_MARK_PLAIN;
         final String xml = "&#x0D;&#x0A;";
 
@@ -181,7 +181,7 @@ public class DfClassificationResourceAnalyzerTest extends EngineTestCase {
 
     public void test_tokenizedLineSeparatorMark_base10() {
         // ## Arrange ##
-        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final DfClassificationResourceFileAnalyzer analyzer = new DfClassificationResourceFileAnalyzer();
         final String plain = LN_MARK_PLAIN;
         final String xml = "&#13;";
 
