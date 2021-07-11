@@ -18,6 +18,7 @@ package org.dbflute.properties.assistant.classification.element.acceptor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -77,7 +78,7 @@ public class DfClsElementBasicItemAcceptor {
     // ===================================================================================
     //                                                                               Name
     //                                                                              ======
-    public String acceptName(String defaultName) { // not null with default
+    public String acceptName(String defaultName) { // not null if not-null default
         final String name = (String) _elementMap.get(DfClassificationElement.KEY_NAME);
         return name != null ? name : defaultName;
     }
@@ -85,7 +86,7 @@ public class DfClsElementBasicItemAcceptor {
     // ===================================================================================
     //                                                                               Alias
     //                                                                               =====
-    public String acceptAlias(String defaultAlias) { // not null with default
+    public String acceptAlias(String defaultAlias) { // not null if not-null default
         final String alias = (String) _elementMap.get(DfClassificationElement.KEY_ALIAS);
         return alias != null ? alias : defaultAlias;
     }
@@ -94,6 +95,15 @@ public class DfClsElementBasicItemAcceptor {
     //                                                                             Comment
     //                                                                             =======
     public String acceptComment() { // null allowed (not required)
+        return doAcceptComment();
+    }
+
+    public String acceptComment(String defaultComment) { // null allowed (not required)
+        final String comment = doAcceptComment();
+        return comment != null ? comment : defaultComment;
+    }
+
+    protected String doAcceptComment() {
         return (String) _elementMap.get(DfClassificationElement.KEY_COMMENT);
     }
 
@@ -101,6 +111,14 @@ public class DfClsElementBasicItemAcceptor {
     //                                                                         Sister Code
     //                                                                         ===========
     public String[] acceptSisters() { // not null, empty allowed (not required)
+        return doAcceptSisters(() -> new String[] {});
+    }
+
+    public String[] acceptSisters(String[] defaultSisters) { // not null if not-null default
+        return doAcceptSisters(() -> defaultSisters);
+    }
+
+    protected String[] doAcceptSisters(Supplier<String[]> defaultProvider) { // null allowed if not defined
         final Object sisterCodeObj = _elementMap.get(DfClassificationElement.KEY_SISTER_CODE);
         final String[] sisters;
         if (sisterCodeObj != null) {
@@ -111,8 +129,8 @@ public class DfClsElementBasicItemAcceptor {
             } else {
                 sisters = new String[] { (String) sisterCodeObj };
             }
-        } else {
-            sisters = new String[] {};
+        } else { // not defined
+            sisters = defaultProvider.get();
         }
         return sisters;
     }
@@ -121,10 +139,18 @@ public class DfClsElementBasicItemAcceptor {
     //                                                                         SubItem Map
     //                                                                         ===========
     public Map<String, Object> acceptSubItemMap() { // not null, empty allowed (not required)
+        return doAcceptSubItemMap(() -> new HashMap<String, Object>(2)); // mutable just in case (2021/07/04)
+    }
+
+    public Map<String, Object> acceptSubItemMap(Map<String, Object> defaultSubItemMap) { // not null if not-null default
+        return doAcceptSubItemMap(() -> defaultSubItemMap);
+    }
+
+    protected Map<String, Object> doAcceptSubItemMap(Supplier<Map<String, Object>> defaultProvider) { // null allowed if not defined
         // initialize dummy instance when no definition for velocity trap
         // (if null, variable in for-each is not overridden so previous loop's value is used)
         @SuppressWarnings("unchecked")
         final Map<String, Object> subItemMap = (Map<String, Object>) _elementMap.get(DfClassificationElement.KEY_SUB_ITEM_MAP);
-        return subItemMap != null ? subItemMap : new HashMap<String, Object>(2); // mutable just in case (2021/07/04)
+        return subItemMap != null ? subItemMap : defaultProvider.get();
     }
 }

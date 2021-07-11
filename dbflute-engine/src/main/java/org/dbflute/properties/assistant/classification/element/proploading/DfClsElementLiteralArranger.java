@@ -32,21 +32,33 @@ import org.dbflute.util.Srl;
 public class DfClsElementLiteralArranger {
 
     public void arrange(String classificationName, Map<String, Object> elementMap) {
+        doArrange(classificationName, elementMap, /*suppressDefault*/false);
+    }
+
+    public void arrangeWithoutDefault(String classificationName, Map<String, Object> elementMap) {
+        doArrange(classificationName, elementMap, /*suppressDefault*/true);
+    }
+
+    protected void doArrange(String classificationName, Map<String, Object> elementMap, boolean suppressDefault) {
         final String codeKey = DfClassificationElement.KEY_CODE;
         final String code = (String) elementMap.get(codeKey);
         if (code == null) { // required check
             throwClassificationLiteralCodeNotFoundException(classificationName, elementMap);
         }
 
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // #for_now jflute default is set at element accepting process so maybe unneeded here (2021/07/11)
+        // _/_/_/_/_/_/_/_/_/_/
+
         final String nameKey = DfClassificationElement.KEY_NAME;
         final String name = (String) elementMap.get(nameKey);
-        if (name == null) { // use code
+        if (name == null && !suppressDefault) { // use code
             elementMap.put(nameKey, code);
         }
 
         final String aliasKey = DfClassificationElement.KEY_ALIAS;
         final String alias = (String) elementMap.get(aliasKey);
-        if (alias == null) { // use name or code
+        if (alias == null && !suppressDefault) { // use name or code
             elementMap.put(aliasKey, name != null ? name : code);
         }
 

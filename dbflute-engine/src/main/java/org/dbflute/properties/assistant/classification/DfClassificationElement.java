@@ -66,6 +66,11 @@ public class DfClassificationElement { // directly used in template
     protected String[] _sisters = new String[] {}; // not null with default
     protected Map<String, Object> _subItemMap; // not null after accept
 
+    // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    protected boolean _refClsIncluded; // for appcls
+
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
@@ -94,6 +99,25 @@ public class DfClassificationElement { // directly used in template
         element._sisters = _sisters;
         element._subItemMap = _subItemMap;
         return element;
+    }
+
+    public DfClassificationElement asRefClsIncluded() { // basically with copyElement()
+        _refClsIncluded = true;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                  Override Attribute
+    //                                                                  ==================
+    public void overrideBasicItemMap(Map<?, ?> elementMap) { // for e.g. appcls
+        // code cannot be overridden, other attributes are not required to override so all defalut values are current
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
+        _name = acceptor.acceptName(_name);
+        _alias = acceptor.acceptAlias(_alias);
+        _comment = acceptor.acceptComment(_comment);
+        _sisters = acceptor.acceptSisters(_sisters);
+        _subItemMap = acceptor.acceptSubItemMap(_subItemMap);
+
     }
 
     // ===================================================================================
@@ -329,5 +353,12 @@ public class DfClassificationElement { // directly used in template
 
     public void setSubItemMap(Map<String, Object> subItemMap) {
         _subItemMap = subItemMap;
+    }
+
+    // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    public boolean isRefClsIncluded() {
+        return _refClsIncluded;
     }
 }
