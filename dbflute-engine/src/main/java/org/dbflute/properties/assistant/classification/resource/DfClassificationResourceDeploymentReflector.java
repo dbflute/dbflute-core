@@ -17,6 +17,7 @@ package org.dbflute.properties.assistant.classification.resource;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
@@ -45,7 +46,7 @@ public class DfClassificationResourceDeploymentReflector {
     // ===================================================================================
     //                                                               Reflect to Deployment
     //                                                               =====================
-    public void reflectClassificationResourceToDeployment(Map<String, String> allColumnClassificationMap) {
+    public void reflectClassificationResourceToDeployment(Supplier<Map<String, String>> allColumnClassificationMapProvider) {
         final List<DfClassificationTop> classificationTopList = _resourcePresentsTopList;
         for (DfClassificationTop classificationTop : classificationTopList) {
             final String classificationName = classificationTop.getClassificationName();
@@ -53,7 +54,9 @@ public class DfClassificationResourceDeploymentReflector {
             if (relatedColumnName == null) {
                 continue;
             }
+            // both callback to keep process order 
             _allColumnClsSetupper.process();
+            final Map<String, String> allColumnClassificationMap = allColumnClassificationMapProvider.get();
             if (allColumnClassificationMap.containsKey(relatedColumnName)) {
                 continue;
             }

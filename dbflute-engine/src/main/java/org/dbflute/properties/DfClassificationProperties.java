@@ -726,7 +726,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
         final List<DfClassificationTop> resourceList = getClassificationResourceList();
         final DfClassificationResourceDeploymentReflector reflector =
                 new DfClassificationResourceDeploymentReflector(resourceList, () -> setupAllColumnClassificationEmptyMapIfNeeds());
-        reflector.reflectClassificationResourceToDeployment(getAllColumnClassificationMap());
+        reflector.reflectClassificationResourceToDeployment(() -> getAllColumnClassificationMap());
     }
 
     // ===================================================================================
