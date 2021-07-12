@@ -164,7 +164,10 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         optionMap.put("classificationTopList", topList);
         optionMap.put("classificationNameList", topList.stream().map(top -> top.getClassificationName()).collect(Collectors.toList()));
         optionMap.put("hasRefCls", hasRefCls);
-        optionMap.put("referredCDefFqcnList", prepareReferredCDefFqcnList(topList)); // @since 1.2.5
+
+        // not contains import-unneeded one (e.g. namedcls to namedcls)
+        final List<String> importedReferredCDefFqcnList = prepareImportedReferredCDefFqcnList(topList, optionMap);
+        optionMap.put("importedReferredCDefFqcnList", importedReferredCDefFqcnList); // @since 1.2.5
 
         // already unused @since 1.2.5 but compatible for plain freegen just in case
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
@@ -210,8 +213,8 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // -----------------------------------------------------
     //                                         Referred CDef
     //                                         -------------
-    protected List<String> prepareReferredCDefFqcnList(List<DfClassificationTop> topList) {
-        return _refClsLoadingHandler.prepareReferredCDefFqcnList(topList);
+    protected List<String> prepareImportedReferredCDefFqcnList(List<DfClassificationTop> topList, Map<String, Object> optionMap) {
+        return _refClsLoadingHandler.prepareImportedReferredCDefFqcnList(topList, optionMap);
     }
 
     // -----------------------------------------------------

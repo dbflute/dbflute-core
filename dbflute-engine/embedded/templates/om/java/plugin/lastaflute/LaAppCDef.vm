@@ -25,7 +25,7 @@ import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
 #if ($optionMap.hasRefCls && !$optionMap.isSuppressDBClsCollaboration)
-#foreach ($referredCDefFqcn in $optionMap.referredCDefFqcnList)
+#foreach ($referredCDefFqcn in $optionMap.importedReferredCDefFqcnList)
 import ${referredCDefFqcn};
 #end
 #end

@@ -74,7 +74,7 @@ public class DfFreeGenResource {
     }
 
     public String getResourceFilePureName() {
-        return _resourceFile != null ? Srl.substringLastRear(_resourceFile, "/") : _resourceFile;
+        return _resourceFile != null ? Srl.substringLastRear(_resourceFile, "/") : _resourceFile; // null check just in case
     }
 
     public boolean hasEncoding() {

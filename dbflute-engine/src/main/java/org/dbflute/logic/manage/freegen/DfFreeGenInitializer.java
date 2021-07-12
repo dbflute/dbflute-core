@@ -82,6 +82,7 @@ public class DfFreeGenInitializer {
             requestMap.put(requestName, request); // may be used in loader process so here
             final DfFreeGenMetaData metaData;
             try {
+                _log.info("...Loading freegen table: request={}, resource={}", requestName, resource.getResourceFilePureName());
                 metaData = tableLoader.loadTable(requestName, resource, mapProp);
             } catch (DfFreeGenCancelException continued) {
                 showCancelledRequest(requestName, continued);

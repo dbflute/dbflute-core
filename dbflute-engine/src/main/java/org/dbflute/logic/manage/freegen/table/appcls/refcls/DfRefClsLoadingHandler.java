@@ -290,7 +290,8 @@ public class DfRefClsLoadingHandler {
     // ===================================================================================
     //                                                                       Referred CDef
     //                                                                       =============
-    public List<String> prepareReferredCDefFqcnList(List<DfClassificationTop> topList) {
+    public List<String> prepareImportedReferredCDefFqcnList(List<DfClassificationTop> topList, Map<String, Object> optionMap) {
+        final String currentCDefPackage = extractCDefPackage(optionMap); // null allowed, as best effort way
         final Map<String, String> refThemeCDefFqcnMap = new LinkedHashMap<String, String>();
         for (DfClassificationTop top : topList) {
             final List<DfRefClsElement> refClsElementList = top.getRefClsElementList();
@@ -301,6 +302,9 @@ public class DfRefClsLoadingHandler {
                     break;
                 }
                 final String referredCDefPackage = refClsElement.getReferredCDefPackage();
+                if (currentCDefPackage != null && currentCDefPackage.equals(referredCDefPackage)) { // same package CDef
+                    continue; // same-package import statement is unneeded (to avoid Eclipse warning) e.g. namedcls to namedcls
+                }
                 final String referredCDefClassName = refClsElement.getReferredCDefClassName();
                 final String refThemeCDefFqcn = referredCDefPackage + "." + referredCDefClassName;
                 refThemeCDefFqcnMap.put(refClsTheme, refThemeCDefFqcn);
@@ -323,8 +327,8 @@ public class DfRefClsLoadingHandler {
         final Map<String, DfClassificationTop> clsTopMap =
                 topList.stream().collect(Collectors.toMap(top -> top.getClassificationName(), top -> top));
 
-        final String cdefPackage = (String) optionMap.get("cdefPackage"); // not null
-        final String cdefClassName = (String) optionMap.get("cdefClassName"); // not null
+        final String cdefPackage = extractCDefPackage(optionMap); // not null here, already checked here
+        final String cdefClassName = extractCDefClassName(optionMap); // me too
         if (cdefPackage == null || cdefClassName == null) { // just in case
             throwRefClsReferenceCDefInfoNotFoundException(requestName, clsTheme, optionMap, cdefPackage, cdefClassName);
         }
@@ -360,6 +364,17 @@ public class DfRefClsLoadingHandler {
         });
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected String extractCDefClassName(Map<String, Object> optionMap) {
+        return (String) optionMap.get("cdefClassName"); // not null if LastaFlute embedded FreeGen
+    }
+
+    protected String extractCDefPackage(Map<String, Object> optionMap) {
+        return (String) optionMap.get("cdefPackage"); // not null if LastaFlute embedded FreeGen
     }
 
     // ===================================================================================

@@ -18,6 +18,8 @@ package org.dbflute.properties.assistant.lastaflute;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -562,6 +564,9 @@ public final class DfLastaFluteFreeGenReflector {
         if (dfpropFiles == null || dfpropFiles.length == 0) {
             return;
         }
+        // standard order by file name for namedcls stably referring to namedcls
+        // (copied from namecls registration)
+        Arrays.sort(dfpropFiles, Comparator.comparing(file -> file.getName()));
         for (File dfpropFile : dfpropFiles) {
             final Map<String, Object> namedclsMap = new LinkedHashMap<String, Object>();
             final String dfpropName = dfpropFile.getName();
@@ -670,6 +675,8 @@ public final class DfLastaFluteFreeGenReflector {
             _log.info("*No namedcls dfprop file in the directory so skip it: " + namedclsPath);
             return;
         }
+        // standard order by file name for namedcls stably referring to namedcls
+        Arrays.sort(dfpropFiles, Comparator.comparing(file -> file.getName()));
         for (File dfpropFile : dfpropFiles) {
             final String dfpropName = dfpropFile.getName();
             final String clsDomain = Srl.extractScopeFirst(dfpropName, filePrefix, fileSuffix).getContent();
