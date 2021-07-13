@@ -68,32 +68,35 @@ public class DfRefClsLoadingHandler {
         final String refAttr = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
         final String refClsTheme; // of e.g. DB or "appcls" or namedcls's name
         final String refClsName; // classification name
-        final String groupName;
+        final String refGroupName;
         if (refAttr.contains("@")) { // #hope other schema's reference
             refClsTheme = Srl.substringFirstFront(refAttr, "@");
             final String rearName = Srl.substringFirstRear(refAttr, "@");
             if (rearName.contains(".")) {
                 refClsName = Srl.substringFirstFront(rearName, ".");
-                groupName = Srl.substringFirstRear(rearName, ".");
+                refGroupName = Srl.substringFirstRear(rearName, ".");
             } else {
                 refClsName = rearName;
-                groupName = null;
+                refGroupName = null;
             }
         } else {
             refClsTheme = getBasicProperties().getProjectName(); // current DB as default
             if (refAttr.contains(".")) {
                 refClsName = Srl.substringFirstFront(refAttr, ".");
-                groupName = Srl.substringFirstRear(refAttr, ".");
+                refGroupName = Srl.substringFirstRear(refAttr, ".");
             } else {
                 refClsName = refAttr;
-                groupName = null;
+                refGroupName = null;
             }
         }
         final String refType = extractRefType(classificationName, elementMap);
         final DfClassificationTop referredClsTop = findReferredClsTop(classificationName, refAttr, refClsTheme, refClsName, resource);
         final DfRefClsReferredCDef referredCDef = findReferredCDef(classificationName, refAttr, refClsTheme, refClsName, resource);
+        final DfClassificationGroup referredGroup =
+                findReferredGroup(classificationName, refAttr, refClsTheme, refClsName, refGroupName, referredClsTop, resource);
         final String resourceFile = resource.getResourceFile();
-        return new DfRefClsElement(refClsTheme, refClsName, groupName, refType, referredClsTop, referredCDef, resourceFile);
+        return new DfRefClsElement(refClsTheme, refClsName, refGroupName, refType, referredClsTop, referredCDef, referredGroup,
+                resourceFile);
     }
 
     protected String extractRefType(String classificationName, Map<String, Object> elementMap) {
@@ -108,6 +111,9 @@ public class DfRefClsLoadingHandler {
     // ===================================================================================
     //                                                                      Find Reference
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                       Referred ClsTop
+    //                                       ---------------
     protected DfClassificationTop findReferredClsTop(String classificationName, String refAttr, String refClsTheme, String refClsName,
             DfFreeGenResource resource) {
         final DfRefClsReference reference = findReference(classificationName, refAttr, refClsTheme, refClsName, resource);
@@ -119,12 +125,40 @@ public class DfRefClsLoadingHandler {
         return referredClsTop;
     }
 
+    protected void throwAppClsReferredClsNotFoundException(String classificationName, String refAttr, String refClsTheme, String refClsName,
+            Map<String, DfClassificationTop> clsTopMap, DfFreeGenResource resource) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the referred classification from the app classification.");
+        br.addItem("Advice");
+        br.addElement("Make sure your classification name of refCls attribute.");
+        br.addItem("AppCls");
+        br.addElement(classificationName);
+        br.addItem("RefCls Attribute");
+        br.addElement(refAttr);
+        br.addItem("RefCls Theme");
+        br.addElement(refClsTheme);
+        br.addItem("NotFound Cls");
+        br.addElement(refClsName);
+        br.addItem("Existing Cls");
+        br.addElement(clsTopMap.keySet());
+        br.addItem("dfprop File");
+        br.addElement(resource.getResourceFile());
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                         Referred CDef
+    //                                         -------------
     protected DfRefClsReferredCDef findReferredCDef(String classificationName, String refAttr, String refClsTheme, String refClsName,
             DfFreeGenResource resource) {
         final DfRefClsReference reference = findReference(classificationName, refAttr, refClsTheme, refClsName, resource);
         return reference.getReferredCDef();
     }
 
+    // -----------------------------------------------------
+    //                                    Reference Registry
+    //                                    ------------------
     protected DfRefClsReference findReference(String classificationName, String refAttr, String refClsTheme, String refClsName,
             DfFreeGenResource resource) {
         final DfRefClsReference reference = DfRefClsReferenceRegistry.getInstance().findReference(refClsTheme);
@@ -168,10 +202,26 @@ public class DfRefClsLoadingHandler {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwAppClsReferredClsNotFoundException(String classificationName, String refAttr, String refClsTheme, String refClsName,
-            Map<String, DfClassificationTop> clsTopMap, DfFreeGenResource resource) {
+    // -----------------------------------------------------
+    //                                        Referred Group
+    //                                        --------------
+    protected DfClassificationGroup findReferredGroup(String classificationName, String refAttr, String refClsTheme, String refClsName,
+            String refGroupName, DfClassificationTop referredClsTop, DfFreeGenResource resource) {
+        DfClassificationGroup referredGroup = null;
+        if (refGroupName != null) {
+            referredGroup = referredClsTop.findGroup(refGroupName);
+            if (referredGroup == null) {
+                throwAppClsReferredClsGroupNotFoundException(classificationName, refAttr, refClsTheme, refClsName, refGroupName,
+                        referredClsTop, resource);
+            }
+        }
+        return referredGroup;
+    }
+
+    protected void throwAppClsReferredClsGroupNotFoundException(String classificationName, String refAttr, String refClsTheme,
+            String refClsName, String refGroupName, DfClassificationTop referredClsTop, DfFreeGenResource resource) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the referred classification from the app classification.");
+        br.addNotice("Not found the group of referred classification from the app classification.");
         br.addItem("Advice");
         br.addElement("Make sure your classification name of refCls attribute.");
         br.addItem("AppCls");
@@ -180,10 +230,12 @@ public class DfRefClsLoadingHandler {
         br.addElement(refAttr);
         br.addItem("RefCls Theme");
         br.addElement(refClsTheme);
-        br.addItem("NotFound Cls");
+        br.addItem("Referred Cls");
         br.addElement(refClsName);
-        br.addItem("Existing Cls");
-        br.addElement(clsTopMap.keySet());
+        br.addItem("NotFound Group");
+        br.addElement(refGroupName);
+        br.addItem("Existing Group");
+        br.addElement(referredClsTop.getGroupList().stream().map(gr -> gr.getGroupName()).collect(Collectors.toList()));
         br.addItem("dfprop File");
         br.addElement(resource.getResourceFile());
         final String msg = br.buildExceptionMessage();

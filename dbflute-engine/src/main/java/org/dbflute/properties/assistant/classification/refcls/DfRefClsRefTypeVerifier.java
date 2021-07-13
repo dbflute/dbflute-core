@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.util.Srl;
 
@@ -35,14 +36,17 @@ public class DfRefClsRefTypeVerifier {
     //                                                                           =========
     protected final DfRefClsRefType _refType;
     protected final DfClassificationTop _referredClsTop;
+    protected final DfClassificationGroup _referredGroup; // null allowed
     protected final String _resourceFile;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop referredClsTop, String resourceFile) {
+    public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop referredClsTop, DfClassificationGroup referredGroup,
+            String resourceFile) {
         _refType = refType;
         _referredClsTop = referredClsTop;
+        _referredGroup = referredGroup;
         _resourceFile = resourceFile;
     }
 
@@ -81,13 +85,14 @@ public class DfRefClsRefTypeVerifier {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                Exists
+    //                                                ------
     protected void doVerifyRefExists(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> appElementList = classificationTop.getClassificationElementList();
-        final List<DfClassificationElement> referredElementList = _referredClsTop.getClassificationElementList();
+        final List<DfClassificationElement> referredElementList = extractReferredElementList();
         final List<DfClassificationElement> nonExistingList = appElementList.stream().filter(appElement -> {
-            return !referredElementList.stream().anyMatch(referredElement -> {
-                return appElement.getCode().equals(referredElement.getCode());
-            });
+            return notMatchesReferredElement(referredElementList, appElement);
         }).collect(Collectors.toList());
         if (!nonExistingList.isEmpty()) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -105,9 +110,9 @@ public class DfRefClsRefTypeVerifier {
             br.addItem("dfprop File");
             br.addElement(_resourceFile);
             br.addItem("AppCls");
-            br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(classificationTop));
+            br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(appElementList));
             br.addItem("ReferredCls");
-            br.addElement(_referredClsTop.getClassificationName() + ": " + buildClsCodesExp(_referredClsTop));
+            br.addElement(buildReferredExp() + ": " + buildClsCodesExp(referredElementList));
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Non-Existing Code");
@@ -119,15 +124,16 @@ public class DfRefClsRefTypeVerifier {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               Matches
+    //                                               -------
     protected void doVerifyRefMatches(DfClassificationTop classificationTop) {
-        final List<DfClassificationElement> webElementList = classificationTop.getClassificationElementList();
-        final List<DfClassificationElement> dbElementList = _referredClsTop.getClassificationElementList();
-        final boolean hasNonExisting = webElementList.stream().anyMatch(webElement -> {
-            return !dbElementList.stream().anyMatch(dbElement -> {
-                return webElement.getCode().equals(dbElement.getCode());
-            });
+        final List<DfClassificationElement> appElementList = classificationTop.getClassificationElementList();
+        final List<DfClassificationElement> referredElementList = extractReferredElementList();
+        final boolean hasNonExisting = appElementList.stream().anyMatch(appElement -> {
+            return notMatchesReferredElement(referredElementList, appElement);
         });
-        if (webElementList.size() != dbElementList.size() || hasNonExisting) {
+        if (appElementList.size() != referredElementList.size() || hasNonExisting) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Unmatched the web classification code with the referred classification");
             br.addItem("Advice");
@@ -141,22 +147,49 @@ public class DfRefClsRefTypeVerifier {
             br.addItem("dfprop File");
             br.addElement(_resourceFile);
             br.addItem("AppCls");
-            br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(classificationTop));
-            br.addItem("DBCls");
-            br.addElement(_referredClsTop.getClassificationName() + ": " + buildClsCodesExp(_referredClsTop));
+            br.addElement(classificationTop.getClassificationName() + ": " + buildClsCodesExp(appElementList));
+            br.addItem("ReferredCls");
+            br.addElement(buildReferredExp() + ": " + buildClsCodesExp(referredElementList));
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Code Count");
-            br.addElement("app=" + webElementList.size() + " / referred=" + dbElementList.size());
+            br.addElement("app=" + appElementList.size() + " / referred=" + referredElementList.size());
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
-    protected String buildClsCodesExp(DfClassificationTop top) {
-        final String dbCodes = top.getClassificationElementList().stream().map(element -> {
-            return element.getCode();
-        }).collect(Collectors.joining(", "));
-        return Srl.is_NotNull_and_NotTrimmedEmpty(dbCodes) ? dbCodes : "(no elements)";
+    // -----------------------------------------------------
+    //                                          Assist Logic
+    //                                          ------------
+    protected List<DfClassificationElement> extractReferredElementList() {
+        final List<DfClassificationElement> referredElementList;
+        if (_referredGroup != null) {
+            referredElementList = _referredGroup.getElementList();
+        } else {
+            referredElementList = _referredClsTop.getClassificationElementList();
+        }
+        return referredElementList;
+    }
+
+    protected boolean notMatchesReferredElement(List<DfClassificationElement> referredElementList, DfClassificationElement appElement) {
+        return !referredElementList.stream().anyMatch(referredElement -> {
+            return appElement.getCode().equals(referredElement.getCode());
+        });
+    }
+
+    protected String buildReferredExp() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_referredClsTop.getClassificationName());
+        if (_referredGroup != null) {
+            sb.append(".").append(_referredGroup.getGroupName());
+        }
+        final String referredExp = sb.toString();
+        return referredExp;
+    }
+
+    protected String buildClsCodesExp(List<DfClassificationElement> elementList) {
+        final String codes = elementList.stream().map(element -> element.getCode()).collect(Collectors.joining(", "));
+        return Srl.is_NotNull_and_NotTrimmedEmpty(codes) ? codes : "(no elements)";
     }
 }

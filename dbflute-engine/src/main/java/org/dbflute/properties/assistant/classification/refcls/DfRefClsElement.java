@@ -15,6 +15,7 @@
  */
 package org.dbflute.properties.assistant.classification.refcls;
 
+import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 
 /**
@@ -33,24 +34,27 @@ public class DfRefClsElement { // directly used in template
     //                                                                           Attribute
     //                                                                           =========
     protected final String _refClsTheme; // e.g. maihamadb, not null
-    protected final String _classificationName; // e.g. MemberStatus, not null
-    protected final String _groupName; // null allowed
+    protected final String _classificationName; // broken reference already checked here, e.g. MemberStatus, not null
+    protected final String _groupName; // broken reference already checked here, null allowed (not required)
     protected final DfRefClsRefType _refType; // not null
     protected final DfClassificationTop _referredClsTop; // not null
     protected final DfRefClsReferredCDef _referredCDef; // not null
+    protected final DfClassificationGroup _referredGroup; // null allowed (synchronized with groupName)
     protected final String _resourceFile; // for e.g. exception message, not null
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfRefClsElement(String refClsTheme, String classificationName, String groupName, String refType,
-            DfClassificationTop referredClsTop, DfRefClsReferredCDef referredCDef, String resourceFile) {
+            DfClassificationTop referredClsTop, DfRefClsReferredCDef referredCDef, DfClassificationGroup referredGroup,
+            String resourceFile) {
         _refClsTheme = refClsTheme;
         _classificationName = classificationName;
         _groupName = groupName;
         _refType = new DfRefClsRefType(refType);
         _referredClsTop = referredClsTop;
         _referredCDef = referredCDef;
+        _referredGroup = referredGroup;
         _resourceFile = resourceFile;
     }
 
@@ -96,7 +100,7 @@ public class DfRefClsElement { // directly used in template
     }
 
     protected DfRefClsRefTypeVerifier createRefClsRefTypeVerifier() {
-        return new DfRefClsRefTypeVerifier(_refType, _referredClsTop, _resourceFile);
+        return new DfRefClsRefTypeVerifier(_refType, _referredClsTop, _referredGroup, _resourceFile);
     }
 
     // ===================================================================================

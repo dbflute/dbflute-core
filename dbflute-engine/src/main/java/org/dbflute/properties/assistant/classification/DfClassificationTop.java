@@ -290,6 +290,10 @@ public class DfClassificationTop { // directly used in template
         return !getGroupList().isEmpty();
     }
 
+    public DfClassificationGroup findGroup(String groupName) { // null allowed, case insensitive
+        return getGroupList().stream().filter(group -> group.getGroupName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
+    }
+
     // -----------------------------------------------------
     //                                        Deprecated Map
     //                                        --------------
