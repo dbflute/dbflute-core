@@ -93,21 +93,10 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 } else {
                     if (isElementMapRefCls(elementMap)) {
                         // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
-                        assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
-                        refClsElement = createRefClsElement(classificationName, elementMap, resource);
-                        refClsElement.verifyFormalRefType(classificationTop);
-                        classificationTop.addRefClsElement(refClsElement);
-                        includeRefClsElement(classificationTop, refClsElement);
+                        refClsElement = arrangeRefCls(resource, classificationName, classificationTop, refClsElement, elementMap);
                     } else {
                         // e.g. map:{ code=FML ; name=OneMan ; alias=ShowBase ; comment=Formalized }
-                        literalArranger.arrangeWithoutDefault(classificationName, elementMap);
-                        final boolean resolved = resolveIncludedOverridingIfExists(classificationTop, refClsElement, elementMap, resource);
-                        if (!resolved) { // can be treated as normal element
-                            final DfClassificationElement element = new DfClassificationElement();
-                            element.setClassificationName(classificationName);
-                            element.acceptBasicItemMap(elementMap);
-                            classificationTop.addClassificationElement(element);
-                        }
+                        arrangeLiteral(resource, classificationName, classificationTop, refClsElement, elementMap, literalArranger);
                     }
                 }
             }
@@ -124,6 +113,42 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         stopRedundantCommentIfNeeds(requestName, resourceFile, topList, optionMap); // @since 1.2.5
         registerRefClsReference(requestName, clsTheme, topList, optionMap); // for next appcls's refCls @since 1.2.5
         return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList()); // #for_now can be flexible? (table name is unused?)
+    }
+
+    protected DfRefClsElement arrangeRefCls(DfFreeGenResource resource, String classificationName, DfClassificationTop classificationTop,
+            DfRefClsElement refClsElement, Map<String, Object> elementMap) {
+        // e.g. map:{ refCls=maihamadb@MemberStatus ; refType=included }
+        assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
+        refClsElement = createRefClsElement(classificationName, elementMap, resource);
+        refClsElement.verifyFormalRefType(classificationTop);
+        classificationTop.addRefClsElement(refClsElement);
+        includeRefClsElement(classificationTop, refClsElement);
+        return refClsElement;
+    }
+
+    protected void arrangeLiteral(DfFreeGenResource resource, String classificationName, DfClassificationTop classificationTop,
+            DfRefClsElement refClsElement, Map<String, Object> elementMap, DfClsElementLiteralArranger literalArranger) {
+        // e.g. map:{ code=FML ; name=OneMan ; alias=ShowBase ; comment=Formalized }
+        literalArranger.arrangeWithoutDefault(classificationName, elementMap);
+        boolean arrangeSuppressed = false;
+        if (refClsElement != null) {
+            if (refClsElement.isRefWayEmbedded()) {
+                arrangeSuppressed = resolveIncludedOverridingIfNeeds(classificationTop, refClsElement, elementMap, resource);
+            } else if (refClsElement.isRefWayLink()) {
+                resolveExistsInheritingIfNeeds(refClsElement, elementMap);
+                // anyway, can arrange it
+            }
+        }
+        if (!arrangeSuppressed) {
+            doArrangeLiteral(classificationName, classificationTop, elementMap);
+        }
+    }
+
+    protected void doArrangeLiteral(String classificationName, DfClassificationTop classificationTop, Map<String, Object> elementMap) {
+        final DfClassificationElement element = new DfClassificationElement();
+        element.setClassificationName(classificationName);
+        element.acceptBasicItemMap(elementMap);
+        classificationTop.addClassificationElement(element);
     }
 
     protected String getDefaultClsTheme() { // you can override for e.g. webcls in LastaDoc (2021/07/10)
@@ -198,9 +223,16 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // -----------------------------------------------------
     //                           Resolve Included Overriding
     //                           ---------------------------
-    protected boolean resolveIncludedOverridingIfExists(DfClassificationTop classificationTop, DfRefClsElement refClsElement,
+    protected boolean resolveIncludedOverridingIfNeeds(DfClassificationTop classificationTop, DfRefClsElement refClsElement,
             Map<String, Object> elementMap, DfFreeGenResource resource) {
-        return _refClsLoadingHandler.resolveIncludedOverridingIfExists(classificationTop, refClsElement, elementMap, resource);
+        return _refClsLoadingHandler.resolveIncludedOverridingIfNeeds(classificationTop, refClsElement, elementMap, resource);
+    }
+
+    // -----------------------------------------------------
+    //                             Resolve Exists Inheriting
+    //                             -------------------------
+    protected boolean resolveExistsInheritingIfNeeds(DfRefClsElement refClsElement, Map<String, Object> elementMap) {
+        return _refClsLoadingHandler.resolveExistsInheritingIfNeeds(refClsElement, elementMap);
     }
 
     // -----------------------------------------------------

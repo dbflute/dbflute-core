@@ -35,12 +35,12 @@ public class DfClsElementBasicItemAcceptor {
     //                                                                           =========
     protected final String _classificationName; // not null
     protected final String _table; // null allowed (not required)
-    protected final Map<?, ?> _elementMap;
+    protected final Map<String, Object> _elementMap; // mutable for reverse
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClsElementBasicItemAcceptor(String classificationName, String table, Map<?, ?> elementMap) {
+    public DfClsElementBasicItemAcceptor(String classificationName, String table, Map<String, Object> elementMap) {
         _classificationName = classificationName;
         _table = table;
         _elementMap = elementMap;
@@ -83,12 +83,20 @@ public class DfClsElementBasicItemAcceptor {
         return name != null ? name : defaultName;
     }
 
+    public void reverseNameIfNone(String reversed) {
+        doReverseValueIfNone(DfClassificationElement.KEY_NAME, reversed);
+    }
+
     // ===================================================================================
     //                                                                               Alias
     //                                                                               =====
     public String acceptAlias(String defaultAlias) { // not null if not-null default
         final String alias = (String) _elementMap.get(DfClassificationElement.KEY_ALIAS);
         return alias != null ? alias : defaultAlias;
+    }
+
+    public void reverseAliasIfNone(String reversed) {
+        doReverseValueIfNone(DfClassificationElement.KEY_ALIAS, reversed);
     }
 
     // ===================================================================================
@@ -105,6 +113,10 @@ public class DfClsElementBasicItemAcceptor {
 
     protected String doAcceptComment() {
         return (String) _elementMap.get(DfClassificationElement.KEY_COMMENT);
+    }
+
+    public void reverseCommentIfNone(String reversed) {
+        doReverseValueIfNone(DfClassificationElement.KEY_COMMENT, reversed);
     }
 
     // ===================================================================================
@@ -126,6 +138,8 @@ public class DfClsElementBasicItemAcceptor {
                 @SuppressWarnings("unchecked")
                 final List<String> sisterCodeList = (List<String>) sisterCodeObj;
                 sisters = sisterCodeList.toArray(new String[sisterCodeList.size()]);
+            } else if (sisterCodeObj instanceof String[]) { // when e.g. reversed
+                sisters = (String[]) sisterCodeObj;
             } else {
                 sisters = new String[] { (String) sisterCodeObj };
             }
@@ -133,6 +147,10 @@ public class DfClsElementBasicItemAcceptor {
             sisters = defaultProvider.get();
         }
         return sisters;
+    }
+
+    public void reverseSistersIfNone(String[] reversed) {
+        doReverseValueIfNone(DfClassificationElement.KEY_SISTER_CODE, reversed);
     }
 
     // ===================================================================================
@@ -152,5 +170,43 @@ public class DfClsElementBasicItemAcceptor {
         @SuppressWarnings("unchecked")
         final Map<String, Object> subItemMap = (Map<String, Object>) _elementMap.get(DfClassificationElement.KEY_SUB_ITEM_MAP);
         return subItemMap != null ? subItemMap : defaultProvider.get();
+    }
+
+    public void reverseSubItemMapIfNone(Map<String, Object> reversed) {
+        doReverseValueIfNone(DfClassificationElement.KEY_SUB_ITEM_MAP, reversed);
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected void doReverseValueIfNone(String key, Object reversed) {
+        if (!_elementMap.containsKey(key)) {
+            if (canBeReversed(reversed)) { // to avoid null value element, already checked here just in case
+                try {
+                    _elementMap.put(key, reversed);
+                } catch (RuntimeException e) { // just in case for e.g. read-only map
+                    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                    br.addNotice("Failed to put the element to the map.");
+                    br.addItem("Classification");
+                    br.addElement(_classificationName);
+                    br.addItem("Key/Value");
+                    br.addElement(key + ", " + reversed);
+                    br.addItem("Element Map");
+                    br.addElement(_elementMap);
+                    final String msg = br.buildExceptionMessage();
+                    throw new IllegalStateException(msg, e);
+                }
+            }
+        }
+    }
+
+    protected boolean canBeReversed(Object reversed) { // needs to fix if new type attribute
+        if (reversed instanceof String[]) {
+            return ((String[]) reversed).length >= 1;
+        } else if (reversed instanceof Map<?, ?>) {
+            return !((Map<?, ?>) reversed).isEmpty();
+        } else {
+            return reversed != null;
+        }
     }
 }

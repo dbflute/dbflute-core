@@ -441,7 +441,7 @@ public final class DfClassificationProperties extends DfAbstractDBFlutePropertie
         return _suppressedDBAccessClassTableSet.contains(tableDbName);
     }
 
-    protected void arrangeTableClassification(DfClassificationTop classificationTop, Map<?, ?> elementMap, String table,
+    protected void arrangeTableClassification(DfClassificationTop classificationTop, Map<String, Object> elementMap, String table,
             List<DfClassificationElement> elementList, Connection conn) {
         final DfClsTableClassificationArranger arranger = new DfClsTableClassificationArranger(_propertyValueHandler);
         arranger.arrangeTableClassification(_tableClassificationMap, classificationTop, elementMap, table, elementList, conn);

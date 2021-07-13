@@ -280,25 +280,29 @@ public class DfRefClsLoadingHandler {
     // ===================================================================================
     //                                                         Resolve Included Overriding
     //                                                         ===========================
-    public boolean resolveIncludedOverridingIfExists(DfClassificationTop classificationTop, DfRefClsElement refClsElement,
+    public boolean resolveIncludedOverridingIfNeeds(DfClassificationTop classificationTop, DfRefClsElement refClsElement,
             Map<String, Object> elementMap, DfFreeGenResource resource) {
         if (refClsElement == null) {
+            return false;
+        }
+        if (!refClsElement.isRefWayEmbedded()) { // e.g. exists, matches
             return false;
         }
         final String literalCode = (String) elementMap.get(DfClassificationElement.KEY_CODE); // not null (already checked)
         final Optional<DfClassificationElement> optSameCodeElement = classificationTop.getClassificationElementList()
                 .stream()
-                .filter(el -> el.isRefClsIncluded())
+                .filter(el -> el.isRefClsIncluded()) // to except added manual element
                 .filter(el -> el.getCode().equals(literalCode))
                 .findFirst();
         optSameCodeElement.ifPresent(sameCodeElement -> {
             final Object overrideProp = elementMap.get("override");
             if (overrideProp != null && "true".equalsIgnoreCase(overrideProp.toString())) {
-                sameCodeElement.overrideBasicItemMap(elementMap);
+                sameCodeElement.overrideBasicItemByElementMap(elementMap);
             } else {
                 throwAppClsRefClsIncludedCodeConflictException(classificationTop, refClsElement, literalCode, resource);
             }
         });
+        // treated as normal element if same-code element not found
         return optSameCodeElement.isPresent();
     }
 
@@ -328,6 +332,33 @@ public class DfRefClsLoadingHandler {
         br.addElement(resource.getResourceFile());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
+    }
+
+    // ===================================================================================
+    //                                                           Resolve Exists Inheriting
+    //                                                           =========================
+    public boolean resolveExistsInheritingIfNeeds(DfRefClsElement refClsElement, Map<String, Object> elementMap) {
+        if (refClsElement == null) {
+            return false;
+        }
+        if (!refClsElement.isRefWayLink()) { // e.g. included
+            return false;
+        }
+        final Object inheritProp = elementMap.get("inherit");
+        if (inheritProp != null && "true".equalsIgnoreCase(inheritProp.toString())) {
+            final String literalCode = (String) elementMap.get(DfClassificationElement.KEY_CODE); // not null (already checked)
+            final List<DfClassificationElement> referredElementList = refClsElement.extractReferredElementList();
+            final Optional<DfClassificationElement> optSameCodeElement =
+                    referredElementList.stream().filter(el -> el.getCode().equals(literalCode)).findFirst();
+            optSameCodeElement.ifPresent(sameCodeElement -> {
+                sameCodeElement.reverseBasicItemIfNoneToElementMap(elementMap);
+            });
+            // certainly mistake if same-code element not found
+            // but treated as normal element and verified later so do nothing here
+            return optSameCodeElement.isPresent();
+        } else {
+            return false;
+        }
     }
 
     // ===================================================================================

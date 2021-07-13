@@ -15,6 +15,9 @@
  */
 package org.dbflute.properties.assistant.classification.refcls;
 
+import java.util.List;
+
+import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 
@@ -88,6 +91,14 @@ public class DfRefClsElement { // directly used in template
         return _refType.isRefTypeMatches();
     }
 
+    public boolean isRefWayEmbedded() { // e.g. included
+        return _refType.isRefWayEmbedded();
+    }
+
+    public boolean isRefWayLink() { // e.g. exists, matches
+        return _refType.isRefWayLink();
+    }
+
     // ===================================================================================
     //                                                                      Verify refType
     //                                                                      ==============
@@ -100,7 +111,7 @@ public class DfRefClsElement { // directly used in template
     }
 
     protected DfRefClsRefTypeVerifier createRefClsRefTypeVerifier() {
-        return new DfRefClsRefTypeVerifier(_refType, _referredClsTop, _referredGroup, _resourceFile);
+        return new DfRefClsRefTypeVerifier(_refType, _referredClsTop, _referredGroup, extractReferredElementList(), _resourceFile);
     }
 
     // ===================================================================================
@@ -142,6 +153,19 @@ public class DfRefClsElement { // directly used in template
     }
 
     // ===================================================================================
+    //                                                              Classification Element
+    //                                                              ======================
+    public List<DfClassificationElement> extractReferredElementList() {
+        final List<DfClassificationElement> referredElementList;
+        if (_referredGroup != null) {
+            referredElementList = _referredGroup.getElementList();
+        } else {
+            referredElementList = _referredClsTop.getClassificationElementList();
+        }
+        return referredElementList;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -175,5 +199,9 @@ public class DfRefClsElement { // directly used in template
 
     public DfClassificationTop getReferredClsTop() {
         return _referredClsTop;
+    }
+
+    public DfClassificationGroup getReferredGroup() {
+        return _referredGroup; // null allowed
     }
 }

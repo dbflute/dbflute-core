@@ -40,6 +40,10 @@ public class DfRefClsRefType { // for e.g. appcls, webcls, namedcls
         return isRefTypeIncluded() || isRefTypeExists() || isRefTypeMatches();
     }
 
+    public boolean isRefTypeIncluded() {
+        return _refTypeValue.equals("included");
+    }
+
     public boolean isRefTypeExists() {
         return _refTypeValue.equals("exists");
     }
@@ -48,8 +52,12 @@ public class DfRefClsRefType { // for e.g. appcls, webcls, namedcls
         return _refTypeValue.equals("matches");
     }
 
-    public boolean isRefTypeIncluded() {
-        return _refTypeValue.equals("included");
+    public boolean isRefWayEmbedded() { // e.g. included
+        return isRefTypeIncluded();
+    }
+
+    public boolean isRefWayLink() { // e.g. exists, matches
+        return isRefTypeExists() || isRefTypeMatches();
     }
 
     // ===================================================================================

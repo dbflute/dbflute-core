@@ -74,8 +74,10 @@ public class DfClassificationElement { // directly used in template
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void acceptBasicItemMap(Map<?, ?> elementMap) {
-        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
+    public void acceptBasicItemMap(Map<String, ? extends Object> elementMap) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> typeFittingMap = (Map<String, Object>) elementMap;
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, typeFittingMap);
         _code = acceptor.acceptCode();
         _name = acceptor.acceptName(_code); // same as code if null (not required)
         _alias = acceptor.acceptAlias(_name); // same as name if null (not required)
@@ -109,7 +111,7 @@ public class DfClassificationElement { // directly used in template
     // ===================================================================================
     //                                                                  Override Attribute
     //                                                                  ==================
-    public void overrideBasicItemMap(Map<?, ?> elementMap) { // for e.g. appcls
+    public void overrideBasicItemByElementMap(Map<String, Object> elementMap) { // for e.g. appcls
         // code cannot be overridden, other attributes are not required to override so all defalut values are current
         final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
         _name = acceptor.acceptName(_name);
@@ -117,7 +119,25 @@ public class DfClassificationElement { // directly used in template
         _comment = acceptor.acceptComment(_comment);
         _sisters = acceptor.acceptSisters(_sisters);
         _subItemMap = acceptor.acceptSubItemMap(_subItemMap);
+    }
 
+    // ===================================================================================
+    //                                                                   Reverse Attribute
+    //                                                                   =================
+    public void reverseBasicItemIfNoneToElementMap(Map<String, Object> elementMap) { // for e.g. appcls
+        // also code cannot be changed here
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
+        acceptor.reverseNameIfNone(_name); // required
+        acceptor.reverseAliasIfNone(_alias); // required
+        if (_comment != null) {
+            acceptor.reverseCommentIfNone(_comment);
+        }
+        if (_sisters.length >= 1) {
+            acceptor.reverseSistersIfNone(_sisters);
+        }
+        if (!_subItemMap.isEmpty()) {
+            acceptor.reverseSubItemMapIfNone(_subItemMap);
+        }
     }
 
     // ===================================================================================

@@ -78,7 +78,7 @@ public class DfClsTableClassificationArranger {
     //                                                                Table Classification
     //                                                                ====================
     public void arrangeTableClassification(Map<String, DfClassificationElement> tableClassificationMap,
-            DfClassificationTop classificationTop, Map<?, ?> elementMap, String table, List<DfClassificationElement> elementList,
+            DfClassificationTop classificationTop, Map<String, Object> elementMap, String table, List<DfClassificationElement> elementList,
             Connection conn) {
         final DfClassificationElement metaElement = createBasicElement(classificationTop, elementMap, table);
         if (isCompatibleElementMapSuppressAutoDeploy(elementMap)) { // for compatible
@@ -94,7 +94,8 @@ public class DfClsTableClassificationArranger {
         metaElement.setClassificationTop(classificationTop);
     }
 
-    protected DfClassificationElement createBasicElement(DfClassificationTop classificationTop, Map<?, ?> elementMap, String table) {
+    protected DfClassificationElement createBasicElement(DfClassificationTop classificationTop, Map<String, Object> elementMap,
+            String table) {
         final DfClassificationElement metaElement = new DfClassificationElement();
         metaElement.setClassificationName(classificationTop.getClassificationName());
         metaElement.setTable(table);

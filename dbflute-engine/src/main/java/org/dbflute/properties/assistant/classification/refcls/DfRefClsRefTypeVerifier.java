@@ -37,16 +37,18 @@ public class DfRefClsRefTypeVerifier {
     protected final DfRefClsRefType _refType;
     protected final DfClassificationTop _referredClsTop;
     protected final DfClassificationGroup _referredGroup; // null allowed
+    protected final List<DfClassificationElement> _referredElementList;
     protected final String _resourceFile;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfRefClsRefTypeVerifier(DfRefClsRefType refType, DfClassificationTop referredClsTop, DfClassificationGroup referredGroup,
-            String resourceFile) {
+            List<DfClassificationElement> referredElementList, String resourceFile) {
         _refType = refType;
         _referredClsTop = referredClsTop;
         _referredGroup = referredGroup;
+        _referredElementList = referredElementList;
         _resourceFile = resourceFile;
     }
 
@@ -90,7 +92,7 @@ public class DfRefClsRefTypeVerifier {
     //                                                ------
     protected void doVerifyRefExists(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> appElementList = classificationTop.getClassificationElementList();
-        final List<DfClassificationElement> referredElementList = extractReferredElementList();
+        final List<DfClassificationElement> referredElementList = _referredElementList;
         final List<DfClassificationElement> nonExistingList = appElementList.stream().filter(appElement -> {
             return notMatchesReferredElement(referredElementList, appElement);
         }).collect(Collectors.toList());
@@ -129,7 +131,7 @@ public class DfRefClsRefTypeVerifier {
     //                                               -------
     protected void doVerifyRefMatches(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> appElementList = classificationTop.getClassificationElementList();
-        final List<DfClassificationElement> referredElementList = extractReferredElementList();
+        final List<DfClassificationElement> referredElementList = _referredElementList;
         final boolean hasNonExisting = appElementList.stream().anyMatch(appElement -> {
             return notMatchesReferredElement(referredElementList, appElement);
         });
@@ -162,16 +164,6 @@ public class DfRefClsRefTypeVerifier {
     // -----------------------------------------------------
     //                                          Assist Logic
     //                                          ------------
-    protected List<DfClassificationElement> extractReferredElementList() {
-        final List<DfClassificationElement> referredElementList;
-        if (_referredGroup != null) {
-            referredElementList = _referredGroup.getElementList();
-        } else {
-            referredElementList = _referredClsTop.getClassificationElementList();
-        }
-        return referredElementList;
-    }
-
     protected boolean notMatchesReferredElement(List<DfClassificationElement> referredElementList, DfClassificationElement appElement) {
         return !referredElementList.stream().anyMatch(referredElement -> {
             return appElement.getCode().equals(referredElement.getCode());
