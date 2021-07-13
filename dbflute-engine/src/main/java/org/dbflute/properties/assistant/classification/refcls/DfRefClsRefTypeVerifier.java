@@ -54,12 +54,12 @@ public class DfRefClsRefTypeVerifier {
             return;
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unknown refType to DB classification in the app classification.");
+        br.addNotice("Unknown refType to referred classification in the app classification.");
         br.addItem("Advice");
         br.addElement("refType can be set: 'included', 'exists', 'matches'");
-        br.addElement("  included : DB classification codes are included as app classification");
-        br.addElement("  exists   : app classification codes should exist in DB classification");
-        br.addElement("  matches  : app classification codes matches with DB classification");
+        br.addElement("  included : referred classification codes are included as app classification");
+        br.addElement("  exists   : app classification codes should exist in referred classification");
+        br.addElement("  matches  : app classification codes matches with referred classification");
         br.addItem("dfprop File");
         br.addElement(_resourceFile);
         br.addItem("AppCls");
@@ -91,17 +91,17 @@ public class DfRefClsRefTypeVerifier {
         }).collect(Collectors.toList());
         if (!nonExistingList.isEmpty()) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Not found the app classification code in the DB classification");
+            br.addNotice("Not found the app classification code in the referred classification");
             br.addItem("Advice");
             br.addElement("The codes of the app classification should be included");
-            br.addElement("in the DB classification because of refType='exists'.");
+            br.addElement("in the referred classification because of refType='exists'.");
             br.addElement("For example:");
-            br.addElement("  (x): app(A), db(B, C)");
-            br.addElement("  (x): app(A, B), db(A, C)");
-            br.addElement("  (x): app(A, B, C), db(A, B)");
-            br.addElement("  (o): app(A), db(A, B)");
-            br.addElement("  (o): app(A, B), db(A, B, C)");
-            br.addElement("  (o): app(A, B, C), db(A, B, C)");
+            br.addElement("  (x): app(A), referred(B, C)");
+            br.addElement("  (x): app(A, B), referred(A, C)");
+            br.addElement("  (x): app(A, B, C), referred(A, B)");
+            br.addElement("  (o): app(A), referred(A, B)");
+            br.addElement("  (o): app(A, B), referred(A, B, C)");
+            br.addElement("  (o): app(A, B, C), referred(A, B, C)");
             br.addItem("dfprop File");
             br.addElement(_resourceFile);
             br.addItem("AppCls");
@@ -129,15 +129,15 @@ public class DfRefClsRefTypeVerifier {
         });
         if (webElementList.size() != dbElementList.size() || hasNonExisting) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Unmatched the web classification code with the DB classification");
+            br.addNotice("Unmatched the web classification code with the referred classification");
             br.addItem("Advice");
             br.addElement("The codes of the web classification should match");
-            br.addElement("with DB classification because of refType='matches'.");
+            br.addElement("with referred classification because of refType='matches'.");
             br.addElement("For example:");
-            br.addElement("  (x): web(A), db(A, C)");
-            br.addElement("  (x): web(A, B), db(A, C)");
-            br.addElement("  (o): web(A, B), db(A, B)");
-            br.addElement("  (o): web(A, B, C), db(A, B, C)");
+            br.addElement("  (x): web(A), referred(A, C)");
+            br.addElement("  (x): web(A, B), referred(A, C)");
+            br.addElement("  (o): web(A, B), referred(A, B)");
+            br.addElement("  (o): web(A, B, C), referred(A, B, C)");
             br.addItem("dfprop File");
             br.addElement(_resourceFile);
             br.addItem("AppCls");
@@ -147,7 +147,7 @@ public class DfRefClsRefTypeVerifier {
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Code Count");
-            br.addElement("web=" + webElementList.size() + " / db=" + dbElementList.size());
+            br.addElement("app=" + webElementList.size() + " / referred=" + dbElementList.size());
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
