@@ -541,15 +541,15 @@ public class JavaPropertiesReader {
     }
 
     // ===================================================================================
-    //                                                                         Read Helper
-    //                                                                         ===========
+    //                                                                    Property Comment
+    //                                                                    ================
     protected Map<String, String> readKeyCommentMap(List<String> duplicateKeyList) {
         final Map<String, String> keyCommentMap = DfCollectionUtil.newLinkedHashMap();
         final String encoding = "UTF-8"; // because properties normally cannot have double bytes
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(preparePropFileStream(), encoding));
-            String previousComment = null;
+            final StringBuilder commentSb = new StringBuilder();
             while (true) {
                 final String line = br.readLine();
                 if (line == null) {
@@ -558,26 +558,32 @@ public class JavaPropertiesReader {
                 final String ltrimmedLine = Srl.ltrim(line);
                 if (ltrimmedLine.startsWith("#")) { // comment lines
                     final String commentCandidate = Srl.substringFirstRear(ltrimmedLine, "#").trim();
-                    if (ltrimmedLine.contains("=")) { // you cannot contain equal mark in comment
-                        previousComment = null; // e.g. #foo.bar.qux = value (comment out???)
+                    if (maybeDelimiterLineComment(ltrimmedLine)) { // e.g. #foo.bar.qux = value (comment out???)
+                        commentSb.setLength(0); // clear comments for (maybe) previous property
                     } else {
                         if (!ltrimmedLine.trim().equals("#")) { // not sharp lonely
-                            previousComment = commentCandidate; // 99% comment
+                            if (commentSb.length() > 0) { // second or more lines
+                                // "\n" string is treated as line separator after loading convert
+                                commentSb.append("\\n");
+                            }
+                            commentSb.append(commentCandidate); // 99% comment
                         }
                     }
                     continue;
                 }
-                // key value here
-                if (!ltrimmedLine.contains("=")) { // what's this? (no way)
+                // non-comment here
+                if (!ltrimmedLine.contains("=")) { // line separated property value for previous
+                    commentSb.setLength(0); // clear previous comment for line separated value
                     continue;
                 }
+                // key value here
                 final String key = Srl.substringFirstFront(ltrimmedLine, "=").trim();
                 if (keyCommentMap.containsKey(key)) {
                     duplicateKeyList.add(key);
                     keyCommentMap.remove(key); // remove existing key for order and override
                 }
-                keyCommentMap.put(key, loadConvert(previousComment));
-                previousComment = null;
+                keyCommentMap.put(key, loadConvert(commentSb.toString()));
+                commentSb.setLength(0);
             }
         } catch (IOException e) {
             throwJavaPropertiesReadFailureException(e);
@@ -591,6 +597,71 @@ public class JavaPropertiesReader {
         return keyCommentMap;
     }
 
+    protected boolean maybeDelimiterLineComment(String lineComment) { // best effort logic
+        if (lineComment.contains("===") || lineComment.contains("---")) { // maybe tag comment, feeling value
+            return true;
+        }
+        if (lineComment.contains("=")) {
+            // e.g. #foo.bar.qux = value (comment out???)
+            // not "sea land piari = bonvo dstore" (natural language)
+            // and also tag comment using equal is here
+            final String left = Srl.substringFirstFront(lineComment, "=");
+            return !Srl.contains(left.trim(), " ");
+        }
+        return false; // normal line comment as natural language
+    }
+
+    // ===================================================================================
+    //                                                                     Unicode Convert
+    //                                                                     ===============
+    protected String loadConvert(String expression) {
+        if (expression == null || expression.isEmpty()) {
+            return null;
+        }
+        final String encoding = "UTF-8";
+        final String fixedKey = "sea";
+        final String propStyle = fixedKey + " = " + Srl.quoteDouble(expression); // quote not to trim
+        try {
+            final Properties prop = new Properties(); // work instance
+            prop.load(new InputStreamReader(new ByteArrayInputStream(propStyle.getBytes(encoding)), encoding));
+            final String converted = prop.getProperty(fixedKey); // not null logically
+            return Srl.unquoteDouble(converted);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Not found the encoding: " + encoding, e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load the input stream: " + encoding, e);
+        }
+        // to avoid Java11 warning
+        //final Method method = getConvertMethod();
+        //if (method == null) {
+        //    return expression;
+        //}
+        //final char[] in = expression.toCharArray();
+        //final Object[] args = new Object[] { in, 0, expression.length(), new char[] {} };
+        //return (String) DfReflectionUtil.invoke(method, _reflectionProperties, args);
+    }
+
+    // to avoid Java11 warning
+    //protected Method getConvertMethod() {
+    //    if (_convertMethod != null) {
+    //        return _convertMethod;
+    //    }
+    //    if (_convertMethodNotFound) {
+    //        return null;
+    //    }
+    //    final Class<?>[] argTypes = new Class<?>[] { char[].class, int.class, int.class, char[].class };
+    //    _convertMethod = DfReflectionUtil.getWholeMethod(Properties.class, "loadConvert", argTypes);
+    //    if (_convertMethod == null) {
+    //        _convertMethodNotFound = true;
+    //    } else {
+    //        _convertMethod.setAccessible(true);
+    //    }
+    //    return _convertMethod;
+    //}
+
+    // ===================================================================================
+    //                                                                    Plain Properties
+    //                                                                    ================
     protected Properties readPlainProperties() {
         final Properties prop = new Properties();
         InputStream ins = null;
@@ -710,54 +781,6 @@ public class JavaPropertiesReader {
         }
         return sb.toString();
     }
-
-    // ===================================================================================
-    //                                                                     Unicode Convert
-    //                                                                     ===============
-    protected String loadConvert(String expression) {
-        if (expression == null) {
-            return null;
-        }
-        final String encoding = "UTF-8";
-        final String fixedKey = "sea";
-        final String propStyle = fixedKey + " = " + Srl.quoteDouble(expression); // quote not to trim
-        try {
-            final Properties prop = new Properties(); // work instance
-            prop.load(new InputStreamReader(new ByteArrayInputStream(propStyle.getBytes(encoding)), encoding));
-            final String converted = prop.getProperty(fixedKey); // not null logically
-            return Srl.unquoteDouble(converted);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Not found the encoding: " + encoding, e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to load the input stream: " + encoding, e);
-        }
-        // to avoid Java11 warning
-        //final Method method = getConvertMethod();
-        //if (method == null) {
-        //    return expression;
-        //}
-        //final char[] in = expression.toCharArray();
-        //final Object[] args = new Object[] { in, 0, expression.length(), new char[] {} };
-        //return (String) DfReflectionUtil.invoke(method, _reflectionProperties, args);
-    }
-
-    // to avoid Java11 warning
-    //protected Method getConvertMethod() {
-    //    if (_convertMethod != null) {
-    //        return _convertMethod;
-    //    }
-    //    if (_convertMethodNotFound) {
-    //        return null;
-    //    }
-    //    final Class<?>[] argTypes = new Class<?>[] { char[].class, int.class, int.class, char[].class };
-    //    _convertMethod = DfReflectionUtil.getWholeMethod(Properties.class, "loadConvert", argTypes);
-    //    if (_convertMethod == null) {
-    //        _convertMethodNotFound = true;
-    //    } else {
-    //        _convertMethod.setAccessible(true);
-    //    }
-    //    return _convertMethod;
-    //}
 
     // ===================================================================================
     //                                                                      General Helper
