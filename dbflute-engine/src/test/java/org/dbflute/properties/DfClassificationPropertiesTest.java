@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.junit.Assert;
@@ -151,22 +150,6 @@ public class DfClassificationPropertiesTest {
         assertFalse(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, "foo");
         assertTrue(prop.isElementMapClassificationTop(elementMap));
-    }
-
-    public void test_isTableClassificationSuppressAutoDeploy() {
-        // ## Arrange ##
-        final Map<String, Map<String, String>> deploymentMap = new LinkedHashMap<String, Map<String, String>>();
-        final DfClassificationProperties prop = createClassificationProperties(deploymentMap);
-        final Map<String, String> elementMap = new HashMap<String, String>();
-
-        // ## Act & Assert ##
-        assertFalse(prop.isElementMapSuppressAutoDeploy(elementMap));
-        elementMap.put("suppressAutoDeploy", "false");
-        assertFalse(prop.isElementMapSuppressAutoDeploy(elementMap));
-        elementMap.put("suppressAutoDeploy", "true");
-        assertTrue(prop.isElementMapSuppressAutoDeploy(elementMap));
-        elementMap.put("suppressAutoDeploy", "True");
-        assertTrue(prop.isElementMapSuppressAutoDeploy(elementMap));
     }
 
     protected DfClassificationProperties createClassificationProperties(Map<String, Map<String, String>> deploymentMap) {

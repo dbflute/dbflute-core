@@ -15,10 +15,13 @@
 ##
 ${manager.allClassCopyright}package ${request.package};
 
-#if ($request.tableMap.interfaceSimpleName)
-import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};
+## import statement to same package classes are warned by new Eclipse
+#if ($request.package != $request.optionMap.superClassPackage)
+#if ($request.optionMap.interfaceSimpleName)
+import ${request.optionMap.superClassPackage}.${request.optionMap.interfaceSimpleName};
 #else
-import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
+import ${request.optionMap.superClassPackage}.${request.optionMap.superClassSimpleName};
+#end
 #end
 import org.lastaflute.core.direction.exception.ConfigPropertyNotFoundException;
 
@@ -26,21 +29,21 @@ import org.lastaflute.core.direction.exception.ConfigPropertyNotFoundException;
  * @author FreeGen
  */
 #set ($$pluginDef = "")
-#if ($request.tableMap.interfaceSimpleName)
-#if ($request.tableMap.pluginInterface)
-#set ($pluginDef = ", ${request.tableMap.pluginInterface}")
+#if ($request.optionMap.interfaceSimpleName)
+#if ($request.optionMap.pluginInterface)
+#set ($pluginDef = ", ${request.optionMap.pluginInterface}")
 #end
-public interface ${request.className} extends ${request.tableMap.interfaceSimpleName}${pluginDef} {
+public interface ${request.className} extends ${request.optionMap.interfaceSimpleName}${pluginDef} {
 #else
-#if ($request.tableMap.pluginInterface)
-#set ($pluginDef = " extends ${request.tableMap.pluginInterface}")
+#if ($request.optionMap.pluginInterface)
+#set ($pluginDef = " extends ${request.optionMap.pluginInterface}")
 #end
 public interface ${request.className}${pluginDef} {
 #end
 #foreach ($column in $table.columnList)
 #if (!$column.isExtends)
 
-    /** The key of the configuration. e.g. ${column.propertyValueHtmlEncoded} */
+    /** The key of the configuration. e.g. ${column.propertyValueJavaDocEncoded} */
     String ${column.defName} = "${column.propertyKey}";
 #end
 #end
@@ -65,9 +68,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}'. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
@@ -76,9 +84,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link Integer}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not integer.
@@ -89,9 +102,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link Long}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not long.
@@ -102,9 +120,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link java.math.BigDecimal}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not decimal.
@@ -115,9 +138,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link java.time.LocalDate}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
@@ -127,9 +155,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Is the property for the key '${column.propertyKey}' true? <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The determination, true or false. (if not found, exception but basically no way)
      */
@@ -142,7 +175,7 @@ public interface ${request.className}${pluginDef} {
      * The simple implementation for configuration.
      * @author FreeGen
      */
-    public static class SimpleImpl extends ${request.tableMap.superClassSimpleName} implements ${request.className} {
+    public static class SimpleImpl extends ${request.optionMap.superClassSimpleName} implements ${request.className} {
 
         /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
@@ -202,7 +235,7 @@ public interface ${request.className}${pluginDef} {
 #end
 #end
 #end
-#if ($request.tableMap.isUseDefaultConfigAtGeneration)
+#if ($request.optionMap.isUseDefaultConfigAtGeneration)
 
         @Override
         protected java.util.Map<String, String> prepareGeneratedDefaultMap() {

@@ -14,6 +14,7 @@ ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
 ant -f build.xml reflect-to-example-with-non-rdb
+ant -f build.xml reflect-to-example-with-remoteapi-gen
 ant -f build.xml reflect-to-howto
 
 cd ..
@@ -83,6 +84,12 @@ mvn -e compile
 cd ../dbflute-example-with-non-rdb/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal,freegen
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-with-remoteapi-gen/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh freegen
 cd ..
 mvn -e compile
 

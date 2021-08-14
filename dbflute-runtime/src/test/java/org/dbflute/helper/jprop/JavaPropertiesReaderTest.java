@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.dbflute.unit.RuntimeTestCase;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * @author jflute
  */
@@ -194,5 +196,108 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
 
     protected ByteArrayInputStream stream(String propDef) throws UnsupportedEncodingException {
         return new ByteArrayInputStream(propDef.getBytes("UTF-8"));
+    }
+
+    // ===================================================================================
+    //                                                                             Comment
+    //                                                                             =======
+    public void test_comment_basic() {
+        // ## Arrange ##
+        JavaPropertiesReader reader = new JavaPropertiesReader("maihama", () -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("# one liner comment").append(ln());
+            sb.append("oneline.sea = 1").append(ln());
+
+            sb.append("# multiple comment1").append(ln());
+            sb.append("# multiple comment2").append(ln());
+            sb.append("# multiple comment3").append(ln());
+            sb.append("multiple.comment.sea = 2").append(ln());
+
+            sb.append("#commentout.prop = dummy").append(ln());
+            sb.append("commentout.only.sea = 3").append(ln());
+
+            sb.append("# comment out property value").append(ln());
+            sb.append("#commentout.prop = dummy").append(ln());
+            sb.append("commentout.before.sea = 4").append(ln());
+
+            sb.append("# before commentout").append(ln());
+            sb.append("#commentout.prop = dummy").append(ln());
+            sb.append("# after commentout").append(ln());
+            sb.append("commentout.beforeafter.sea = 5").append(ln());
+
+            sb.append("# before tagcomment").append(ln());
+            sb.append("# =========================").append(ln());
+            sb.append("#                      Tag").append(ln());
+            sb.append("#                     =====").append(ln());
+            sb.append("# after tagcomment1").append(ln());
+            sb.append("# after tagcomment2").append(ln());
+            sb.append("tagomment.beforeafter.sea = 6").append(ln());
+
+            sb.append("# before nesttagcomment").append(ln());
+            sb.append("# -------------------------").append(ln());
+            sb.append("#                      Tag").append(ln());
+            sb.append("#                     -----").append(ln());
+            sb.append("# after nesttagcomment1").append(ln());
+            sb.append("# after nesttagcomment2").append(ln());
+            sb.append("nesttagomment.beforeafter.sea = 7").append(ln());
+
+            sb.append("# @Override after override @Secure after secure").append(ln());
+            sb.append("annotation.only.sea = 8").append(ln());
+
+            sb.append("# before annotation").append(ln());
+            sb.append("# @Override after override @Secure after secure").append(ln());
+            sb.append("# after annotation").append(ln());
+            sb.append("annotation.beforeafter.sea = 9").append(ln());
+            return stream(sb.toString());
+        });
+
+        // ## Act ##
+        JavaPropertiesResult result = reader.read();
+
+        // ## Assert ##
+        assertPropertyComment(result, "oneline.sea", "1", "one liner comment");
+
+        assertPropertyComment(result, "multiple.comment.sea", "2", "multiple", "comment3");
+        assertPropertyComment(result, "multiple.comment.sea", "2", "multiple", "comment1", "comment2");
+
+        assertPropertyComment(result, "commentout.only.sea", "3");
+
+        assertPropertyComment(result, "commentout.before.sea", "4");
+        assertException(AssertionFailedError.class, () -> {
+            assertPropertyComment(result, "commentout.before.sea", "4", "comment out property value");
+        });
+
+        assertPropertyComment(result, "commentout.beforeafter.sea", "5", "after commentout");
+        assertException(AssertionFailedError.class, () -> {
+            assertPropertyComment(result, "commentout.beforeafter.sea", "5", "after commentout", "before commentout");
+        });
+
+        assertPropertyComment(result, "tagomment.beforeafter.sea", "6", "after tagcomment");
+        assertException(AssertionFailedError.class, () -> {
+            assertPropertyComment(result, "tagomment.beforeafter.sea", "6", "after tagcomment", "before tagcomment");
+        });
+
+        assertPropertyComment(result, "nesttagomment.beforeafter.sea", "7", "after nesttagcomment");
+        assertException(AssertionFailedError.class, () -> {
+            assertPropertyComment(result, "nesttagomment.beforeafter.sea", "7", "after nesttagcomment", "before nesttagcomment");
+        });
+
+        assertPropertyComment(result, "annotation.only.sea", "8", "@Override", "@Secure");
+
+        assertPropertyComment(result, "annotation.beforeafter.sea", "9", "after anno", "before anno", "@Override", "@Secure");
+    }
+
+    private void assertPropertyComment(JavaPropertiesResult result, String propertyKey, String propertyValue, String... comments) {
+        JavaPropertiesProperty property = result.getProperty(propertyKey);
+        log("...Asserting property: {}, {}, {}", property.getPropertyKey(), property.getPropertyValue(), property.getComment());
+        assertEquals(propertyValue, property.getPropertyValue());
+        if (comments.length > 0) {
+            assertNotNull(property.getComment());
+            for (String comment : comments) {
+                assertContains(property.getComment(), comment);
+            }
+        } else {
+            assertNull(property.getComment());
+        }
     }
 }

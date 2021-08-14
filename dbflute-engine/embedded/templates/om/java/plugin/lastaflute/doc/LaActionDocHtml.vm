@@ -21,7 +21,7 @@
         <th rowspan="2">No.</th>
         <th rowspan="2">URL</th>
         <th rowspan="2">type</th>
-#if (!$table.tableMap.isSuppressDescriptionInList)
+#if (!$optionMap.isSuppressDescriptionInList)
         <th rowspan="2">description</th>
 #end
         <th rowspan="2">class#method</th>
@@ -50,7 +50,7 @@
             api
 #end
         </td>
-#if (!$table.tableMap.isSuppressDescriptionInList)
+#if (!$optionMap.isSuppressDescriptionInList)
         <td class="rowcell">$!manager.htmlEscape($actionDocMeta.description)</td>
 #end
         <td class="rowcell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>

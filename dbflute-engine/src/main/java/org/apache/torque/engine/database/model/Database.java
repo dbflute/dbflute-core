@@ -1983,10 +1983,6 @@ public class Database {
         return getClassificationProperties().getClassificationTop(classificationName);
     }
 
-    public String buildClassificationApplicationComment(DfClassificationElement classificationElement) {
-        return getClassificationProperties().buildClassificationApplicationComment(classificationElement);
-    }
-
     public String buildClassificationApplicationCommentForJavaDoc(DfClassificationElement classificationElement) {
         return getClassificationProperties().buildClassificationApplicationCommentForJavaDoc(classificationElement);
     }

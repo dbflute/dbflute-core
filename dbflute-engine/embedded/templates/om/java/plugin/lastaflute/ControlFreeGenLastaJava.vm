@@ -15,8 +15,8 @@
 ##
 $manager.info("requestList: ${requestList.size()}")
 #foreach ($request in $requestList)
-#set ($tableMap = $request.tableMap)
-#if ($tableMap.isLastaFlute)
+#set ($optionMap = $request.optionMap)
+#if ($optionMap.isLastaFlute)
 $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 

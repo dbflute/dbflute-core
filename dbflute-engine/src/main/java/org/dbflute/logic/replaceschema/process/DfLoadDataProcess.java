@@ -29,21 +29,22 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
-import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
-import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
-import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
-import org.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
-import org.dbflute.logic.replaceschema.loaddata.DfLoadedFile;
-import org.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
-import org.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
-import org.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
-import org.dbflute.logic.replaceschema.loaddata.impl.DfLoadedClassificationLazyChecker;
-import org.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
-import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
-import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
-import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
-import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSQLServer;
-import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedDataInfo;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedFile;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfConvertValueProp;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfDefaultValueProp;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
+import org.dbflute.logic.replaceschema.loaddata.base.interceptor.DfDataWritingInterceptor;
+import org.dbflute.logic.replaceschema.loaddata.base.interceptor.DfDataWritingInterceptorSQLServer;
+import org.dbflute.logic.replaceschema.loaddata.base.interceptor.DfDataWritingInterceptorSybase;
+import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfLoadedClassificationLazyChecker;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataHandler;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataHandlerImpl;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataResource;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataResultInfo;
+import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataHandler;
+import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataHandlingWriter;
+import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataResource;
 import org.dbflute.logic.replaceschema.process.xls.DfXlsWritingResource;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.Srl;
@@ -85,7 +86,7 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
     // -----------------------------------------------------
     //                                             Load Data
     //                                             ---------
-    protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
+    protected DfXlsDataHandlingWriter _xlsDataHandlerImpl;
     protected DfDelimiterDataHandlerImpl _delimiterDataHandlerImpl;
     protected boolean _success;
 
@@ -97,6 +98,9 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
     //                                                ------
     protected boolean _suppressCheckColumnDef;
     protected boolean _suppressCheckImplicitSet;
+
+    /** The data-prop of convert value map. (NotNull) */
+    protected final DfConvertValueProp _convertValueProp = new DfConvertValueProp();
 
     /** The data-prop of default value map. (NotNull) */
     protected final DfDefaultValueProp _defaultValueProp = new DfDefaultValueProp();
@@ -202,14 +206,13 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
         if (_delimiterDataHandlerImpl != null) {
             return _delimiterDataHandlerImpl; // cached
         }
-        final DfDelimiterDataHandlerImpl handler = new DfDelimiterDataHandlerImpl();
+        final DfDelimiterDataHandlerImpl handler = new DfDelimiterDataHandlerImpl(_dataSource, _mainSchema);
         handler.setLoggingInsertSql(isLoggingInsertSql());
-        handler.setDataSource(_dataSource);
-        handler.setUnifiedSchema(_mainSchema);
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
         handler.setSuppressCheckColumnDef(isSuppressCheckColumnDef());
         handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
+        handler.setConvertValueProp(_convertValueProp);
         handler.setDefaultValueProp(_defaultValueProp);
         handler.setLoadingControlProp(_loadingControlProp);
         _delimiterDataHandlerImpl = handler;
@@ -325,17 +328,18 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
         handler.writeSeveralData(resource, _loadedDataInfo);
     }
 
-    protected DfXlsDataHandlerImpl createXlsDataHandlerImpl() {
+    protected DfXlsDataHandlingWriter createXlsDataHandlerImpl() {
         if (_xlsDataHandlerImpl != null) {
             return _xlsDataHandlerImpl;
         }
-        final DfXlsDataHandlerImpl handler = new DfXlsDataHandlerImpl(_dataSource, _mainSchema);
+        final DfXlsDataHandlingWriter handler = new DfXlsDataHandlingWriter(_dataSource, _mainSchema);
+        handler.acceptSkipSheet(getReplaceSchemaProperties().getSkipSheet());
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
         handler.setSuppressCheckColumnDef(isSuppressCheckColumnDef());
         handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
-        handler.setSkipSheet(getReplaceSchemaProperties().getSkipSheet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
+        handler.setConvertValueProp(_convertValueProp);
         handler.setDefaultValueProp(_defaultValueProp);
         handler.setLoadingControlProp(_loadingControlProp);
         _xlsDataHandlerImpl = handler;

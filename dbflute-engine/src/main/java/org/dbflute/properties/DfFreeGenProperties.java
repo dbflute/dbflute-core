@@ -83,7 +83,7 @@ public final class DfFreeGenProperties extends DfAbstractDBFluteProperties {
         if (_freeGenMap == null) {
             final String mapName = "freeGenMap";
             final Map<String, Object> specifiedMap = resolveSplit(mapName, doGetFreeGenMap(mapName));
-            _freeGenMap = newLinkedHashMap();
+            _freeGenMap = newLinkedHashMap(); // should be ordered, not only embedded first but also appcls referring namedcls
             reflectEmbeddedProperties(); // uses _freeGenMap
             reflectSpecifiedProperties(specifiedMap); // uses _freeGenMap
         }

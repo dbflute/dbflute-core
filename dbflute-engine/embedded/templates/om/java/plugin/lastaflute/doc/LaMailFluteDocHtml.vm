@@ -31,7 +31,7 @@
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell"><a href="#$manager.htmlEscape($mail.resourcePath)">$manager.htmlEscape($mail.resourcePath)</a></td>
         <td class="rowcell">$!manager.htmlEscape($mail.title)</td>
-        <td class="rowcell"><span title="$manager.htmlEscape($table.tableMap.mailPackage).$manager.htmlEscape($mail.className)">$!manager.htmlEscape($mail.className)</span></td>
+        <td class="rowcell"><span title="$manager.htmlEscape($optionMap.mailPackage).$manager.htmlEscape($mail.className)">$!manager.htmlEscape($mail.className)</span></td>
         <td class="rowcellnum">$mail.propertyList.size()</td>
     </tr>
 #end
@@ -46,7 +46,7 @@ $manager.htmlEscape($mail.resourcePath)
 	<span class="doctitle">Title:</span> <span class="mailtitle">$manager.htmlEscape($mail.title)</span>
 </p>
 <p>
-	<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($table.tableMap.mailPackage).$manager.htmlEscape($mail.className)</span>
+	<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($optionMap.mailPackage).$manager.htmlEscape($mail.className)</span>
 </p>
 <p class="docsubitem">
 	<span class="docsubtitle">hasOptionPlusHtml:</span>

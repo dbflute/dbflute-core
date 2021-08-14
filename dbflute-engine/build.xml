@@ -5,9 +5,9 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.2.4" />
+	<property name="version" value="1.2.5" />
 	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.2.4" />
+	<property name="runtime.version" value="1.2.5" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
@@ -61,6 +61,7 @@
 	<property name="example.on.springboot.dir" value="${example.on.stage.base}/dbflute-example-on-springboot" />
 	<property name="example.on.play2java.dir" value="${example.on.stage.base}/dbflute-example-on-play2java" />
 	<property name="example.with.non.rdb" value="${example.on.stage.base}/dbflute-example-with-non-rdb" />
+	<property name="example.with.remoteapi.gen" value="${example.on.stage.base}/dbflute-example-with-remoteapi-gen" />
 	<property name="example.with.doma.dir" value="${example.on.stage.base}/dbflute-example-with-doma" />
 
 	<!-- ============================================================================= -->
@@ -164,9 +165,6 @@
 			</zipfileset>
 			<zipfileset prefix="etc/logprop" dir="${embedded}/etc/logprop">
 				<include name="log4j.properties" />
-			</zipfileset>
-			<zipfileset prefix="etc/friends/eclipse" dir="${embedded}/etc/friends/eclipse">
-				<include name="*.xml" />
 			</zipfileset>
 			<zipfileset prefix="lib" dir="${embedded}/lib">
 				<include name="*.jar" />
@@ -358,6 +356,15 @@
 			description="==> reflect to example with non-RDB">
 		<delete dir="${example.with.non.rdb}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${example.with.non.rdb}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-example-with-remoteapi-gen" depends="prepare-reflection"
+			description="==> reflect to example with RemoteApiGen">
+		<delete dir="${example.with.remoteapi.gen}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.with.remoteapi.gen}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

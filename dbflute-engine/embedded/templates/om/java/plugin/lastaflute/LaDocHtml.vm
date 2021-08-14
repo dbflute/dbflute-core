@@ -17,7 +17,7 @@
 <html lang="en"> <!-- main language (to avoid HTML validator) -->
 <head>
     <meta charset="UTF-8" />
-    <title>${table.tableMap.appName} lastadoc</title>
+    <title>${optionMap.appName} lastadoc</title>
     <style type="text/css">
 /* -------------------------------------------------
                                              Core
@@ -217,17 +217,17 @@ table.child, table.child td, table.child th {
 </head>
 <body>
 <div style="position:fixed; width:95%"><div class="pagetop"><a href="#top">▲Page Top</a></div></div>
-<h1>lastadoc for ${table.tableMap.appName}</h1>
+<h1>lastadoc for ${optionMap.appName}</h1>
 <div class="navilinkarea">
 #set ($linkDelimiter = "")
-#if ($table.tableMap.hasSchemaHtml)
-<p class="sisterneighborlink"><a href="${table.tableMap.schemaHtmlPath}">to SchemaHTML</a></p>
+#if ($optionMap.hasSchemaHtml)
+<p class="sisterneighborlink"><a href="${optionMap.schemaHtmlPath}">to SchemaHTML</a></p>
 #end
-#if ($table.tableMap.appList.size() > 1)
+#if ($optionMap.appList.size() > 1)
 <p class="sisterneighborlink">
-#foreach ($app in $table.tableMap.appList)
+#foreach ($app in $optionMap.appList)
 ${linkDelimiter}
-#if ($app.appName == $table.tableMap.appName)
+#if ($app.appName == $optionMap.appName)
 to ${app.appName}
 #else
 <a href="${app.lastadocPath}">to ${app.appName}</a>
@@ -238,44 +238,44 @@ to ${app.appName}
 #end
 
 <p class="sisterneighborlink">
-#if ($table.tableMap.actionDocMetaList)
-    <a href="#lastadoc_action">to action($table.tableMap.actionDocMetaList.size())</a>
+#if ($optionMap.actionDocMetaList)
+    <a href="#lastadoc_action">to action($optionMap.actionDocMetaList.size())</a>
 #else
     <a href="#lastadoc_action">to action($table.columnList.size())</a>
 #end
-#if ($table.tableMap.jobDocMetaList && $table.tableMap.jobDocMetaList.size() > 0)
-    | <a href="#lastadoc_job">to job($table.tableMap.jobDocMetaList.size())</a>
+#if ($optionMap.jobDocMetaList && $optionMap.jobDocMetaList.size() > 0)
+    | <a href="#lastadoc_job">to job($optionMap.jobDocMetaList.size())</a>
 #end
-#if ($table.tableMap.mailList.size() > 0)
-    | <a href="#lastadoc_mail">to mail($table.tableMap.mailList.size())</a>
+#if ($optionMap.mailList.size() > 0)
+    | <a href="#lastadoc_mail">to mail($optionMap.mailList.size())</a>
 #end
-#if ($table.tableMap.templateList.size() > 0)
-    | <a href="#lastadoc_template">to template($table.tableMap.templateList.size())</a>
+#if ($optionMap.templateList.size() > 0)
+    | <a href="#lastadoc_template">to template($optionMap.templateList.size())</a>
 #end
-#if ($table.tableMap.appclsMap.classificationTopList.size() > 0)
-    | <a href="#lastadoc_appcls">to appcls($table.tableMap.appclsMap.classificationTopList.size())</a>
+#if ($optionMap.appclsMap.classificationTopList.size() > 0)
+    | <a href="#lastadoc_appcls">to appcls($optionMap.appclsMap.classificationTopList.size())</a>
 #end
-#if ($table.tableMap.webclsMap.classificationTopList.size() > 0)
-    | <a href="#lastadoc_webcls">to webcls($table.tableMap.webclsMap.classificationTopList.size())</a>
+#if ($optionMap.webclsMap.classificationTopList.size() > 0)
+    | <a href="#lastadoc_webcls">to webcls($optionMap.webclsMap.classificationTopList.size())</a>
 #end
-#if ($table.tableMap.namedclsList.size() > 0)
+#if ($optionMap.namedclsList.size() > 0)
     | <a href="#lastadoc_namedcls">to namedcls</a>
 #end
 $manager.getLastaDocHtmlMarkFreeGenDocNaviLink()
 </p>
 </div>
 
-$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtml.vm", null, "actionDocMetaList", $table.tableMap.actionDocMetaList)
-$generator.parse("om/java/plugin/lastaflute/doc/LaJobDocHtml.vm", null, "jobDocMetaList", $table.tableMap.jobDocMetaList)
-$generator.parse("om/java/plugin/lastaflute/doc/LaMailFluteDocHtml.vm", null, "mailList", $table.tableMap.mailList)
-$generator.parse("om/java/plugin/lastaflute/doc/LaPmTemplateDocHtml.vm", null, "templateList", $table.tableMap.templateList)
-$generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $table.tableMap.appclsMap)
-#if ($table.tableMap.webclsMap)
-$generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $table.tableMap.webclsMap)
+$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtml.vm", null, "actionDocMetaList", $optionMap.actionDocMetaList)
+$generator.parse("om/java/plugin/lastaflute/doc/LaJobDocHtml.vm", null, "jobDocMetaList", $optionMap.jobDocMetaList)
+$generator.parse("om/java/plugin/lastaflute/doc/LaMailFluteDocHtml.vm", null, "mailList", $optionMap.mailList)
+$generator.parse("om/java/plugin/lastaflute/doc/LaPmTemplateDocHtml.vm", null, "templateList", $optionMap.templateList)
+$generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $optionMap.appclsMap)
+#if ($optionMap.webclsMap)
+$generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $optionMap.webclsMap)
 #end
-#if ($table.tableMap.namedclsList.size() > 0)
+#if ($optionMap.namedclsList.size() > 0)
 <span id="lastadoc_namedcls"></span> <!-- only for id handling -->
-#foreach ($namedclsMap in $table.tableMap.namedclsList)
+#foreach ($namedclsMap in $optionMap.namedclsList)
 $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $namedclsMap)
 #end
 #end

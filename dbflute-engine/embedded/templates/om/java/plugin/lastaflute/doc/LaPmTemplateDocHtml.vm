@@ -30,7 +30,7 @@
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell"><a href="#$manager.htmlEscape($template.resourcePath)">$manager.htmlEscape($template.resourcePath)</a></td>
-        <td class="rowcell"><span title="$manager.htmlEscape($table.tableMap.templatePackage).$manager.htmlEscape($template.className)">$!manager.htmlEscape($template.className)</span></td>
+        <td class="rowcell"><span title="$manager.htmlEscape($optionMap.templatePackage).$manager.htmlEscape($template.className)">$!manager.htmlEscape($template.className)</span></td>
         <td class="rowcell">$!manager.htmlEscape($template.title)</td>
         <td class="rowcellnum">$template.propertyList.size()</td>
     </tr>
@@ -46,7 +46,7 @@ $manager.htmlEscape($template.resourcePath)
 $manager.htmlEscape($template.title)
 </h4>
 <p>
-<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($table.tableMap.templatePackage).$manager.htmlEscape($template.className)</span>
+<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($optionMap.templatePackage).$manager.htmlEscape($template.className)</span>
 </p>
 
 <p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($template.headerComment)</p>

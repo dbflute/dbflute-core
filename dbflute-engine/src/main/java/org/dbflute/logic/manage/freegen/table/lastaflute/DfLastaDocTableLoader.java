@@ -107,19 +107,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         if (optionMap.get("templatePackage") != null) {
             optionMap.put("templateList", new DfPmFileTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
         }
-        if (optionMap.get("appclsPackage") != null) {
-            final String clsTheme = "appcls";
-            final DfFreeGenResource docResource = createDocResource(resource, optionMap, clsTheme);
-            final DfFreeGenMapProp docMapProp = createDocMapProp(mapProp, mapProp.getOptionMap());
-            optionMap.put("appclsMap", new DfAppClsTableLoader().loadTable(requestName, docResource, docMapProp).getOptionMap());
-        }
-        if (optionMap.get("webclsPackage") != null) {
-            final String clsTheme = "webcls";
-            final DfFreeGenResource docResource = createDocResource(resource, optionMap, clsTheme);
-            final DfFreeGenMapProp docMapProp = createDocMapProp(mapProp, mapProp.getOptionMap());
-            optionMap.put("webclsMap", new DfWebClsTableLoader().loadTable(requestName, docResource, docMapProp).getOptionMap());
-        }
-        if (optionMap.get("namedclsList") != null) {
+        if (optionMap.get("namedclsList") != null) { // should be before appcls, webcls for refCls
             @SuppressWarnings("unchecked")
             final List<Map<String, Object>> namedclsList = (List<Map<String, Object>>) optionMap.get("namedclsList");
             if (!namedclsList.isEmpty()) {
@@ -132,6 +120,18 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
                 }
                 optionMap.put("namedclsList", loadedList); // override, convert to loaded list
             }
+        }
+        if (optionMap.get("appclsPackage") != null) { // should be after namedcls for refCls
+            final String clsTheme = "appcls";
+            final DfFreeGenResource docResource = createDocResource(resource, optionMap, clsTheme);
+            final DfFreeGenMapProp docMapProp = createDocMapProp(mapProp, mapProp.getOptionMap());
+            optionMap.put("appclsMap", new DfAppClsTableLoader().loadTable(requestName, docResource, docMapProp).getOptionMap());
+        }
+        if (optionMap.get("webclsPackage") != null) { // should be after appcls for refCls
+            final String clsTheme = "webcls";
+            final DfFreeGenResource docResource = createDocResource(resource, optionMap, clsTheme);
+            final DfFreeGenMapProp docMapProp = createDocMapProp(mapProp, mapProp.getOptionMap());
+            optionMap.put("webclsMap", new DfWebClsTableLoader().loadTable(requestName, docResource, docMapProp).getOptionMap());
         }
         setupContentsAdjustment(optionMap);
         return DfFreeGenMetaData.asOnlyOne(optionMap, "unused", columnList);
@@ -160,9 +160,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         if (resourceFile == null) { // no way
             throw new IllegalStateException("Not found the resource file for clsTheme: " + clsTheme + ", " + optionMap.keySet());
         }
-        final DfFreeGenResource docResource =
-                new DfFreeGenResource(resource.getBaseDir(), resource.getResourceType(), resourceFile, resource.getEncoding());
-        return docResource;
+        return new DfFreeGenResource(resource.getBaseDir(), resource.getResourceType(), resourceFile, resource.getEncoding());
     }
 
     protected DfFreeGenMapProp createDocMapProp(DfFreeGenMapProp mapProp, Map<String, Object> optionMap) {

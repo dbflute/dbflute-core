@@ -185,6 +185,10 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
         return _grammarJava.buildJavaDocLineAndIndent(sourceCodeLineSeparator, baseIndent);
     }
 
+    public String buildJavaDocLineAndIndentPre(String sourceCodeLineSeparator, String baseIndent) {
+        return _grammarJava.buildJavaDocLineAndIndentPre(sourceCodeLineSeparator, baseIndent);
+    }
+
     public String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent) {
         return _grammarJava.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, adjustedIndent);
     }

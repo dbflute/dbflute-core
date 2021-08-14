@@ -15,11 +15,11 @@
  */
 package org.dbflute.task.manage;
 
-import org.dbflute.logic.DfDBFluteTaskUtil;
 import org.dbflute.logic.manage.DfRefreshMan;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
+import org.dbflute.task.util.DfDBFluteTaskUtil;
 import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.Srl;
 

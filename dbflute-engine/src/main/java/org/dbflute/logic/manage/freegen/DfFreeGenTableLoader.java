@@ -20,5 +20,9 @@ package org.dbflute.logic.manage.freegen;
  */
 public interface DfFreeGenTableLoader {
 
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // #for_now jflute table means DB table but already non-DB resources exist so tranditional name (2021/07/09)
+    // _/_/_/_/_/_/_/_/_/_/
+
     DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp);
 }

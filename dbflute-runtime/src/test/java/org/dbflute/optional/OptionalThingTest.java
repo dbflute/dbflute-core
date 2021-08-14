@@ -66,19 +66,5 @@ public class OptionalThingTest extends RuntimeTestCase {
         }
     }
 
-    public void test_orElseTranslatingThrow() throws Exception {
-        assertNotNull(OptionalThing.of("sea").orElseTranslatingThrow(cause -> {
-            return new IllegalStateException("traslated", cause);
-        }));
-        assertException(IllegalStateException.class, () -> {
-            OptionalThing.ofNullable(null, () -> {
-                throw new IllegalArgumentException("cause");
-            }).orElseTranslatingThrow(cause -> {
-                assertEquals("cause", cause.getMessage());
-                markHere("cause");
-                return new IllegalStateException("traslated", cause);
-            });
-        });
-        assertMarked("cause");
-    }
+    // tests for handling methods are in OptionalEntityTest
 }

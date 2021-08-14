@@ -15,15 +15,16 @@
  */
 package org.dbflute.properties.assistant.classification;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.dbflute.DfBuildProperties;
-import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.classification.element.acceptor.DfClsElementBasicItemAcceptor;
+import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementApplicationComment;
+import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementCodeAliasVariables;
+import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementCommentDisp;
+import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementSisterCodeExp;
+import org.dbflute.properties.assistant.classification.element.attribute.DfClsElementSubItemExp;
+import org.dbflute.properties.assistant.classification.element.topoption.DfClsElementDeprecatedHandling;
+import org.dbflute.properties.assistant.classification.element.topoption.DfClsElementGroupHandling;
 import org.dbflute.util.Srl;
 
 /**
@@ -31,7 +32,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.2 (2008/10/22 Wednesday)
  */
-public class DfClassificationElement {
+public class DfClassificationElement { // directly used in template
 
     // ===================================================================================
     //                                                                          Definition
@@ -47,270 +48,232 @@ public class DfClassificationElement {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _classificationName; // required
-    protected String _table; // table classification only
+    // -----------------------------------------------------
+    //                                       Top Information
+    //                                       ---------------
+    protected String _classificationName; // not null (required)
     protected DfClassificationTop _classificationTop; // after registered to top
 
-    // basic items
-    protected String _code;
-    protected String _name;
-    protected String _alias;
-    protected String _comment;
-    protected String[] _sisters = new String[] {}; // as default
-    protected Map<String, Object> _subItemMap; // not-null after accept
+    // -----------------------------------------------------
+    //                                     Element Attribute
+    //                                     -----------------
+    // almost items are not null after accept but null check in methods just in case
+    protected String _table; // table classification only
+    protected String _code; // not null after accept
+    protected String _name; // not null after accept
+    protected String _alias; // not null after accept
+    protected String _comment; // null allowed
+    protected String[] _sisters = new String[] {}; // not null with default
+    protected Map<String, Object> _subItemMap; // not null after accept
+
+    // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    protected boolean _refClsIncluded; // for appcls
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void acceptBasicItemMap(Map<?, ?> elementMap) {
-        doAcceptBasicItemMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT, KEY_SISTER_CODE, KEY_SUB_ITEM_MAP);
-    }
-
-    protected void doAcceptBasicItemMap(Map<?, ?> elementMap, String codeKey, String nameKey, String aliasKey, String commentKey,
-            String sisterCodeKey, String subItemMapKey) {
-        final String code = (String) elementMap.get(codeKey);
-        if (code == null) {
-            throwClassificationRequiredAttributeNotFoundException(elementMap);
-        }
-        _code = code;
-
-        final String name = (String) elementMap.get(nameKey);
-        _name = (name != null ? name : code); // same as code if null
-
-        final String alias = (String) elementMap.get(aliasKey);
-        _alias = (alias != null ? alias : name); // same as name if null
-
-        _comment = (String) elementMap.get(commentKey);
-
-        final Object sisterCodeObj = elementMap.get(sisterCodeKey);
-        if (sisterCodeObj != null) {
-            if (sisterCodeObj instanceof List<?>) {
-                @SuppressWarnings("unchecked")
-                final List<String> sisterCodeList = (List<String>) sisterCodeObj;
-                _sisters = sisterCodeList.toArray(new String[sisterCodeList.size()]);
-            } else {
-                _sisters = new String[] { (String) sisterCodeObj };
-            }
-        } else {
-            _sisters = new String[] {};
-        }
-
-        // initialize by dummy when no definition for velocity trap
-        // (if null, variable in foreach is not overridden so previous loop's value is used)
+    public void acceptBasicItemMap(Map<String, ? extends Object> elementMap) {
         @SuppressWarnings("unchecked")
-        final Map<String, Object> subItemMap = (Map<String, Object>) elementMap.get(subItemMapKey);
-        this._subItemMap = subItemMap != null ? subItemMap : new HashMap<String, Object>(2);
-    }
-
-    protected void throwClassificationRequiredAttributeNotFoundException(Map<?, ?> elementMap) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The element map did not have a 'code' attribute.");
-        br.addItem("Advice");
-        br.addElement("An element map requires 'code' attribute like this:");
-        br.addElement("  (o): map:{table=MEMBER_STATUS; code=MEMBER_STATUS_CODE; ...}");
-        br.addItem("Classification");
-        br.addElement(_classificationName);
-        if (_table != null) {
-            br.addItem("Table");
-            br.addElement(_table);
-        }
-        br.addItem("ElementMap");
-        br.addElement(elementMap);
-        final String msg = br.buildExceptionMessage();
-        throw new DfClassificationRequiredAttributeNotFoundException(msg);
+        final Map<String, Object> typeFittingMap = (Map<String, Object>) elementMap;
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, typeFittingMap);
+        _code = acceptor.acceptCode();
+        _name = acceptor.acceptName(_code); // same as code if null (not required)
+        _alias = acceptor.acceptAlias(_name); // same as name if null (not required)
+        _comment = acceptor.acceptComment(); // null allowed (not required)
+        _sisters = acceptor.acceptSisters(); // not null, empty allowed (not required)
+        _subItemMap = acceptor.acceptSubItemMap(); // not null, empty allowed (not required)
     }
 
     // ===================================================================================
-    //                                                                       Alias/Comment
+    //                                                                               Copy
+    //                                                                              ======
+    public DfClassificationElement copyElement(DfClassificationTop newTop) { // for e.g. appcls
+        final DfClassificationElement element = new DfClassificationElement();
+        element._classificationName = newTop.getClassificationName();
+        element._classificationTop = newTop;
+        element._table = _table;
+        element._code = _code;
+        element._name = _name;
+        element._alias = _alias;
+        element._comment = _comment;
+        element._sisters = _sisters;
+        element._subItemMap = _subItemMap;
+        return element;
+    }
+
+    public DfClassificationElement asRefClsIncluded() { // basically with copyElement()
+        _refClsIncluded = true;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                  Override Attribute
+    //                                                                  ==================
+    public void overrideBasicItemByElementMap(Map<String, Object> elementMap) { // for e.g. appcls
+        // code cannot be overridden, other attributes are not required to override so all defalut values are current
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
+        _name = acceptor.acceptName(_name);
+        _alias = acceptor.acceptAlias(_alias);
+        _comment = acceptor.acceptComment(_comment);
+        _sisters = acceptor.acceptSisters(_sisters);
+        _subItemMap = acceptor.acceptSubItemMap(_subItemMap);
+    }
+
+    // ===================================================================================
+    //                                                                   Reverse Attribute
+    //                                                                   =================
+    public void reverseBasicItemIfNoneToElementMap(Map<String, Object> elementMap) { // for e.g. appcls
+        // also code cannot be changed here
+        final DfClsElementBasicItemAcceptor acceptor = new DfClsElementBasicItemAcceptor(_classificationName, _table, elementMap);
+        acceptor.reverseNameIfNone(_name); // required
+        acceptor.reverseAliasIfNone(_alias); // required
+        if (_comment != null) {
+            acceptor.reverseCommentIfNone(_comment);
+        }
+        if (_sisters.length >= 1) {
+            acceptor.reverseSistersIfNone(_sisters);
+        }
+        if (!_subItemMap.isEmpty()) {
+            acceptor.reverseSubItemMapIfNone(_subItemMap);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
     //                                                                       =============
     public boolean hasAlias() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_alias);
     }
 
-    public boolean hasComment() {
+    public boolean hasComment() { // means plain comment
         return Srl.is_NotNull_and_NotTrimmedEmpty(_comment);
     }
 
-    public boolean hasCommentDisp() {
+    public boolean hasCommentDisp() { // e.g. with deprecated comment
         return Srl.is_NotNull_and_NotTrimmedEmpty(getCommentDisp());
     }
 
-    // ===================================================================================
-    //                                                                         Sister Code
-    //                                                                         ===========
-    public String buildSisterCodeExpForSchemaHtml() {
-        if (_sisters == null || _sisters.length == 0) {
-            return "&nbsp;";
-        }
-        final StringBuilder sb = new StringBuilder();
-        int index = 0;
-        for (String sister : _sisters) {
-            if (index > 0) {
-                sb.append(", ");
-            }
-            sb.append(sister);
-            ++index;
-        }
-        return sb.toString();
+    public boolean hasSiserCode() {
+        return _sisters != null && _sisters.length >= 1;
+    }
+
+    public boolean hasSubItem() {
+        return _subItemMap != null && !_subItemMap.isEmpty();
     }
 
     // ===================================================================================
-    //                                                                         SubItem Map
-    //                                                                         ===========
-    public String buildSubItemExpForSchemaHtml() {
-        if (_subItemMap == null || _subItemMap.isEmpty()) {
-            return "&nbsp;";
-        }
-        final StringBuilder sb = new StringBuilder();
-        int index = 0;
-        for (Entry<String, Object> entry : _subItemMap.entrySet()) {
-            final String key = entry.getKey();
-            final Object value = entry.getValue();
-            if (index > 0) {
-                sb.append("\n, ");
-            }
-            sb.append(key).append("=").append(value);
-            ++index;
-        }
-        return filterSubItemForSchemaHtml(sb.toString());
+    //                                                                    Basic Expression
+    //                                                                    ================
+    // #hope jflute resolve "get" or "build" problem of methods for template (2021/07/05)
+    // -----------------------------------------------------
+    //                                           Sister Code
+    //                                           -----------
+    public String buildSisterCodeExpForSchemaHtml() { // e.g. "sea, land"
+        return new DfClsElementSisterCodeExp(_sisters).buildSisterCodeExpForSchemaHtml();
     }
 
-    protected String filterSubItemForSchemaHtml(String str) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveSchemaHtmlContent(Srl.replace(str, "\\n", "\n"));
+    public String buildSisterCodeExpForDfpropMap() { // e.g. list:{ sea ; land }
+        return new DfClsElementSisterCodeExp(_sisters).buildSisterCodeExpForDfpropMap();
     }
 
-    // ===================================================================================
-    //                                                                        Grouping Map
-    //                                                                        ============
+    // -----------------------------------------------------
+    //                                           SubItem Map
+    //                                           -----------
+    public String buildSubItemExpForSchemaHtml() { // key-value expression for HTML display
+        return new DfClsElementSubItemExp(_subItemMap).buildSubItemExpForSchemaHtml();
+    }
+
+    public String buildSubItemExpForDfpropMap() { // e.g. map:{ order=1 ; desc=... }
+        return new DfClsElementSubItemExp(_subItemMap).buildSubItemExpForDfpropMap();
+    }
+
+    // -----------------------------------------------------
+    //                                          Grouping Map
+    //                                          ------------
     public boolean isGroup(String groupName) {
-        if (_classificationTop == null) {
-            return false;
-        }
-        final List<DfClassificationGroup> groupList = _classificationTop.getGroupList();
-        for (DfClassificationGroup group : groupList) {
-            if (groupName.equals(group.getGroupName())) {
-                final List<String> elementNameList = group.getElementNameList();
-                if (elementNameList.contains(_name)) {
-                    return true;
-                }
-                break;
-            }
-        }
-        return false;
+        return new DfClsElementGroupHandling(_classificationTop, _name).isGroup(groupName);
     }
 
-    // ===================================================================================
-    //                                                                      Deprecated Map
-    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                        Deprecated Map
+    //                                        --------------
     public boolean isDeprecated() {
-        if (_classificationTop == null) { // just in case
-            return false;
-        }
-        return _classificationTop.getDeprecatedMap().containsKey(_name);
+        return new DfClsElementDeprecatedHandling(_classificationTop, _name).isDeprecated();
     }
 
     public String getDeprecatedComment() {
-        if (!isDeprecated()) {
-            return "";
-        }
-        final String comment = _classificationTop.getDeprecatedMap().get(_name);
-        return comment != null ? removeLineSeparator(comment) : "";
-    }
-
-    protected String removeLineSeparator(String str) {
-        return Srl.replace(Srl.replace(str, "\r\n", "\n"), "\n", "");
+        return new DfClsElementDeprecatedHandling(_classificationTop, _name).getDeprecatedComment();
     }
 
     // ===================================================================================
-    //                                                                         Escape Text
-    //                                                                         ===========
-    protected String resolveTextForJavaDoc(String comment, String indent) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveJavaDocContent(comment, indent);
-    }
-
-    protected String resolveTextForSchemaHtml(String comment) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveSchemaHtmlContent(comment);
-    }
-
-    // ===================================================================================
-    //                                                                        Code Builder
-    //                                                                        ============
+    //                                                                Code Alias Variables
+    //                                                                ====================
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // Code Alias Variables means e.g. "FML", "Formalized", new String[]{"a", "b"}
+    // (too long name but give up renaming because of too many fix) by jflute (2021/07/03)
+    // _/_/_/_/_/_/_/_/_/_/
     public String buildClassificationCodeAliasVariables() {
-        return doBuildClassificationCodeAliasVariables();
+        return createClsElementCodeAliasVariables().buildCodeAliasVariables();
     }
 
     public String buildClassificationCodeAliasSisterCodeVariables() {
-        final StringBuilder sb = new StringBuilder();
-        final String codeAliasVariables = buildClassificationCodeAliasVariables();
-        sb.append(codeAliasVariables);
-        final String[] sisters = getSisters();
-        sb.append(", ");
-        if (sisters != null && sisters.length > 0) {
-            sb.append("new String[] {");
-            if (sisters != null && sisters.length > 0) {
-                int index = 0;
-                for (String sister : sisters) {
-                    if (index > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append("\"").append(sister).append("\"");
-                    ++index;
-                }
-            }
-            sb.append("}");
-        } else {
-            sb.append("emptyStrings()"); // changed from EMPTY_SISTERS since 1.1.2
-        }
-        return sb.toString();
+        return createClsElementCodeAliasVariables().buildCodeAliasSisterCodeVariables();
     }
 
-    protected String doBuildClassificationCodeAliasVariables() {
-        final StringBuilder sb = new StringBuilder();
-        final String code = getCode();
-        final String alias = getAlias();
-        sb.append("\"").append(code).append("\"");
-        if (alias != null && alias.trim().length() > 0) {
-            sb.append(", \"").append(alias).append("\"");
-        } else {
-            sb.append(", null");
-        }
-        return sb.toString();
+    protected DfClsElementCodeAliasVariables createClsElementCodeAliasVariables() {
+        return new DfClsElementCodeAliasVariables(getCode(), getAlias(), getSisters());
     }
 
     // ===================================================================================
-    //                                                                     Comment Builder
+    //                                                                 Application Comment
+    //                                                                 ===================
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // Application Comment means alias + commentDisp
+    // (too long name but give up renaming because of too many fix) by jflute (2021/07/03)
+    // _/_/_/_/_/_/_/_/_/_/
+    public String buildClassificationApplicationCommentForJavaDoc() { // has many user e.g. CDef template
+        return createClsElementApplicationComment().buildApplicationCommentForJavaDoc();
+    }
+
+    public String buildClassificationApplicationCommentForSchemaHtml() { // unused now (commentDisp used instead) (2021/07/03)
+        return createClsElementApplicationComment().buildApplicationCommentForSchemaHtml();
+    }
+
+    protected DfClsElementApplicationComment createClsElementApplicationComment() {
+        return new DfClsElementApplicationComment(getAlias(), getCommentDisp());
+    }
+
+    // ===================================================================================
+    //                                                                     Comment Display
     //                                                                     ===============
-    public String buildClassificationApplicationCommentForJavaDoc() {
-        final String comment = buildClassificationApplicationComment();
-        return getDocumentProperties().resolveJavaDocContent(comment, "    "); // basically indent is unused
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // Comment Display (commentDisp) means comment + deprecated comment (if exists)
+    // _/_/_/_/_/_/_/_/_/_/
+    protected String getCommentDisp() { // not null, empty allowed if no comment
+        return createClsElementCommentDisp().buildCommentDisp();
     }
 
-    public String buildClassificationApplicationCommentForSchemaHtml() {
-        final String comment = buildClassificationApplicationComment();
-        return getDocumentProperties().resolveSchemaHtmlContent(comment);
+    protected DfClsElementCommentDisp createClsElementCommentDisp() {
+        return new DfClsElementCommentDisp(_comment, getDeprecatedComment());
     }
 
-    protected String buildClassificationApplicationComment() {
-        final StringBuilder sb = new StringBuilder();
-        if (hasAlias()) {
-            sb.append(getAlias());
-        }
-        if (hasCommentDisp()) {
-            if (sb.length() > 0) {
-                sb.append(": ");
-            }
-            final String comment = getCommentDisp();
-            final String filtered = Srl.replace(comment, "\n", comment); // just in case (basically one line)
-            sb.append(filtered);
-        }
-        return sb.toString();
+    // forJavaDoc methods are unused now, application comment is used in JavaDoc instead (2021/06/22)
+    public String getCommentForJavaDoc() {
+        return createClsElementCommentDisp().buildCommentForJavaDoc();
     }
 
-    protected DfDocumentProperties getDocumentProperties() {
-        return DfBuildProperties.getInstance().getDocumentProperties();
+    public String getCommentForJavaDocNest() {
+        return createClsElementCommentDisp().buildCommentForJavaDocNest();
+    }
+
+    public String getCommentForSchemaHtml() { // used by just SchemaHTML
+        return createClsElementCommentDisp().buildCommentForSchemaHtml();
+    }
+
+    public String getCommentPlainlyForDfpropMap() { // used by e.g. Client NamedCls
+        return createClsElementCommentDisp().buildCommentPlainlyForDfpropMap();
     }
 
     // ===================================================================================
@@ -331,20 +294,15 @@ public class DfClassificationElement {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                       Top Information
+    //                                       ---------------
     public String getClassificationName() {
         return _classificationName;
     }
 
     public void setClassificationName(String classificationName) {
-        this._classificationName = classificationName;
-    }
-
-    public String getTable() {
-        return _table;
-    }
-
-    public void setTable(String table) {
-        this._table = table;
+        _classificationName = classificationName;
     }
 
     public DfClassificationTop getClassificationTop() {
@@ -352,19 +310,30 @@ public class DfClassificationElement {
     }
 
     public void setClassificationTop(DfClassificationTop classificationTop) {
-        this._classificationTop = classificationTop;
+        _classificationTop = classificationTop;
+    }
+
+    // -----------------------------------------------------
+    //                                     Element Attribute
+    //                                     -----------------
+    public String getTable() {
+        return _table; // exists if table classification
+    }
+
+    public void setTable(String table) {
+        _table = table;
     }
 
     public String getCode() {
-        return _code;
+        return _code; // not null after accept
     }
 
     public void setCode(String code) {
-        this._code = code;
+        _code = code;
     }
 
     public String getName() {
-        return _name;
+        return _name; // not null after accept
     }
 
     public void setName(String name) {
@@ -372,57 +341,26 @@ public class DfClassificationElement {
     }
 
     public String getAlias() {
-        return _alias;
+        return _alias; // not null after accept
     }
 
     public void setAlias(String alias) {
         _alias = alias;
     }
 
-    public String getComment() {
-        return _comment;
-    }
-
-    public String getCommentDisp() {
-        return buildCommentDisp();
-    }
-
-    protected String buildCommentDisp() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(_comment != null ? _comment : "");
-        if (isDeprecated()) {
-            final String deprecatedComment = getDeprecatedComment();
-            if (sb.length() > 0) {
-                sb.append(" ");
-            }
-            sb.append("(deprecated: ").append(deprecatedComment).append(")");
-        }
-        final String disp = sb.toString();
-        return Srl.replace(disp, "\n", ""); // basically one line
-    }
-
-    public String getCommentForJavaDoc() {
-        return buildCommentForJavaDoc("    "); // basically indent unused
-    }
-
-    public String getCommentForJavaDocNest() {
-        return buildCommentForJavaDoc("        "); // basically indent unused
-    }
-
-    protected String buildCommentForJavaDoc(String indent) {
-        return resolveTextForJavaDoc(getCommentDisp(), indent);
-    }
-
-    public String getCommentForSchemaHtml() {
-        return resolveTextForSchemaHtml(getCommentDisp());
+    // other comment expression methods exists e.g. getCommentDisp()
+    // use them if it needs instead of this
+    public String getComment() { // so basically unused (directly) in templates
+        return _comment; // null allowed
     }
 
     public void setComment(String comment) {
         _comment = comment;
     }
 
-    public String[] getSisters() {
-        return _sisters;
+    // string array is hard to be handled in templates
+    public String[] getSisters() { // so basically unused (directly) in templates
+        return _sisters; // not null (has default)
     }
 
     public void setSisters(String[] sisters) {
@@ -430,10 +368,17 @@ public class DfClassificationElement {
     }
 
     public Map<String, Object> getSubItemMap() {
-        return _subItemMap;
+        return _subItemMap; // not null after accept
     }
 
     public void setSubItemMap(Map<String, Object> subItemMap) {
         _subItemMap = subItemMap;
+    }
+
+    // -----------------------------------------------------
+    //                                            Supplement
+    //                                            ----------
+    public boolean isRefClsIncluded() {
+        return _refClsIncluded;
     }
 }

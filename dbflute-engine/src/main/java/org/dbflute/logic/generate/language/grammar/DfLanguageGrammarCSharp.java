@@ -203,6 +203,10 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustClassElementIndent(baseIndent));
     }
 
+    public String buildJavaDocLineAndIndentPre(String sourceCodeLineSeparator, String baseIndent) {
+        return buildJavaDocLineAndIndent(sourceCodeLineSeparator, baseIndent); // not html so same as normal
+    }
+
     public String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent) {
         return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustedIndent);
     }

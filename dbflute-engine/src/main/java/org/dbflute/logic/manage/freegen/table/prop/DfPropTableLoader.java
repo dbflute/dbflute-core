@@ -245,7 +245,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
 
     protected List<Map<String, Object>> doConvertToMapList(final List<JavaPropertiesProperty> propertyList, Map<String, Object> tableMap) {
         final List<String> exceptKeyList = extractExceptKeyList(tableMap);
-        final Map<String, String> groupingKeyMap = extractDeterminationMap(tableMap);
+        final Map<String, String> groupingKeyMap = extractGroupingKeyMap(tableMap);
         final DfDocumentProperties prop = getDocumentProperties();
         final List<Map<String, Object>> mapList = DfCollectionUtil.newArrayList();
         for (JavaPropertiesProperty property : propertyList) {
@@ -255,10 +255,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
                 continue;
             }
             columnMap.put("propertyKey", propertyKey);
-            final String propertyValue = property.getPropertyValue();
+            final String propertyValue = property.getPropertyValue(); // basically one line
             columnMap.put("propertyValue", propertyValue != null ? propertyValue : "");
-            final String valueHtmlEncoded = prop.resolveSimpleLineHtmlContent(propertyValue);
-            columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
+            setupPropertyValueDocument(prop, columnMap, propertyValue);
             columnMap.put("propertyValueStringLiteral", preparePropertyValueStringLiteral(propertyValue));
             columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
 
@@ -281,11 +280,14 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             columnMap.put("variableArgSet", property.getVariableArgSet());
             columnMap.put("hasVariable", !variableStringList.isEmpty());
 
-            final String comment = property.getComment();
+            final String comment = property.getComment(); // can be multiple line
             columnMap.put("comment", comment != null ? comment : "");
-            final String commentHtmlEncoded = prop.resolveSimpleLineHtmlContent(comment);
-            columnMap.put("commentHtmlEncoded", commentHtmlEncoded != null ? commentHtmlEncoded : "");
-            columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
+            setupPropertyCommentDocument(prop, columnMap, comment);
+            {
+                final boolean hasComment = Srl.is_NotNull_and_NotTrimmedEmpty(comment);
+                columnMap.put("hasComment", hasComment);
+                columnMap.put("isMultipleLineComment", hasComment && Srl.contains(comment, "\n"));
+            }
             columnMap.put("isExtends", property.isExtends());
             columnMap.put("isOverride", property.isOverride());
             columnMap.put("mayBeIntegerProperty", mayBeIntegerProperty(property, comment));
@@ -306,6 +308,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         return mapList;
     }
 
+    // -----------------------------------------------------
+    //                                            Except Key
+    //                                            ----------
     protected List<String> extractExceptKeyList(Map<String, Object> tableMap) {
         @SuppressWarnings("unchecked")
         final List<String> exceptKeyList = (List<String>) tableMap.get("exceptKeyList");
@@ -315,7 +320,10 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         return DfCollectionUtil.emptyList();
     }
 
-    protected Map<String, String> extractDeterminationMap(Map<String, Object> tableMap) {
+    // -----------------------------------------------------
+    //                                          Grouping Key
+    //                                          ------------
+    protected Map<String, String> extractGroupingKeyMap(Map<String, Object> tableMap) {
         @SuppressWarnings("unchecked")
         final Map<String, String> groupingKeyMap = (Map<String, String>) tableMap.get("groupingKeyMap");
         if (groupingKeyMap != null) {
@@ -324,6 +332,33 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         return DfCollectionUtil.emptyMap();
     }
 
+    // -----------------------------------------------------
+    //                                       Set up Document
+    //                                       ---------------
+    protected void setupPropertyValueDocument(DfDocumentProperties prop, Map<String, Object> columnMap, String propertyValue) {
+        // property value is basically one liner but treat it as multiple line just in case
+        final String defaultIndent = "    "; // one nest as default, add new key if you need two nest
+        columnMap.put("propertyValueJavaDocEncoded", filterDocumentNull(prop.resolveJavaDocContent(propertyValue, defaultIndent)));
+        columnMap.put("propertyValueJavaDocEncodedPre", filterDocumentNull(prop.resolveJavaDocPreText(propertyValue, defaultIndent)));
+        columnMap.put("propertyValueHtmlEncoded", filterDocumentNull(prop.resolveSchemaHtmlContent(propertyValue)));
+        columnMap.put("propertyValueHtmlEncodedPre", filterDocumentNull(prop.resolveSchemaHtmlPreText(propertyValue)));
+    }
+
+    protected void setupPropertyCommentDocument(DfDocumentProperties prop, Map<String, Object> columnMap, String comment) {
+        final String defaultIndent = "    "; // one nest as default, add new key if you need two nest
+        columnMap.put("commentJavaDocEncoded", filterDocumentNull(prop.resolveJavaDocContent(comment, defaultIndent)));
+        columnMap.put("commentJavaDocEncodedPre", filterDocumentNull(prop.resolveJavaDocPreText(comment, defaultIndent)));
+        columnMap.put("commentHtmlEncoded", filterDocumentNull(prop.resolveSchemaHtmlContent(comment)));
+        columnMap.put("commentHtmlEncodedPre", filterDocumentNull(prop.resolveSchemaHtmlPreText(comment)));
+    }
+
+    protected String filterDocumentNull(String value) {
+        return value != null ? value : "";
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
     protected boolean isTargetKey(String propertyKey, List<String> exceptKeyList) {
         final List<String> targetDummyList = DfCollectionUtil.emptyList();
         return DfNameHintUtil.isTargetByHint(propertyKey, targetDummyList, exceptKeyList);

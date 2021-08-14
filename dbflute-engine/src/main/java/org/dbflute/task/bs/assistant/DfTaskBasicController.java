@@ -21,12 +21,12 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
-import org.dbflute.logic.DfDBFluteTaskUtil;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.task.bs.DfAbstractTask;
+import org.dbflute.task.util.DfDBFluteTaskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

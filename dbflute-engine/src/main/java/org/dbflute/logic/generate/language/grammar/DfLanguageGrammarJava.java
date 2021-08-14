@@ -36,9 +36,8 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
     static {
         // likely words only (and only can be checked at examples)
         final StringSet stringSet = StringSet.createAsCaseInsensitive();
-        final List<String> list =
-                DfCollectionUtil.newArrayList("class", "case", "package", "default", "new", "native", "void", "public", "protected",
-                        "private", "interface", "abstract", "final", "finally", "return", "double", "float", "short");
+        final List<String> list = DfCollectionUtil.newArrayList("class", "case", "package", "default", "new", "native", "void", "public",
+                "protected", "private", "interface", "abstract", "final", "finally", "return", "double", "float", "short");
         stringSet.addAll(list);
         _pgReservColumnSet = stringSet;
     }
@@ -211,14 +210,18 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
     }
 
     public String buildJavaDocLineAndIndent(String sourceCodeLineSeparator, String baseIndent) {
-        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustClassElementIndent(baseIndent));
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustClassElementIndent(baseIndent), /*preText*/false);
+    }
+
+    public String buildJavaDocLineAndIndentPre(String sourceCodeLineSeparator, String baseIndent) {
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustClassElementIndent(baseIndent), /*preText*/true);
     }
 
     public String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent) {
-        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustedIndent);
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustedIndent, /*preText*/false);
     }
 
-    protected String doBuildJavaDocLineAndIndent(String sourceCodeLineSeparator, String adjustedIndent) {
-        return "<br>" + sourceCodeLineSeparator + adjustedIndent + " * ";
+    protected String doBuildJavaDocLineAndIndent(String sourceCodeLineSeparator, String adjustedIndent, boolean preText) {
+        return (!preText ? "<br>" : "") + sourceCodeLineSeparator + adjustedIndent + " * ";
     }
 }

@@ -15,8 +15,11 @@
  */
 package org.dbflute.optional;
 
+import java.util.stream.Stream;
+
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.NonSetupSelectRelationAccessException;
+import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
@@ -120,6 +123,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         }
     }
 
+    // #giveup jflute want to rename relationalEmpty() but give up (2021/04/19)
     /**
      * @param <EMPTY> The type of empty optional entity.
      * @param entity The base entity of the relation for exception message. (NotNull)
@@ -176,9 +180,12 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // ===================================================================================
     //                                                                   Standard Handling
     //                                                                   =================
+    // -----------------------------------------------------
+    //                                             ifPresent
+    //                                             ---------
     /**
      * Handle the wrapped entity if it is present. <br>
-     * You should call this if null entity handling is unnecessary (do nothing if null). <br>
+     * You should call this if empty handling is unnecessary (do nothing if not present). <br>
      * If exception is preferred when null entity, use required().
      * <pre>
      * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -196,11 +203,26 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param entityLambda The callback interface to consume the optional entity. (NotNull)
      * @return The handler of after process when if not present. (NotNull)
      */
-    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<ENTITY> entityLambda) {
+    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<? super ENTITY> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
         return callbackIfPresent(entityLambda);
     }
 
+    /**
+     * Handle the wrapped thing if it is both present and empty. <br>
+     * <span style="color: #AD4747; font-size: 120%">You have a choice, you can use this method or ifPresent().orElse().</span>
+     * @param entityLambda The present-case callback interface to consume the optional thing. (NotNull)
+     * @param noArgLambda The empty-case callback interface to handle or-else. (NotNull)
+     */
+    public void ifPresentOrElse(OptionalThingConsumer<? super ENTITY> entityLambda, IndependentProcessor noArgLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        assertNoArgLambdaNotNull(noArgLambda);
+        callbackIfPresentOrElse(entityLambda, noArgLambda);
+    }
+
+    // -----------------------------------------------------
+    //                                         isPresent/get
+    //                                         -------------
     /**
      * Is the entity instance present? (existing?)
      * <pre>
@@ -216,11 +238,30 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @return The determination, true or false.
      */
     public boolean isPresent() {
-        return exists();
+        return determinePresent();
     }
 
     /**
-     * Get the entity or exception if null.
+     * Is the entity instance empty? (not existing?)
+     * <pre>
+     * OptionalEntity&lt;Member&gt; <span style="color: #553000">optMember</span> = <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(cb <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     cb.query()...;
+     * });
+     * if (<span style="color: #553000">optMember</span>.<span style="color: #CC4747">isEmpty()</span>) { <span style="color: #3F7E5E">// true if the entity does not exist</span>
+     *     ...
+     * } else { // present here
+     *     Member member = <span style="color: #553000">optMember</span>.get();
+     * }
+     * </pre>
+     * @return The determination, true or false.
+     */
+    public boolean isEmpty() {
+        return determineEmpty();
+    }
+
+    /**
+     * Get the entity or (detail-message) exception if not present. <br>
+     * <span style="color: #AD4747; font-size: 120%">However the alwaysPresent() or the orElseThrow() is recommended instead this.</span>
      * <pre>
      * OptionalEntity&lt;Member&gt; <span style="color: #553000">optMember</span> = <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
@@ -244,6 +285,60 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return directlyGet();
     }
 
+    // -----------------------------------------------------
+    //                                             or/orElse
+    //                                             ---------
+    /** {@inheritDoc} */
+    public OptionalThing<ENTITY> or(OptionalThingSupplier<? extends OptionalThing<? extends ENTITY>> noArgLambda) {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackOr(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public ENTITY orElse(ENTITY other) {
+        return directlyGetOrElse(other);
+    }
+
+    /** {@inheritDoc} */
+    public ENTITY orElseGet(OptionalThingSupplier<? extends ENTITY> noArgLambda) {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackGetOrElseGet(noArgLambda);
+    }
+
+    /**
+     * Get the entity or (detail-message) exception if not present.
+     * <pre>
+     * OptionalEntity&lt;Member&gt; <span style="color: #553000">optMember</span> = <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
+     * });
+     *
+     * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
+     * Member member = <span style="color: #553000">optMember</span>.<span style="color: #CC4747">orElseThrow()</span>;
+     * </pre>
+     * @return The entity instance wrapped in this optional object. (NotNull)
+     * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public ENTITY orElseThrow() {
+        return directlyGet();
+    }
+
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable> ENTITY orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
+        assertNoArgLambdaNotNull(noArgLambda);
+        return callbackGetOrElseThrow(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable, TRANSLATED extends Throwable> ENTITY orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> causeLambda) throws TRANSLATED {
+        assertCauseLambdaNotNull(causeLambda);
+        return callbackGetOrElseTranslatingThrow(causeLambda);
+    }
+
+    // -----------------------------------------------------
+    //                                            filter/map
+    //                                            ----------
     /**
      * Filter the entity by the predicate.
      * <pre>
@@ -257,7 +352,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param entityLambda The callback to predicate whether the entity is remained. (NotNull)
      * @return The filtered optional entity, might be empty. (NotNull)
      */
-    public OptionalEntity<ENTITY> filter(OptionalThingPredicate<ENTITY> entityLambda) {
+    public OptionalEntity<ENTITY> filter(OptionalThingPredicate<? super ENTITY> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
         return (OptionalEntity<ENTITY>) callbackFilter(entityLambda);
     }
@@ -316,29 +411,12 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return new OptionalEntity<ARG>(obj, _thrower);
     }
 
-    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-    // following methods might be rare case...
-    // _/_/_/_/_/_/_/_/_/_/
-
+    // -----------------------------------------------------
+    //                                                stream
+    //                                                ------
     /** {@inheritDoc} */
-    public ENTITY orElse(ENTITY other) {
-        return directlyGetOrElse(other);
-    }
-
-    /** {@inheritDoc} */
-    public ENTITY orElseGet(OptionalThingSupplier<ENTITY> noArgLambda) {
-        return directlyGetOrElseGet(noArgLambda);
-    }
-
-    /** {@inheritDoc} */
-    public <CAUSE extends Throwable> ENTITY orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
-        return directlyGetOrElseThrow(noArgLambda);
-    }
-
-    /** {@inheritDoc} */
-    public <CAUSE extends Throwable, TRANSLATED extends Throwable> ENTITY orElseTranslatingThrow(
-            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED {
-        return directlyGetOrElseTranslatingThrow(oneArgLambda);
+    public Stream<ENTITY> stream() {
+        return convertToStream();
     }
 
     // ===================================================================================
@@ -352,7 +430,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
      * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// called if value exists, or exception</span>
      *     ... = <span style="color: #553000">member</span>.getMemberName();
-     *     <span style="color: #553000">member</span>.getMemberStatus().<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">status</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// also relation</span>
+     *     <span style="color: #553000">member</span>.getMemberStatus().<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">status</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// also relationship</span>
      *         ... = <span style="color: #553000">status</span>.getMemberStatusName();
      *     });
      * });
@@ -360,19 +438,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param entityLambda The callback interface to consume the optional value. (NotNull)
      * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      */
-    public void alwaysPresent(OptionalThingConsumer<ENTITY> entityLambda) {
+    public void alwaysPresent(OptionalThingConsumer<? super ENTITY> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
         callbackAlwaysPresent(entityLambda);
-    }
-
-    /**
-     * Get the entity instance or null if not present. <br>
-     * basically use ifPresent() if might be not present, this is for emergency
-     * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
-     * @deprecated basically use ifPresent() or use orElse(null)
-     */
-    public ENTITY orElseNull() {
-        return directlyGetOrElse(null);
     }
 
     // ===================================================================================

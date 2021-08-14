@@ -33,7 +33,8 @@ import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.logic.doc.supplement.escape.DfDocumentTextResolver;
+import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReader;
+import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
@@ -51,7 +52,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     protected static final String BASIC_LINE_SEPARATOR = "\n";
     protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
 
-    protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
+    public static final String STYLE_SHEET_EMBEDDED_MARK = "$"; // public for reader
     protected static final String JAVA_SCRIPT_EMBEDDED_MARK = "$";
 
     protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "./schema/project-sync-schema.xml";
@@ -193,50 +194,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                                             =======================
     public boolean isEntityDBMetaDbCommentValid() {
         return isProperty("isEntityDBMetaDbCommentValid", false, getDocumentMap());
-    }
-
-    // ===================================================================================
-    //                                                                       Escape Facade
-    //                                                                       =============
-    // these are facade as utilities (for compatible)
-    // -----------------------------------------------------
-    //                                            SchemaHTML
-    //                                            ----------
-    public String resolveSchemaHtmlContent(String text) {
-        return _documentTextResolver.resolveSchemaHtmlContent(text);
-    }
-
-    public String resolveSchemaHtmlPreText(String text) {
-        return _documentTextResolver.resolveSchemaHtmlPreText(text);
-    }
-
-    public String resolveSchemaHtmlTagAttr(String text) {
-        return _documentTextResolver.resolveSchemaHtmlTagAttr(text);
-    }
-
-    // -----------------------------------------------------
-    //                                               JavaDoc
-    //                                               -------
-    public String resolveJavaDocContent(String comment, String indent) {
-        return _documentTextResolver.resolveJavaDocContent(comment, indent);
-    }
-
-    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
-        return _documentTextResolver.resolveJavaDocContentIndentDirectly(comment, indent);
-    }
-
-    // -----------------------------------------------------
-    //                                               JavaDoc
-    //                                               -------
-    public String resolveSimpleLineHtmlContent(String text) {
-        return _documentTextResolver.resolveSimpleLineHtmlContent(text);
-    }
-
-    // -----------------------------------------------------
-    //                                           DBMeta code
-    //                                           -----------
-    public String resolveDBMetaCodeSettingText(String text) { // C# same as Java
-        return _documentTextResolver.resolveDBMetaCodeSettingText(text);
     }
 
     // ===================================================================================
@@ -1305,39 +1262,51 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // ===================================================================================
+    //                                                                       Escape Facade
+    //                                                                       =============
+    // these are facade as utilities (for compatible)
+    // #hope jflute move Escape Facade to formal class (2021/07/04)
+    // -----------------------------------------------------
+    //                                               JavaDoc
+    //                                               -------
+    public String resolveJavaDocContent(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocContent(comment, indent);
+    }
+
+    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocContentIndentDirectly(comment, indent);
+    }
+
+    public String resolveJavaDocPreText(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocPreText(comment, indent);
+    }
+
+    // -----------------------------------------------------
+    //                                            SchemaHTML
+    //                                            ----------
+    public String resolveSchemaHtmlContent(String text) {
+        return _documentTextResolver.resolveSchemaHtmlContent(text);
+    }
+
+    public String resolveSchemaHtmlPreText(String text) {
+        return _documentTextResolver.resolveSchemaHtmlPreText(text);
+    }
+
+    public String resolveSchemaHtmlTagAttr(String text) {
+        return _documentTextResolver.resolveSchemaHtmlTagAttr(text);
+    }
+
+    // -----------------------------------------------------
+    //                                           DBMeta code
+    //                                           -----------
+    public String resolveDBMetaCodeSettingText(String text) { // C# same as Java
+        return _documentTextResolver.resolveDBMetaCodeSettingText(text);
+    }
+
+    // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
     protected String readEmbeddedStyleSheet(String styleSheet) {
-        final String purePath = Srl.substringFirstRear(styleSheet, STYLE_SHEET_EMBEDDED_MARK);
-        final File cssFile = new File(purePath);
-        BufferedReader br = null;
-        try {
-            final String encoding = getBasicProperties().getTemplateFileEncoding();
-            final String separator = getBasicProperties().getSourceCodeLineSeparator();
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
-            final StringBuilder sb = new StringBuilder();
-            while (true) {
-                final String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                sb.append(line).append(separator);
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            String currentPath = null;
-            try {
-                currentPath = new File(".").getCanonicalPath();
-            } catch (IOException ignored) {}
-            final String currentExp = currentPath != null ? " (current: " + currentPath + ")" : "";
-            String msg = "Failed to read the CSS file: " + cssFile + currentExp;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {}
-            }
-        }
+        return new DfDocStyleSheetReader().readEmbeddedStyleSheet(styleSheet);
     }
 }

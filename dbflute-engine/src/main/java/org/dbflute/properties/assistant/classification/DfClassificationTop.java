@@ -16,21 +16,20 @@
 package org.dbflute.properties.assistant.classification;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import org.dbflute.DfBuildProperties;
-import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
-import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.task.DfDBFluteTaskStatus;
+import org.dbflute.properties.assistant.classification.refcls.DfRefClsElement;
+import org.dbflute.properties.assistant.classification.top.acceptor.DfClsTopBasicItemAcceptor;
+import org.dbflute.properties.assistant.classification.top.comment.DfClsTopCommentDisp;
+import org.dbflute.properties.assistant.classification.top.deprecated.DfClsTopDeprecatedExistenceVerifier;
+import org.dbflute.properties.assistant.classification.top.elementoption.sistercode.DfClsTopSisterCodeHandler;
+import org.dbflute.properties.assistant.classification.top.elementoption.subitem.DfClsTopRegularSubItem;
+import org.dbflute.properties.assistant.classification.top.elementoption.subitem.DfClsTopSubItemHandler;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupInheritanceArranger;
+import org.dbflute.properties.assistant.classification.top.grouping.DfClsTopGroupListArranger;
 import org.dbflute.util.Srl;
 
 /**
@@ -38,7 +37,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.2 (2008/10/22 Wednesday)
  */
-public class DfClassificationTop {
+public class DfClassificationTop { // directly used in template
 
     // ===================================================================================
     //                                                                          Definition
@@ -47,497 +46,160 @@ public class DfClassificationTop {
 
     // code type
     public static final String KEY_CODE_TYPE = "codeType";
-    public static final String KEY_DATA_TYPE = "dataType"; // old style
+    public static final String KEY_DATA_TYPE = "dataType"; // old style, for compatibility
     public static final String CODE_TYPE_STRING = "String";
     public static final String CODE_TYPE_NUMBER = "Number";
     public static final String CODE_TYPE_BOOLEAN = "Boolean";
     public static final String DEFAULT_CODE_TYPE = CODE_TYPE_STRING;
 
-    // primitive control, closet
-    public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet"; // old style
-
     // document default, basically true
-    public static final String KEY_UNDEFINED_HANDLING_TYPE = "undefinedHandlingType";
-    public static final String KEY_MAKE_NATIVE_TYPE_SETTER = "isMakeNativeTypeSetter";
+    public static final String KEY_UNDEFINED_HANDLING_TYPE = "undefinedHandlingType"; // related to checkClassificationCode
+    public static final String KEY_MAKE_NATIVE_TYPE_SETTER = "isMakeNativeTypeSetter"; // related to forceClassificationSetting
+
+    // (elements) mapping settings
+    public static final String KEY_GROUPING_MAP = "groupingMap"; // grouping elements
+    public static final String KEY_DEPRECATED_MAP = "deprecatedMap"; // deprecated elements
+
+    // primitive control, closet
+    public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet"; // old style, for compatibility
 
     // small options
     public static final String KEY_USE_DOCUMENT_ONLY = "isUseDocumentOnly";
     public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
     public static final String KEY_SUPPRESS_DBACCESS_CLASS = "isSuppressDBAccessClass";
     public static final String KEY_SUPPRESS_NAME_CAMELIZING = "isSuppressNameCamelizing";
-    public static final String KEY_DEPRECATED = "isDeprecated";
-
-    // mapping settings
-    public static final String KEY_GROUPING_MAP = "groupingMap";
-    public static final String KEY_DEPRECATED_MAP = "deprecatedMap";
+    public static final String KEY_DEPRECATED = "isDeprecated"; // deprecated option for classification itsself
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _classificationName;
+    // -----------------------------------------------------
+    //                               Classification Identity
+    //                               -----------------------
+    protected final String _classificationName; // not null (required)
+
+    // -----------------------------------------------------
+    //                                            Basic Item
+    //                                            ----------
+    // basically not null after accept (required)
+    // but null allowed only when no topElementMap (then cannot use e.g. groupingMap)
     protected String _topComment;
-    protected String _codeType = DfClassificationTop.CODE_TYPE_STRING; // as default
-    protected boolean _checkClassificationCode;
+
+    protected String _codeType = DEFAULT_CODE_TYPE; // not null with default
+
+    // -----------------------------------------------------
+    //                                    Undefined Handling
+    //                                    ------------------
+    // basically check determination is related to the handling type
+    // however for example, no check when check=false even if handling=EXCEPTION
+    // littleAdjustment's force option and old style isCheckImplicitSet are also related
+    protected boolean _checkClassificationCode; // derived by e.g. undefined handling, checkImplicitSet
     protected ClassificationUndefinedHandlingType _undefinedHandlingType = ClassificationUndefinedHandlingType.LOGGING; // as default
-    protected String _relatedColumnName;
+
+    // -----------------------------------------------------
+    //                                Classification Element
+    //                                ----------------------
     protected final List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
-    protected boolean _tableClassification;
-    protected boolean _checkImplicitSet; // old style
-    protected boolean _checkSelectedClassification; // old style
-    protected boolean _forceClassificationSetting;
-    protected boolean _useDocumentOnly;
+    protected boolean _tableClassification; // derived by classification elements
+
+    // -----------------------------------------------------
+    //                                        Mapping Option
+    //                                        --------------
+    // means grouping elements, getGroupList() is used in template instead of this plain map
+    protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
+
+    // means deprecated elements, used in classification element object, this is plain map
+    protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
+
+    // -----------------------------------------------------
+    //                                      Reference Option
+    //                                      ----------------
+    protected final List<DfRefClsElement> _refClsElementList = new ArrayList<DfRefClsElement>(); // for appcls
+
+    // -----------------------------------------------------
+    //                                     Adjustment Option
+    //                                     -----------------
+    // #hope jflute delete two old style options (from java6) to be simple (2021/07/04)
+    protected boolean _checkImplicitSet; // old style, use undefinedHandlingType
+    protected boolean _checkSelectedClassification; // old style, use undefinedHandlingType
+    protected boolean _forceClassificationSetting; // suppress native-type setter, already true as defalut since java8
+    protected boolean _useDocumentOnly; // suppress generating at application code
     protected boolean _suppressAutoDeploy; // no automatic classification deployment
     protected boolean _suppressDBAccessClass; // no DB-access class (e.g. behavior) for table classification
     protected boolean _suppressNameCamelizing; // use plain name, to avoid Japanese and English headache 
-    protected boolean _deprecated;
-    protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
-    protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
-    protected final List<DfRefClsElement> _refClsElementList = new ArrayList<DfRefClsElement>(); // for webCls
+    protected boolean _deprecated; // deprecated option for classification itsself
+
+    // -----------------------------------------------------
+    //                               Manually-Related Column
+    //                               -----------------------
+    // normally unused, only for e.g. classification resource
+    protected String _relatedColumnName;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfClassificationTop(String classificationName) {
+        _classificationName = classificationName;
+    }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void acceptClassificationTopBasicItemMap(Map<?, ?> elementMap) {
-        acceptTopMap(elementMap, KEY_TOP_COMMENT, KEY_CODE_TYPE, KEY_DATA_TYPE);
-    }
-
-    protected void acceptTopMap(Map<?, ?> elementMap, String commentKey, String codeTypeKey, String dataTypeKey) {
-        // topComment
-        final String topComment = (String) elementMap.get(commentKey);
-        if (topComment == null) {
-            throwClassificationLiteralCommentNotFoundException(_classificationName, elementMap);
-        }
-        _topComment = topComment;
-
-        // codeType
-        final String codeType;
-        {
-            String tmpType = (String) elementMap.get(codeTypeKey);
-            if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
-                // for compatibility
-                tmpType = (String) elementMap.get(dataTypeKey);
-            }
-            codeType = tmpType;
-        }
-        if (codeType != null) {
-            _codeType = codeType;
-        }
-    }
-
-    protected void throwClassificationLiteralCommentNotFoundException(String classificationName, Map<?, ?> elementMap) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The comment attribute of the classification was not found.");
-        br.addItem("Advice");
-        br.addElement("The classification should have the comment attribute.");
-        br.addElement("See the document for the DBFlute property.");
-        br.addItem("Classification");
-        br.addElement(classificationName);
-        br.addItem("Element Map");
-        br.addElement(elementMap);
-        final String msg = br.buildExceptionMessage();
-        throw new DfClassificationRequiredAttributeNotFoundException(msg);
+    public void acceptBasicItem(Map<?, ?> topElementMap) {
+        final DfClsTopBasicItemAcceptor acceptor = new DfClsTopBasicItemAcceptor(_classificationName, topElementMap);
+        _topComment = acceptor.acceptTopComment(); // not null
+        _codeType = acceptor.acceptCodeType(_codeType); // not null with default
     }
 
     // ===================================================================================
-    //                                                                           Top Basic
-    //                                                                           =========
-    public boolean hasTopComment() {
+    //                                                                          Basic Item
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                           Top Comment
+    //                                           -----------
+    public boolean hasTopComment() { // almost true but may be false in rare case (no topElementMap)
         return Srl.is_NotNull_and_NotTrimmedEmpty(_topComment);
     }
 
+    public String getTopCommentDisp() {
+        return createClsTopCommentDisp().buildTopCommentDisp();
+    }
+
+    public String getTopCommentForJavaDoc() {
+        return createClsTopCommentDisp().buildTopCommentForJavaDoc();
+    }
+
+    public String getTopCommentForJavaDocNest() {
+        return createClsTopCommentDisp().buildTopCommentForJavaDocNest();
+    }
+
+    public String getTopCommentForSchemaHtml() { // used by just SchemaHTML
+        return createClsTopCommentDisp().buildTopCommentForSchemaHtml();
+    }
+
+    public String getTopCommentPlainlyForDfpropMap() { // used by e.g. Client NamedCls
+        return createClsTopCommentDisp().buildTopCommentPlainlyForDfpropMap();
+    }
+
+    protected DfClsTopCommentDisp createClsTopCommentDisp() {
+        return new DfClsTopCommentDisp(_topComment, _useDocumentOnly);
+    }
+
+    // -----------------------------------------------------
+    //                                             Code Type
+    //                                             ---------
     public boolean hasCodeType() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_codeType);
     }
 
     public boolean isCodeTypeNeedsQuoted() {
-        if (_codeType == null) { // unknown
-            return true; // quoted
-        }
-        return _codeType.equalsIgnoreCase(CODE_TYPE_STRING);
+        // basically codeType is not null but just in case
+        return _codeType == null || _codeType.equalsIgnoreCase(CODE_TYPE_STRING); // quoted if unknown
     }
 
     // ===================================================================================
-    //                                                                         Sister Code
-    //                                                                         ===========
-    public boolean isSisterBooleanHandling() {
-        if (_elementList.size() != 2) {
-            return false;
-        }
-        final Set<String> firstSet = new HashSet<String>();
-        {
-            final String[] firstSisters = _elementList.get(0).getSisters();
-            for (String sister : firstSisters) {
-                firstSet.add(sister.toLowerCase());
-            }
-        }
-        final Set<String> secondSet = new HashSet<String>();
-        {
-            final String[] secondSisters = _elementList.get(1).getSisters();
-            for (String sister : secondSisters) {
-                secondSet.add(sister.toLowerCase());
-            }
-        }
-        return (firstSet.contains("true") && secondSet.contains("false") // first true
-                || firstSet.contains("false") && secondSet.contains("true")); // first false
-    }
-
-    public boolean hasSisterCode() {
-        final List<DfClassificationElement> elementList = getClassificationElementList();
-        for (DfClassificationElement element : elementList) {
-            final String[] sisters = element.getSisters();
-            if (sisters != null && sisters.length > 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // ===================================================================================
-    //                                                                         SubItem Map
-    //                                                                         ===========
-    public boolean hasSubItem() {
-        final List<DfClassificationElement> elementList = getClassificationElementList();
-        for (DfClassificationElement element : elementList) {
-            Map<String, Object> subItemMap = element.getSubItemMap();
-            if (subItemMap != null && !subItemMap.isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public List<DfClassificationRegularSubItem> getRegularSubItemList() {
-        final List<DfClassificationElement> elementList = getClassificationElementList();
-        final Map<String, List<Object>> subItemListMap = new LinkedHashMap<String, List<Object>>();
-        for (DfClassificationElement element : elementList) {
-            final Map<String, Object> subItemMap = element.getSubItemMap();
-            if (subItemMap == null || subItemMap.isEmpty()) {
-                continue;
-            }
-            for (Entry<String, Object> entry : subItemMap.entrySet()) {
-                final String subItemKey = entry.getKey();
-                final Object subItemValue = entry.getValue();
-                List<Object> subItemList = subItemListMap.get(subItemKey);
-                if (subItemList == null) {
-                    subItemList = new ArrayList<Object>();
-                    subItemListMap.put(subItemKey, subItemList);
-                }
-                subItemList.add(subItemValue);
-            }
-        }
-        final String typeObject = DfClassificationRegularSubItem.TYPE_OBJECT;
-        final String typeString = DfClassificationRegularSubItem.TYPE_STRING;
-        final List<DfClassificationRegularSubItem> regularSubItemList = new ArrayList<DfClassificationRegularSubItem>();
-        final int elementSize = elementList.size();
-        for (Entry<String, List<Object>> entry : subItemListMap.entrySet()) {
-            final String subItemKey = entry.getKey();
-            final List<Object> subItemList = entry.getValue();
-            if (subItemList != null && subItemList.size() == elementSize) {
-                String subItemType = null;
-                for (Object value : subItemList) {
-                    if (value == null) {
-                        continue;
-                    }
-                    if (!(value instanceof String)) {
-                        subItemType = typeObject;
-                        break;
-                    } else if (Srl.startsWith((String) value, "map:", "list:")) {
-                        subItemType = typeObject;
-                        break;
-                    }
-                }
-                if (subItemType == null) {
-                    subItemType = typeString;
-                }
-                regularSubItemList.add(new DfClassificationRegularSubItem(subItemKey, subItemType));
-            }
-        }
-        return regularSubItemList;
-    }
-
-    public static class DfClassificationRegularSubItem {
-        // Object or String only supported
-        public static final String TYPE_OBJECT = "Object";
-        public static final String TYPE_STRING = "String";
-
-        protected final String _subItemName;
-        protected final String _subItemType;
-
-        public DfClassificationRegularSubItem(String subItemName, String subItemType) {
-            _subItemName = subItemName;
-            _subItemType = subItemType;
-        }
-
-        public boolean isSubItemTypeObject() {
-            return _subItemType.equals(TYPE_OBJECT);
-        }
-
-        public boolean isSubItemTypeString() {
-            return _subItemType.equals(TYPE_STRING);
-        }
-
-        public String getSubItemName() {
-            return _subItemName;
-        }
-
-        public String getSubItemType() {
-            return _subItemType;
-        }
-    }
-
-    // ===================================================================================
-    //                                                                        Grouping Map
-    //                                                                        ============
-    protected List<DfClassificationGroup> _cachedGroupList;
-
-    public void acceptGroupList(List<DfClassificationGroup> _cachedGroupList) { // for e.g. appcls
-        this._cachedGroupList = _cachedGroupList;
-    }
-
-    public List<DfClassificationGroup> getGroupList() {
-        if (_cachedGroupList != null) {
-            return _cachedGroupList;
-        }
-        final List<DfClassificationGroup> groupList = new ArrayList<DfClassificationGroup>();
-        for (Entry<String, Map<String, Object>> entry : _groupingMap.entrySet()) {
-            final String groupName = entry.getKey();
-            final Map<String, Object> attrMap = entry.getValue();
-            final String groupComment = (String) attrMap.get("groupComment");
-            @SuppressWarnings("unchecked")
-            final List<String> elementList = (List<String>) attrMap.get("elementList");
-            if (elementList == null) {
-                String msg = "The elementList in grouping map is required: " + getClassificationName();
-                throw new DfClassificationRequiredAttributeNotFoundException(msg);
-            }
-            final String docOnly = (String) attrMap.get("isUseDocumentOnly");
-            final DfClassificationGroup group = new DfClassificationGroup(this, groupName);
-            group.setGroupComment(groupComment);
-            group.setElementNameList(elementList);
-            group.setUseDocumentOnly(docOnly != null && docOnly.trim().equalsIgnoreCase("true"));
-            groupList.add(group);
-        }
-        resolveGroupVariable(groupList);
-        _cachedGroupList = prepareGroupRealList(groupList);
-        return _cachedGroupList;
-    }
-
-    protected void resolveGroupVariable(List<DfClassificationGroup> groupList) {
-        final Map<String, DfClassificationGroup> groupMap = new LinkedHashMap<String, DfClassificationGroup>();
-        for (DfClassificationGroup group : groupList) {
-            groupMap.put(group.getGroupName(), group);
-        }
-        // e.g.
-        // ; servicePlus = map:{
-        //     ; elementList = list:{ $$ref$$.serviceAvailable ; Withdrawal }
-        // }
-        final String refPrefix = "$$ref$$.";
-        for (DfClassificationGroup group : groupList) {
-            final List<String> elementNameList = group.getElementNameList();
-            final Set<String> resolvedNameSet = new LinkedHashSet<String>();
-            for (String elementName : elementNameList) {
-                if (Srl.startsWith(elementName, refPrefix)) {
-                    final String refName = Srl.substringFirstRear(elementName, refPrefix).trim();
-                    final DfClassificationGroup refGroup = groupMap.get(refName);
-                    if (refGroup == null) {
-                        throwClassificationGroupingMapReferenceNotFoundException(groupList, group, refName);
-                    }
-                    resolvedNameSet.addAll(refGroup.getElementNameList());
-                } else {
-                    resolvedNameSet.add(elementName);
-                }
-            }
-            if (elementNameList.size() < resolvedNameSet.size()) {
-                group.setElementNameList(new ArrayList<String>(resolvedNameSet));
-            }
-        }
-    }
-
-    protected void throwClassificationGroupingMapReferenceNotFoundException(List<DfClassificationGroup> groupList,
-            DfClassificationGroup group, String refName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the refenrece in the grouping map.");
-        br.addItem("Classification Name");
-        br.addElement(group.getClassificationName());
-        br.addItem("Group Name");
-        br.addElement(group.getGroupName());
-        br.addItem("NotFound Name");
-        br.addElement(refName);
-        br.addItem("Defined Group");
-        for (DfClassificationGroup defined : groupList) {
-            br.addElement(defined);
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
-    }
-
-    protected List<DfClassificationGroup> prepareGroupRealList(final List<DfClassificationGroup> groupList) {
-        final List<DfClassificationGroup> realList = new ArrayList<DfClassificationGroup>();
-        final boolean docOnly = isDocOnlyTask();
-        for (DfClassificationGroup group : groupList) {
-            if (!docOnly && group.isUseDocumentOnly()) {
-                continue;
-            }
-            realList.add(group);
-        }
-        return realList;
-    }
-
-    public boolean hasGroup() {
-        return !getGroupList().isEmpty();
-    }
-
-    // ===================================================================================
-    //                                                                     Deprecated List
-    //                                                                     ===============
-    public void checkDeprecatedElementExistence() {
-        for (String deprecated : _deprecatedMap.keySet()) {
-            boolean found = false;
-            for (DfClassificationElement element : _elementList) {
-                final String name = element.getName();
-                if (name.equals(deprecated)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throwDeprecatedClassificationElementNotFoundException(deprecated);
-            }
-        }
-    }
-
-    protected void throwDeprecatedClassificationElementNotFoundException(String deprecated) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the specified element in deprecated list.");
-        br.addItem("Classification");
-        br.addElement(_classificationName);
-        br.addItem("Existing Element");
-        final StringBuilder sb = new StringBuilder();
-        for (DfClassificationElement element : _elementList) {
-            if (sb.length() > 0) {
-                sb.append(", ");
-            }
-            sb.append(element.getName());
-        }
-        br.addElement(sb.toString());
-        br.addItem("NotFound Element");
-        br.addElement(deprecated);
-        final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
-    }
-
-    // ===================================================================================
-    //                                                              Classification Element
-    //                                                              ======================
-    public int getElementSize() {
-        return _elementList.size();
-    }
-
-    // ===================================================================================
-    //                                                                         Escape Text
-    //                                                                         ===========
-    protected String resolveTextForJavaDoc(String comment, String indent) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveJavaDocContent(comment, indent);
-    }
-
-    protected String resolveTextForSchemaHtml(String comment) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveSchemaHtmlContent(comment);
-    }
-
-    // ===============================================================================
-    //                                                                     Task Status
-    //                                                                     ===========
-    protected boolean isDocOnlyTask() {
-        final DfDBFluteTaskStatus instance = DfDBFluteTaskStatus.getInstance();
-        return instance.isDocTask() || instance.isReplaceSchema();
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public String toString() {
-        return "{" + _classificationName + ", " + _topComment + ", " + _codeType + ", " + _relatedColumnName + ", " + _elementList + "}";
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    // -----------------------------------------------------
-    //                                            Basic Item
-    //                                            ----------
-    public String getClassificationName() {
-        return _classificationName;
-    }
-
-    public void setClassificationName(String classificationName) {
-        _classificationName = classificationName;
-    }
-
-    public String getTopComment() {
-        return _topComment;
-    }
-
-    public String getTopCommentDisp() {
-        return buildTopCommentDisp();
-    }
-
-    protected String buildTopCommentDisp() {
-        if (_topComment == null) {
-            return "";
-        }
-        final String comment;
-        if (_useDocumentOnly) {
-            comment = _topComment + " (document only)";
-        } else {
-            comment = _topComment;
-        }
-        return Srl.replace(comment, "\n", ""); // basically one line
-    }
-
-    public String getTopCommentForJavaDoc() {
-        return buildTopCommentForJavaDoc("    "); // basically indent unused
-    }
-
-    public String getTopCommentForJavaDocNest() {
-        return buildTopCommentForJavaDoc("        "); // basically indent unused
-    }
-
-    protected String buildTopCommentForJavaDoc(String indent) {
-        return resolveTextForJavaDoc(getTopCommentDisp(), indent);
-    }
-
-    public String getTopCommentForSchemaHtml() {
-        return resolveTextForSchemaHtml(getTopCommentDisp());
-    }
-
-    public void setTopComment(String topComment) {
-        _topComment = topComment;
-    }
-
-    public String getCodeType() {
-        return _codeType;
-    }
-
-    public void setCodeType(String codeType) {
-        _codeType = codeType;
-    }
-
-    // -----------------------------------------------------
-    //                                 UndefinedHandlingType
-    //                                 ---------------------
-    public boolean isCheckClassificationCode() {
-        return _checkClassificationCode;
-    }
-
-    public void setCheckClassificationCode(boolean checkClassificationCode) {
-        _checkClassificationCode = checkClassificationCode;
-    }
-
-    public ClassificationUndefinedHandlingType getUndefinedHandlingType() {
-        return _undefinedHandlingType;
-    }
-
+    //                                                                  Undefined Handling
+    //                                                                  ==================
     public boolean isUndefinedHandlingTypeChecked() {
         return _undefinedHandlingType != null && _undefinedHandlingType.isChecked();
     }
@@ -554,26 +216,14 @@ public class DfClassificationTop {
         return _undefinedHandlingType != null && _undefinedHandlingType.isContinued();
     }
 
-    public void setUndefinedHandlingType(ClassificationUndefinedHandlingType undefinedHandlingType) {
-        _undefinedHandlingType = undefinedHandlingType;
-    }
-
+    // ===================================================================================
+    //                                                              Classification Element
+    //                                                              ======================
     // -----------------------------------------------------
-    //                                     RelatedColumnName
-    //                                     -----------------
-    public String getRelatedColumnName() {
-        return _relatedColumnName;
-    }
-
-    public void setRelatedColumnName(String relatedColumnName) {
-        _relatedColumnName = relatedColumnName;
-    }
-
-    // -----------------------------------------------------
-    //                             ClassificationElementList
-    //                             -------------------------
-    public List<DfClassificationElement> getClassificationElementList() {
-        return _elementList;
+    //                                      Element Handling
+    //                                      ----------------
+    public int getElementSize() {
+        return _elementList.size();
     }
 
     public void addClassificationElement(DfClassificationElement classificationElement) {
@@ -582,24 +232,138 @@ public class DfClassificationTop {
     }
 
     public void addClassificationElementAll(List<DfClassificationElement> classificationElementList) {
-        for (DfClassificationElement element : classificationElementList) {
-            element.setClassificationTop(this);
-        }
+        classificationElementList.forEach(el -> el.setClassificationTop(this));
         _elementList.addAll(classificationElementList);
     }
 
-    public DfClassificationElement findClassificationElementByName(String name) {
-        for (DfClassificationElement element : _elementList) {
-            if (element.getName().equals(name)) {
-                return element;
-            }
-        }
-        return null;
+    public DfClassificationElement findClassificationElementByName(String name) { // null if not found
+        return _elementList.stream().filter(el -> el.getName().equals(name)).findFirst().orElse(null);
     }
 
     // -----------------------------------------------------
-    //                                 Various Determination
-    //                                 ---------------------
+    //                                           Sister Code
+    //                                           -----------
+    public boolean hasSisterCode() {
+        return new DfClsTopSisterCodeHandler(_elementList).hasSisterCode();
+    }
+
+    public boolean isSisterBooleanHandling() {
+        return new DfClsTopSisterCodeHandler(_elementList).isSisterBooleanHandling();
+    }
+
+    // -----------------------------------------------------
+    //                                           SubItem Map
+    //                                           -----------
+    public boolean hasSubItem() {
+        return new DfClsTopSubItemHandler(this).hasSubItem();
+    }
+
+    public List<DfClsTopRegularSubItem> getRegularSubItemList() {
+        return new DfClsTopSubItemHandler(this).arrangeRegularSubItemList();
+    }
+
+    // ===================================================================================
+    //                                                                      Mapping Option
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                          Grouping Map
+    //                                          ------------
+    public void inheritRefClsGroup(DfClassificationTop referredClsTop) { // for e.g. appcls
+        new DfClsTopGroupInheritanceArranger(this, referredClsTop).inheritRefClsGroup(_groupingMap);
+    }
+
+    public boolean isAlreadyGroupArranged() { // for e.g. inheritance process
+        return _cachedGroupList != null; // means already arranged
+    }
+
+    protected List<DfClassificationGroup> _cachedGroupList; // null means before arrangement
+
+    public List<DfClassificationGroup> getGroupList() {
+        if (_cachedGroupList != null) {
+            return _cachedGroupList;
+        }
+        _cachedGroupList = new DfClsTopGroupListArranger(this, _groupingMap).arrangeGroupList();
+        return _cachedGroupList;
+    }
+
+    public boolean hasGroup() {
+        return !getGroupList().isEmpty();
+    }
+
+    public DfClassificationGroup findGroup(String groupName) { // null allowed, case insensitive
+        return getGroupList().stream().filter(group -> group.getGroupName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
+    }
+
+    // -----------------------------------------------------
+    //                                        Deprecated Map
+    //                                        --------------
+    public void verifyDeprecatedElementExistence() {
+        new DfClsTopDeprecatedExistenceVerifier(this, _deprecatedMap).verifyDeprecatedElementExistence();
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _classificationName + ", " + _topComment + ", " + _codeType + ", elements=" + _elementList.size() + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                               Classification Identity
+    //                               -----------------------
+    public String getClassificationName() {
+        return _classificationName;
+    }
+
+    // -----------------------------------------------------
+    //                                            Basic Item
+    //                                            ----------
+    public String getTopComment() {
+        return _topComment;
+    }
+
+    public void setTopComment(String topComment) {
+        _topComment = topComment;
+    }
+
+    public String getCodeType() {
+        return _codeType;
+    }
+
+    public void setCodeType(String codeType) {
+        _codeType = codeType;
+    }
+
+    // -----------------------------------------------------
+    //                                    Undefined Handling
+    //                                    ------------------
+    public boolean isCheckClassificationCode() {
+        return _checkClassificationCode;
+    }
+
+    public void setCheckClassificationCode(boolean checkClassificationCode) {
+        _checkClassificationCode = checkClassificationCode;
+    }
+
+    public ClassificationUndefinedHandlingType getUndefinedHandlingType() {
+        return _undefinedHandlingType;
+    }
+
+    public void setUndefinedHandlingType(ClassificationUndefinedHandlingType undefinedHandlingType) {
+        _undefinedHandlingType = undefinedHandlingType;
+    }
+
+    // -----------------------------------------------------
+    //                                Classification Element
+    //                                ----------------------
+    public List<DfClassificationElement> getClassificationElementList() {
+        return _elementList;
+    }
+
     public boolean isTableClassification() {
         return _tableClassification;
     }
@@ -608,7 +372,40 @@ public class DfClassificationTop {
         _tableClassification = tableClassification;
     }
 
-    public boolean isCheckImplicitSet() {
+    // -----------------------------------------------------
+    //                                        Mapping Option
+    //                                        --------------
+    protected Map<String, Map<String, Object>> getGroupingMap() { // not public to use resolved group list
+        return _groupingMap; // not null
+    }
+
+    public void putGroupingAll(Map<String, Map<String, Object>> groupingMap) {
+        _groupingMap.putAll(groupingMap);
+    }
+
+    public Map<String, String> getDeprecatedMap() {
+        return _deprecatedMap; // not null
+    }
+
+    public void putDeprecatedAll(Map<String, String> deprecatedMap) {
+        _deprecatedMap.putAll(deprecatedMap);
+    }
+
+    // -----------------------------------------------------
+    //                                     RefClsElementList
+    //                                     -----------------
+    public List<DfRefClsElement> getRefClsElementList() { // for webCls
+        return _refClsElementList;
+    }
+
+    public void addRefClsElement(DfRefClsElement classificationElement) {
+        _refClsElementList.add(classificationElement);
+    }
+
+    // -----------------------------------------------------
+    //                                     Adjustment Option
+    //                                     -----------------
+    public boolean isCheckImplicitSet() { // contains table classification determination
         return !_tableClassification && _checkImplicitSet;
     }
 
@@ -673,32 +470,13 @@ public class DfClassificationTop {
     }
 
     // -----------------------------------------------------
-    //                                        Mapping Option
-    //                                        --------------
-    protected Map<String, Map<String, Object>> getGroupingMap() { // not public to use resolved group list
-        return _groupingMap;
+    //                               Manually-Related Column
+    //                               -----------------------
+    public String getRelatedColumnName() { // not for template, for deployment
+        return _relatedColumnName;
     }
 
-    public void putGroupingAll(Map<String, Map<String, Object>> groupingMap) {
-        _groupingMap.putAll(groupingMap);
-    }
-
-    public Map<String, String> getDeprecatedMap() {
-        return _deprecatedMap;
-    }
-
-    public void putDeprecatedAll(Map<String, String> deprecatedMap) {
-        _deprecatedMap.putAll(deprecatedMap);
-    }
-
-    // -----------------------------------------------------
-    //                                     RefClsElementList
-    //                                     -----------------
-    public List<DfRefClsElement> getRefClsElementList() { // for webCls
-        return _refClsElementList;
-    }
-
-    public void addRefClsElement(DfRefClsElement classificationElement) {
-        _refClsElementList.add(classificationElement);
+    public void setRelatedColumnName(String relatedColumnName) {
+        _relatedColumnName = relatedColumnName;
     }
 }
