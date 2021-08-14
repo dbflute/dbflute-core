@@ -89,7 +89,7 @@ mvn -e compile
 
 cd ../dbflute-example-with-remoteapi-gen/dbflute_maihamadb
 rm ./log/*.log
-. manage.sh renewal,freegen
+. manage.sh freegen
 cd ..
 mvn -e compile
 
