@@ -51,7 +51,7 @@ public class ${request.className} extends UserMessages {
 #if (!$column.isExtends)
 #if (!$column.isOverride)
 
-    /** The key of the message: ${column.propertyValueHtmlEncoded} */
+    /** The key of the message: ${column.propertyValueJavaDocEncoded} */
     public static final String ${column.defName} = "{${column.propertyKey}}";
 #end
 #end
@@ -64,9 +64,14 @@ public class ${request.className} extends UserMessages {
     /**
      * Add the created action message for the key '${column.propertyKey}' with parameters.
      * <pre>
-     * message: ${column.propertyValueHtmlEncoded}
-#if ($column.comment != "")
-     * comment: ${column.commentHtmlEncoded}
+     * message: ${column.propertyValueJavaDocEncodedPre}
+#if ($column.hasComment)
+#if ($column.isMultipleLineComment)
+     * comment:
+     * ${column.commentJavaDocEncodedPre}
+#else
+     * comment: ${column.commentJavaDocEncodedPre}
+#end
 #end
      * </pre>
      * @param property The property name for the message. (NotNull)
@@ -87,9 +92,14 @@ public class ${request.className} extends UserMessages {
     /**
      * Add the created action message for the key '${column.propertyKey}' with parameters.
      * <pre>
-     * message: ${column.propertyValueHtmlEncoded}
-#if ($column.comment != "")
-     * comment: ${column.commentHtmlEncoded}
+     * message: ${column.propertyValueJavaDocEncodedPre}
+#if ($column.hasComment)
+#if ($column.isMultipleLineComment)
+     * comment:
+     * ${column.commentJavaDocEncodedPre}
+#else
+     * comment: ${column.commentJavaDocEncodedPre}
+#end
 #end
      * </pre>
      * @param property The property name for the message. (NotNull)

@@ -43,7 +43,7 @@ public interface ${request.className}${pluginDef} {
 #foreach ($column in $table.columnList)
 #if (!$column.isExtends)
 
-    /** The key of the configuration. e.g. ${column.propertyValueHtmlEncoded} */
+    /** The key of the configuration. e.g. ${column.propertyValueJavaDocEncoded} */
     String ${column.defName} = "${column.propertyKey}";
 #end
 #end
@@ -68,9 +68,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}'. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
@@ -79,9 +84,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link Integer}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not integer.
@@ -92,9 +102,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link Long}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not long.
@@ -105,9 +120,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link java.math.BigDecimal}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not decimal.
@@ -118,9 +138,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Get the value for the key '${column.propertyKey}' as {@link java.time.LocalDate}. <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
@@ -130,9 +155,14 @@ public interface ${request.className}${pluginDef} {
 
     /**
      * Is the property for the key '${column.propertyKey}' true? <br>
-     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+     * The value is, e.g. ${column.propertyValueJavaDocEncoded} <br>
 #if ($column.hasComment)
-     * comment: ${column.commentHtmlEncoded}
+#if ($column.isMultipleLineComment)
+     * comment: <br>
+     * ${column.commentJavaDocEncoded}
+#else
+     * comment: ${column.commentJavaDocEncoded}
+#end
 #end
      * @return The determination, true or false. (if not found, exception but basically no way)
      */

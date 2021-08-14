@@ -235,6 +235,13 @@ public interface DfLanguageGrammar {
 
     /**
      * @param sourceCodeLineSeparator The line separator for source code. (NotNull)
+     * @param baseIndent The base indent, based on Java indent. (NotNull)
+     * @return The string expression of JavaDoc line and indent for "pre" text, e.g. "(ln)     * ". (NotNull)
+     */
+    String buildJavaDocLineAndIndentPre(String sourceCodeLineSeparator, String baseIndent);
+
+    /**
+     * @param sourceCodeLineSeparator The line separator for source code. (NotNull)
      * @param adjustedIndent The indent already adjusted, means no adjustment is needed. (NotNull)
      * @return The string expression of JavaDoc line and indent, e.g. "&lt;br /&gt;(ln)     * ". (NotNull)
      */

@@ -38,14 +38,18 @@ public class DfDocumentTextResolver {
     //                                                                             JavaDoc
     //                                                                             =======
     public String resolveJavaDocContent(String comment, String indent) {
-        return doResolveJavaDocContent(comment, indent, false);
+        return doResolveJavaDocContent(comment, indent, /*directIndent*/false, /*preText*/false);
     }
 
-    public String resolveJavaDocContentIndentDirectly(String comment, String indent) {
-        return doResolveJavaDocContent(comment, indent, true);
+    public String resolveJavaDocContentIndentDirectly(String comment, String indent) { // for e.g. BQP
+        return doResolveJavaDocContent(comment, indent, /*directIndent*/true, /*preText*/false);
     }
 
-    protected String doResolveJavaDocContent(String comment, String indent, boolean directIndent) {
+    public String resolveJavaDocPreText(String comment, String indent) {
+        return doResolveJavaDocContent(comment, indent, /*directIndent*/false, /*preText*/true);
+    }
+
+    protected String doResolveJavaDocContent(String comment, String indent, boolean directIndent, boolean preText) {
         if (comment == null || comment.trim().length() == 0) {
             return null;
         }
@@ -58,8 +62,13 @@ public class DfDocumentTextResolver {
         final String javaDocLineSeparator;
         if (directIndent) {
             javaDocLineSeparator = grammar.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, indent);
+            // #for_now jflute directIndent with preText is unsupported for now (2021/08/15)
         } else {
-            javaDocLineSeparator = grammar.buildJavaDocLineAndIndent(sourceCodeLineSeparator, indent);
+            if (preText) {
+                javaDocLineSeparator = grammar.buildJavaDocLineAndIndentPre(sourceCodeLineSeparator, indent);
+            } else {
+                javaDocLineSeparator = grammar.buildJavaDocLineAndIndent(sourceCodeLineSeparator, indent);
+            }
         }
         if (work.contains(BASIC_LINE_SEPARATOR)) {
             work = work.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
@@ -82,6 +91,7 @@ public class DfDocumentTextResolver {
         text = Srl.replace(text, "&", "&amp;"); // should be first, to keep already-escaped word
         text = Srl.replace(text, "<", "&lt;");
         text = Srl.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "@", "&#064;"); // e.g. javadoc
         text = Srl.replace(text, " ", "&nbsp;");
 
         // line separator (should be after escaping)
@@ -104,6 +114,7 @@ public class DfDocumentTextResolver {
         text = Srl.replace(text, "&", "&amp;"); // should be first, to keep already-escaped word
         text = Srl.replace(text, "<", "&lt;");
         text = Srl.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "@", "&#064;"); // e.g. javadoc
         // unneeded because of "pre" tag
         //text = Srl.replace(text, " ", "&nbsp;");
 
@@ -123,19 +134,6 @@ public class DfDocumentTextResolver {
 
         // line separator
         text = removeCR(text);
-        return text;
-    }
-
-    // ===================================================================================
-    //                                                                     SimpleLine HTML
-    //                                                                     ===============
-    public String resolveSimpleLineHtmlContent(String text) {
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        // escape
-        text = Srl.replace(text, "<", "&lt;");
-        text = Srl.replace(text, ">", "&gt;");
         return text;
     }
 

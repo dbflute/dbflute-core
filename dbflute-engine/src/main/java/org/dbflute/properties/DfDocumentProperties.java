@@ -1277,6 +1277,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return _documentTextResolver.resolveJavaDocContentIndentDirectly(comment, indent);
     }
 
+    public String resolveJavaDocPreText(String comment, String indent) {
+        return _documentTextResolver.resolveJavaDocPreText(comment, indent);
+    }
+
     // -----------------------------------------------------
     //                                            SchemaHTML
     //                                            ----------
@@ -1290,13 +1294,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public String resolveSchemaHtmlTagAttr(String text) {
         return _documentTextResolver.resolveSchemaHtmlTagAttr(text);
-    }
-
-    // -----------------------------------------------------
-    //                                      Simple Line HTML
-    //                                      ----------------
-    public String resolveSimpleLineHtmlContent(String text) {
-        return _documentTextResolver.resolveSimpleLineHtmlContent(text);
     }
 
     // -----------------------------------------------------
