@@ -104,8 +104,8 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         sb.append("select rits.inhrelid, child_cls.relname as child_name");
         sb.append(", rits.inhparent, parent_cls.relname as parent_name, inhseqno");
         sb.append(" from pg_inherits rits");
-        sb.append(" left outer join pg_class child_cls on inhrelid = oid");
-        sb.append(" left outer join pg_class parent_cls on inhparent = oid");
+        sb.append(" left outer join pg_class child_cls on rits.inhrelid = child_cls.oid");
+        sb.append(" left outer join pg_class parent_cls on rits.inhparent = parent_cls.oid");
         final String sql = sb.toString();
         final List<String> colList = Arrays.asList("inhrelid", "child_name", "inhparent", "parent_name", "inhseqno");
         final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
