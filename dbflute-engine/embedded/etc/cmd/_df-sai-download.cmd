@@ -9,7 +9,7 @@ call %DBFLUTE_HOME%\etc\cmd\_df-copy-properties.cmd %NATIVE_PROPERTIES_PATH%
 call %DBFLUTE_HOME%\etc\cmd\_df-copy-extlib.cmd
 
 :: to derive "extlib" directory
-set CLIENT_HOME=%~dp0
+set CLIENT_HOME=%CD%
 
 call %DBFLUTE_HOME%\ant\bin\ant -Ddfenv=%DBFLUTE_ENVIRONMENT_TYPE% -Ddfclient=%CLIENT_HOME% -f %DBFLUTE_HOME%\build-torque.xml sai-download
 
