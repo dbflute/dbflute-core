@@ -144,7 +144,8 @@ public class DfFrgJavaScriptJsonEngine {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON script engine for FreeGen.");
         br.addItem("Advice");
-        br.addElement("Nashorn (JavaScript engine) is removed since Java15.");
+        br.addElement("Your FreeGen request needs JavaScript engine.");
+        br.addElement("But Nashorn (JavaScript engine) is removed since Java15.");
         br.addElement("");
         br.addElement("So prepare 'sai' libraries in your 'extlib' directory.");
         br.addElement("It is JavaScript engine forked from Nashorn.");
