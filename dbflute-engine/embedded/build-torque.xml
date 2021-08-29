@@ -241,8 +241,8 @@
   </target>
 
   <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
-  <!--                                                                         Utility -->
-  <!--                                                                         nnnnnnn -->
+  <!--                                                                   Utility 10~29 -->
+  <!--                                                                   nnnnnnnnnnnnn -->
   <target name="refresh" description="Refresh task">
   	<!-- @param dfprj refresh project name (NotRequired) -->
     <df-refresh
@@ -271,8 +271,12 @@
     </df-take-assert>
   </target>
 
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                   Utility 30~99 -->
+  <!--                                                                   nnnnnnnnnnnnn -->
   <target name="sai-download" description="Sai Download task">
-    <!-- @param dfclient the directory of DBFlute Client (Required)
+    <!--
+     @param dfclient the directory of DBFlute Client (Required)
      The Ant world "basedir" is DBFlute Engine, cannot get execution current directory.
      (however, Java class current directory is DBFlute Client...why?)
      -->
@@ -281,6 +285,11 @@
   	<!-- Apache Ant, mkdir task https://ant.apache.org/manual/Tasks/mkdir.html -->
   	<mkdir dir="${dest.base}"/>
 
+  	<!-- to give you attention to the licenses -->
+  	<property name="license.url.base" value="https://dbflute.org/meta/prototype/license"/>
+	<get src="${license.url.base}/ASM_License.txt" dest="${dest.base}/ASM_License.txt" verbose="on"></get>
+	<get src="${license.url.base}/Sai_License.txt" dest="${dest.base}/Sai_License.txt" verbose="on"></get>
+
   	<!--
   	 Apache Ant, get task: https://ant.apache.org/manual/Tasks/get.html
   	 cannot use nested elements because of old version now
@@ -288,13 +297,13 @@
   	 migrate Nashorn to sai: http://dbflute.seasar.org/ja/lastaflute/howto/upgrade/migration/lahorntosai.html 
   	 about sai jar files
   	-->
-  	<property name="url.base" value="https://repo1.maven.org/maven2"/>
-	<get src="${url.base}/org/ow2/asm/asm/7.1/asm-7.1.jar" dest="${dest.base}/asm-7.1.jar" verbose="on"></get>
-	<get src="${url.base}/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar" dest="${dest.base}/asm-analysis-7.1.jar" verbose="on"></get>
-	<get src="${url.base}/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar" dest="${dest.base}/asm-commons-7.1.jar" verbose="on"></get>
-	<get src="${url.base}/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar" dest="${dest.base}/asm-tree-7.1.jar" verbose="on"></get>
-	<get src="${url.base}/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar" dest="${dest.base}/asm-util-7.1.jar" verbose="on"></get>
-	<get src="${url.base}/org/codelibs/sai/0.2.0/sai-0.2.0.jar" dest="${dest.base}/sai-0.2.0.jar" verbose="on"></get>
+  	<property name="maven.url.base" value="https://repo1.maven.org/maven2"/>
+	<get src="${maven.url.base}/org/ow2/asm/asm/7.1/asm-7.1.jar" dest="${dest.base}/asm-7.1.jar" verbose="on"></get>
+	<get src="${maven.url.base}/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar" dest="${dest.base}/asm-analysis-7.1.jar" verbose="on"></get>
+	<get src="${maven.url.base}/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar" dest="${dest.base}/asm-commons-7.1.jar" verbose="on"></get>
+	<get src="${maven.url.base}/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar" dest="${dest.base}/asm-tree-7.1.jar" verbose="on"></get>
+	<get src="${maven.url.base}/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar" dest="${dest.base}/asm-util-7.1.jar" verbose="on"></get>
+	<get src="${maven.url.base}/org/codelibs/sai/0.2.0/sai-0.2.0.jar" dest="${dest.base}/sai-0.2.0.jar" verbose="on"></get>
   </target>
 
   <target name="intro" description="DBFlute Intro task">
