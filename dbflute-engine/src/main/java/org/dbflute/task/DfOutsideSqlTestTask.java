@@ -410,7 +410,7 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setSpecifiedSqlFile(String specifiedSqlFile) {
+    public void setSpecifiedSqlFile(String specifiedSqlFile) { // simple file name of target SQL
         DfSpecifiedSqlFile.getInstance().setSpecifiedSqlFile(specifiedSqlFile);
     }
 }

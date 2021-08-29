@@ -19,20 +19,25 @@ if "%FIRST_ARG%"=="" (
   echo      ^| ^| ^|-\ ^|-  ^| ^| ^| -+- /_\
   echo      ^|/  ^|-/ ^|   ^| ^|_^|  ^|  \-
   echo:
-  echo  ^<^<^< DB Change ^>^>^> *delete database
+  echo  ^<^<^< DB Task ^>^>^>
   echo    0 : replace-schema  =^> drop tables and create schema
   echo    1 : renewal         =^> call 0-^>21-^>22-^>23-^>25-^>24
+  echo    4 : load-data-reverse  5 : schema-sync-check
   echo    7 : save-previous  8 : alter-check
   echo:
-  echo  ^<^<^< Generate ^>^>^>
+  echo  ^<^<^< Generate Task ^>^>^>
   echo    2 : regenerate  =^> call 21-^>22-^>23-^>25-^>24
   echo   21 : jdbc        22 : doc  23 : generate
   echo   24 : sql2entity  25 : outside-sql-test
   echo:
-  echo  ^<^<^< Utility ^>^>^>
-  echo    4 : load-data-reverse  5 : schema-sync-check
-  echo   11 : refresh  12 : freegen  13 : take-assert
-  echo   88 : intro    94 : upgrade  97 : help
+  echo  ^<^<^< Utility Task ^>^>^>
+  echo   12 : freegen  =^> generate anything you like
+  echo   88 : intro    =^> boot DBFlute Intro
+  echo:
+  echo  ^<^<^< Environment Task ^>^>^>
+  echo   31 : sai      =^> download sai libraries
+  echo   94 : upgrade  =^> upgrade DBFlute Engine
+  echo   97 : help     =^> show list of all tasks
   echo:
 
   echo (input on your console^)

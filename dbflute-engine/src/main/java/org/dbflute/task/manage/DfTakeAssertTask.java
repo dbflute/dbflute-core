@@ -184,7 +184,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setSqlRootDir(String sqlRootDir) {
+    public void setSqlRootDir(String sqlRootDir) { // e.g. ./playsql/sea
         if (Srl.is_Null_or_TrimmedEmpty(sqlRootDir)) {
             return;
         }

@@ -174,7 +174,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _varyingArg; // set by Ant process
+    protected String _varyingArg; // set by Ant process, e.g. load-data-reverse, schema-sync-check, null allowed
     protected boolean _syncCheckGhastlyTragedy; // set by schema-sync process
     protected DfSPolicyResult _schemaPolicyResult; // null allowed (before policy check or no policy)
     protected DfDecoMapPickup _decoMapPickup; // null allowed (before decomment process)
@@ -509,7 +509,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setVaryingArg(String varyingArg) {
+    public void setVaryingArg(String varyingArg) { // e.g. load-data-reverse, schema-sync-check
         if (Srl.is_Null_or_TrimmedEmpty(varyingArg)) {
             return;
         }

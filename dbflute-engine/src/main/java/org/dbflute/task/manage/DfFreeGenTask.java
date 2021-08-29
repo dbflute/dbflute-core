@@ -271,7 +271,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setGenTarget(String genTarget) {
+    public void setGenTarget(String genTarget) { // FreeGen request to be executed
         if (Srl.is_Null_or_TrimmedEmpty(genTarget)) {
             return;
         }
