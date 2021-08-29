@@ -39,7 +39,7 @@ public class DfPublicProperties {
     // -----------------------------------------------------
     //                                     Public Properties
     //                                     -----------------
-    public static final String PUBLIC_PROP_URL = "http://dbflute.org/meta/public.properties";
+    public static final String PUBLIC_PROP_URL = "https://dbflute.org/meta/public.properties";
     public static final String VERSION_VARIABLE = "$$version$$";
 
     // -----------------------------------------------------
