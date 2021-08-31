@@ -28,7 +28,7 @@ import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgJavaScriptJsonEngine;
 import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgJavaScriptJsonEngine.ScriptEngineFound;
-import org.dbflute.logic.manage.freegen.table.json.engine.DfVeloworldScriptEngine;
+import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgVeloScriptEngine;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -203,7 +203,7 @@ public class DfFreeGenManager {
         if (engine == null) {
             throwJsonScriptPublicEngineNotFoundException();
         }
-        return new DfVeloworldScriptEngine(engine.getFoundEngine());
+        return new DfFrgVeloScriptEngine(engine.getFoundEngine());
     }
 
     protected void throwJsonScriptPublicEngineNotFoundException() {
