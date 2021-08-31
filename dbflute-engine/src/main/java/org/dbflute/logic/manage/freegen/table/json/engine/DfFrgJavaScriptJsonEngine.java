@@ -67,7 +67,7 @@ public class DfFrgJavaScriptJsonEngine {
             //}
             engine.eval("var result = " + json);
         } catch (ScriptException e) {
-            throwJsonParseFailureException(requestName, resourceFile, e);
+            throwJsonParseFailureException(requestName, resourceFile, engine, e);
         }
         @SuppressWarnings("unchecked")
         final RESULT result = (RESULT) engine.get("result");
@@ -164,13 +164,15 @@ public class DfFrgJavaScriptJsonEngine {
     // -----------------------------------------------------
     //                                         Parse Failure
     //                                         -------------
-    protected void throwJsonParseFailureException(String requestName, String resourceFile, Exception cause) {
+    protected void throwJsonParseFailureException(String requestName, String resourceFile, ScriptEngine engine, Exception cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the JSON file for FreeGen.");
         br.addItem("FreeGen Request");
         br.addElement(requestName);
         br.addItem("JSON File");
         br.addElement(resourceFile);
+        br.addItem("JSON Engine");
+        br.addElement(engine);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg, cause);
     }
