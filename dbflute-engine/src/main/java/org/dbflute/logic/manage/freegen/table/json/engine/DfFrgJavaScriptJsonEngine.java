@@ -182,10 +182,10 @@ public class DfFrgJavaScriptJsonEngine {
     public ScriptEngineFound findScriptEngine(ScriptEngineManager manager) { // null allowed
         ScriptEngineFound engine = getEngineByName(manager, "sai");
         if (engine == null) {
-            engine = getEngineByName(manager, "nashorn");
+            engine = getEngineByName(manager, "rhino");
         }
         if (engine == null) {
-            engine = getEngineByName(manager, "rhino");
+            engine = getEngineByName(manager, "nashorn");
         }
         if (engine == null) {
             engine = getEngineByName(manager, "javascript");
