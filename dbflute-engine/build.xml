@@ -19,6 +19,7 @@
 	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="test.dbms.stage.base" value="${workspace.base}" />
 	<property name="test.option.stage.base" value="${workspace.base}" />
+	<property name="test.lasta.stage.base" value="${workspace.base}" />
 	<property name="example.on.stage.base" value="${workspace.base}" />
 	<property name="tryout.base" value="${workspace.base}/dbflute-tryout" />
 
@@ -55,6 +56,9 @@
 
 	<!-- Test: Option Stage -->
 	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
+
+	<!-- Test: Lasta Stage -->
+	<property name="test.lasta.fortress.dir" value="${test.lasta.stage.base}/lastaflute-test-fortress" />
 
 	<!-- SubProject Examples -->
 	<property name="example.on.parade.dir" value="${example.on.stage.base}/dbflute-example-on-parade" />
@@ -320,6 +324,15 @@
 			description="==> reflect to test of option for compatible10x">
 		<delete dir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-lasta-fortress" depends="prepare-reflection"
+			description="==> reflect to test of lasta as fortress">
+		<delete dir="${test.lasta.fortress.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.lasta.fortress.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
