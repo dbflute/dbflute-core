@@ -274,7 +274,11 @@
   <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
   <!--                                                                   Utility 30~99 -->
   <!--                                                                   nnnnnnnnnnnnn -->
-  <target name="sai-download" description="Sai Download task">
+  <target name="sai-download" description="Sai (Rhino now) Download task">
+  	<!--
+  	 Here, Sai means JavaScripg engines e.g. (codelib)sai, Rhino, Nashorn...
+  	 They are all "sai" in Japanese.
+  	 -->
     <!--
      @param dfclient the directory of DBFlute Client (Required)
      The Ant world "basedir" is DBFlute Engine, cannot get execution current directory.
@@ -287,23 +291,32 @@
 
   	<!-- to give you attention to the licenses -->
   	<property name="license.url.base" value="https://dbflute.org/meta/prototype/license"/>
+	<get src="${license.url.base}/Rhino_License.txt" dest="${dest.base}/Rhino_License.txt" verbose="on"></get>
+  	<!-- #sai_to_rhino
 	<get src="${license.url.base}/ASM_License.txt" dest="${dest.base}/ASM_License.txt" verbose="on"></get>
 	<get src="${license.url.base}/Sai_License.txt" dest="${dest.base}/Sai_License.txt" verbose="on"></get>
+  	-->
 
+  	<!--
+  	 about jar files:
+  	 migrate Nashorn to Rhino: http://dbflute.seasar.org/ja/lastaflute/howto/upgrade/migration/lahorntorhino.html 
+  	 migrate Nashorn to sai: http://dbflute.seasar.org/ja/lastaflute/howto/upgrade/migration/lahorntosai.html 
+  	-->
   	<!--
   	 Apache Ant, get task: https://ant.apache.org/manual/Tasks/get.html
   	 cannot use nested elements because of old version now
-
-  	 migrate Nashorn to sai: http://dbflute.seasar.org/ja/lastaflute/howto/upgrade/migration/lahorntosai.html 
-  	 about sai jar files
   	-->
   	<property name="maven.url.base" value="https://repo1.maven.org/maven2"/>
+	<get src="${maven.url.base}/org/mozilla/rhino/1.7.13/rhino-1.7.13.jar" dest="${dest.base}/rhino-1.7.13.jar" verbose="on"></get>
+	<get src="${maven.url.base}/org/mozilla/rhino-engine/1.7.13/rhino-engine-1.7.13.jar" dest="${dest.base}/rhino-engine-1.7.13.jar" verbose="on"></get>
+  	<!-- #sai_to_rhino
 	<get src="${maven.url.base}/org/ow2/asm/asm/7.1/asm-7.1.jar" dest="${dest.base}/asm-7.1.jar" verbose="on"></get>
 	<get src="${maven.url.base}/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar" dest="${dest.base}/asm-analysis-7.1.jar" verbose="on"></get>
 	<get src="${maven.url.base}/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar" dest="${dest.base}/asm-commons-7.1.jar" verbose="on"></get>
 	<get src="${maven.url.base}/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar" dest="${dest.base}/asm-tree-7.1.jar" verbose="on"></get>
 	<get src="${maven.url.base}/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar" dest="${dest.base}/asm-util-7.1.jar" verbose="on"></get>
 	<get src="${maven.url.base}/org/codelibs/sai/0.2.0/sai-0.2.0.jar" dest="${dest.base}/sai-0.2.0.jar" verbose="on"></get>
+	 -->
   </target>
 
   <target name="intro" description="DBFlute Intro task">
