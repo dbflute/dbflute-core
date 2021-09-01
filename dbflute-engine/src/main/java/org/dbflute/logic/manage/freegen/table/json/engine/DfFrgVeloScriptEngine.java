@@ -500,7 +500,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         return _invokingStack.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
-    // use error_snapshot instead (for rhino stop)
+    // use error_snapshot instead (for rhino stop when nested invoking)
     //protected void setupNestedException(ExceptionMessageBuilder br, Exception cause) {
     //    // because e.g. rhino may ignore nested exception...? (actually shadowed)
     //    br.addItem("Nested Exception");
