@@ -174,7 +174,6 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         br.addItem("Secondary");
         br.addElement(secondary); // null allowed
         setupInvokingStack(br);
-        setupNestedException(br, cause);
         final String msg = br.buildExceptionMessage();
         return new DfVeloScriptException(msg, cause);
     }
@@ -225,49 +224,73 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
             line = Srl.replace(line, javaTypeExp, classExp);
             _log.debug("  after : {}", line.trim());
         }
-        // TODO jflute rhino replace() problem (2021/09/01)
-        /*
-         The choice of Java method java.lang.String.replace
-         matching JavaScript argument types (function,string) is ambiguous;
-         candidate methods are: 
-            class java.lang.String replace(char,char)
-            class java.lang.String replace(java.lang.CharSequence,java.lang.CharSequence)
-         */
-        //if (line.contains(".replace(")) {
-        //final List<String> partList = Srl.splitList(line, ".replace(");
-        //final StringBuilder sb = new StringBuilder();
-        //boolean quoted = false;
-        //int index = 0;
-        //for (String part : partList) {
-        //    if (index >= 1) {
-        //        sb.append(".replace(");
-        //    }
-        //    if (index >= 1 && !part.startsWith("'")) {
-        //        String firstArg = Srl.substringFirstFront(part, ", ");
-        //        String nextRear = Srl.substringFirstRear(part, ", ");
-        //        if (!isFirstArgInlineFunctionCall(firstArg)) {
-        //            sb.append("'").append(firstArg).append("'").append(", ").append(nextRear);
-        //            quoted = true;
-        //        } else {
-        //            sb.append(part);
-        //        }
-        //    } else {
-        //        sb.append(part);
-        //    }
-        //    ++index;
-        //}
-        //if (quoted) {
-        //    _log.debug("Filtered loaded script line for replace quatation:");
-        //    _log.debug("  before: {}", line.trim());
-        //    line = sb.toString();
-        //    _log.debug("  after : {}", line.trim());
-        //}
-        //}
+        // #needs_fix jflute rhino replace() problem (2021/09/02)
+        //
+        // The choice of Java method java.lang.String.replace
+        // matching JavaScript argument types (function,string) is ambiguous;
+        // candidate methods are: 
+        //    class java.lang.String replace(char,char)
+        //    class java.lang.String replace(java.lang.CharSequence,java.lang.CharSequence)
+        //
+        if (line.contains(".replace(")) {
+            final List<String> partList = Srl.splitList(line, ".replace(");
+            final StringBuilder sb = new StringBuilder();
+            boolean replaceFiltered = false;
+            int index = 0;
+            for (String part : partList) {
+                if (index == 0) { // before first replace()
+                    sb.append(part); // normal
+                } else {
+                    if (part.startsWith("'")) { // e.g. .replace('sea', '')
+                        sb.append(".replace(").append(part); // normal
+                        // determination of argument direct is too difficult
+                        // (and also determination of next replace() on same-line)
+                        //  e.g.
+                        //   return className.replace(/(Part|Result|Model|Bean)$/, '') + 'Part';
+                        //} else if (previousPart != null && previousPart.endsWith(" className")) {
+                        //    sb.append(".replace(").append(part); // normal
+                        //} else if (previousPart != null && previousPart.endsWith(" definitionKey")) {
+                        //    sb.append(".replace(").append(part); // normal
+                    } else {
+                        // e.g. .replace(/^sea/, '')
+                        //   or .replace(/^sea/g, '')
+                        //   or .replace(this.mystic(), '')
+                        String firstArg = Srl.substringFirstFront(part, ", ");
+                        String nextRear = Srl.substringFirstRear(part, ", ");
+                        if (firstArg.startsWith("/") && firstArg.endsWith("/")) { // e.g. .replace(/^sea/, '')
+                            final String regexp = unescapeJavaScriptRegexp(Srl.unquoteAnything(firstArg, "/"));
+                            sb.append(".replaceFirst("); // Java's regex as first only
+                            sb.append("'").append(regexp).append("'").append(", ").append(nextRear);
+                            replaceFiltered = true;
+                        } else if (firstArg.startsWith("/") && firstArg.endsWith("/g")) { // e.g. .replace(/^sea/g, '')
+                            final String regexp = unescapeJavaScriptRegexp(Srl.unquoteAnything(firstArg, "/", "/g"));
+                            sb.append(".replaceAll("); // Java's regex as global option
+                            sb.append("'").append(regexp).append("'").append(", ").append(nextRear);
+                            replaceFiltered = true;
+                        } else { // e.g. .replace(this.mystic(), '')
+                            sb.append(".replace(").append(part);
+                            // determination of next replace() on same-line is too difficult
+                            //  e.g. manager.camelize(this.subPackage(api).replace(this.behaviorSubPackage(api), '').replace(/\./g, '_'))
+                        }
+                    }
+                }
+                ++index;
+            }
+            if (replaceFiltered) {
+                _log.debug("Filtered loaded script line for replace quatation:");
+                _log.debug("  before: {}", line.trim());
+                line = sb.toString();
+                _log.debug("  after : {}", line.trim());
+            }
+        }
         return line;
     }
 
-    protected boolean isFirstArgInlineFunctionCall(String firstArg) {
-        return firstArg.contains("(") && firstArg.endsWith(")") || firstArg.startsWith("this.");
+    protected String unescapeJavaScriptRegexp(String regexp) {
+        String filtered = regexp;
+        filtered = Srl.replace(regexp, "\\/", "/");
+        filtered = Srl.replace(regexp, "\\", "\\\\");
+        return filtered;
     }
 
     public static class DfVeloScriptInputStreamReader extends CharArrayReader {
@@ -352,7 +375,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         _invokingStack.push(thiz + "." + name + "()"); // without argument, too big
         try {
             return ((Invocable) _realEngine).invokeMethod(thiz, name, args);
-        } catch (ScriptException | NoSuchMethodException e) {
+        } catch (ScriptException | NoSuchMethodException | RuntimeException e) {
             throw prepareInvokeTranslationException(thiz, name, args, e);
         } finally {
             _invokingStack.pop();
@@ -366,7 +389,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         _invokingStack.push(name + "()"); // me too
         try {
             return ((Invocable) _realEngine).invokeFunction(name, args);
-        } catch (ScriptException | NoSuchMethodException e) {
+        } catch (ScriptException | NoSuchMethodException | RuntimeException e) {
             throw prepareInvokeTranslationException(null, name, args, e);
         } finally {
             _invokingStack.pop();
@@ -406,6 +429,8 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
     protected ScriptException prepareInvokeTranslationException(Object thiz, String name, Object[] args, Exception cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to invoke the function.");
+        br.addItem("Advice");
+        setupErrorSnapshotMessage(br);
         br.addItem("Object");
         br.addElement(thiz); // null allowed (if top-level function)
         br.addItem("Function");
@@ -413,34 +438,47 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         br.addItem("Arguments");
         br.addElement(args != null ? prepareUnwrappedArgs(args) : null);
         setupInvokingStack(br);
-        setupNestedException(br, cause);
         final String msg = br.buildExceptionMessage();
-        return new DfVeloScriptException(msg, cause);
+        final DfVeloScriptException thrown = new DfVeloScriptException(msg, cause);
+        _log.warn("#error_snapshot", thrown);
+        return thrown;
     }
 
     protected RuntimeException prepareGetInterfaceTranslationException(Object thiz, Class<?> clasz, RuntimeException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to get the interface.");
+        br.addItem("Advice");
+        setupErrorSnapshotMessage(br);
         br.addItem("Object");
         br.addElement(thiz); // null allowed (if top-level function)
         br.addItem("Class");
         br.addElement(clasz);
         setupInvokingStack(br);
-        setupNestedException(br, cause);
         final String msg = br.buildExceptionMessage();
-        return new IllegalStateException(msg, cause);
+        final IllegalStateException thrown = new IllegalStateException(msg, cause);
+        _log.warn("#error_snapshot", thrown);
+        return thrown;
     }
 
     protected void throwScriptEngineNotInvocableException(String methodName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not implemented the invocable interface so cannot call.");
+        br.addItem("Advice");
+        setupErrorSnapshotMessage(br);
         br.addItem("Engine");
         br.addElement(_realEngine);
         br.addItem("Method");
         br.addElement(methodName);
         setupInvokingStack(br);
         final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+        IllegalStateException thrown = new IllegalStateException(msg);
+        _log.warn("#error_snapshot", thrown);
+        throw thrown;
+    }
+
+    protected void setupErrorSnapshotMessage(ExceptionMessageBuilder br) {
+        br.addElement("The exception chain may be stopped (by rhino).");
+        br.addElement("Search by #error_snapshot for related messages.");
     }
 
     // ===================================================================================
@@ -462,18 +500,19 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         return _invokingStack.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
-    protected void setupNestedException(ExceptionMessageBuilder br, Exception cause) {
-        // because e.g. rhino may ignore nested exception...? (actually shadowed)
-        br.addItem("Nested Exception");
-        br.addElement(cause.getClass());
-        br.addElement(cause.getMessage());
-        final Throwable nestedCause = cause.getCause();
-        if (nestedCause != null) {
-            br.addItem("Nested Nested Exception");
-            br.addElement(nestedCause.getClass());
-            br.addElement(nestedCause.getMessage());
-        }
-    }
+    // use error_snapshot instead (for rhino stop)
+    //protected void setupNestedException(ExceptionMessageBuilder br, Exception cause) {
+    //    // because e.g. rhino may ignore nested exception...? (actually shadowed)
+    //    br.addItem("Nested Exception");
+    //    br.addElement(cause.getClass());
+    //    br.addElement(cause.getMessage());
+    //    final Throwable nestedCause = cause.getCause();
+    //    if (nestedCause != null) {
+    //        br.addItem("Nested Nested Exception");
+    //        br.addElement(nestedCause.getClass());
+    //        br.addElement(nestedCause.getMessage());
+    //    }
+    //}
 
     // ===================================================================================
     //                                                                        Assist Logic
