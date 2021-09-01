@@ -182,15 +182,17 @@ public class DfFrgJavaScriptJsonEngine {
     //                                                                  ==================
     // called by e.g. DfFreeGenManager
     public ScriptEngineFound findScriptEngine(ScriptEngineManager manager) { // null allowed
-        ScriptEngineFound engine = getEngineByName(manager, "sai");
+        // name "javascript" may be conflicted if two engines exist in same JavaVM by jflute (2021/09/01)
+        // rhino might be best at the future but sai has the best compatibility so first is sai
+        ScriptEngineFound engine = getEngineByName(manager, "sai"); // forked from nashorn, since Java11
         if (engine == null) {
-            engine = getEngineByName(manager, "rhino");
+            engine = getEngineByName(manager, "rhino"); // also can use Java8
         }
         if (engine == null) {
-            engine = getEngineByName(manager, "nashorn");
+            engine = getEngineByName(manager, "nashorn"); // embedded until Java14
         }
         if (engine == null) {
-            engine = getEngineByName(manager, "javascript");
+            engine = getEngineByName(manager, "javascript"); // may be conflicted so last
         }
         return engine;
     }
