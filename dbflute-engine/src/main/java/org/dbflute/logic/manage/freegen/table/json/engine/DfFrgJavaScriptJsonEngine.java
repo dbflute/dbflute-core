@@ -26,7 +26,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,8 +103,6 @@ public class DfFrgJavaScriptJsonEngine {
         br.addElement("But Nashorn (JavaScript engine) is removed since Java15.");
         br.addElement("");
         br.addElement("So prepare 'sai' libraries in your 'extlib' directory.");
-        br.addElement("It is JavaScript engine forked from Nashorn.");
-        br.addElement(" https://github.com/codelibs/sai");
         br.addElement("");
         br.addElement("You can download automatically by DBFlute 'sai' task like this:");
         br.addElement(" 1. execute manage.sh|bat");
@@ -182,6 +182,9 @@ public class DfFrgJavaScriptJsonEngine {
     //                                                                  ==================
     // called by e.g. DfFreeGenManager
     public ScriptEngineFound findScriptEngine(ScriptEngineManager manager) { // null allowed
+        if (getLittleAdjustmentProperties().isFreeGenJavaScriptEngineNashorn()) {
+            return getEngineByName(manager, "nashorn"); // for emergency debug
+        }
         // name "javascript" may be conflicted if two engines exist in same JavaVM by jflute (2021/09/01)
         // rhino might be best at the future but sai has the best compatibility so first is sai
         ScriptEngineFound engine = getEngineByName(manager, "sai"); // forked from nashorn, since Java11
@@ -224,5 +227,16 @@ public class DfFrgJavaScriptJsonEngine {
         public ScriptEngine getFoundEngine() {
             return foundEngine;
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 }

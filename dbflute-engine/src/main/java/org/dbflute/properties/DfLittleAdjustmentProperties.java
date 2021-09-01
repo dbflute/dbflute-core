@@ -1640,8 +1640,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     // ===================================================================================
     //                                                                          LastaFlute
     //                                                                          ==========
-    public boolean isLastaMigrationAlsoGenearteDiXml() {
+    public boolean isLastaMigrationAlsoGenearteDiXml() { // closet
         return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
+    }
+
+    // ===================================================================================
+    //                                                                             FreeGen
+    //                                                                             =======
+    public boolean isFreeGenJavaScriptEngineNashorn() { // closet, for emergency debug
+        return isProperty("isFreeGenJavaScriptEngineNashorn", false);
     }
 
     // ===================================================================================

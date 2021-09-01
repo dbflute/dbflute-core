@@ -215,8 +215,6 @@ public class DfFreeGenManager {
         br.addElement("But Nashorn (JavaScript engine) is removed since Java15.");
         br.addElement("");
         br.addElement("So prepare 'sai' libraries in your 'extlib' directory.");
-        br.addElement("It is JavaScript engine forked from Nashorn.");
-        br.addElement(" https://github.com/codelibs/sai");
         br.addElement("");
         br.addElement("You can download automatically by DBFlute 'sai' task like this:");
         br.addElement(" 1. execute manage.sh|bat");
