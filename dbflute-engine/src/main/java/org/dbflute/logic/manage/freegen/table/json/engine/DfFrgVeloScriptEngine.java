@@ -72,10 +72,19 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
     //                                     -----------------
     @Override
     public Object eval(String script) throws ScriptException {
-        final File loadedFile = extractLoadedFile(script);
+        // load() special handling for e.g. engine difference, debug logging
+        final File loadedFile = handleLoadedFile(script);
         if (loadedFile != null) {
             return executeLoadingEval(loadedFile, () -> eval(adaptToReader(loadedFile, script)));
         }
+        final String loadedFilePath = extractLoadedFilePath(script);
+        if (loadedFilePath != null) {
+            return executeLoadingEval(loadedFilePath, () -> doEval(script));
+        }
+        return doEval(script); // except load()
+    }
+
+    protected Object doEval(String script) throws ScriptException {
         try {
             return _realEngine.eval(script);
         } catch (ScriptException e) {
@@ -85,10 +94,18 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
 
     @Override
     public Object eval(String script, Bindings bindings) throws ScriptException {
-        final File loadedFile = extractLoadedFile(script);
+        final File loadedFile = handleLoadedFile(script);
         if (loadedFile != null) {
             return executeLoadingEval(loadedFile, () -> eval(adaptToReader(loadedFile, script), bindings));
         }
+        final String loadedFilePath = extractLoadedFilePath(script);
+        if (loadedFilePath != null) {
+            return executeLoadingEval(loadedFilePath, () -> doEval(script, bindings));
+        }
+        return doEval(script, bindings);
+    }
+
+    protected Object doEval(String script, Bindings bindings) throws ScriptException {
         try {
             return _realEngine.eval(script, bindings);
         } catch (ScriptException e) {
@@ -98,10 +115,18 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
 
     @Override
     public Object eval(String script, ScriptContext context) throws ScriptException {
-        final File loadedFile = extractLoadedFile(script);
+        final File loadedFile = handleLoadedFile(script);
         if (loadedFile != null) {
             return executeLoadingEval(loadedFile, () -> eval(adaptToReader(loadedFile, script), context));
         }
+        final String loadedFilePath = extractLoadedFilePath(script);
+        if (loadedFilePath != null) {
+            return executeLoadingEval(loadedFilePath, () -> doEval(script, context));
+        }
+        return doEval(script, context);
+    }
+
+    protected Object doEval(String script, ScriptContext context) throws ScriptException {
         try {
             return _realEngine.eval(script, context);
         } catch (ScriptException e) {
@@ -142,7 +167,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
     // -----------------------------------------------------
     //                                      Loading Evaluate
     //                                      ----------------
-    protected Object executeLoadingEval(File loadedFile, LoadingEvalCall evalCall) throws ScriptException {
+    protected Object executeLoadingEval(Object loadedFile, LoadingEvalCall evalCall) throws ScriptException {
         _log.info("...Evaluating the loaded script file: {}", loadedFile);
         Throwable cause = null;
         try {
@@ -182,25 +207,16 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
     //                                                                     load() Adapting
     //                                                                     ===============
     // basically for rhino, nashorn's load() is used by many FreeGen modules so adapting here
-    protected File extractLoadedFile(String script) {
+    protected File handleLoadedFile(String script) {
         if (isLoadFunctionSupported()) {
             return null;
         }
-        final String trimmed = script.trim();
-        final String path;
-        if (trimmed.startsWith("load(\"") && (trimmed.endsWith("\")") || trimmed.endsWith("\");"))) { // DQ
-            path = Srl.extractScopeFirst(trimmed, "load(\"", "\")").getContent(); // DQ
-        } else if (trimmed.startsWith("load('") && (trimmed.endsWith("')") || trimmed.endsWith("');"))) { // SQ
-            path = Srl.extractScopeFirst(trimmed, "load('", "')").getContent(); // SQ
-        } else {
-            path = null;
-        }
+        final String path = extractLoadedFilePath(script);
         return path != null ? new File(path) : null;
     }
 
-    protected boolean isLoadFunctionSupported() { // best effort logic
-        // load() is nashorn extension (and sai is forked from nashorn)
-        return Srl.startsWithIgnoreCase(_realEngine.getClass().getSimpleName(), "sai", "nashorn");
+    protected boolean isLoadFunctionSupported() {
+        return isEngineSaiOrNashorn(); // load() is nashorn extension
     }
 
     protected Reader adaptToReader(File loadedFile, String script) {
@@ -224,7 +240,8 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
             line = Srl.replace(line, javaTypeExp, classExp);
             _log.debug("  after : {}", line.trim());
         }
-        // #needs_fix jflute rhino replace() problem (2021/09/02)
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // #hope jflute rhino replace() problem (2021/09/02)
         //
         // The choice of Java method java.lang.String.replace
         // matching JavaScript argument types (function,string) is ambiguous;
@@ -232,6 +249,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         //    class java.lang.String replace(char,char)
         //    class java.lang.String replace(java.lang.CharSequence,java.lang.CharSequence)
         //
+        // _/_/_/_/_/_/_/_/_/_/
         if (line.contains(".replace(")) {
             final List<String> partList = Srl.splitList(line, ".replace(");
             final StringBuilder sb = new StringBuilder();
@@ -428,9 +446,10 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
     //                                    ------------------
     protected ScriptException prepareInvokeTranslationException(Object thiz, String name, Object[] args, Exception cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to invoke the function.");
+        br.addNotice("Failed to invoke the JavaScript function.");
         br.addItem("Advice");
-        setupErrorSnapshotMessage(br);
+        br.addElement("Confirm your invokeMethod() or invokeFunction() call.");
+        setupErrorSnapshotMessageIfNeeds(br);
         br.addItem("Object");
         br.addElement(thiz); // null allowed (if top-level function)
         br.addItem("Function");
@@ -440,7 +459,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         setupInvokingStack(br);
         final String msg = br.buildExceptionMessage();
         final DfVeloScriptException thrown = new DfVeloScriptException(msg, cause);
-        _log.warn("#error_snapshot", thrown);
+        showErrorSnapshotIfNeeds(thrown);
         return thrown;
     }
 
@@ -448,7 +467,8 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to get the interface.");
         br.addItem("Advice");
-        setupErrorSnapshotMessage(br);
+        br.addElement("Confirm your JavaScript engine specification.");
+        setupErrorSnapshotMessageIfNeeds(br);
         br.addItem("Object");
         br.addElement(thiz); // null allowed (if top-level function)
         br.addItem("Class");
@@ -456,7 +476,7 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         setupInvokingStack(br);
         final String msg = br.buildExceptionMessage();
         final IllegalStateException thrown = new IllegalStateException(msg, cause);
-        _log.warn("#error_snapshot", thrown);
+        showErrorSnapshotIfNeeds(thrown);
         return thrown;
     }
 
@@ -464,7 +484,8 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not implemented the invocable interface so cannot call.");
         br.addItem("Advice");
-        setupErrorSnapshotMessage(br);
+        br.addElement("Confirm your JavaScript engine specification.");
+        setupErrorSnapshotMessageIfNeeds(br);
         br.addItem("Engine");
         br.addElement(_realEngine);
         br.addItem("Method");
@@ -472,13 +493,25 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
         setupInvokingStack(br);
         final String msg = br.buildExceptionMessage();
         IllegalStateException thrown = new IllegalStateException(msg);
-        _log.warn("#error_snapshot", thrown);
+        showErrorSnapshotIfNeeds(thrown);
         throw thrown;
     }
 
-    protected void setupErrorSnapshotMessage(ExceptionMessageBuilder br) {
-        br.addElement("The exception chain may be stopped (by rhino).");
-        br.addElement("Search by #error_snapshot for related messages.");
+    protected void setupErrorSnapshotMessageIfNeeds(ExceptionMessageBuilder br) {
+        if (isShowErrorSnapshot()) {
+            br.addElement("The exception chain may be stopped (by rhino).");
+            br.addElement("Search by #error_snapshot for related messages.");
+        }
+    }
+
+    protected void showErrorSnapshotIfNeeds(Exception thrown) {
+        if (isShowErrorSnapshot()) {
+            _log.warn("#error_snapshot", thrown);
+        }
+    }
+
+    protected boolean isShowErrorSnapshot() {
+        return isEngineRhino(); // no problem if nashorn
     }
 
     // ===================================================================================
@@ -517,8 +550,32 @@ public class DfFrgVeloScriptEngine implements ScriptEngine, Invocable { // non-t
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
+    protected boolean isEngineSaiOrNashorn() { // best effort logic
+        return Srl.startsWithIgnoreCase(_realEngine.getClass().getSimpleName(), "sai", "nashorn");
+    }
+
+    protected boolean isEngineRhino() { // me too
+        return Srl.startsWithIgnoreCase(_realEngine.getClass().getSimpleName(), "rhino");
+    }
+
     protected List<Object> prepareUnwrappedArgs(Object[] args) {
         // #hope jflute unwrap engine internal object (2021/09/01)
         return Arrays.asList(args);
+    }
+
+    protected String extractLoadedFilePath(String script) {
+        if (!script.contains("load(")) {
+            return null;
+        }
+        final String trimmed = script.trim();
+        final String path;
+        if (trimmed.startsWith("load(\"") && (trimmed.endsWith("\")") || trimmed.endsWith("\");"))) { // DQ
+            path = Srl.extractScopeFirst(trimmed, "load(\"", "\")").getContent(); // DQ
+        } else if (trimmed.startsWith("load('") && (trimmed.endsWith("')") || trimmed.endsWith("');"))) { // SQ
+            path = Srl.extractScopeFirst(trimmed, "load('", "')").getContent(); // SQ
+        } else { // cannot parse
+            path = null;
+        }
+        return path;
     }
 }
