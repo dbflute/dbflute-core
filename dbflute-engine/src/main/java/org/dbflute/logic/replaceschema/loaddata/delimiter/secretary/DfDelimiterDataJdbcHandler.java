@@ -48,9 +48,11 @@ public class DfDelimiterDataJdbcHandler {
     public void commitTransaction(Connection conn) throws SQLException {
         conn.commit();
     }
-    
+
     public void rollbackTransaction(Connection conn) throws SQLException {
-        conn.rollback();
+        if (conn != null) { // possible when rollback 
+            conn.rollback();
+        }
     }
 
     public void commitJustInCase(Connection conn) {
