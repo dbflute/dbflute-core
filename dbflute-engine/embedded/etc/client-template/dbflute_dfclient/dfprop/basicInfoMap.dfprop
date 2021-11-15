@@ -186,7 +186,7 @@ map:{
     #  The line separator setting for source code of generated classes.
     #   LF   -> converted to LF
     #   CRLF -> converted to CRLF
-    #   (no setting) -> no convert (template default is CRLF)
+    #   (no setting) -> no convert (template files are basically LF)
     #
     #; sourceCodeLineSeparator = LF
     # - - - - - - - - - -/
