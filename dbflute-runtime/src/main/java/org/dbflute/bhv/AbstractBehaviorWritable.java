@@ -124,6 +124,10 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return op;
     }
 
+    protected InsertOption<CB> createPlainInsertOption() { // for e.g. default use
+        return newInsertOption();
+    }
+
     protected InsertOption<CB> newInsertOption() {
         return new InsertOption<CB>();
     }
@@ -245,6 +249,10 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return op;
     }
 
+    protected UpdateOption<CB> createPlainUpdateOption() { // for e.g. default use
+        return newUpdateOption();
+    }
+
     protected UpdateOption<CB> newUpdateOption() {
         return new UpdateOption<CB>();
     }
@@ -307,24 +315,47 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                      ----------------
     protected void doInsertOrUpdate(ENTITY entity, InsertOption<CB> insertOption, UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
+        insertOption = filterInsertOrUpdateInsertOption(insertOption);
+        updateOption = filterInsertOrUpdateUpdateOption(updateOption);
         helpInsertOrUpdateInternally(entity, insertOption, updateOption);
     }
 
     protected void doInsertOrUpdateNonstrict(ENTITY entity, InsertOption<CB> insertOption, UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
+        insertOption = filterInsertOrUpdateInsertOption(insertOption);
+        updateOption = filterInsertOrUpdateUpdateOption(updateOption);
         helpInsertOrUpdateNonstrictInternally(entity, insertOption, updateOption);
     }
 
-    protected <RESULT extends ENTITY> void helpInsertOrUpdateInternally(RESULT entity, InsertOption<CB> insOption,
-            UpdateOption<CB> updOption) {
+    // #for_now jflute option may be null so use filtering way here, want to unify (2021/11/20)
+    protected InsertOption<CB> filterInsertOrUpdateInsertOption(InsertOption<CB> insertOption) {
+        return insertOption;
+    }
+
+    protected UpdateOption<CB> filterInsertOrUpdateUpdateOption(UpdateOption<CB> updateOption) {
+        if (isInsertOrUpdateCountPreChecked()) {
+            if (updateOption == null) { // the argument is null allowed
+                updateOption = newUpdateOption();
+            }
+            updateOption.precheckInsertOrUpdateCount();
+        }
+        return updateOption;
+    }
+
+    protected boolean isInsertOrUpdateCountPreChecked() {
+        return false; // might be overridden by generator option
+    }
+
+    protected <RESULT extends ENTITY> void helpInsertOrUpdateInternally(RESULT entity, InsertOption<CB> insertOption,
+            UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
-        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
-            doCreate(entity, insOption);
+        if (helpDetermineInsertOrUpdateDirectInsert(entity, insertOption, updateOption)) {
+            doCreate(entity, insertOption);
             return;
         }
         RuntimeException updateException = null;
         try {
-            doModify(entity, updOption);
+            doModify(entity, updateOption);
         } catch (EntityAlreadyUpdatedException e) { // already updated (or means not found)
             updateException = e;
         } catch (EntityAlreadyDeletedException e) { // means not found
@@ -348,32 +379,50 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             cb.acceptPrimaryKeyMap(asDBMeta().extractPrimaryKeyMap(entity));
         }
         if (readCount(cb) == 0) { // anyway if not found, insert
-            doCreate(entity, insOption);
+            doCreate(entity, insertOption);
         } else {
             throw updateException;
         }
     }
 
-    protected <RESULT extends ENTITY> void helpInsertOrUpdateNonstrictInternally(RESULT entity,
-            InsertOption<? extends ConditionBean> insOption, UpdateOption<? extends ConditionBean> updOption) {
+    protected <RESULT extends ENTITY> void helpInsertOrUpdateNonstrictInternally(RESULT entity, InsertOption<CB> insertOption,
+            UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
-        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
-            doCreate(entity, insOption);
+        if (helpDetermineInsertOrUpdateDirectInsert(entity, insertOption, updateOption)) {
+            doCreate(entity, insertOption);
         } else {
             try {
-                doModifyNonstrict(entity, updOption);
+                doModifyNonstrict(entity, updateOption);
             } catch (EntityAlreadyDeletedException ignored) { // means not found
-                doCreate(entity, insOption);
+                doCreate(entity, insertOption);
             }
         }
     }
 
-    protected boolean helpDetermineInsertOrUpdateDirectInsert(Entity entity) {
+    protected boolean helpDetermineInsertOrUpdateDirectInsert(Entity entity, InsertOption<CB> insertOption, UpdateOption<CB> updateOption) {
         final Set<String> uniqueDrivenProperties = entity.myuniqueDrivenProperties();
-        if (uniqueDrivenProperties != null && !uniqueDrivenProperties.isEmpty()) {
-            return false;
+        if (uniqueDrivenProperties.isEmpty() && !entity.hasPrimaryKeyValue()) {
+            return true; // cannot update, may be identity PK so insert only
         }
-        return !entity.hasPrimaryKeyValue();
+        // no identity here
+        if (updateOption != null && updateOption.isInsertOrUpdateCountPreChecked()) {
+            // basically to avoid Otegaru Deadlock of MySQL RepeatableRead.
+            final boolean hasPK = entity.hasPrimaryKeyValue();
+            if (hasPK || !uniqueDrivenProperties.isEmpty()) { // basically true here but independent
+                final CB cb = newConditionBean();
+                if (hasPK) {
+                    cb.acceptPrimaryKeyMap(asDBMeta().extractPrimaryKeyMap(entity));
+                } else {
+                    for (String uq : uniqueDrivenProperties) {
+                        cb.localCQ().invokeQueryEqual(uq, asDBMeta().findColumnInfo(uq).read(entity));
+                    }
+                }
+                if (readCount(cb) == 0) {
+                    return true; // the PK or unique key is not found so insert only
+                }
+            }
+        }
+        return false; // update statement first 
     }
 
     // -----------------------------------------------------
@@ -532,10 +581,6 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return delegateBatchInsert(entityList, rlop);
     }
 
-    protected InsertOption<CB> createPlainInsertOption() {
-        return newInsertOption();
-    }
-
     protected <ELEMENT extends ENTITY> void prepareBatchInsertOption(List<ELEMENT> entityList, InsertOption<CB> option) { // might be overridden to set option
         if (isBatchInsertColumnModifiedPropertiesFragmentedDisallowed()) {
             option.xdisallowInsertColumnModifiedPropertiesFragmented(); // default is allowed so use 'disallow' as option
@@ -574,30 +619,16 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                          ------------
     protected int[] doBatchUpdate(List<ENTITY> entityList, UpdateOption<CB> option) {
         assertEntityListNotNull(entityList);
-        final UpdateOption<CB> rlop;
-        if (option != null) {
-            rlop = option;
-        } else {
-            rlop = createPlainUpdateOption();
-        }
+        final UpdateOption<CB> rlop = option != null ? option : createPlainUpdateOption();
         prepareBatchUpdateOption(entityList, rlop); // required
         return delegateBatchUpdate(entityList, rlop);
     }
 
     protected int[] doBatchUpdateNonstrict(List<ENTITY> entityList, UpdateOption<CB> option) {
         assertEntityListNotNull(entityList);
-        final UpdateOption<CB> rlop;
-        if (option != null) {
-            rlop = option;
-        } else {
-            rlop = createPlainUpdateOption();
-        }
+        final UpdateOption<CB> rlop = option != null ? option : createPlainUpdateOption();
         prepareBatchUpdateOption(entityList, rlop);
         return delegateBatchUpdateNonstrict(entityList, rlop);
-    }
-
-    protected UpdateOption<CB> createPlainUpdateOption() {
-        return new UpdateOption<CB>();
     }
 
     protected UpdateOption<CB> createSpecifiedUpdateOption(SpecifyQuery<CB> updateColumnSpec) {
