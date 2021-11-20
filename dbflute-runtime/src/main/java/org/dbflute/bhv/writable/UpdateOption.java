@@ -715,7 +715,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         return this;
     }
 
-    public boolean isInsertOrUpdateCountPreChecked() {
+    public boolean isInsertOrUpdateCountPreCheck() {
         return _insertOrUpdateCountPreChecked;
     }
 

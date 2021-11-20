@@ -333,7 +333,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected UpdateOption<CB> filterInsertOrUpdateUpdateOption(UpdateOption<CB> updateOption) {
-        if (isInsertOrUpdateCountPreChecked()) {
+        if (isInsertOrUpdateCountPreCheck()) {
             if (updateOption == null) { // the argument is null allowed
                 updateOption = newUpdateOption();
             }
@@ -342,7 +342,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return updateOption;
     }
 
-    protected boolean isInsertOrUpdateCountPreChecked() {
+    protected boolean isInsertOrUpdateCountPreCheck() {
         return false; // might be overridden by generator option
     }
 
@@ -405,7 +405,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             return true; // cannot update, may be identity PK so insert only
         }
         // no identity here
-        if (updateOption != null && updateOption.isInsertOrUpdateCountPreChecked()) {
+        if (updateOption != null && updateOption.isInsertOrUpdateCountPreCheck()) {
             // basically to avoid Otegaru Deadlock of MySQL RepeatableRead.
             final boolean hasPK = entity.hasPrimaryKeyValue();
             if (hasPK || !uniqueDrivenProperties.isEmpty()) { // basically true here but independent
