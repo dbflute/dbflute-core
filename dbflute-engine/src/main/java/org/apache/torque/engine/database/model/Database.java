@@ -2238,6 +2238,10 @@ public class Database {
         return getLittleAdjustmentProperties().isQueryUpdateCountPreCheck();
     }
 
+    public boolean isInsertOrUpdateCountPreCheck() {
+        return getLittleAdjustmentProperties().isInsertOrUpdateCountPreCheck();
+    }
+
     public boolean isZeroUpdateCheckExistenceForPassing() {
         return getLittleAdjustmentProperties().isZeroUpdateCheckExistenceForPassing();
     }

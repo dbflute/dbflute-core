@@ -1030,6 +1030,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         doInsertOrUpdateNonstrict(${myEntityVariableName}, null, null);
     }
 #end
+#if ($database.isInsertOrUpdateCountPreCheck())
+
+    @Override
+    protected boolean isInsertOrUpdateCountPreCheck() { return true; }
+#end
 
     /**
 #if ($table.hasOptimisticLock())
@@ -1817,6 +1822,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
 #if ($database.isZeroUpdateCheckExistenceForPassing())
 
+    // ===================================================================================
+    //                                                                 Delegate to Command
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                         Entity Update
+    //                                         -------------
     @Override
     protected int delegateUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
         // ignore optimistic lock failure because optimistic lock column is

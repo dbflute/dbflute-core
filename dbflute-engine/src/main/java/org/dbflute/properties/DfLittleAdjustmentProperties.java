@@ -1277,8 +1277,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     //                                                                        Query Update
     //                                                                        ============
     public boolean isQueryUpdateCountPreCheck() { // closet
+        // to avoid Otegaru Deadlock of MySQL RepeatableRead
         final boolean defaultValue = isProperty("isCheckCountBeforeQueryUpdate", false); // for compatible
         return isProperty("isQueryUpdateCountPreCheck", defaultValue);
+    }
+
+    // ===================================================================================
+    //                                                                    Insert or Update
+    //                                                                    ================
+    public boolean isInsertOrUpdateCountPreCheck() { // closet
+        // to avoid Otegaru Deadlock of MySQL RepeatableRead
+        return isProperty("isInsertOrUpdateCountPreCheck", false);
     }
 
     // ===================================================================================
