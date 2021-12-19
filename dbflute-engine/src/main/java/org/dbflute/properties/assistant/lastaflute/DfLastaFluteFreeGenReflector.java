@@ -579,6 +579,9 @@ public final class DfLastaFluteFreeGenReflector {
             namedclsMap.put(clsTheme + "ResourceFile", filterOverridden(clsResourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
             namedclsMap.put(clsTheme + "Package", buildCDefPackage("namedcls", appName, lastafluteMap, clsTheme));
 
+            // redundant comment is checked when classification generate so unneeded here
+            namedclsMap.put("isSuppressRedundantCommentStop", true); // inner use so direct literal
+
             namedclsList.add(namedclsMap);
         }
     }
