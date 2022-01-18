@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.dbflute.unit.EngineTestCase;
 

@@ -15,8 +15,6 @@
  */
 package org.dbflute.logic.jdbc.urlanalyzer;
 
-import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
-import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerDB2;
 import org.dbflute.unit.EngineTestCase;
 
 /**

@@ -19,8 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.dbflute.properties.DfTypeMappingProperties;
-
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/21 Tuesday)

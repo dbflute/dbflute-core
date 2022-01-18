@@ -18,7 +18,6 @@ package org.dbflute.logic.jdbc.metadata.basic;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.dbflute.unit.EngineTestCase;
 
 /**

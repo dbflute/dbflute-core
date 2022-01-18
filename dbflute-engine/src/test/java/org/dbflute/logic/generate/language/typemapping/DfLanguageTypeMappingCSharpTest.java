@@ -15,7 +15,6 @@
  */
 package org.dbflute.logic.generate.language.typemapping;
 
-import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingCSharp;
 import org.dbflute.unit.EngineTestCase;
 
 /**

@@ -15,7 +15,6 @@
  */
 package org.dbflute.logic.generate.language;
 
-import org.dbflute.logic.generate.language.DfLanguageSmallHelper;
 import org.dbflute.unit.EngineTestCase;
 
 /**

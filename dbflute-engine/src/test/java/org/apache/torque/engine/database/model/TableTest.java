@@ -18,8 +18,8 @@ package org.apache.torque.engine.database.model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.dbflute.unit.EngineTestCase;
+import org.junit.Assert;
 
 /**
  * @author jflute

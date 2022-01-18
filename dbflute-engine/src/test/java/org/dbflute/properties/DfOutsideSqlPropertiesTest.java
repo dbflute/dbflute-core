@@ -17,7 +17,6 @@ package org.dbflute.properties;
 
 import java.util.Properties;
 
-import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.unit.EngineTestCase;
 
 /**

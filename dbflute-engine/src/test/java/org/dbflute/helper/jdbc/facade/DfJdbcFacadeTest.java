@@ -19,7 +19,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.unit.EngineTestCase;
 

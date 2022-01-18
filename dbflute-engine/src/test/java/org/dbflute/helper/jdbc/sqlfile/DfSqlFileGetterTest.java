@@ -18,10 +18,9 @@ package org.dbflute.helper.jdbc.sqlfile;
 import java.io.File;
 import java.util.List;
 
-import org.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
-import org.junit.Assert;
 import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.DfResourceUtil;
+import org.junit.Assert;
 
 /**
  * @author jflute

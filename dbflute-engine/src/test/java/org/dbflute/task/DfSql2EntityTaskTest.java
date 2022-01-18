@@ -18,8 +18,6 @@ package org.dbflute.task;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.dbflute.task.DfSql2EntityTask;
-
 /**
  * @author jflute
  */

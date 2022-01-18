@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.properties.assistant.classification.resource.DfClassificationResourceFileAnalyzer;
 import org.dbflute.unit.EngineTestCase;
 
 /**
