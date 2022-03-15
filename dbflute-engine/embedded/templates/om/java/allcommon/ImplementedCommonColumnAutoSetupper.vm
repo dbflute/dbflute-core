@@ -72,6 +72,8 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     }
 
     protected void doHandleCommonColumnOfInsertIfNeeds(${glEntityDefinedCommonColumn} entity) {
+        // this implementation is generated based on commonColumnMap.dfprop
+        // so confirm the settings if you have compile errors here
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($entityCommonColumnMap = ${database.commonColumnMap})
@@ -105,6 +107,8 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     }
 
     protected void doHandleCommonColumnOfUpdateIfNeeds(${glEntityDefinedCommonColumn} entity) {
+        // this implementation is generated based on commonColumnMap.dfprop
+        // so confirm the settings if you have compile errors here
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($entityCommonColumnMap = ${database.CommonColumnMap})
