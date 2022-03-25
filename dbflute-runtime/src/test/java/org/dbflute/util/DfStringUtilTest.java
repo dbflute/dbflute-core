@@ -1062,6 +1062,10 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("foo,,qux", connectByDelimiter(newArrayList("foo", "", "qux"), ","));
         assertEquals("foo,null,qux", connectByDelimiter(newArrayList("foo", null, "qux"), ","));
         assertEquals("", connectByDelimiter(new ArrayList<String>(), ","));
+
+        // should be illegal argument but keep compatible so treat it as "null"
+        assertEquals("foonullbar", connectByDelimiter(newArrayList("foo", "bar"), null));
+        assertEquals("foo,null,bar", connectByDelimiter(newArrayList("foo", null, "bar"), ","));
     }
 
     public void test_connectByDelimiterQuoted_basic() {
@@ -1072,6 +1076,14 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("'foo','','qux'", connectByDelimiterQuoted(newArrayList("foo", "", "qux"), ",", "'"));
         assertEquals("'foo','null','qux'", connectByDelimiterQuoted(newArrayList("foo", null, "qux"), ",", "'"));
         assertEquals("", connectByDelimiterQuoted(new ArrayList<String>(), ",", "'"));
+
+        // should be illegal argument but keep compatible so treat it as "null"
+        assertEquals("'foo'null'bar'", connectByDelimiterQuoted(newArrayList("foo", "bar"), null, "'"));
+        assertEquals("'foo','null','bar'", connectByDelimiterQuoted(newArrayList("foo", null, "bar"), ",", "'"));
+
+        // if null/empty quoation
+        assertException(IllegalArgumentException.class, () -> connectByDelimiterQuoted(newArrayList("foo", "bar"), ",", null));
+        assertEquals("foo,bar", connectByDelimiterQuoted(newArrayList("foo", "bar"), ",", ""));
     }
 
     public void test_connectPrefix_basic() {
