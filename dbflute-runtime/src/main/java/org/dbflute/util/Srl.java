@@ -352,6 +352,7 @@ public class Srl {
     protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
         assertStringNotNull(str);
         assertDelimiterNotNull(delimiter);
+        assertStringNotNullAndNotEmpty("delimiter", delimiter); // to avoid infinity loop
         final List<String> list = new ArrayList<String>();
         int elementIndex = 0;
         int delimiterIndex = str.indexOf(delimiter);
@@ -2385,6 +2386,12 @@ public class Srl {
      */
     public static String removeEmptyLine(String str) {
         assertStringNotNull(str);
+        if (str.isEmpty()) { // to avoid out-of-bounds
+            return str;
+        }
+        if (!str.contains("\n")) { // no line so unneeded
+            return str;
+        }
         final StringBuilder sb = new StringBuilder();
         final List<String> lineList = splitList(str, "\n");
         for (String line : lineList) {
@@ -2394,7 +2401,10 @@ public class Srl {
             sb.append(removeCR(line)).append("\n");
         }
         final String filtered = sb.toString();
-        return filtered.substring(0, filtered.length() - "\n".length());
+        if (filtered.isEmpty()) { // e.g. " \n \n ", to avoid out-of-bounds 
+            return filtered;
+        }
+        return filtered.substring(0, filtered.length() - "\n".length()); // remove rear LF
     }
 
     /**

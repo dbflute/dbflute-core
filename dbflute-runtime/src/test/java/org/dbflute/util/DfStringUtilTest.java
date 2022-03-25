@@ -360,7 +360,7 @@ public class DfStringUtilTest extends RuntimeTestCase {
     //                                                                               =====
     public void test_splitList_basic() {
         String ln = "\n";
-        List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
+        List<String> splitList = DfStringUtil.splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
@@ -371,9 +371,9 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(Arrays.asList("aaa"), splitList("aaa", "/"));
     }
 
-    public void test_splitList_empty() {
+    public void test_splitList_emptyStr() {
         String ln = "\n";
-        List<String> splitList = splitList("", ln);
+        List<String> splitList = DfStringUtil.splitList("", ln);
         assertHasOnlyOneElement(splitList);
         assertEquals("", splitList.get(0));
     }
@@ -386,14 +386,27 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(" ccc", splitList.get(2));
     }
 
+    public void test_splitList_illegal() {
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitList("s e a", null));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitList("s e a", ""));
+        assertEquals(Arrays.asList("s", "e", "a"), splitList("s e a", " "));
+    }
+
     public void test_splitListTrimmed_trim() {
         String ln = "\n";
-        List<String> splitList = splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
+        List<String> splitList = DfStringUtil.splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
 
         assertEquals(Arrays.asList("aaa", "bbb", "ccc"), splitListTrimmed(" aaa/ bbb/ ccc ", "/"));
+    }
+
+    public void test_splitListTrimmed_illegal() {
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitListTrimmed("s e a", null));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitListTrimmed("s e a", ""));
+        assertEquals(Arrays.asList("s", "e", "a"), splitListTrimmed("s e a", " "));
+        assertEquals(Arrays.asList("s", "e", "a"), splitListTrimmed("s \ne \ta\n", " "));
     }
 
     // ===================================================================================
@@ -1669,6 +1682,14 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("aaaa\nbbbb\n--\ncccc", actual);
     }
 
+    public void test_removeEmptyLine_illegal() {
+        assertException(IllegalArgumentException.class, () -> removeEmptyLine(null));
+        assertEquals("", removeEmptyLine(""));
+        assertEquals(" ", removeEmptyLine(" "));
+        assertEquals("", removeEmptyLine(" \n  \n"));
+        assertEquals(" se\na", removeEmptyLine(" se\n  \na"));
+    }
+
     public void test_removeBlockComment_basic() {
         // ## Arrange ##
         String sql = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
@@ -1689,6 +1710,12 @@ public class DfStringUtilTest extends RuntimeTestCase {
 
         // ## Assert ##
         assertEquals("barbaz", actual);
+    }
+
+    public void test_removeBlockComment_illegal() {
+        assertException(IllegalArgumentException.class, () -> removeEmptyLine(null));
+        assertEquals("", removeEmptyLine(""));
+        assertEquals(" ", removeEmptyLine(" "));
     }
 
     public void test_removeLineComment_basic() throws Exception {
