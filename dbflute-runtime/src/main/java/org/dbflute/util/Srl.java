@@ -225,7 +225,7 @@ public class Srl {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
-        if (trimStr == null) {
+        if (trimStr == null || trimStr.length() == 0) { // also "" to avoid infinity loop
             final String notTrimmedString = "a";
             final String trimmed = (str + notTrimmedString).trim();
             return trimmed.substring(0, trimmed.length() - notTrimmedString.length());
@@ -243,7 +243,7 @@ public class Srl {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
-        if (trimStr == null) {
+        if (trimStr == null || trimStr.length() == 0) { // also "" to avoid infinity loop
             final String notTrimmedString = "a";
             return (notTrimmedString + str).trim().substring(notTrimmedString.length());
         }
@@ -2698,6 +2698,20 @@ public class Srl {
         }
         if (value == null) {
             String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the entity is not null and not empty.
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     */
+    protected static void assertStringNotNullAndNotEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (value.length() == 0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
     }

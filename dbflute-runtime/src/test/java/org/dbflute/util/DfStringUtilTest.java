@@ -114,6 +114,9 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("foo", trim("\n \n foo "));
         assertEquals("foo", trim(" \r\n foo "));
         assertEquals("foo", trim(" \r\n \r\n foo "));
+        assertEquals("", trim(""));
+        assertEquals("", trim(" "));
+        assertException(IllegalArgumentException.class, () -> trim(null));
     }
 
     public void test_trim_originalTrimTarget() {
@@ -128,6 +131,11 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("f\"o\"o", trim("\"f\"o\"o\"", "\""));
         assertEquals("fo\"\"o", trim("\"fo\"\"o\"", "\""));
         assertEquals("Long", trim(">>Long>>", ">"));
+        assertEquals("sea", trim("sea ", " "));
+        assertEquals("", trim("", " "));
+        assertEquals("sea", trim(" sea ", null)); // me too
+        assertEquals("sea", trim(" sea ", "")); // same as String@trim()
+        assertException(IllegalArgumentException.class, () -> trim(null, " "));
     }
 
     public void test_ltrim_default() {
