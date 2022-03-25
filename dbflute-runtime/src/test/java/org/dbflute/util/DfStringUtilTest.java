@@ -1632,6 +1632,10 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO_NAME", decamelize("foo_name"));
         assertEquals("FOO_NAME_BAR", decamelize("FOO_NameBar"));
         assertEquals("FOO_NAME_BAR", decamelize("foo_NameBar"));
+
+        // illegal
+        assertException(IllegalArgumentException.class, () -> decamelize(null));
+        assertEquals("", decamelize(""));
     }
 
     public void test_decamelize_delimiter() {
@@ -1640,6 +1644,10 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO@BAR@NAME", decamelize("fooBarName", "@"));
         assertEquals("F", decamelize("f", "_"));
         assertEquals("F*O*O_*NAME*BAR", decamelize("FOO_NameBar", "*")); // before FOO_*NAME*BAR
+        assertEquals("FOO BAR NAME", decamelize("foo Bar Name", " "));
+
+        assertException(IllegalArgumentException.class, () -> decamelize("sea", null));
+        assertException(IllegalArgumentException.class, () -> decamelize("sea", ""));
     }
 
     // ===================================================================================

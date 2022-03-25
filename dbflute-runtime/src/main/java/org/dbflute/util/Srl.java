@@ -2332,6 +2332,7 @@ public class Srl {
     protected static String doDecamelize(String camelName, String delimiter) {
         assertCamelNameNotNull(camelName);
         assertDelimiterNotNull(delimiter);
+        assertStringNotNullAndNotEmpty("delimiter", delimiter); // to avoid infinity loop
         final StringBuilder sb = new StringBuilder();
         final List<String> splitList = splitList(camelName, delimiter); // one element if no delimiter
         for (String element : splitList) { // to separate e.g. FOO_NameBar (to FOO_NAME_BAR)
