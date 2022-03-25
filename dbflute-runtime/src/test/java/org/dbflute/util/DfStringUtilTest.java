@@ -399,6 +399,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                             Replace
     //                                                                             =======
+    public void test_replace_basic() {
+        assertEquals("obar", DfStringUtil.replace("foobar", "foo", "o"));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace(null, "foo", "bar"));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace("foobar", null, "o"));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace("foobar", "foo", null));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace("foobar", "", "o"));
+        assertEquals("fbar", DfStringUtil.replace("foobar", "o", ""));
+    }
+
     public void test_replaceScopeContent_basic() {
         // ## Arrange ##
         String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
@@ -408,6 +417,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
 
         // ## Assert ##
         assertEquals("/*jflute*/foo/*bar*/bar/*jflutebarbaz*/", actual);
+    }
+
+    public void test_replaceScopeContent_empty() {
+        // ## Arrange ##
+        String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
+
+        // ## Act ##
+        // ## Assert ##
+        assertException(IllegalArgumentException.class, () -> replaceScopeContent(str, "", "jflute", "/*", "*/"));
     }
 
     public void test_replaceInterspaceContent_basic() {

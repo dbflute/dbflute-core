@@ -262,6 +262,7 @@ public class Srl {
     public static String replace(String str, String fromStr, String toStr) {
         assertStringNotNull(str);
         assertFromStringNotNull(fromStr);
+        assertStringNotNullAndNotEmpty("fromStr", fromStr); // to avoid infinity loop
         assertToStringNotNull(toStr);
         StringBuilder sb = null; // lazy load
         int pos = 0;
