@@ -969,6 +969,9 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(2, count("foo.bar.baz", "."));
         assertEquals(4, count(".foo.bar.baz.", "."));
         assertEquals(1, count("fooo.bar", "oo"));
+        assertEquals(2, count("fooo .ba r", " "));
+        assertException(IllegalArgumentException.class, () -> count("fooo.bar", null));
+        assertException(IllegalArgumentException.class, () -> count("fooo.bar", ""));
     }
 
     public void test_countIgnoreCase_basic() {

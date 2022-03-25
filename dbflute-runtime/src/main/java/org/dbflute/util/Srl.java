@@ -1243,6 +1243,7 @@ public class Srl {
     protected static int doCount(String str, String element, boolean ignoreCase) {
         assertStringNotNull(str);
         assertElementNotNull(element);
+        assertStringNotNullAndNotEmpty("element", element); // to avoid infinity loop
         final String filteredStr = ignoreCase ? str.toLowerCase() : str;
         final String filteredElement = ignoreCase ? element.toLowerCase() : element;
         int count = 0;
