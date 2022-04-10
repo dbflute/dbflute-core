@@ -102,9 +102,10 @@ public class DfProcedureExecutionMetaExtractor {
         final List<Object> testValueList = DfCollectionUtil.newArrayList();
         setupTestValueList(columnList, testValueList);
         final boolean existsReturn = existsReturnValue(columnList);
-        final String sql = createSql(procedure, existsReturn, true);
+        final String sql = createSql(procedure, existsReturn, /*escape*/true);
         Connection conn = null;
         CallableStatement cs = null;
+        SQLException retrySqlEx = null;
         boolean beginTransaction = false;
         try {
             _log.info("...Calling: " + sql);
@@ -119,16 +120,20 @@ public class DfProcedureExecutionMetaExtractor {
             try {
                 executed = cs.execute();
             } catch (SQLException e) { // retry without escape because Oracle sometimes hates escape
-                final String retrySql = createSql(procedure, existsReturn, false);
+                final String retrySql = createSql(procedure, existsReturn, /*escape*/false);
                 try {
                     try {
                         cs.close();
                     } catch (SQLException ignored) {}
+                    // begin transaction again for e.g. PostgreSQL
+                    conn.rollback(); // close previous transaction
+                    conn.setAutoCommit(false); // new transaction
                     cs = conn.prepareCall(retrySql);
                     setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
                     executed = cs.execute();
                     _log.info("  (o) retry: " + retrySql);
-                } catch (SQLException ignored) {
+                } catch (SQLException continued) {
+                    retrySqlEx = continued;
                     _log.info("  (x) retry: " + retrySql);
                     throw e;
                 }
@@ -192,30 +197,7 @@ public class DfProcedureExecutionMetaExtractor {
                 ++index;
             }
         } catch (SQLException e) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Failed to execute the procedure for getting meta data.");
-            br.addItem("SQL");
-            br.addElement(sql);
-            br.addItem("Parameter");
-            for (DfProcedureColumnMeta column : columnList) {
-                br.addElement(column.getColumnDisplayName());
-            }
-            br.addItem("Test Value");
-            br.addElement(buildTestValueDisp(testValueList));
-            br.addItem("Exception Message");
-            br.addElement(DfJDBCException.extractMessage(e));
-            final SQLException nextEx = e.getNextException();
-            if (nextEx != null) {
-                br.addElement(DfJDBCException.extractMessage(nextEx));
-            }
-            final String msg = br.buildExceptionMessage();
-            final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
-            if (prop.hasSpecifiedExecutionMetaProcedure()) {
-                throw new DfProcedureExecutionMetaGettingFailureException(msg, e);
-            } else { // if no specified, it continues
-                _continuedFailureMessageMap.put(procedure.getProcedureFullQualifiedName(), msg);
-                _log.info("*Failed to call so read the warning message displayed later");
-            }
+            handleExecutionFailure(procedure, columnList, testValueList, sql, e, retrySqlEx);
         } finally {
             if (cs != null) {
                 cs.close();
@@ -237,25 +219,6 @@ public class DfProcedureExecutionMetaExtractor {
                 }
             }
         }
-    }
-
-    protected String buildTestValueDisp(List<Object> testValueList) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        int index = 0;
-        for (Object value : testValueList) {
-            if (index > 0) {
-                sb.append(", ");
-            }
-            if (value instanceof String) {
-                sb.append("\"").append(value).append("\"");
-            } else {
-                sb.append(value);
-            }
-            ++index;
-        }
-        sb.append("}");
-        return sb.toString();
     }
 
     protected boolean existsReturnValue(List<DfProcedureColumnMeta> columnList) {
@@ -383,7 +346,7 @@ public class DfProcedureExecutionMetaExtractor {
         return getTypeMappingProperties().isJavaNativeBinaryObject(javaNative);
     }
 
-    public String createSql(DfProcedureMeta procedure, boolean existsReturn, boolean escape) {
+    protected String createSql(DfProcedureMeta procedure, boolean existsReturn, boolean escape) {
         final boolean calledBySelect = procedure.isCalledBySelect();
         if (calledBySelect) {
             existsReturn = false;
@@ -560,6 +523,72 @@ public class DfProcedureExecutionMetaExtractor {
         return valueType;
     }
 
+    // -----------------------------------------------------
+    //                                    Exception Handling
+    //                                    ------------------
+    protected void handleExecutionFailure(DfProcedureMeta procedure, List<DfProcedureColumnMeta> columnList, List<Object> testValueList,
+            String sql, SQLException mainSqlExp, SQLException retrySqlEx) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to execute the procedure for getting meta data.");
+        br.addItem("SQL");
+        br.addElement(sql);
+        br.addItem("Parameter");
+        for (DfProcedureColumnMeta column : columnList) {
+            br.addElement(column.getColumnDisplayName());
+        }
+        br.addItem("Test Value");
+        br.addElement(buildTestValueDisp(testValueList));
+        br.addItem("Exception Message");
+        final String exceptionMessage = DfJDBCException.extractMessage(mainSqlExp);
+        br.addElement(exceptionMessage);
+        final SQLException nextEx = mainSqlExp.getNextException();
+        if (nextEx != null) {
+            br.addElement(DfJDBCException.extractMessage(nextEx));
+        }
+        if (retrySqlEx != null) {
+            final String retryMessage = DfJDBCException.extractMessage(retrySqlEx);
+            final boolean sameEx = exceptionMessage != null && exceptionMessage.equals(retryMessage);
+            if (!sameEx) {
+                br.addItem("Retry Exception");
+                br.addElement(retryMessage);
+                SQLException retryNextEx = retrySqlEx.getNextException();
+                if (retryNextEx != null) {
+                    br.addElement(DfJDBCException.extractMessage(retryNextEx));
+                }
+            }
+        }
+        final String msg = br.buildExceptionMessage();
+        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
+        if (prop.hasSpecifiedExecutionMetaProcedure()) {
+            throw new DfProcedureExecutionMetaGettingFailureException(msg, mainSqlExp);
+        } else { // if no specified, it continues
+            _continuedFailureMessageMap.put(procedure.getProcedureFullQualifiedName(), msg);
+            _log.info("*Failed to call so read the warning message displayed later");
+        }
+    }
+
+    protected String buildTestValueDisp(List<Object> testValueList) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int index = 0;
+        for (Object value : testValueList) {
+            if (index > 0) {
+                sb.append(", ");
+            }
+            if (value instanceof String) {
+                sb.append("\"").append(value).append("\"");
+            } else {
+                sb.append(value);
+            }
+            ++index;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // -----------------------------------------------------
+    //                                        Close Resource
+    //                                        --------------
     protected void closeResult(ResultSet rs) {
         if (rs != null) {
             try {
