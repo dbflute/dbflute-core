@@ -703,6 +703,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected void adjustProcedureColumnList(DfProcedureMeta procedureMeta) {
         adjustPostgreSQLResultSetParameter(procedureMeta);
+        adjustPostgreSQLVoidReturn(procedureMeta);
     }
 
     protected void adjustPostgreSQLResultSetParameter(DfProcedureMeta procedureMeta) {
@@ -737,6 +738,35 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             // when it also has result set parameters (as an out parameter).
             String name = procedureMeta.buildProcedureLoggingName() + "." + resultSetReturnName;
             log("...Removing the result set return which is unnecessary: " + name);
+            columnMetaList.remove(resultSetReturnIndex);
+        }
+    }
+
+    protected void adjustPostgreSQLVoidReturn(DfProcedureMeta procedureMeta) {
+        if (!isDatabasePostgreSQL()) {
+            return;
+        }
+        final List<DfProcedureColumnMeta> columnMetaList = procedureMeta.getProcedureColumnList();
+        boolean existsVoidReturn = false;
+        int resultSetReturnIndex = 0;
+        String resultSetReturnName = null;
+        int index = 0;
+        for (DfProcedureColumnMeta columnMeta : columnMetaList) {
+            final DfProcedureColumnType procedureColumnType = columnMeta.getProcedureColumnType();
+            final String dbTypeName = columnMeta.getDbTypeName();
+            if (procedureColumnType.equals(DfProcedureColumnType.procedureColumnReturn)) {
+                if ("void".equalsIgnoreCase(dbTypeName)) {
+                    existsVoidReturn = true;
+                    resultSetReturnIndex = index;
+                    resultSetReturnName = columnMeta.getColumnName();
+                }
+            }
+            ++index;
+        }
+        if (existsVoidReturn) {
+            // PostgreSQL (real) procedure may have "void" type return by jflute (2022/04/10)
+            String name = procedureMeta.buildProcedureLoggingName() + "." + resultSetReturnName;
+            log("...Removing the void return which is unnecessary: " + name);
             columnMetaList.remove(resultSetReturnIndex);
         }
     }
