@@ -580,7 +580,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                           Column Meta
     //                                           -----------
-    protected void setupProcedureColumnMeta(DfProcedureMeta procedureMetaInfo, ResultSet columnRs) throws SQLException {
+    protected void setupProcedureColumnMeta(DfProcedureMeta procedureMeta, ResultSet columnRs) throws SQLException {
         final Set<String> uniqueSet = new HashSet<String>();
         while (columnRs.next()) {
             // /- - - - - - - - - - - - - - - - - - - - - - - -
@@ -617,7 +617,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 } catch (RuntimeException ignored) { // pinpoint patch
                     // for example, SQLServer throws an exception
                     // if the procedure is a function that returns table type
-                    final String procdureName = procedureMetaInfo.getProcedureFullQualifiedName();
+                    final String procdureName = procedureMeta.getProcedureFullQualifiedName();
                     log("*Failed to get data type: " + procdureName + "." + columnName);
                     tmpJdbcType = Types.OTHER;
                 }
@@ -678,9 +678,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             procedureColumnMeta.setColumnSize(columnSize);
             procedureColumnMeta.setDecimalDigits(decimalDigits);
             procedureColumnMeta.setColumnComment(columnComment);
-            procedureMetaInfo.addProcedureColumn(procedureColumnMeta);
+            procedureMeta.addProcedureColumn(procedureColumnMeta);
         }
-        adjustProcedureColumnList(procedureMetaInfo);
+        adjustProcedureColumnList(procedureMeta);
     }
 
     protected int toInt(String title, String value) {
@@ -693,23 +693,23 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected String buildProcedureFullQualifiedName(DfProcedureMeta metaInfo) {
-        return metaInfo.getProcedureSchema().buildFullQualifiedName(metaInfo.getProcedureName());
+    protected String buildProcedureFullQualifiedName(DfProcedureMeta procedureMeta) {
+        return procedureMeta.getProcedureSchema().buildFullQualifiedName(procedureMeta.getProcedureName());
     }
 
-    protected String buildProcedureSchemaQualifiedName(DfProcedureMeta metaInfo) {
-        return metaInfo.getProcedureSchema().buildSchemaQualifiedName(metaInfo.getProcedureName());
+    protected String buildProcedureSchemaQualifiedName(DfProcedureMeta procedureMeta) {
+        return procedureMeta.getProcedureSchema().buildSchemaQualifiedName(procedureMeta.getProcedureName());
     }
 
-    protected void adjustProcedureColumnList(DfProcedureMeta procedureMetaInfo) {
-        adjustPostgreSQLResultSetParameter(procedureMetaInfo);
+    protected void adjustProcedureColumnList(DfProcedureMeta procedureMeta) {
+        adjustPostgreSQLResultSetParameter(procedureMeta);
     }
 
-    protected void adjustPostgreSQLResultSetParameter(DfProcedureMeta procedureMetaInfo) {
+    protected void adjustPostgreSQLResultSetParameter(DfProcedureMeta procedureMeta) {
         if (!isDatabasePostgreSQL()) {
             return;
         }
-        final List<DfProcedureColumnMeta> columnMetaList = procedureMetaInfo.getProcedureColumnList();
+        final List<DfProcedureColumnMeta> columnMetaList = procedureMeta.getProcedureColumnList();
         boolean existsResultSetParameter = false;
         boolean existsResultSetReturn = false;
         int resultSetReturnIndex = 0;
@@ -735,7 +735,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         if (existsResultSetParameter && existsResultSetReturn) {
             // It is a precondition that PostgreSQL does not allow functions to have a result set return
             // when it also has result set parameters (as an out parameter).
-            String name = procedureMetaInfo.buildProcedureLoggingName() + "." + resultSetReturnName;
+            String name = procedureMeta.buildProcedureLoggingName() + "." + resultSetReturnName;
             log("...Removing the result set return which is unnecessary: " + name);
             columnMetaList.remove(resultSetReturnIndex);
         }
