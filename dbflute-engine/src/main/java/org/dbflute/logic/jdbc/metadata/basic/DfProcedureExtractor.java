@@ -736,9 +736,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         if (existsResultSetParameter && existsResultSetReturn) {
             // It is a precondition that PostgreSQL does not allow functions to have a result set return
             // when it also has result set parameters (as an out parameter).
-            String name = procedureMeta.buildProcedureLoggingName() + "." + resultSetReturnName;
-            log("...Removing the result set return which is unnecessary: " + name);
-            columnMetaList.remove(resultSetReturnIndex);
+            removePostgreSQLUnnecessaryColumn(procedureMeta, columnMetaList, resultSetReturnIndex, resultSetReturnName);
         }
     }
 
@@ -765,10 +763,15 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
         if (existsVoidReturn) {
             // PostgreSQL (real) procedure may have "void" type return by jflute (2022/04/10)
-            String name = procedureMeta.buildProcedureLoggingName() + "." + resultSetReturnName;
-            log("...Removing the void return which is unnecessary: " + name);
-            columnMetaList.remove(resultSetReturnIndex);
+            removePostgreSQLUnnecessaryColumn(procedureMeta, columnMetaList, resultSetReturnIndex, resultSetReturnName);
         }
+    }
+
+    protected void removePostgreSQLUnnecessaryColumn(DfProcedureMeta procedureMeta, List<DfProcedureColumnMeta> columnMetaList,
+            int resultSetReturnIndex, String resultSetReturnName) {
+        String name = procedureMeta.buildProcedureLoggingName() + "." + resultSetReturnName;
+        log("...Removing the result set return which is unnecessary: " + name);
+        columnMetaList.remove(resultSetReturnIndex);
     }
 
     // -----------------------------------------------------
