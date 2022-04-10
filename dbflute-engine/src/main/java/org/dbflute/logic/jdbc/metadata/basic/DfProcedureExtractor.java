@@ -442,13 +442,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             conn = dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             procedureRs = doGetProcedures(metaData, unifiedSchema);
-            setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
+            setupProcedureMeta(metaInfoList, procedureRs, unifiedSchema);
             for (DfProcedureMeta metaInfo : metaInfoList) {
                 procedureName = metaInfo.getProcedureName();
                 ResultSet columnRs = null;
                 try {
                     columnRs = doGetProcedureColumns(metaData, metaInfo);
-                    setupProcedureColumnMetaInfo(metaInfo, columnRs);
+                    setupProcedureColumnMeta(metaInfo, columnRs);
                 } catch (SQLException e) {
                     throw e;
                 } finally {
@@ -468,13 +468,19 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         return metaInfoList;
     }
 
+    // -----------------------------------------------------
+    //                                            Procedures
+    //                                            ----------
     protected ResultSet doGetProcedures(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
         final String catalogName = unifiedSchema.getPureCatalog();
         final String schemaName = unifiedSchema.getPureSchema();
         return metaData.getProcedures(catalogName, schemaName, null);
     }
 
-    protected void setupProcedureMetaInfo(List<DfProcedureMeta> procedureMetaInfoList, ResultSet procedureRs, UnifiedSchema unifiedSchema)
+    // -----------------------------------------------------
+    //                                        Procedure Meta
+    //                                        --------------
+    protected void setupProcedureMeta(List<DfProcedureMeta> procedureMetaInfoList, ResultSet procedureRs, UnifiedSchema unifiedSchema)
             throws SQLException {
         boolean skippedPgCatalog = false;
         while (procedureRs.next()) {
@@ -523,43 +529,46 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             final Integer procedureType = Integer.valueOf(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
 
-            final DfProcedureMeta metaInfo = new DfProcedureMeta();
-            metaInfo.setProcedureCatalog(procedureCatalog);
-            metaInfo.setProcedureSchema(createAsDynamicSchema(procedureCatalog, procedureSchema));
-            metaInfo.setProcedureName(procedureName);
+            final DfProcedureMeta procedureMeta = new DfProcedureMeta();
+            procedureMeta.setProcedureCatalog(procedureCatalog);
+            procedureMeta.setProcedureSchema(createAsDynamicSchema(procedureCatalog, procedureSchema));
+            procedureMeta.setProcedureName(procedureName);
             if (procedureType == DatabaseMetaData.procedureResultUnknown) {
-                metaInfo.setProcedureType(DfProcedureType.procedureResultUnknown);
+                procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
             } else if (procedureType == DatabaseMetaData.procedureNoResult) {
-                metaInfo.setProcedureType(DfProcedureType.procedureNoResult);
+                procedureMeta.setProcedureType(DfProcedureType.procedureNoResult);
             } else if (procedureType == DatabaseMetaData.procedureReturnsResult) {
-                metaInfo.setProcedureType(DfProcedureType.procedureReturnsResult);
+                procedureMeta.setProcedureType(DfProcedureType.procedureReturnsResult);
             } else {
                 String msg = "Unknown procedureType: type=" + procedureType + " procedure=" + procedureName;
                 throw new IllegalStateException(msg);
             }
-            metaInfo.setProcedureComment(procedureComment);
-            metaInfo.setProcedurePackage(procedurePackage);
-            metaInfo.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(metaInfo));
-            metaInfo.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(metaInfo));
-            procedureMetaInfoList.add(metaInfo);
+            procedureMeta.setProcedureComment(procedureComment);
+            procedureMeta.setProcedurePackage(procedurePackage);
+            procedureMeta.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(procedureMeta));
+            procedureMeta.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(procedureMeta));
+            procedureMetaInfoList.add(procedureMeta);
         }
         if (skippedPgCatalog) {
             _log.info("*Skipped pg_catalog's procedures");
         }
     }
 
-    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta metaInfo) throws SQLException {
-        final String catalogName = metaInfo.getProcedureCatalog();
-        final String schemaName = metaInfo.getProcedureSchema().getPureSchema();
-        final String procedurePureName = metaInfo.buildProcedurePureName();
+    // -----------------------------------------------------
+    //                                     Procedure Columns
+    //                                     -----------------
+    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta procedureMeta) throws SQLException {
+        final String catalogName = procedureMeta.getProcedureCatalog();
+        final String schemaName = procedureMeta.getProcedureSchema().getPureSchema();
+        final String procedurePureName = procedureMeta.buildProcedurePureName();
         final String catalogArgName;
         final String procedureArgName;
         if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
             // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
             catalogArgName = catalogName;
             procedureArgName = Srl.connectPrefix(procedurePureName, catalogName, ".");
-        } else if (isDatabaseOracle() && metaInfo.isPackageProcdure()) {
-            catalogArgName = metaInfo.getProcedurePackage();
+        } else if (isDatabaseOracle() && procedureMeta.isPackageProcdure()) {
+            catalogArgName = procedureMeta.getProcedurePackage();
             procedureArgName = procedurePureName; // needs to use pure name
         } else {
             catalogArgName = catalogName;
@@ -568,7 +577,10 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
     }
 
-    protected void setupProcedureColumnMetaInfo(DfProcedureMeta procedureMetaInfo, ResultSet columnRs) throws SQLException {
+    // -----------------------------------------------------
+    //                                           Column Meta
+    //                                           -----------
+    protected void setupProcedureColumnMeta(DfProcedureMeta procedureMetaInfo, ResultSet columnRs) throws SQLException {
         final Set<String> uniqueSet = new HashSet<String>();
         while (columnRs.next()) {
             // /- - - - - - - - - - - - - - - - - - - - - - - -
@@ -644,29 +656,29 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             }
             final String columnComment = columnRs.getString("REMARKS");
 
-            final DfProcedureColumnMeta procedureColumnMetaInfo = new DfProcedureColumnMeta();
-            procedureColumnMetaInfo.setColumnName(columnName);
+            final DfProcedureColumnMeta procedureColumnMeta = new DfProcedureColumnMeta();
+            procedureColumnMeta.setColumnName(columnName);
             if (procedureColumnType == DatabaseMetaData.procedureColumnUnknown) {
-                procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnUnknown);
+                procedureColumnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnUnknown);
             } else if (procedureColumnType == DatabaseMetaData.procedureColumnIn) {
-                procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnIn);
+                procedureColumnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnIn);
             } else if (procedureColumnType == DatabaseMetaData.procedureColumnInOut) {
-                procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnInOut);
+                procedureColumnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnInOut);
             } else if (procedureColumnType == DatabaseMetaData.procedureColumnOut) {
-                procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnOut);
+                procedureColumnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnOut);
             } else if (procedureColumnType == DatabaseMetaData.procedureColumnReturn) {
-                procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnReturn);
+                procedureColumnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnReturn);
             } else if (procedureColumnType == DatabaseMetaData.procedureColumnResult) {
-                procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnResult);
+                procedureColumnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnResult);
             } else {
                 throw new IllegalStateException("Unknown procedureColumnType: " + procedureColumnType);
             }
-            procedureColumnMetaInfo.setJdbcDefType(jdbcType);
-            procedureColumnMetaInfo.setDbTypeName(dbTypeName);
-            procedureColumnMetaInfo.setColumnSize(columnSize);
-            procedureColumnMetaInfo.setDecimalDigits(decimalDigits);
-            procedureColumnMetaInfo.setColumnComment(columnComment);
-            procedureMetaInfo.addProcedureColumn(procedureColumnMetaInfo);
+            procedureColumnMeta.setJdbcDefType(jdbcType);
+            procedureColumnMeta.setDbTypeName(dbTypeName);
+            procedureColumnMeta.setColumnSize(columnSize);
+            procedureColumnMeta.setDecimalDigits(decimalDigits);
+            procedureColumnMeta.setColumnComment(columnComment);
+            procedureMetaInfo.addProcedureColumn(procedureColumnMeta);
         }
         adjustProcedureColumnList(procedureMetaInfo);
     }
@@ -697,15 +709,15 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         if (!isDatabasePostgreSQL()) {
             return;
         }
-        final List<DfProcedureColumnMeta> columnMetaInfoList = procedureMetaInfo.getProcedureColumnList();
+        final List<DfProcedureColumnMeta> columnMetaList = procedureMetaInfo.getProcedureColumnList();
         boolean existsResultSetParameter = false;
         boolean existsResultSetReturn = false;
         int resultSetReturnIndex = 0;
         String resultSetReturnName = null;
         int index = 0;
-        for (DfProcedureColumnMeta columnMetaInfo : columnMetaInfoList) {
-            final DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
-            final String dbTypeName = columnMetaInfo.getDbTypeName();
+        for (DfProcedureColumnMeta columnMeta : columnMetaList) {
+            final DfProcedureColumnType procedureColumnType = columnMeta.getProcedureColumnType();
+            final String dbTypeName = columnMeta.getDbTypeName();
             if (procedureColumnType.equals(DfProcedureColumnType.procedureColumnOut)) {
                 if ("refcursor".equalsIgnoreCase(dbTypeName)) {
                     existsResultSetParameter = true;
@@ -715,7 +727,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 if ("refcursor".equalsIgnoreCase(dbTypeName)) {
                     existsResultSetReturn = true;
                     resultSetReturnIndex = index;
-                    resultSetReturnName = columnMetaInfo.getColumnName();
+                    resultSetReturnName = columnMeta.getColumnName();
                 }
             }
             ++index;
@@ -725,10 +737,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             // when it also has result set parameters (as an out parameter).
             String name = procedureMetaInfo.buildProcedureLoggingName() + "." + resultSetReturnName;
             log("...Removing the result set return which is unnecessary: " + name);
-            columnMetaInfoList.remove(resultSetReturnIndex);
+            columnMetaList.remove(resultSetReturnIndex);
         }
     }
 
+    // -----------------------------------------------------
+    //                                          Assist Logic
+    //                                          ------------
     protected void throwProcedureListGettingFailureException(UnifiedSchema unifiedSchema, String procedureName, Exception e)
             throws SQLException {
         final boolean forSqlEx = e instanceof SQLException;
@@ -953,8 +968,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                          Great Wall
     //                                                                          ==========
-    protected void doSetupGreatWallOracle(StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap,
-            StringKeyMap<DfTypeStructInfo> structInfoMap, List<DfProcedureMeta> metaInfoList, DfProcedureSupplementExtractorOracle extractor) {
+    protected void doSetupGreatWallOracle(StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap, StringKeyMap<DfTypeStructInfo> structInfoMap,
+            List<DfProcedureMeta> metaInfoList, DfProcedureSupplementExtractorOracle extractor) {
         final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
         final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
         for (DfProcedureMeta metaInfo : metaInfoList) {
