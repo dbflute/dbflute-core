@@ -58,12 +58,9 @@ public interface ${glCDef} extends Classification {
         private static final Map<String, ${classificationName}> _codeClsMap = new HashMap<String, ${classificationName}>();
         private static final Map<String, ${classificationName}> _nameClsMap = new HashMap<String, ${classificationName}>();
         static {
-            for (${classificationName} value : values()) {
-                _codeClsMap.put(value.code().toLowerCase(), value);
-                for (String sister : value.sisterSet()) { _codeClsMap.put(sister.toLowerCase(), value); }
-                _nameClsMap.put(value.name().toLowerCase(), value);
-            }
+            ZzzoneSlimmer.initMap(values(), _codeClsMap, _nameClsMap);
         }
+        private static final ZzzoneSlimmer<${classificationName}> _slimmer = new ZzzoneSlimmer<>(${classificationName}.class, _codeClsMap, _nameClsMap);
 #if ($database.hasClassificationSubItemMap($classificationName))
         private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
         static {
@@ -85,7 +82,7 @@ public interface ${glCDef} extends Classification {
 #end
         private String _code; private String _alias; private Set<String> _sisterSet;
         private ${classificationName}(String code, String alias, String[] sisters)
-        { _code = code; _alias = alias; _sisterSet = Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(sisters))); }
+        { _code = code; _alias = alias; _sisterSet = ZzzoneSlimmer.toSisterSet(sisters); }
         public String code() { return _code; } public String alias() { return _alias; }
         public Set<String> sisterSet() { return _sisterSet; }
 #if ($database.hasClassificationSubItemMap($classificationName))
@@ -137,12 +134,7 @@ public interface ${glCDef} extends Classification {
          * @return The optional classification corresponding to the code. (NotNull, EmptyAllowed: if not found, returns empty)
          */
         public static OptionalThing<${classificationName}> of(Object code) {
-            if (code == null) { return OptionalThing.ofNullable(null, () -> { throw new ClassificationNotFoundException("null code specified"); }); }
-            if (code instanceof ${classificationName}) { return OptionalThing.of((${classificationName})code); }
-            if (code instanceof OptionalThing<?>) { return of(((OptionalThing<?>)code).orElse(null)); }
-            return OptionalThing.ofNullable(_codeClsMap.get(code.toString().toLowerCase()), () ->{
-                throw new ClassificationNotFoundException("Unknown classification code: " + code);
-            });
+            return _slimmer.of(code);
         }
 
         /**
@@ -151,10 +143,7 @@ public interface ${glCDef} extends Classification {
          * @return The optional classification corresponding to the name. (NotNull, EmptyAllowed: if not found, returns empty)
          */
         public static OptionalThing<${classificationName}> byName(String name) {
-            if (name == null) { throw new IllegalArgumentException("The argument 'name' should not be null."); }
-            return OptionalThing.ofNullable(_nameClsMap.get(name.toLowerCase()), () ->{
-                throw new ClassificationNotFoundException("Unknown classification name: " + name);
-            });
+            return _slimmer.byName(name);
         }
 
         /**
@@ -164,9 +153,7 @@ public interface ${glCDef} extends Classification {
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
          */
         public static ${classificationName} codeOf(Object code) {
-            if (code == null) { return null; }
-            if (code instanceof ${classificationName}) { return (${classificationName})code; }
-            return _codeClsMap.get(code.toString().toLowerCase());
+            return _slimmer.codeOf(code);
         }
 
         /**
@@ -176,8 +163,7 @@ public interface ${glCDef} extends Classification {
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
          */
         public static ${classificationName} nameOf(String name) {
-            if (name == null) { return null; }
-            try { return valueOf(name); } catch (RuntimeException ignored) { return null; }
+            return _slimmer.nameOf(name, nm -> valueOf(nm));
         }
 
         /**
@@ -185,7 +171,7 @@ public interface ${glCDef} extends Classification {
          * @return The snapshot list of all classification elements. (NotNull)
          */
         public static List<${classificationName}> listAll() {
-            return new ArrayList<${classificationName}>(Arrays.asList(values()));
+            return _slimmer.listAll(values());
         }
 
         /**
@@ -207,10 +193,7 @@ public interface ${glCDef} extends Classification {
          * @return The snapshot list of classification elements in the code list. (NotNull, EmptyAllowed: when empty specified)
          */
         public static List<${classificationName}> listOf(Collection<String> codeList) {
-            if (codeList == null) { throw new IllegalArgumentException("The argument 'codeList' should not be null."); }
-            List<${classificationName}> clsList = new ArrayList<${classificationName}>(codeList.size());
-            for (String code : codeList) { clsList.add(of(code).get()); }
-            return clsList;
+            return _slimmer.listOf(codeList);
         }
 #foreach ($group in $classificationTop.groupList)
 
@@ -361,6 +344,101 @@ public interface ${glCDef} extends Classification {
         @SuppressWarnings("unused")
         private String[] xinternalEmptyString() {
             return emptyStrings(); // to suppress 'unused' warning of import statement
+        }
+    }
+
+    public static class ZzzoneSlimmer<CLS extends ${glCDef}> {
+
+        public static <CLS extends ${glCDef}> void initMap(CLS[] values, Map<String, CLS> codeClsMap, Map<String, CLS> nameClsMap) {
+            for (CLS value : values) {
+                codeClsMap.put(value.code().toLowerCase(), value);
+                for (String sister : value.sisterSet()) {
+                    codeClsMap.put(sister.toLowerCase(), value);
+                }
+                nameClsMap.put(value.name().toLowerCase(), value);
+            }
+        }
+
+        public static Set<String> toSisterSet(String[] sisters) {
+            return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(sisters)));
+        }
+
+        private final Class<CLS> _clsType;
+        private final Map<String, CLS> _codeClsMap;
+        private final Map<String, CLS> _nameClsMap;
+
+        public ZzzoneSlimmer(Class<CLS> clsType, Map<String, CLS> codeClsMap, Map<String, CLS> nameClsMap) {
+            _clsType = clsType;
+            _codeClsMap = codeClsMap;
+            _nameClsMap = nameClsMap;
+        }
+
+        public OptionalThing<CLS> of(Object code) {
+            if (code == null) {
+                return OptionalThing.ofNullable(null, () -> {
+                    throw new ClassificationNotFoundException("null code specified");
+                });
+            }
+            if (_clsType.isAssignableFrom(code.getClass())) {
+                @SuppressWarnings("unchecked")
+                CLS cls = (CLS) code;
+                return OptionalThing.of(cls);
+            }
+            if (code instanceof OptionalThing<?>) {
+                @SuppressWarnings("unchecked")
+                CLS cls = ((OptionalThing<CLS>) code).orElse(null);
+                return of(cls.code());
+            }
+            return OptionalThing.ofNullable(_codeClsMap.get(code.toString().toLowerCase()), () -> {
+                throw new ClassificationNotFoundException("Unknown classification code: " + code);
+            });
+        }
+
+        public OptionalThing<CLS> byName(String name) {
+            if (name == null) {
+                throw new IllegalArgumentException("The argument 'name' should not be null.");
+            }
+            return OptionalThing.ofNullable(_nameClsMap.get(name.toLowerCase()), () -> {
+                throw new ClassificationNotFoundException("Unknown classification name: " + name);
+            });
+        }
+
+        public CLS codeOf(Object code) {
+            if (code == null) {
+                return null;
+            }
+            if (_clsType.isAssignableFrom(code.getClass())) {
+                @SuppressWarnings("unchecked")
+                CLS cls = (CLS) code;
+                return cls;
+            }
+            return _codeClsMap.get(code.toString().toLowerCase());
+        }
+
+        public CLS nameOf(String name, java.util.function.Function<String, CLS> valueOfCall) {
+            if (name == null) {
+                return null;
+            }
+            try {
+                return valueOfCall.apply(name);
+            } catch (RuntimeException ignored) {
+                return null;
+            }
+        }
+
+        public List<CLS> listAll(CLS[] clss) {
+            return new ArrayList<CLS>(Arrays.asList(clss));
+        }
+
+        public List<CLS> listOf(Collection<String> codeList) {
+            if (codeList == null) {
+                throw new IllegalArgumentException("The argument 'codeList' should not be null.");
+            }
+            List<CLS> clsList = new ArrayList<CLS>(codeList.size());
+            for (String code : codeList) {
+                clsList.add(of(code).get());
+            }
+            return clsList;
         }
     }
 }
