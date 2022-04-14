@@ -23,7 +23,6 @@ import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
-import static org.dbflute.util.DfTypeUtil.emptyStrings;
 
 /**
  * The definition of classification.
@@ -42,25 +41,26 @@ public interface ${glCDef} extends Classification {
     @Deprecated
 #end
     public enum ${classificationName} implements ${glCDef} {
-#set ($count = 0)
+#set ($index = 0)
 #foreach ($classificationElement in $classificationTop.classificationElementList)
-#if ($count != 0)
-        ,
-#end
         /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
 #if ($classificationElement.isDeprecated())
         @Deprecated
 #end
-        ${classificationElement.name}($classificationElement.buildClassificationCodeAliasSisterCodeVariables())
-#set ($count = $count + 1)
+#set ($rearCommna = "")
+#if ($index < $classificationTop.classificationElementList.size() - 1)
+#set ($rearCommna = ",")
+#else
+#set ($rearCommna = ";")
 #end
-        ;
-        private static final Map<String, ${classificationName}> _codeClsMap = new HashMap<String, ${classificationName}>();
-        private static final Map<String, ${classificationName}> _nameClsMap = new HashMap<String, ${classificationName}>();
-        static {
-            ZzzoneSlimmer.initMap(values(), _codeClsMap, _nameClsMap);
-        }
-        private static final ZzzoneSlimmer<${classificationName}> _slimmer = new ZzzoneSlimmer<>(${classificationName}.class, _codeClsMap, _nameClsMap);
+#if ($classificationTop.hasSisterCode())
+        ${classificationElement.name}($classificationElement.buildClassificationCodeAliasSisterCodeVariables())${rearCommna}
+#else
+        ${classificationElement.name}($classificationElement.buildClassificationCodeAliasVariables())${rearCommna}
+#end
+#set ($index = $index + 1)
+#end
+        private static ZzzoneSlimmer<${classificationName}> _slimmer = new ZzzoneSlimmer<>(${classificationName}.class, values());
 #if ($database.hasClassificationSubItemMap($classificationName))
         private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
         static {
@@ -80,18 +80,26 @@ public interface ${glCDef} extends Classification {
 #end
         }
 #end
+#if ($classificationTop.hasSisterCode())
         private String _code; private String _alias; private Set<String> _sisterSet;
         private ${classificationName}(String code, String alias, String[] sisters)
         { _code = code; _alias = alias; _sisterSet = ZzzoneSlimmer.toSisterSet(sisters); }
+#else
+        private String _code; private String _alias;
+        private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
+#end
         public String code() { return _code; } public String alias() { return _alias; }
+#if ($classificationTop.hasSisterCode())
         public Set<String> sisterSet() { return _sisterSet; }
+#else
+        public Set<String> sisterSet() { return Collections.emptySet(); }
+#end
 #if ($database.hasClassificationSubItemMap($classificationName))
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
         public Map<String, Object> subItemMap() { return Collections.emptyMap(); }
 #end
         public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
-
 #foreach ($regularSubItem in $classificationTop.regularSubItemList)
 #set ($subItemMap = $classificationElement.subItemMap)
 #set ($subItemType = "Object")
@@ -105,7 +113,6 @@ public interface ${glCDef} extends Classification {
             return (${subItemType})subItemMap().get("${regularSubItem.subItemName}");
 #end
         }
-
 #end
 #foreach ($group in $classificationTop.groupList)
         /**
@@ -116,64 +123,49 @@ public interface ${glCDef} extends Classification {
          * ${group.buildElementDisp()}
          * @return The determination, true or false.
          */
-        public boolean is${group.groupNameInitCap}() {
-            return ${group.buildReturnExpThis()};
-        }
-
+        public boolean is${group.groupNameInitCap}() { return ${group.buildReturnExpThis()}; }
 #end
+#if ($classificationTop.hasGroup())
         public boolean inGroup(String groupName) {
 #foreach ($group in $classificationTop.groupList)
             if ("${group.groupName}".equals(groupName)) { return is${group.groupNameInitCap}(); }
 #end
             return false;
         }
-
+#else
+        public boolean inGroup(String groupName) { return false; }
+#end
         /**
          * Get the classification of the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns empty)
          * @return The optional classification corresponding to the code. (NotNull, EmptyAllowed: if not found, returns empty)
          */
-        public static OptionalThing<${classificationName}> of(Object code) {
-            return _slimmer.of(code);
-        }
-
+        public static OptionalThing<${classificationName}> of(Object code) { return _slimmer.of(code); }
         /**
          * Find the classification by the name. (CaseInsensitive)
          * @param name The string of name, which is case-insensitive. (NotNull)
          * @return The optional classification corresponding to the name. (NotNull, EmptyAllowed: if not found, returns empty)
          */
-        public static OptionalThing<${classificationName}> byName(String name) {
-            return _slimmer.byName(name);
-        }
-
+        public static OptionalThing<${classificationName}> byName(String name) { return _slimmer.byName(name); }
         /**
          * <span style="color: #AD4747; font-size: 120%">Old style so use of(code).</span> <br>
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
          */
-        public static ${classificationName} codeOf(Object code) {
-            return _slimmer.codeOf(code);
-        }
-
+        public static ${classificationName} codeOf(Object code) { return _slimmer.codeOf(code); }
         /**
          * <span style="color: #AD4747; font-size: 120%">Old style so use byName(name).</span> <br>
          * Get the classification by the name (also called 'value' in ENUM world).
          * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
          */
-        public static ${classificationName} nameOf(String name) {
-            return _slimmer.nameOf(name, nm -> valueOf(nm));
-        }
-
+        public static ${classificationName} nameOf(String name) { return _slimmer.nameOf(name, nm -> valueOf(nm)); }
         /**
          * Get the list of all classification elements. (returns new copied list)
          * @return The snapshot list of all classification elements. (NotNull)
          */
-        public static List<${classificationName}> listAll() {
-            return _slimmer.listAll(values());
-        }
-
+        public static List<${classificationName}> listAll() { return _slimmer.listAll(values()); }
         /**
          * Get the list of classification elements in the specified group. (returns new copied list) <br>
          * @param groupName The string of group name, which is case-insensitive. (NotNull)
@@ -186,17 +178,13 @@ public interface ${glCDef} extends Classification {
 #end
             throw new ClassificationNotFoundException("Unknown classification group: ${classificationName}." + groupName);
         }
-
         /**
          * Get the list of classification elements corresponding to the specified codes. (returns new copied list) <br>
          * @param codeList The list of plain code, which is case-insensitive. (NotNull)
          * @return The snapshot list of classification elements in the code list. (NotNull, EmptyAllowed: when empty specified)
          */
-        public static List<${classificationName}> listOf(Collection<String> codeList) {
-            return _slimmer.listOf(codeList);
-        }
+        public static List<${classificationName}> listOf(Collection<String> codeList) { return _slimmer.listOf(codeList); }
 #foreach ($group in $classificationTop.groupList)
-
         /**
          * Get the list of group classification elements. (returns new copied list) <br>
 #if ($group.hasGroupComment())
@@ -209,93 +197,97 @@ public interface ${glCDef} extends Classification {
             return new ArrayList<${classificationName}>(Arrays.asList(${group.buildCDefArgExp()}));
         }
 #end
-
         /**
          * Get the list of classification elements in the specified group. (returns new copied list) <br>
          * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
          * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if the group is not found)
          */
+#if ($classificationTop.hasGroup())
         public static List<${classificationName}> groupOf(String groupName) {
 #foreach ($group in $classificationTop.groupList)
             if ("${group.groupName}".equals(groupName)) { return listOf${group.groupNameInitCap}(); }
 #end
-            return new ArrayList<${classificationName}>(4);
+            return new ArrayList<${classificationName}>();
         }
-
+#else
+        public static List<${classificationName}> groupOf(String groupName) { return new ArrayList<${classificationName}>(); }
+#end
         @Override public String toString() { return code(); }
     }
 
 #end
     public enum DefMeta implements ClassificationMeta {
-#set ($count = 0)
+#set ($index = 0)
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
-#if ($count != 0)
-        ,
-#end
 #if ($classificationTop.hasTopComment())
         /** ${classificationTop.topCommentForJavaDocNest} */
 #end
-        ${classificationName}
-#set ($count = $count + 1)
+#set ($rearCommna = "")
+#if ($index < $database.classificationNameList.size() - 1)
+#set ($rearCommna = ",")
+#else
+#set ($rearCommna = ";")
 #end
-        ;
+        ${classificationName}${rearCommna}
+#set ($index = $index + 1)
+#end
         public String classificationName() {
             return name(); // same as definition name
         }
 
         public OptionalThing<? extends Classification> of(Object code) {
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.of(code); }
+            if (is(${classificationName})) { return ${glCDef}.${classificationName}.of(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public OptionalThing<? extends Classification> byName(String name) {
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.byName(name); }
+            if (is(${classificationName})) { return ${glCDef}.${classificationName}.byName(name); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public Classification codeOf(Object code) { // null if not found, old style so use of(code)
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
+            if (is(${classificationName})) { return ${glCDef}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public Classification nameOf(String name) { // null if not found, old style so use byName(name)
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.valueOf(name); }
+            if (is(${classificationName})) { return ${glCDef}.${classificationName}.valueOf(name); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> listAll() {
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listAll()); }
+            if (is(${classificationName})) { return toClsList(${glCDef}.${classificationName}.listAll()); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> listByGroup(String groupName) { // exception if not found
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listByGroup(groupName)); }
+            if (is(${classificationName})) { return toClsList(${glCDef}.${classificationName}.listByGroup(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> listOf(Collection<String> codeList) {
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listOf(codeList)); }
+            if (is(${classificationName})) { return toClsList(${glCDef}.${classificationName}.listOf(codeList)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> groupOf(String groupName) { // old style
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.groupOf(groupName)); }
+            if (is(${classificationName})) { return toClsList(${glCDef}.${classificationName}.groupOf(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
@@ -309,7 +301,7 @@ public interface ${glCDef} extends Classification {
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #if ($classificationTop.hasCodeType())
-            if (${classificationName}.name().equals(name())) { return ClassificationCodeType.${classificationTop.codeType}; }
+            if (is(${classificationName})) { return ClassificationCodeType.${classificationTop.codeType}; }
 #end
 #end
             return ClassificationCodeType.String; // as default
@@ -318,7 +310,7 @@ public interface ${glCDef} extends Classification {
         public ClassificationUndefinedHandlingType undefinedHandlingType() {
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
-            if (${classificationName}.name().equals(name())) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
+            if (is(${classificationName})) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
 #end
             return ClassificationUndefinedHandlingType.LOGGING; // as default
         }
@@ -326,7 +318,7 @@ public interface ${glCDef} extends Classification {
         public static OptionalThing<${glCDef}.DefMeta> find(String classificationName) { // instead of valueOf()
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return OptionalThing.of(${glCDef}.DefMeta.${classificationName}); }
+            if (is(${classificationName}, classificationName)) { return OptionalThing.of(${classificationName}); }
 #end
             return OptionalThing.ofNullable(null, () -> {
                 throw new ClassificationNotFoundException("Unknown classification: " + classificationName);
@@ -336,41 +328,45 @@ public interface ${glCDef} extends Classification {
         public static ${glCDef}.DefMeta meta(String classificationName) { // old style so use find(name)
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
+            if (is(${classificationName}, classificationName)) { return ${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
         }
+#if (!$database.classificationNameList.isEmpty())
 
-        @SuppressWarnings("unused")
-        private String[] xinternalEmptyString() {
-            return emptyStrings(); // to suppress 'unused' warning of import statement
+        private boolean is(DefMeta meta) {
+            return meta.name().equals(name());
         }
+
+        private static boolean is(DefMeta meta, String classificationName) {
+            return meta.name().equalsIgnoreCase(classificationName);
+        }
+#end
     }
 
     public static class ZzzoneSlimmer<CLS extends ${glCDef}> {
 
-        public static <CLS extends ${glCDef}> void initMap(CLS[] values, Map<String, CLS> codeClsMap, Map<String, CLS> nameClsMap) {
-            for (CLS value : values) {
-                codeClsMap.put(value.code().toLowerCase(), value);
-                for (String sister : value.sisterSet()) {
-                    codeClsMap.put(sister.toLowerCase(), value);
-                }
-                nameClsMap.put(value.name().toLowerCase(), value);
-            }
-        }
-
-        public static Set<String> toSisterSet(String[] sisters) {
+        public static Set<String> toSisterSet(String[] sisters) { // used by initializer so static
             return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(sisters)));
         }
 
         private final Class<CLS> _clsType;
-        private final Map<String, CLS> _codeClsMap;
-        private final Map<String, CLS> _nameClsMap;
+        private final Map<String, CLS> _codeClsMap = new HashMap<>();
+        private final Map<String, CLS> _nameClsMap = new HashMap<>();
 
-        public ZzzoneSlimmer(Class<CLS> clsType, Map<String, CLS> codeClsMap, Map<String, CLS> nameClsMap) {
+        public ZzzoneSlimmer(Class<CLS> clsType, CLS[] values) {
             _clsType = clsType;
-            _codeClsMap = codeClsMap;
-            _nameClsMap = nameClsMap;
+            initMap(values);
+        }
+
+        private void initMap(CLS[] values) {
+            for (CLS value : values) {
+                _codeClsMap.put(value.code().toLowerCase(), value);
+                for (String sister : value.sisterSet()) {
+                    _codeClsMap.put(sister.toLowerCase(), value);
+                }
+                _nameClsMap.put(value.name().toLowerCase(), value);
+            }
         }
 
         public OptionalThing<CLS> of(Object code) {
