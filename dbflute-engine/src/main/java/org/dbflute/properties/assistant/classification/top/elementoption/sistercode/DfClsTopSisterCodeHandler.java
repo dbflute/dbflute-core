@@ -44,9 +44,19 @@ public class DfClsTopSisterCodeHandler {
     //                                                                    ================
     public boolean hasSisterCode() {
         for (DfClassificationElement element : _elementList) {
-            final String[] sisters = element.getSisters();
-            if (sisters != null && sisters.length > 0) {
+            if (element.hasSiserCode()) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasSisterEmpty() {
+        if (hasSisterCode()) {
+            for (DfClassificationElement element : _elementList) {
+                if (!element.hasSiserCode()) {
+                    return true;
+                }
             }
         }
         return false;

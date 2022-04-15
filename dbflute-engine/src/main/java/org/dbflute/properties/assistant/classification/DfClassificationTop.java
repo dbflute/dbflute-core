@@ -247,6 +247,10 @@ public class DfClassificationTop { // directly used in template
         return new DfClsTopSisterCodeHandler(_elementList).hasSisterCode();
     }
 
+    public boolean hasSisterEmpty() {
+        return new DfClsTopSisterCodeHandler(_elementList).hasSisterEmpty();
+    }
+
     public boolean isSisterBooleanHandling() {
         return new DfClsTopSisterCodeHandler(_elementList).isSisterBooleanHandling();
     }
