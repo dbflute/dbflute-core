@@ -17,6 +17,9 @@ package org.dbflute.jdbc;
 
 import java.util.List;
 
+import org.dbflute.exception.ClassificationNotFoundException;
+import org.dbflute.optional.OptionalThing;
+
 /**
  * The meta of classification. <br>
  * It's an internal interface for DBFlute runtime.
@@ -31,31 +34,53 @@ public interface ClassificationMeta {
     String classificationName();
 
     /**
-     * Get classification by the code.
+     * Get the classification of the code. (CaseInsensitive)
+     * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns empty)
+     * @return The optional classification corresponding to the code. (NotNull, EmptyAllowed: if not found, returns empty)
+     */
+    OptionalThing<? extends Classification> of(Object code);
+
+    /**
+     * Find the classification by the name. (CaseInsensitive)
+     * @param name The string of name, which is case-insensitive. (NotNull)
+     * @return The optional classification corresponding to the name. (NotNull, EmptyAllowed: if not found, returns empty)
+     */
+    OptionalThing<? extends Classification> byName(String name);
+
+    /**
+     * (old style)
      * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
      * @return The instance of the classification. (NullAllowed: when not found and code is null)
      */
-    Classification codeOf(Object code);
+    Classification codeOf(Object code); // old style
 
     /**
-     * Get classification by the name.
-     * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
+     * (old style)
+     * @param name The string of name, which is case-insensitive. (NullAllowed: if null, returns null)
      * @return The instance of the classification. (NullAllowed: when not found and name is null)
      */
-    Classification nameOf(String name);
+    Classification nameOf(String name); // old style
 
     /**
      * Get the list of all classification elements. (returns new copied list)
      * @return The snapshot list of classification elements. (NotNull, NotEmpty)
      */
-    List<Classification> listAll(); // actually want to change unmodifiable but for compatible
+    List<Classification> listAll(); // hope to change unmodifiable but for compatible
 
     /**
      * Get the list of group classification elements. (returns new copied list)
-     * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
+     * @param groupName The string of group name, which is case-insensitive. (NotNull)
+     * @return The snapshot list of classification elements. (NotNull)
+     * @throws ClassificationNotFoundException When the group is not found.
+     */
+    List<Classification> listByGroup(String groupName);
+
+    /**
+     * (old style)
+     * @param groupName The string of group name, which is case-insensitive. (NullAllowed: if null, returns empty list)
      * @return The snapshot list of classification elements. (NotNull, EmptyAllowed: if the group is not found)
      */
-    List<Classification> groupOf(String groupName); // actually want to change error if not found but for compatible
+    List<Classification> groupOf(String groupName); // old style
 
     /**
      * Get the code type of the classification. e.g. String, Number

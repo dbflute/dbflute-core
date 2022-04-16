@@ -2057,8 +2057,20 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
-    public boolean isCDefToStringReturnsName() {
-        return getLittleAdjustmentProperties().isCDefToStringReturnsName();
+    public boolean isMakeCDefOldStyleCodeOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleCodeOfMethod();
+    }
+
+    public boolean isMakeCDefOldStyleNameOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleNameOfMethod();
+    }
+
+    public boolean isMakeCDefOldStyleListOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleListOfMethod();
+    }
+
+    public boolean isMakeCDefOldStyleGroupOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleGroupOfMethod();
     }
 
     public String getConditionQueryNotEqualDefinitionName() {

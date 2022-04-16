@@ -36,6 +36,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.table.appcls.refcls.DfRefClsLoadingHandler;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.classification.element.proploading.DfClsElementLiteralArranger;
@@ -196,6 +197,24 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
 
         // already unused @since 1.2.5 but compatible for plain freegen just in case
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
+
+        // old style method option, user property is prior
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        reflectOldStyleOption(optionMap, "isMakeCDefOldStyleCodeOfMethod", littleProp.isMakeCDefOldStyleCodeOfMethod());
+        reflectOldStyleOption(optionMap, "isMakeCDefOldStyleNameOfMethod", littleProp.isMakeCDefOldStyleNameOfMethod());
+        reflectOldStyleOption(optionMap, "isMakeCDefOldStyleListOfMethod", littleProp.isMakeCDefOldStyleListOfMethod());
+        reflectOldStyleOption(optionMap, "isMakeCDefOldStyleGroupOfMethod", littleProp.isMakeCDefOldStyleGroupOfMethod());
+    }
+
+    protected void reflectOldStyleOption(Map<String, Object> optionMap, String key, boolean defaultValue) {
+        if (!optionMap.containsKey(key)) {
+            optionMap.put(key, defaultValue);
+        } else {
+            final Object existingValue = optionMap.get(key);
+            if (existingValue instanceof String) {
+                optionMap.put(key, "true".equalsIgnoreCase(existingValue.toString())); // for template use
+            }
+        }
     }
 
     // ===================================================================================
@@ -337,5 +356,9 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
 
     protected DfClassificationProperties getClassificationProperties() {
         return DfBuildProperties.getInstance().getClassificationProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 }

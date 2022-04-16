@@ -659,11 +659,32 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     // -----------------------------------------------------
-    //                                          Small Option
-    //                                          ------------
-    public boolean isCDefToStringReturnsName() { // closet
-        return isProperty("isCDefToStringReturnsName", false);
+    //                                           CDef Option
+    //                                           -----------
+    public boolean isMakeCDefOldStyleCodeOfMethod() { // closet
+        // default true until removing codeOf() dependencies
+        return isProperty("isMakeCDefOldStyleCodeOfMethod", true);
     }
+
+    public boolean isMakeCDefOldStyleNameOfMethod() { // closet
+        // default true until deprecated version
+        return isProperty("isMakeCDefOldStyleNameOfMethod", true);
+    }
+
+    public boolean isMakeCDefOldStyleListOfMethod() { // closet
+        // default true until deprecated version
+        return isProperty("isMakeCDefOldStyleListOfMethod", true);
+    }
+
+    public boolean isMakeCDefOldStyleGroupOfMethod() { // closet
+        // default true until deprecated version
+        return isProperty("isMakeCDefOldStyleGroupOfMethod", true);
+    }
+
+    // already unused
+    //public boolean isCDefToStringReturnsName() { // closet
+    //    return isProperty("isCDefToStringReturnsName", false);
+    //}
 
     // unsupported since 1.1
     //public boolean isMakeEntityOldStyleClassify() { // closet

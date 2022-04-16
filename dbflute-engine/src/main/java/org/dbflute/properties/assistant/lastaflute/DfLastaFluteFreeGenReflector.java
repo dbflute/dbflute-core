@@ -620,6 +620,7 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -654,6 +655,7 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -715,6 +717,7 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -747,6 +750,17 @@ public final class DfLastaFluteFreeGenReflector {
         final String key = "isSuppressRedundantCommentStop";
         final boolean overriddenValue = false; // used in template so you can use boolean directly
         optionMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
+    }
+
+    // -----------------------------------------------------
+    //                                  CDef OldStyle Option
+    //                                  --------------------
+    protected void doSetupCDefOldStyleOption(Map<String, Object> lastafluteMap, String appName, String clsTheme,
+            Map<String, Object> optionMap) {
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleCodeOfMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleNameOfMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleListOfMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleGroupOfMethod", optionMap);
     }
 
     // -----------------------------------------------------
