@@ -818,19 +818,44 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                          Overridden
     //                                                                          ==========
-    protected <VALUE> VALUE filterOverridden(VALUE overriddenValue, Map<String, Object> lastafluteMap, String appName, String title,
+    protected <VALUE> VALUE filterOverridden(VALUE standardValue, Map<String, Object> lastafluteMap, String appName, String title,
             String key) {
         // e.g. lastafluteMap.dfprop
         //  ; overrideMap = map:{
         //      ; hangar.freeGen.appcls.isSuppressRedundantCommentStop = true
         //  }
+        final VALUE overridingValue = extractOverridingValue(lastafluteMap, appName, title, key);
+        if (overridingValue != null) {
+            if (standardValue instanceof Boolean) {
+                // convert to e.g. "true" to true for template use
+                final Boolean nativeBoolean = "true".equalsIgnoreCase(overridingValue.toString());
+                @SuppressWarnings("unchecked")
+                final VALUE typeMatched = (VALUE) nativeBoolean;
+                return typeMatched;
+            } else {
+                return overridingValue;
+            }
+        } else {
+            return standardValue;
+        }
+    }
+
+    protected void overrideBooleanOptionIfExists(Map<String, Object> lastafluteMap, String appName, String clsTheme, String key,
+            Map<String, Object> optionMap) {
+        final Object overridingValue = extractOverridingValue(lastafluteMap, appName, clsTheme, key);
+        if (overridingValue != null) {
+            optionMap.put(key, "true".equalsIgnoreCase(overridingValue.toString()));
+        }
+    }
+
+    protected <VALUE> VALUE extractOverridingValue(Map<String, Object> lastafluteMap, String appName, String title, String key) {
         @SuppressWarnings("unchecked")
         final Map<String, VALUE> overrideMap = (Map<String, VALUE>) lastafluteMap.get("overrideMap");
         if (overrideMap == null) {
-            return overriddenValue;
+            return null;
         }
         final String fullKey = appName + ".freeGen." + title + "." + key;
-        return (VALUE) overrideMap.getOrDefault(fullKey, overriddenValue);
+        return (VALUE) overrideMap.get(fullKey);
     }
 
     // ===================================================================================
