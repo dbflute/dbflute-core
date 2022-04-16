@@ -173,6 +173,7 @@ public interface ${glCDef} extends Classification {
          * <span style="color: #AD4747; font-size: 120%">Old style so use byName(name).</span>
          * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
+         * @deprecated use byName(name) instead.
          */
         public static ${classificationName} nameOf(String name) { return _slimmer.nameOf(name, nm -> valueOf(nm)); }
 #end
@@ -199,6 +200,7 @@ public interface ${glCDef} extends Classification {
          * <span style="color: #AD4747; font-size: 120%">Old style so use e.g. Stream API with of().</span>
          * @param codeList The list of plain code, which is case-insensitive. (NotNull)
          * @return The snapshot list of classification elements in the code list. (NotNull, EmptyAllowed: when empty specified)
+         * @deprecated use e.g. Stream API with of() instead.
          */
         public static List<${classificationName}> listOf(Collection<String> codeList) { return _slimmer.listOf(codeList); }
 #end
@@ -220,6 +222,7 @@ public interface ${glCDef} extends Classification {
          * <span style="color: #AD4747; font-size: 120%">Old style so use listByGroup(groupName).</span>
          * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
          * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if the group is not found)
+         * @deprecated use listByGroup(groupName) instead.
          */
 #if ($classificationTop.hasGroup())
         public static List<${classificationName}> groupOf(String groupName) {
