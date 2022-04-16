@@ -147,7 +147,7 @@ public interface ${glCDef} extends Classification {
 #if ($classificationTop.hasGroup())
         public boolean inGroup(String groupName) {
 #foreach ($group in $classificationTop.groupList)
-            if ("${group.groupName}".equals(groupName)) { return is${group.groupNameInitCap}(); }
+            if ("${group.groupName}".equalsIgnoreCase(groupName)) { return is${group.groupNameInitCap}(); }
 #end
             return false;
         }
@@ -230,7 +230,7 @@ public interface ${glCDef} extends Classification {
 #if ($classificationTop.hasGroup())
         public static List<${classificationName}> groupOf(String groupName) {
 #foreach ($group in $classificationTop.groupList)
-            if ("${group.groupName}".equals(groupName)) { return listOf${group.groupNameInitCap}(); }
+            if ("${group.groupName}".equalsIgnoreCase(groupName)) { return listOf${group.groupNameInitCap}(); }
 #end
             return new ArrayList<>();
         }

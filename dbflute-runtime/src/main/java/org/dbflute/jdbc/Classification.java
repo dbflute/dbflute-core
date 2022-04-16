@@ -51,14 +51,14 @@ public interface Classification {
 
     /**
      * Is the classification in the group?
-     * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns false)
+     * @param groupName The string of group name, which is case-insensitive. (NullAllowed: if null, returns false)
      * @return The determination, true or false. (true: this classification is in the group)
      */
     boolean inGroup(String groupName);
 
     /**
      * Get the map of sub items that are your original attributes.
-     * @return The read-only map of sub-items. (NotNull, EmptyAllowed)
+     * @return The read-only map of sub-items, whose key is case-sensitive. (NotNull, EmptyAllowed)
      */
     Map<String, Object> subItemMap();
 
