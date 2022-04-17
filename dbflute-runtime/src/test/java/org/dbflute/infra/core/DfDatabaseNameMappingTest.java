@@ -18,6 +18,7 @@ package org.dbflute.infra.core;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.dbway.DBDef;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -52,5 +53,12 @@ public class DfDatabaseNameMappingTest extends RuntimeTestCase {
         final Map<String, Map<String, String>> databaseBaseInfo = config.analyze();
         assertNotNull(databaseBaseInfo);
         log("databaseBaseInfoTest=" + databaseBaseInfo);
+    }
+
+    public void test_findDBDef() {
+        final DfDatabaseNameMapping mapping = DfDatabaseNameMapping.getInstance();
+        assertEquals(DBDef.Oracle, mapping.findDBDef("oracle"));
+        assertEquals(DBDef.Unknown, mapping.findDBDef("none"));
+        assertEquals(DBDef.Unknown, mapping.findDBDef(null)); // treated as default
     }
 }

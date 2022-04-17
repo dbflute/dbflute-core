@@ -196,7 +196,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (meta == null) { // no way (just in case)
             return null;
         }
-        return meta.codeOf(code);
+        return meta.of(code).orElse(null);
     }
 
     protected static Integer cti(Object value) { // convertToInteger
@@ -893,7 +893,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap, boolean pkOnly) {
         final List<ColumnInfo> columnInfoList = pkOnly ? getPrimaryInfo().getPrimaryColumnList() : getColumnInfoList();
         final MetaHandlingMapToEntityMapper mapper = createMetaHandlingMapToEntityMapper(columnMap);
-        mapper.mappingToEntity(entity, columnMap, columnInfoList);
+        mapper.mappingToEntity(entity, columnInfoList);
     }
 
     protected MetaHandlingMapToEntityMapper createMetaHandlingMapToEntityMapper(Map<String, ? extends Object> columnMap) {

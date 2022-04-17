@@ -2632,12 +2632,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     ===============
     // handleShortChar()
     protected String hSC(String columnName, String value, Integer size, String modeCode) {
-        final ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);
-        if (mode == null) {
-            String msg = "The mode was not found by the code: ";
-            msg = msg + " columnName=" + columnName + " modeCode=" + modeCode;
-            throw new IllegalStateException(msg);
-        }
+        final ShortCharHandlingMode mode = ShortCharHandlingMode.of(modeCode).orElseTranslatingThrow(cause -> {
+            String msg = "The mode was not found by the code: columnName=" + columnName + " modeCode=" + modeCode;
+            throw new IllegalStateException(msg, cause); // basically no way, as specified by generated code
+        });
         return FunCustodial.handleShortChar(columnName, value, size, mode);
     }
 

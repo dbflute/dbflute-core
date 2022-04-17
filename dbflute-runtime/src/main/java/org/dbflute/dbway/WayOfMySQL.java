@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.optional.OptionalThing;
+
 /**
  * The DB-way of MySQL.
  * @author jflute
@@ -112,6 +114,7 @@ public class WayOfMySQL implements DBWay, Serializable {
         , InNaturalLanguageMode("in natural language mode") //
         , InNaturalLanguageModeWithQueryExpansion("in natural language mode with query expansion") //
         , WithQueryExpansion("with query expansion");
+
         private static final Map<String, FullTextSearchModifier> _codeValueMap = new HashMap<String, FullTextSearchModifier>();
         static {
             for (FullTextSearchModifier value : values()) {
@@ -128,11 +131,27 @@ public class WayOfMySQL implements DBWay, Serializable {
             return _code;
         }
 
-        public static FullTextSearchModifier codeOf(Object code) {
+        public static OptionalThing<FullTextSearchModifier> of(Object code) {
             if (code == null) {
-                return null;
+                return OptionalThing.ofNullable(null, () -> {
+                    throw new IllegalArgumentException("The argument 'code' should not be null.");
+                });
             }
-            return _codeValueMap.get(code.toString().toLowerCase());
+            if (code instanceof FullTextSearchModifier) {
+                return OptionalThing.of((FullTextSearchModifier) code);
+            }
+            if (code instanceof OptionalThing<?>) {
+                return of(((OptionalThing<?>) code).orElse(null));
+            }
+            final FullTextSearchModifier modifier = _codeValueMap.get(code.toString().toLowerCase());
+            return OptionalThing.ofNullable(modifier, () -> {
+                throw new IllegalStateException("Not found the modifier by the code: " + code);
+            });
+        }
+
+        @Deprecated
+        public static FullTextSearchModifier codeOf(Object code) {
+            return of(code).orElse(null);
         }
     }
 }

@@ -447,11 +447,9 @@ public class SqlAnalyzer {
             String msg = "Unknown loop variable comment: " + comment;
             throw new IllegalStateException(msg);
         }
-        final LoopVariableType type = LoopVariableType.codeOf(code);
-        if (type == null) { // no way
-            String msg = "Unknown loop variable comment: " + comment;
-            throw new IllegalStateException(msg);
-        }
+        final LoopVariableType type = LoopVariableType.of(code).orElseTranslatingThrow(cause -> {
+            throw new IllegalStateException("Unknown loop variable comment: " + comment, cause); // no way
+        });
         final String condition = comment.substring(type.name().length()).trim();
         final LoopAbstractNode loopFirstNode = createLoopFirstNode(condition, type);
         peek().addChild(loopFirstNode);

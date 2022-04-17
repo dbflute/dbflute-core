@@ -18,6 +18,7 @@ package org.dbflute.dbway;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dbflute.optional.OptionalThing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,19 +68,32 @@ public enum DBDef {
     }
 
     /**
-     * @param code The code of the DB. (NullAllowed: If the code is null, it returns null)
-     * @return The instance that has the code. (NullAllowed)
+     * @param code The code of the DB. (NullAllowed: If the code is null, it returns empty)
+     * @return The optional instance that has the code. (NotNull, EmptyAllowed: if not found)
      */
-    public static DBDef codeOf(String code) {
+    public static OptionalThing<DBDef> of(String code) {
         if (code == null) {
-            return null;
+            return OptionalThing.ofNullable(null, () -> {
+                throw new IllegalArgumentException("null code specified");
+            });
         }
         final String lowerCaseCode = code.toLowerCase();
         DBDef def = _codeValueMap.get(lowerCaseCode);
         if (def == null) {
             def = _codeAliasValueMap.get(lowerCaseCode);
         }
-        return def;
+        return OptionalThing.ofNullable(def, () -> {
+            throw new IllegalStateException("Not found the DB definition by the code: " + code);
+        });
+    }
+
+    /**
+     * @param code The code of the DB. (NullAllowed: If the code is null, it returns null)
+     * @return The instance that has the code. (NullAllowed)
+     * @deprecated use of().
+     */
+    public static DBDef codeOf(String code) {
+        return of(code).orElse(null);
     }
 
     // ===================================================================================

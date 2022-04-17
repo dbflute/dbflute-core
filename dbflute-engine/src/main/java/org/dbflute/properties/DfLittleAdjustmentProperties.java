@@ -571,10 +571,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
             }
         }
         final String code = doGetClassificationUndefinedHandlingType(defaultValue);
-        final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
-        if (handlingType == null) {
-            throwUnknownClassificationUndefinedHandlingTypeException(code, KEY_littleAdjustmentMap + ".dfprop");
-        }
+        final ClassificationUndefinedHandlingType handlingType =
+                ClassificationUndefinedHandlingType.of(code).orElseTranslatingThrow(cause -> {
+                    throwUnknownClassificationUndefinedHandlingTypeException(code, KEY_littleAdjustmentMap + ".dfprop", cause);
+                    return null; // unreachable
+                });
         return handlingType;
     }
 
@@ -582,7 +583,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return getProperty("classificationUndefinedHandlingType", defaultValue);
     }
 
-    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code, String dfpropFile) {
+    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code, String dfpropFile, Throwable cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown handling type of classification undefined code.");
         br.addItem("Advice");
@@ -604,7 +605,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         br.addItem("dfprop File");
         br.addElement(dfpropFile);
         final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
+        throw new DfIllegalPropertySettingException(msg, cause);
     }
 
     public boolean isPlainCheckClassificationCode() { // for e.g. classificationResource
@@ -662,7 +663,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     //                                           CDef Option
     //                                           -----------
     public boolean isMakeCDefOldStyleCodeOfMethod() { // closet
-        // default true until removing codeOf() dependencies
+        // default true until removing old style dependencies
         return isProperty("isMakeCDefOldStyleCodeOfMethod", true);
     }
 

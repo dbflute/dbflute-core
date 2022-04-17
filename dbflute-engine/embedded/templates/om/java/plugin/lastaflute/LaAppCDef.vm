@@ -406,9 +406,7 @@ public interface ${glCDef} extends Classification {
                 return OptionalThing.of(cls);
             }
             if (code instanceof OptionalThing<?>) {
-                @SuppressWarnings("unchecked")
-                CLS cls = ((OptionalThing<CLS>) code).orElse(null);
-                return of(cls.code());
+                return of(((OptionalThing<?>) code).orElse(null));
             }
             return OptionalThing.ofNullable(_codeClsMap.get(code.toString().toLowerCase()), () -> {
                 throw new ClassificationNotFoundException("Unknown classification code: " + code);

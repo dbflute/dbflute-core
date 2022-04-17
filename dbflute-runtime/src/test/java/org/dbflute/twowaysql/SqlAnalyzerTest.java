@@ -136,6 +136,31 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         assertEquals(0, ctx.getBindVariables().length);
     }
 
+    public void test_analyze_FOR_loopVariable() {
+        // ## Arrange ##
+        StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(ln());
+        sb.append(ln()).append("/*FOR pmb.dstore*//*FIRST*/han/*END*/");
+        sb.append(ln()).append("/*$#current*/mystic");
+        sb.append(ln()).append("/*LAST*/gar/*END*//*END*/");
+        sb.append(ln()).append("/*FOR pmb.bonvo*/oneman/*END*/");
+        sb.append(ln()).append("/*$pmb.iks*/");
+        String twoway = sb.toString();
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        assertEquals("select *\n\nhan\nuni\n\ncity\ngar\n\namba", sql);
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
     // ===================================================================================
     //                                                                BindVariable Comment
     //                                                                ====================

@@ -42,17 +42,14 @@ public class ${glDBCurrent} {
 
     protected DBDef _currentDBDef;
     {
-        _currentDBDef = DBDef.codeOf("${database.defaultDBDef}");
-        if (_currentDBDef == null) {
-            _currentDBDef = DBDef.Unknown;
-        }
+        _currentDBDef = DBDef.of("${database.defaultDBDef}").orElse(DBDef.Unknown);
     }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
+     * Only for singleton.
      */
     private ${glDBCurrent}() {
     }
@@ -61,8 +58,8 @@ public class ${glDBCurrent} {
     //                                                                           Singleton
     //                                                                           =========
     /**
-     * Get singleton instance.
-     * @return Singleton instance. (NotNull)
+     * Get the saved singleton instance.
+     * @return always same instance. (NotNull)
      */
     public static ${glDBCurrent} getInstance() {
         return _instance;

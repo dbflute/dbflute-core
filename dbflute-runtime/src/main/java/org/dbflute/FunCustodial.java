@@ -204,7 +204,7 @@ public class FunCustodial {
         if (!undefinedHandlingType.isChecked()) { // basically no way (not called if no check)
             return;
         }
-        if (meta.codeOf(code) != null) {
+        if (meta.of(code).isPresent()) {
             return;
         }
         final boolean allowedByOption = entity.myundefinedClassificationAccessAllowed();

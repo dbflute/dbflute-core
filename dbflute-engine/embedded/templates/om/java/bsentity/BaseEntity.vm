@@ -228,7 +228,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
      * @param determination The determination, true or false. (NullAllowed: if null, null value is set to the column)
      */
     public void set${col.javaName}AsBoolean(Boolean determination) {
-        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).orElse(null));
     }
 #end
 

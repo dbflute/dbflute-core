@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.exception.ForCommentIllegalParameterBeanSpecificationException;
 import org.dbflute.twowaysql.exception.ForCommentParameterNotListException;
@@ -200,6 +201,7 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
                 return new LoopLastNode(expression, specifiedSql);
             }
         });
+
         private static final Map<String, LoopVariableType> _codeValueMap = new HashMap<String, LoopVariableType>();
         static {
             for (LoopVariableType value : values()) {
@@ -218,14 +220,27 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
             return _code;
         }
 
-        public static LoopVariableType codeOf(Object code) {
+        public static OptionalThing<LoopVariableType> of(Object code) {
             if (code == null) {
-                return null;
+                return OptionalThing.ofNullable(null, () -> {
+                    throw new IllegalArgumentException("The argument 'code' should not be null.");
+                });
             }
             if (code instanceof LoopVariableType) {
-                return (LoopVariableType) code;
+                return OptionalThing.of((LoopVariableType) code);
             }
-            return _codeValueMap.get(code.toString().toLowerCase());
+            if (code instanceof OptionalThing<?>) {
+                return of(((OptionalThing<?>) code).orElse(null));
+            }
+            final LoopVariableType modifier = _codeValueMap.get(code.toString().toLowerCase());
+            return OptionalThing.ofNullable(modifier, () -> {
+                throw new IllegalStateException("Not found the type by the code: " + code);
+            });
+        }
+
+        @Deprecated
+        public static LoopVariableType codeOf(Object code) {
+            return of(code).orElse(null);
         }
 
         public LoopAbstractNode createNode(String expression, String specifiedSql) {

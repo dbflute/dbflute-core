@@ -126,7 +126,6 @@ public class DfDatabaseNameMapping {
             String msg = "The database should have its defName: " + mapping;
             throw new IllegalStateException(msg);
         }
-        final DBDef dbdef = DBDef.codeOf(defName);
-        return dbdef != null ? dbdef : DBDef.Unknown;
+        return DBDef.of(defName).orElse(DBDef.Unknown);
     }
 }

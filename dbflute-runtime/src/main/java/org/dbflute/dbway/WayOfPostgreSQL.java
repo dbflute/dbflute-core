@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.optional.OptionalThing;
+
 /**
  * The DB-way of PostgreSQL.
  * @author jflute
@@ -92,6 +94,7 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
     //                                                                ====================
     public enum OperandOfLikeSearch implements ExtensionOperand {
         BASIC("like"), CASE_INSENSITIVE("ilike"), FULL_TEXT_SEARCH("%%"), OLD_FULL_TEXT_SEARCH("@@");
+
         private static final Map<String, OperandOfLikeSearch> _codeValueMap = new HashMap<String, OperandOfLikeSearch>();
         static {
             for (OperandOfLikeSearch value : values()) {
@@ -108,11 +111,27 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
             return _code;
         }
 
-        public static OperandOfLikeSearch codeOf(Object code) {
+        public static OptionalThing<OperandOfLikeSearch> of(Object code) {
             if (code == null) {
-                return null;
+                return OptionalThing.ofNullable(null, () -> {
+                    throw new IllegalArgumentException("The argument 'code' should not be null.");
+                });
             }
-            return _codeValueMap.get(code.toString().toLowerCase());
+            if (code instanceof OperandOfLikeSearch) {
+                return OptionalThing.of((OperandOfLikeSearch) code);
+            }
+            if (code instanceof OptionalThing<?>) {
+                return of(((OptionalThing<?>) code).orElse(null));
+            }
+            final OperandOfLikeSearch operand = _codeValueMap.get(code.toString().toLowerCase());
+            return OptionalThing.ofNullable(operand, () -> {
+                throw new IllegalStateException("Not found the operand by the code: " + code);
+            });
+        }
+
+        @Deprecated
+        public static OperandOfLikeSearch codeOf(Object code) {
+            return of(code).orElse(null);
         }
 
         public String operand() {

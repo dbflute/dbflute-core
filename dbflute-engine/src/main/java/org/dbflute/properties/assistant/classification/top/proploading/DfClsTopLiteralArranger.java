@@ -107,14 +107,15 @@ public class DfClsTopLiteralArranger {
         final ClassificationUndefinedHandlingType defaultType = prop.getClassificationUndefinedHandlingType();
         final String defaultValue = defaultType.code();
         final String code = getProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
-        final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
-        if (handlingType == null) {
-            throwUnknownClassificationUndefinedCodeHandlingTypeException(code);
-        }
+        final ClassificationUndefinedHandlingType handlingType =
+                ClassificationUndefinedHandlingType.of(code).orElseTranslatingThrow(cause -> {
+                    throwUnknownClassificationUndefinedCodeHandlingTypeException(code, cause);
+                    return null; // unreachable
+                });
         return handlingType;
     }
 
-    protected void throwUnknownClassificationUndefinedCodeHandlingTypeException(String code) {
+    protected void throwUnknownClassificationUndefinedCodeHandlingTypeException(String code, Throwable cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown handling type of classification undefined code.");
         br.addItem("Advice");
@@ -136,7 +137,7 @@ public class DfClsTopLiteralArranger {
         br.addItem("Specified Unknown Type");
         br.addElement(code);
         final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
+        throw new DfIllegalPropertySettingException(msg, cause);
     }
 
     // user closet, old style

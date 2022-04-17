@@ -23,6 +23,14 @@ import org.dbflute.unit.RuntimeTestCase;
  */
 public class DBDefTest extends RuntimeTestCase {
 
+    public void test_of_basic() throws Exception {
+        assertEquals(DBDef.MySQL, DBDef.of("mysql").get());
+        assertEquals(DBDef.MySQL, DBDef.of("MySQL").get());
+        assertEquals(DBDef.PostgreSQL, DBDef.of("postgresql").get());
+        assertException(IllegalArgumentException.class, () -> DBDef.of(null).get());
+        assertException(IllegalStateException.class, () -> DBDef.of("none").get());
+    }
+
     public void test_switchDBWay_basic() throws Exception {
         // ## Arrange ##
         DBWay original = DBDef.MySQL.dbway();
