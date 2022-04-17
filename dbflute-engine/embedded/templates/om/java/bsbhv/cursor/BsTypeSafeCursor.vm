@@ -19,6 +19,7 @@ ${database.allClassCopyright}package ${myBaseCursorPackageName};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.dbflute.jdbc.CursorAccessor;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 
@@ -29,7 +30,7 @@ import org.dbflute.s2dao.valuetype.TnValueTypes;
 #end
  * @author ${database.classAuthor}
  */
-public class ${myClassName} {
+public class ${myClassName} implements CursorAccessor {
 
     // ===================================================================================
     //                                                                          Definition
@@ -76,10 +77,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
-    /**
-     * Accept the result set.
-     * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
-     */
+    /** {@inheritDoc} */
     public void accept(ResultSet rs) {
         this._rs = rs;
     }
@@ -87,10 +85,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                              Direct
     //                                                                              ======
-    /**
-     * Get the wrapped cursor (result set).
-     * @return The instance of result set. (NotNull)
-     */
+    /** {@inheritDoc} */
     public ResultSet cursor() {
         return _rs;
     }
@@ -98,11 +93,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Delegate
     //                                                                            ========
-    /**
-     * Move to next result.
-     * @return Is exist next result.
-     * @throws SQLException When it fails to move the cursor to next point.
-     */
+    /** {@inheritDoc} */
     public boolean next() throws SQLException {
         return _rs.next();
     }
@@ -110,7 +101,11 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                  Type Safe Accessor
     //                                                                  ==================
+#set ($index = 0)
 #foreach ($col in $table.columns)
+#if ($index >= 1)
+
+#end
     /**
      * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
@@ -122,6 +117,6 @@ public class ${myClassName} {
     public ${col.javaNative} get${col.javaName}() throws SQLException {
         return (${col.javaNative})_vt${col.javaName}.getValue(_rs, DB_NAME_${col.name});
     }
-
+#set ($index = $index + 1)
 #end
 }

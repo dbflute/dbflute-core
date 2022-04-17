@@ -19,17 +19,29 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * The handler of cursor. <br>
- * Basically implemented by generated CursorHandler classes for OutsideSql.
+ * The accessor of cursor. <br>
+ * Basically implemented by generated Cursor classes for OutsideSql.
  * @author jflute
+ * @since 1.2.6 (2022/04/17 Sunday)
  */
-public interface CursorHandler {
+public interface CursorAccessor {
 
     /**
-     * Handle the cursor.
+     * Accept the result set.
      * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
-     * @return The result object of handling process. (NullAllowed)
-     * @throws SQLException When it fails to handle the SQL.
      */
-    Object handle(ResultSet rs) throws SQLException;
+    void accept(ResultSet rs);
+
+    /**
+     * Get the wrapped cursor (result set).
+     * @return The instance of result set. (NotNull)
+     */
+    ResultSet cursor();
+
+    /**
+     * Move to next result.
+     * @return Does the next result exist?
+     * @throws SQLException When it fails to move the cursor to next point.
+     */
+    boolean next() throws SQLException;
 }
