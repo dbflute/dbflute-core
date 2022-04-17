@@ -24,11 +24,12 @@ import org.apache.log4j.helpers.CountingQuietWriter;
 import org.apache.log4j.helpers.LogLog;
 
 /**
- * The appender using rolling-file for DBFlute.
+ * The appender using rolling-file for DBFlute. <br>
+ * Mainly for backup file customization. (e.g. dbflute-backup1.log)
  * @author jflute
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
-public class DfFlutistRollingFileAppender extends RollingFileAppender {
+public class DfFlutistRollingFileAppender extends RollingFileAppender { // used by log4j.properties
 
     // ===================================================================================
     //                                                                         Constructor

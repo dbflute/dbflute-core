@@ -23,6 +23,7 @@ import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.dbflute.friends.log4j.DfFlutistRollingFileAppender;
 import org.dbflute.util.DfTypeUtil;
 
+// #for_now jflute already unused so maybe deleted future (2022/04/17)
 /**
  * The log system using Log4j for DBFlute.
  * @author jflute
