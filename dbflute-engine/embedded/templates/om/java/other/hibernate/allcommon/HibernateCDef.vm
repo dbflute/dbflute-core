@@ -18,6 +18,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import java.util.*;
 import static ${glPackageBaseCommon}.${glCDef}.XInternalCDefUtil.emptyStrings;
 
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ 
+## memorable function, so keep compatible by jflute (2022/04/17)
+## _/_/_/_/_/_/_/_/_/_/
 /**
  * The definition of classification.
  * @author ${database.classAuthor}

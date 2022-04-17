@@ -197,7 +197,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
-        return ${glCDef}.${col.classificationName}.codeOf(get${col.javaName}());
+        return ${glCDef}.${col.classificationName}.of(get${col.javaName}()).orElse(null);
     }
 
     /**

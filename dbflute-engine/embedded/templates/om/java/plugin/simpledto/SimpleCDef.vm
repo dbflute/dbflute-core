@@ -52,6 +52,9 @@ import static org.dbflute.util.DfTypeUtil.emptyStrings;
 import static ${database.simpleCDefPackage}.${database.simpleCDefClass}.XInternalCDefUtil.emptyStrings;
 #end
 
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ 
+## memorable function, so keep compatible by jflute (2022/04/17)
+## _/_/_/_/_/_/_/_/_/_/
 /**
  * The definition of classification.
  * @author ${database.classAuthor}
