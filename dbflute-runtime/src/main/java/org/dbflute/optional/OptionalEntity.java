@@ -127,37 +127,37 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * @param <EMPTY> The type of empty optional entity.
      * @param entity The base entity of the relation for exception message. (NotNull)
-     * @param relation The property name of the relation for exception message. (NotNull)
+     * @param relationship The property name of the relation for exception message. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
      */
-    public static <EMPTY> OptionalEntity<EMPTY> relationEmpty(final Object entity, final String relation) {
+    public static <EMPTY> OptionalEntity<EMPTY> relationEmpty(final Object entity, final String relationship) {
         if (entity == null) {
             String msg = "The argument 'entity' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        if (relation == null) {
-            String msg = "The argument 'relation' should not be null.";
+        if (relationship == null) {
+            String msg = "The argument 'relationship' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         return new OptionalEntity<EMPTY>(null, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
-                throwNonSetupSelectRelationAccessException(entity, relation);
+                throwNonSetupSelectRelationAccessException(entity, relationship);
             }
         });
     }
 
-    protected static void throwNonSetupSelectRelationAccessException(Object entity, String relation) {
+    protected static void throwNonSetupSelectRelationAccessException(Object entity, String relationship) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Non-setupSelect relation was accessed.");
+        br.addNotice("Non-setupSelect relationship was accessed by your code.");
         br.addItem("Advice");
-        br.addElement("Confirm your access to the relation.");
+        br.addElement("Confirm your access to the relationship.");
         br.addElement("Call setupSelect or fix your access.");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    memberBhv.selectList(cb -> {");
-        br.addElement("        cb.setupSelect_MemberStatus();");
+        br.addElement("        cb.setupSelect_MemberStatus(); // status");
         br.addElement("    }).forEach(member -> {");
-        br.addElement("        ... = member.getMemberSecurityAsOne().alwaysPresent(...); // *NG");
+        br.addElement("        ... = member.getMemberSecurityAsOne().alwaysPresent(...); // *NG: security");
         br.addElement("    });");
         br.addElement("  (o): (fix access mistake)");
         br.addElement("    List<Member> memberList = memberBhv.selectList(cb -> {");
@@ -171,8 +171,10 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         br.addElement("    }).forEach(member -> {");
         br.addElement("        ... = member.getMemberSecurityAsOne().alwaysPresent(...);");
         br.addElement("    });");
-        br.addItem("Your Relation");
-        br.addElement(entity.getClass().getSimpleName() + "." + relation);
+        br.addItem("Local Table");
+        br.addElement(entity);
+        br.addItem("Accessed Relationship");
+        br.addElement(entity.getClass().getSimpleName() + "." + relationship);
         final String msg = br.buildExceptionMessage();
         throw new NonSetupSelectRelationAccessException(msg);
     }
