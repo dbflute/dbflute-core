@@ -28,12 +28,14 @@ import java.util.Set;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.friends.velocity.DfFlutistLog4JLogSystem;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
@@ -290,8 +292,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             generator.setProperty("classpath.resource.loader.cache", "false");
             generator.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
         }
-        // velocity.log is unneeded for debug so remove it (also for removing log4j dependencies) by jflute (2022/04/17)
-        //generator.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfFlutistLog4JLogSystem.class.getName());
+        // this setting needs to remove velocity.log (default makes it directly under DBFlute client) by jflute (2022/04/17)
+        generator.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfFlutistLog4JLogSystem.class.getName());
     }
 
     protected DfGenerator setupGenerator() {
