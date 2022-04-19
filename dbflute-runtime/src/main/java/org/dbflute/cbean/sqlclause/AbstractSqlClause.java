@@ -180,7 +180,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     protected Map<String, String> _selectColumnKeyNameMap;
 
-    /** Is use select index? Default value is true. */
+    // TODO jflute xxxx (2022/04/19)
+    /** Is use select index? e.g. select MEMBER_NAME as c1, Default value is true. */
     protected boolean _useSelectIndex = true;
 
     /** The limit size of alias name to adjust alias length on query. */
@@ -231,13 +232,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Fetch Property
     //                                        --------------
-    /** Fetch start index. (for fetchXxx()) */
+    /** Fetch start index of scope select, different from paging offset. (for fetchXxx()) */
     protected int _fetchStartIndex = 0;
 
-    /** Fetch size. (for fetchXxx()) */
+    /** Fetch size, basically same as pageSize. (for fetchXxx()) */
     protected int _fetchSize = 0;
 
-    /** Fetch page number. (for fetchXxx()) This value should be plus. */
+    /** Fetch page number, which means current page number. (for fetchXxx()) This value should be plus. */
     protected int _fetchPageNumber = 1;
 
     /** Is fetch-narrowing effective? Default value is false but true when registered. */
@@ -391,9 +392,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
+     * Basic Constructor.
      * @param tableDbName The DB name of table. (NotNull)
-     **/
+     */
     public AbstractSqlClause(String tableDbName) {
         if (tableDbName == null) {
             String msg = "The argument 'tableDbName' should not be null.";

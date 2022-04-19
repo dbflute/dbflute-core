@@ -102,20 +102,28 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                       =============
     /**
      * Fetch first records only.
+     * <pre>
      * e.g. ConditionBean
-     * MemberCB cb = new MemberCB();
-     * cb.query().setMemberName_PrefixSearch("S");
-     * cb.query().addOrderBy_Birthdate_Desc();
-     * cb.<span style="color: #CC4747">fetchFirst</span>(5); <span style="color: #3F7E5E">// top 5</span>
-     * ListResultBean&lt;Member&gt; memberList = memberBhv.<span style="color: #CC4747">selectList</span>(cb);
-     * @param fetchSize The size of fetch. (NotMinus, NotZero)
+     *  MemberCB cb = new MemberCB();
+     *  cb.query().setMemberName_PrefixSearch("S");
+     *  cb.query().addOrderBy_Birthdate_Desc();
+     *  cb.<span style="color: #CC4747">fetchFirst</span>(5); <span style="color: #3F7E5E">// top 5</span>
+     *  ListResultBean&lt;Member&gt; memberList = memberBhv.<span style="color: #CC4747">selectList</span>(cb);
+     * </pre>
+     * @param fetchSize The size of fetching. (NotMinus, NotZero)
      * @return this. (NotNull)
      */
     PagingBean fetchFirst(int fetchSize);
 
     /**
-     * Fetch records in the scope only. {Internal}<br>
-     * This method is an old style, so you should use paging() instead of this. <br>
+     * Fetch records in the scope only. <br>
+     * Useful when you cannot derive paging() arguments. <br>
+     * (For example, frontend sends only start and end indexes) <br>
+     * 
+     * <p>This was internal method but needed so you can use this in your application.</p>
+     * 
+     * <del>This method is an old style, so you should use paging() instead of this.</del>
+     * 
      * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
      * @param fetchSize The size of fetch. (NotMinus, NotZero)
      * @return this. (NotNull)
@@ -123,7 +131,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     PagingBean xfetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page. {Internal}<br>
+     * Fetch the page records only. {Internal}<br>
      * This method is an old style, so you should use paging() instead of this. <br>
      * When you call this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br>
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br>
@@ -148,32 +156,35 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                      Fetch Property
     //                                                                      ==============
     /**
-     * Get fetch start index.
-     * @return The index of fetch-start.
+     * Get fetch start index of scope select, different from paging offset. <br>
+     * Basically used by fetchScope().
+     * @return The start index to fetch. 0 origin (NotMinus)
      */
     int getFetchStartIndex();
 
     /**
-     * Get fetch size of paging, also called page size.
-     * @return The size of fetching rows.
+     * Get the size to fetch page records, basically same as pageSize.
+     * @return The record size to fetch. (NotMinus)
      */
     int getFetchSize();
 
     /**
-     * Get fetch page number.
-     * @return The page number of fetch.
+     * Get the page number to fetch page records, which means current page number.
+     * @return The page number to fetch. 1 origin. (NotMinus, NotZero)
      */
     int getFetchPageNumber();
 
     /**
-     * Get page start index.
-     * @return The index of page start, 0 origin. (NotMinus)
+     * Get the start index of selected current page, as paging offset. <br>
+     * e.g. pageSize=4, pageNumber=3 then pageStartIndex=8
+     * @return The start index of the selected page. 0 origin. (NotMinus)
      */
     int getPageStartIndex();
 
     /**
-     * Get page end index.
-     * @return The index of page end, 0 origin. (NotMinus)
+     * Get the end index of selected current page. <br>
+     * e.g. pageSize=4, pageNumber=3 then pageStartIndex=12
+     * @return The end index of the selected page. 0 origin. (NotMinus)
      */
     int getPageEndIndex();
 

@@ -166,7 +166,7 @@ public interface SqlClause {
     void changeAliasNameLimitSize(int aliasNameLimitSize);
 
     /**
-     * Disable select index.
+     * Disable select index. (select index is e.g. select MEMBER_NAME as c1)
      */
     void disableSelectIndex();
 
@@ -646,19 +646,19 @@ public interface SqlClause {
     //                                                                          ==========
     /**
      * Fetch first several rows only.
-     * @param fetchSize The size of fetching. (NotMinus)
+     * @param fetchSize The size of fetching. (NotMinus, NotZero)
      */
     void fetchFirst(int fetchSize);
 
     /**
-     * Fetch scope (skip first several rows, and fetch first rows).
+     * Fetch the scoped records only. (skip first several rows, and fetch first rows)
      * @param fetchStartIndex The index of fetch-start. 0 origin. (NotMinus)
      * @param fetchSize The size of fetching from start index. (NotMinus)
      */
     void fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page.
+     * Fetch the page records only.
      * <p>
      * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
@@ -669,32 +669,35 @@ public interface SqlClause {
     void fetchPage(int fetchPageNumber);
 
     /**
-     * Get fetch start index.
-     * @return Fetch start index.
+     * Get start index to fetch scoped records, different from paging offset. <br>
+     * Basically used by fetchScope().
+     * @return The start index to fetch. 0 origin (NotMinus)
      */
     int getFetchStartIndex();
 
     /**
-     * Get fetch size.
-     * @return Fetch size.
+     * Get the size to fetch page records, basically same as pageSize.
+     * @return The record size to fetch. (NotMinus)
      */
     int getFetchSize();
 
     /**
-     * Get fetch page number.
-     * @return Fetch page number.
+     * Get the page number to fetch page records, which means current page number.
+     * @return The page number to fetch. 1 origin. (NotMinus, NotZero)
      */
     int getFetchPageNumber();
 
     /**
-     * Get page start index.
-     * @return Page start index. 0 origin. (NotMinus)
+     * Get the start index of selected current page, as paging offset. <br>
+     * e.g. pageSize=4, pageNumber=3 then pageStartIndex=8
+     * @return The start index of the selected page. 0 origin. (NotMinus)
      */
     int getPageStartIndex();
 
     /**
-     * Get page end index.
-     * @return Page end index. 0 origin. (NotMinus)
+     * Get the end index of selected current page. <br>
+     * e.g. pageSize=4, pageNumber=3 then pageStartIndex=12
+     * @return The end index of the selected page. 0 origin. (NotMinus)
      */
     int getPageEndIndex();
 
