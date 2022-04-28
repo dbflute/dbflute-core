@@ -2735,6 +2735,11 @@ public class Database {
         return filterComponentNameWithProjectPrefix(filterComponentNameWithAllcommonPrefix(filtered));
     }
 
+    public boolean isDBFluteModuleGuiceRuntimeComponentByName() {
+        final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
+        return prop.isDBFluteModuleGuiceRuntimeComponentByName();
+    }
+
     // -----------------------------------------------------
     //                                     Filtering Utility
     //                                     -----------------
