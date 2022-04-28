@@ -194,26 +194,6 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o multipleSchemaSyncCheckMap: (NotRequired - Default map:{})
-    #
-    # created by #dbflute_intro
-    ; multipleSchemaSyncCheckMap = map:{
-        ; previow.EXAMPLEDB = map:{
-            ; url = jdbc:...
-            ; schema = EXAMPLEDB
-            ; user = exampuser
-            ; password = exampword
-        }
-        ; staging.EXAMPLEDB2 = map:{
-            ; url = jdbc:...
-            ; schema = EXAMPLEDB
-            ; user = exampuser
-            ; password = exampword
-        }
-    }
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o propertiesHtmlMap: (NotRequired - Default map:{})
     #  You can set PropertiesHtml settings.
     #  Elements of this map are as below:

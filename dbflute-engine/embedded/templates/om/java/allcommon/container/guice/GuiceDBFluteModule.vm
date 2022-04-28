@@ -18,7 +18,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import javax.sql.DataSource;
 
 import com.google.inject.AbstractModule;
-#if ($xxx)
+#if ($database.isDBFluteModuleGuiceRuntimeComponentByName())
 import com.google.inject.name.Names;
 #end
 import org.dbflute.bhv.BehaviorSelector;
