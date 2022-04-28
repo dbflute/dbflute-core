@@ -30,6 +30,9 @@ rm ./log/*.log
 . diffworld-test.sh
 . lrevworld-test.sh
 . syncworld-test.sh
+cd ../dbflute_resortlinedb
+rm ./log/*.log
+. manage.sh renewal
 cd ..
 mvn -e compile
 
