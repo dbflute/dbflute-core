@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.util.DfTypeUtil;
@@ -108,22 +110,6 @@ public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProp
             }
         }
         return mapProp("torque." + key, defaultValue);
-    }
-
-    // ===================================================================================
-    //                                                                    Filter Component
-    //                                                                    ================
-    public String filterRuntimeComponentPrefix(String componentName) {
-        if (getBasicProperties().isTargetContainerSpring()) {
-            final String prefix = getDBFluteBeansRuntimeComponentPrefix();
-            if (prefix == null || prefix.trim().length() == 0) {
-                return componentName;
-            }
-            final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
-            return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
-        } else {
-            return componentName;
-        }
     }
 
     // ===================================================================================
@@ -315,6 +301,78 @@ public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProp
 
     public String getRdbDiXmlResourceName() { // Java Only
         return getProperty("rdbDiXmlResourceName", getLanguageFramework().getRdbDiXmlResourceName());
+    }
+
+    // ===================================================================================
+    //                                                                      Component Name
+    //                                                                      ==============
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    // These methods for runtime components are used when it needs to identity their components.
+    // For example when the DI container is Seasar, These methods are not used
+    // because S2Container has name-space in the DI architecture.
+    // = = = = = = = = = =/
+    public String getDBFluteInitializerComponentName() {
+        return filterRuntimeComponentPrefix("introduction");
+    }
+
+    public String getInvokerAssistantComponentName() {
+        return filterRuntimeComponentPrefix("invokerAssistant");
+    }
+
+    public String getCommonColumnAutoSetupperComponentName() {
+        return filterRuntimeComponentPrefix("commonColumnAutoSetupper");
+    }
+
+    public String getBehaviorSelectorComponentName() {
+        return filterRuntimeComponentPrefix("behaviorSelector");
+    }
+
+    public String getBehaviorCommandInvokerComponentName() {
+        return filterRuntimeComponentPrefix("behaviorCommandInvoker");
+    }
+
+    protected String filterRuntimeComponentPrefix(String componentName) {
+        final DfBasicProperties basicProp = getBasicProperties();
+        String filtered = resolveDIContainerRuntimeComponentNameSpec(componentName);
+        filtered = basicProp.filterComponentNameWithAllcommonPrefix(filtered);
+        filtered = basicProp.filterComponentNameWithProjectPrefix(filtered);
+        return filtered;
+    }
+
+    protected String resolveDIContainerRuntimeComponentNameSpec(String componentName) {
+        if (getBasicProperties().isTargetContainerSpring()) {
+            final String prefix = getDBFluteBeansRuntimeComponentPrefix();
+            if (prefix == null || prefix.trim().length() == 0) {
+                return componentName; // basically here
+            }
+            final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+            return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
+        } else if (getBasicProperties().isTargetContainerGuice()) {
+            if (isDBFluteModuleGuiceRuntimeComponentByName()) {
+                final DfBasicProperties basicProp = getBasicProperties();
+                if (basicProp.getProjectPrefix().isEmpty() && basicProp.getAllcommonPrefix().isEmpty()) {
+                    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                    br.addNotice("Guice byName requires projectPrefix or allcommonPrefix.");
+                    br.addItem("Advice");
+                    br.addElement("If isDBFluteModuleGuiceRuntimeComponentByName=true,");
+                    br.addElement("then use projectPrefix or allcommonPrefix.");
+                    br.addElement("");
+                    br.addElement("isDBFluteModuleGuiceRuntimeComponentByName is on dependencyInjectionMap.dfprop.");
+                    br.addElement("projectPrefix, allcommonPrefix are on basicInfoMap.dfprop.");
+                    br.addItem("componentName (for debug)");
+                    br.addElement(componentName);
+                    final String msg = br.buildExceptionMessage();
+                    throw new DfIllegalPropertySettingException(msg);
+                }
+            }
+            // https://github.com/dbflute/dbflute-core/issues/144
+            // component name is only supplement identity of type on Guice
+            // so component name needs only prefix
+            //  e.g. Named("resola") BehaviorSelector resolaBehaviorSelector
+            return "";
+        } else {
+            return componentName;
+        }
     }
 
     // ===================================================================================

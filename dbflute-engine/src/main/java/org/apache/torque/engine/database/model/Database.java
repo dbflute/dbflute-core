@@ -175,7 +175,6 @@ import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDatabaseProperties;
-import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.base.DfTableDeterminer;
@@ -2701,62 +2700,41 @@ public class Database {
     //                                                  Component Name Helper for Template
     //                                                  ==================================
     // -----------------------------------------------------
-    //                                   AllCommon Component
-    //                                   -------------------
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    // These methods for all-common components are used when it needs to identity their components.
-    // For example when the DI container is Seasar, These methods are not used
-    // because S2Container has name-space in the DI architecture.
-    // = = = = = = = = = =/
-
+    //                                     Runtime Component
+    //                                     -----------------
     public String getDBFluteInitializerComponentName() {
-        return filterRuntimeComponentPrefix("introduction");
+        return getProperties().getDependencyInjectionProperties().getDBFluteInitializerComponentName();
     }
 
     public String getInvokerAssistantComponentName() {
-        return filterRuntimeComponentPrefix("invokerAssistant");
+        return getProperties().getDependencyInjectionProperties().getInvokerAssistantComponentName();
     }
 
     public String getCommonColumnAutoSetupperComponentName() {
-        return filterRuntimeComponentPrefix("commonColumnAutoSetupper");
+        return getProperties().getDependencyInjectionProperties().getCommonColumnAutoSetupperComponentName();
     }
 
     public String getBehaviorSelectorComponentName() {
-        return filterRuntimeComponentPrefix("behaviorSelector");
+        return getProperties().getDependencyInjectionProperties().getBehaviorSelectorComponentName();
     }
 
     public String getBehaviorCommandInvokerComponentName() {
-        return filterRuntimeComponentPrefix("behaviorCommandInvoker");
-    }
-
-    protected String filterRuntimeComponentPrefix(String componentName) {
-        final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
-        final String filtered = prop.filterRuntimeComponentPrefix(componentName);
-        return filterComponentNameWithProjectPrefix(filterComponentNameWithAllcommonPrefix(filtered));
+        return getProperties().getDependencyInjectionProperties().getBehaviorCommandInvokerComponentName();
     }
 
     public boolean isDBFluteModuleGuiceRuntimeComponentByName() {
-        final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
-        return prop.isDBFluteModuleGuiceRuntimeComponentByName();
+        return getProperties().getDependencyInjectionProperties().isDBFluteModuleGuiceRuntimeComponentByName();
     }
 
     // -----------------------------------------------------
     //                                     Filtering Utility
     //                                     -----------------
     public String filterComponentNameWithProjectPrefix(String componentName) { // called from Table
-        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getProjectPrefix());
+        return getBasicProperties().filterComponentNameWithProjectPrefix(componentName);
     }
 
-    protected String filterComponentNameWithAllcommonPrefix(String componentName) {
-        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getAllcommonPrefix());
-    }
-
-    protected String doFilterComponentNameWithPrefix(String componentName, String prefix) {
-        if (prefix == null || prefix.trim().length() == 0) {
-            return componentName;
-        }
-        final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
-        return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
+    public String filterComponentNameWithAllcommonPrefix(String componentName) {
+        return getBasicProperties().filterComponentNameWithAllcommonPrefix(componentName);
     }
 
     // ===================================================================================

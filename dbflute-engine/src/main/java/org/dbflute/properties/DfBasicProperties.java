@@ -578,11 +578,40 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         return "Bs"; // for generation gap
     }
 
+    // -----------------------------------------------------
+    //                                                 CDef
+    //                                                ------
     public String getCDefPureName() { // e.g. CDef
         final String projectPrefix = getProjectPrefix();
         final String allcommonPrefix = getAllcommonPrefix();
         final DfLanguageClassPackage classPackage = getLanguageDependency().getLanguageClassPackage();
         return classPackage.buildCDefPureClassName(projectPrefix, allcommonPrefix);
+    }
+
+    // -----------------------------------------------------
+    //                                        Component Name
+    //                                        --------------
+    public String filterComponentNameWithProjectPrefix(String componentName) { // called from Table
+        return doFilterComponentNameWithPrefix(componentName, getProjectPrefix());
+    }
+
+    public String filterComponentNameWithAllcommonPrefix(String componentName) {
+        return doFilterComponentNameWithPrefix(componentName, getAllcommonPrefix());
+    }
+
+    protected String doFilterComponentNameWithPrefix(String componentName, String prefix) {
+        if (prefix == null || prefix.trim().length() == 0) {
+            return componentName;
+        }
+        final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+        return filteredPrefix + adjustPrefixFilteredComponentName(componentName);
+    }
+
+    protected String adjustPrefixFilteredComponentName(String componentName) {
+        if (componentName.isEmpty()) { // e.g. runtime components on Google Guice
+            return componentName;
+        }
+        return componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
     }
 
     // ===================================================================================
