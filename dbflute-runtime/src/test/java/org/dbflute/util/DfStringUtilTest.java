@@ -1610,6 +1610,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FooName", camelize("foo__name"));
         assertEquals("FooName", camelize("FOO _ NAME"));
         assertEquals("FooNa me", camelize("FOO _ NA ME"));
+
+        // #for_now jflute camel conversion for front and rear delimiters, unexpected pattern, cannot decamelize after (2022/05/02)
+        assertEquals("FooName", camelize("_FOO_NAME_"));
+        assertEquals("FooName", camelize("_FOO_NAME"));
+        assertEquals("FooName", camelize("FOO_NAME_"));
+
+        // illegal
+        assertException(IllegalArgumentException.class, () -> camelize(null));
+        assertEquals("", camelize(""));
     }
 
     public void test_camelize_delimiters() {
@@ -1657,6 +1666,11 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO_NAME", decamelize("foo_name"));
         assertEquals("FOO_NAME_BAR", decamelize("FOO_NameBar"));
         assertEquals("FOO_NAME_BAR", decamelize("foo_NameBar"));
+
+        // #for_now jflute camel conversion for front and rear delimiters, unexpected pattern, cannot camelize after (2022/05/02)
+        assertEquals("FOO_NAME_", decamelize("_FooName_"));
+        assertEquals("FOO_NAME", decamelize("_FooName"));
+        assertEquals("FOO_NAME_", decamelize("FooName_"));
 
         // illegal
         assertException(IllegalArgumentException.class, () -> decamelize(null));
