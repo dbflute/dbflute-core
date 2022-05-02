@@ -8,31 +8,20 @@ import ${request.package}.cbean.ca.${table.camelizedName}CA;
 import ${request.package}.cbean.cq.${table.camelizedName}CQ;
 import ${request.package}.cbean.cq.bs.Bs${table.camelizedName}CQ;
 
-import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.global.GlobalAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.missing.MissingAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.IpRangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.sampler.SamplerAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.significant.SignificantTermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.avg.AvgAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.percentiles.PercentileRanksAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.percentiles.PercentilesAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.scripted.ScriptedMetricAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.stats.StatsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStatsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.tophits.TopHitsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
+import org.opensearch.search.aggregations.AbstractAggregationBuilder;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.global.GlobalAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.missing.MissingAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.range.IpRangeAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.range.RangeAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.sampler.SamplerAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.terms.SignificantTermsAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.opensearch.search.aggregations.metrics.*;
 
 /**
  * @author ESFlute (using FreeGen)

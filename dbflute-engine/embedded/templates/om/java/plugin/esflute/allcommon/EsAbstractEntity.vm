@@ -9,8 +9,8 @@ import org.dbflute.FunCustodial;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
 import org.dbflute.util.DfCollectionUtil;
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.opensearch.action.delete.DeleteRequestBuilder;
+import org.opensearch.action.index.IndexRequestBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -29,6 +29,7 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
     protected final EntityUniqueDrivenProperties __uniqueDrivenProperties = newUniqueDrivenProperties();
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
     protected EntityModifiedProperties __specifiedProperties;
+    protected boolean __createdBySelect;
 
     // ===================================================================================
     //                                                                            Doc Meta
@@ -149,22 +150,6 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
     }
 
     // ===================================================================================
-    //                                                                     Birthplace Mark
-    //                                                                     ===============
-    @Override
-    public void markAsSelect() {
-    }
-
-    @Override
-    public boolean createdBySelect() {
-        return false;
-    }
-
-    @Override
-    public void clearMarkAsSelect() {
-    }
-
-    // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
     @Override
@@ -174,6 +159,23 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
     @Override
     public boolean myundefinedClassificationAccessAllowed() {
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    @Override
+    public void markAsSelect() {
+        __createdBySelect = true;
+    }
+
+    @Override
+    public boolean createdBySelect() {
+        return __createdBySelect;
+    }
+
+    public void clearMarkAsSelect() {
+        __createdBySelect = false;
     }
 
     // ===================================================================================
@@ -225,6 +227,10 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
 
         protected Long version;
 
+        protected Long seqNo;
+
+        protected Long primaryTerm;
+
         private transient RequestOptionCall<IndexRequestBuilder> indexOption;
 
         private transient RequestOptionCall<DeleteRequestBuilder> deleteOption;
@@ -246,6 +252,24 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
 
         public Long version() {
             return version;
+        }
+
+        public DocMeta seqNo(Long seqNo) {
+            this.seqNo = seqNo;
+            return this;
+        }
+
+        public Long seqNo() {
+            return seqNo;
+        }
+
+        public DocMeta primaryTerm(Long primaryTerm) {
+            this.primaryTerm = primaryTerm;
+            return this;
+        }
+
+        public Long primaryTerm() {
+            return primaryTerm;
         }
 
         public DocMeta indexOption(RequestOptionCall<IndexRequestBuilder> builder) {

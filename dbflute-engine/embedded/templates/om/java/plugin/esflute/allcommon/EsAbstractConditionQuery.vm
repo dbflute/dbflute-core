@@ -23,11 +23,11 @@ import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.InvalidQueryRegisteredException;
 import org.dbflute.util.Srl;
-import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.*;
-import org.elasticsearch.index.query.functionscore.*;
-import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder.FilterFunctionBuilder;
-import org.elasticsearch.search.sort.*;
+import org.opensearch.common.unit.Fuzziness;
+import org.opensearch.index.query.*;
+import org.opensearch.index.query.functionscore.*;
+import org.opensearch.index.query.functionscore.FunctionScoreQueryBuilder.FilterFunctionBuilder;
+import org.opensearch.search.sort.*;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -171,7 +171,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
 
     protected IdsQueryBuilder regIdsQ(Collection<String> values) {
         checkEsInvalidQueryCollection("_id", values);
-        IdsQueryBuilder idsQuery = QueryBuilders.idsQuery(asTableDbName()).addIds(values.toArray(new String[values.size()]));
+        IdsQueryBuilder idsQuery = QueryBuilders.idsQuery().addIds(values.toArray(new String[values.size()]));
         regQ(idsQuery);
         return idsQuery;
     }
@@ -498,7 +498,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     public class DocMetaCQ {
 
         public void setId_Equal(String id) {
-            regQ(QueryBuilders.idsQuery(asTableDbName()).addIds(id));
+            regQ(QueryBuilders.idsQuery().addIds(id));
         }
     }
 
