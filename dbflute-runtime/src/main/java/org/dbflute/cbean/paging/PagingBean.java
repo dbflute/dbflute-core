@@ -122,8 +122,6 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * 
      * <p>This was internal method but needed so you can use this in your application.</p>
      * 
-     * <del>This method is an old style, so you should use paging() instead of this.</del>
-     * 
      * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
      * @param fetchSize The size of fetch. (NotMinus, NotZero)
      * @return this. (NotNull)
