@@ -394,10 +394,7 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
     }
 
     protected String buildDefaultSchemaHistoryFilePath() {
-        final StringBuilder sb = new StringBuilder();
-        final String projectName = getBasicProperties().getProjectName();
-        sb.append("./schema/project-history-").append(projectName).append(".diffmap");
-        return sb.toString();
+        return "./schema/project-history-" + getBasicProperties().getProjectName() + ".diffmap";
     }
 
     // ===================================================================================

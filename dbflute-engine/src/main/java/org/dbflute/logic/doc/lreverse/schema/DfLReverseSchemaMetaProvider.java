@@ -54,7 +54,7 @@ public class DfLReverseSchemaMetaProvider {
     }
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, /*historyFile*/null);
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml);
     }
 
     protected DfSchemaXmlReader createSchemaXmlReader(String schemaXml) {

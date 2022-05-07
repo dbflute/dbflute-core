@@ -106,7 +106,7 @@ public class DfMapFile { // migrated MapListFile, basically keeping compatible
      * }
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read map. (NotNull, EmptyAllowed)
+     * @return The read map, keeping order. (NotNull, EmptyAllowed)
      * @throws IOException When it fails to handle the IO.
      */
     public Map<String, Object> readMap(InputStream ins) throws IOException {

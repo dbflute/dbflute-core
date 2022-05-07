@@ -229,12 +229,12 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
     }
 
     public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile());
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsMonolithic(getSchemaSyncCheckDiffMapFile());
         doLoadSchemaHistory(schemaHistory);
     }
 
     public void loadSchemaHistoryAsAlterCheck() { // for AlterCheck
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getAlterCheckDiffMapFile());
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsMonolithic(getAlterCheckDiffMapFile());
         doLoadSchemaHistory(schemaHistory);
     }
 

@@ -1,0 +1,33 @@
+map:{
+    ; 2099/12/31 23:59:59 = map:{
+        ; diffDate = 2012/07/13 13:22:39
+        ; tableCount = map:{
+            ; next = 22
+            ; previous = 22
+        }
+        ; tableDiff = map:{
+            ; MEMBER = map:{
+                ; tableName = MEMBER
+                ; diffType = CHANGE
+                ; columnDiff = map:{
+                    ; MEMBER_ACCOUNT = map:{
+                        ; columnName = MEMBER_ACCOUNT
+                        ; diffType = CHANGE
+                        ; columnSizeDiff = map:{
+                            ; next = 50
+                            ; previous = 80
+                        }
+                        ; notNullDiff = map:{
+                            ; next = true
+                            ; previous = false
+                        }
+                    }
+                    ; CLUB_DB2_MEMO = map:{
+                        ; columnName = CLUB_DB2_MEMO
+                        ; diffType = DELETE
+                    }
+                }
+            }
+        }
+    }
+}

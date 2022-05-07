@@ -432,8 +432,8 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
     }
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml, DfCraftDiffAssertDirection direction) {
-        final String historyFile = null; // no use history here (use SchemaDiff directly later)
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, historyFile);
+        // no use history here (use SchemaDiff directly later)
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml);
         final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
         serializer.enableCraftDiff(_dataSource, craftMetaDir, direction);
         return serializer;
@@ -476,7 +476,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     protected void serializeSchemaDiff(DfSchemaDiff schemaDiff) {
         final String diffMapFile = getMigrationAlterCheckDiffMapFile();
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(diffMapFile);
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsMonolithic(diffMapFile);
         try {
             _log.info("...Serializing schema diff: " + diffMapFile);
             schemaHistory.serializeSchemaDiff(schemaDiff);

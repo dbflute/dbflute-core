@@ -107,7 +107,7 @@ public class DfSPolicyInRepsChecker {
     }
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(final String schemaXml) {
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, /*historyFile*/null); // history unneeded
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml); // history unneeded
     }
 
     protected DfSchemaXmlReader createSchemaXmlReader(String schemaXml) {

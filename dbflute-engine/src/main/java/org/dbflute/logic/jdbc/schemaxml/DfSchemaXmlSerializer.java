@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
@@ -156,7 +157,7 @@ public class DfSchemaXmlSerializer {
     //                                        --------------
     protected final DfSchemaSource _dataSource;
     protected final String _schemaXml;
-    protected final String _historyFile; // null allowed, only for JDBC task
+    protected final Supplier<DfSchemaHistory> _historyFactory; // null allowed, only for JDBC task, SchemaSyncCheck
     protected final DfSchemaDiff _schemaDiff;
 
     // -----------------------------------------------------
@@ -212,12 +213,12 @@ public class DfSchemaXmlSerializer {
     /**
      * @param dataSource The data source of the database. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
-     * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
+     * @param historyFactory The instance factory of schema history. (NullAllowed: if null, no action for schema-diff)
      */
-    protected DfSchemaXmlSerializer(DfSchemaSource dataSource, String schemaXml, String historyFile) {
+    protected DfSchemaXmlSerializer(DfSchemaSource dataSource, String schemaXml, Supplier<DfSchemaHistory> historyFactory) {
         _dataSource = dataSource;
         _schemaXml = schemaXml;
-        _historyFile = historyFile;
+        _historyFactory = historyFactory;
         _schemaDiff = DfSchemaDiff.createAsSerializer(schemaXml);
     }
 
@@ -231,8 +232,9 @@ public class DfSchemaXmlSerializer {
         final DfBasicProperties basicProp = buildProp.getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         final String schemaXml = facadeProp.getProejctSchemaXMLFile();
-        final String historyFile = facadeProp.getProjectSchemaHistoryFile();
-        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, () -> {
+            return DfSchemaHistory.createAsCore();
+        });
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
         final String craftMetaDir = docProp.getCoreCraftMetaDir();
         serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
@@ -240,8 +242,23 @@ public class DfSchemaXmlSerializer {
         return serializer;
     }
 
+    protected static boolean determineCoreDiffPiece() {
+        return !DfBuildProperties.getInstance().getLittleAdjustmentProperties().isCompatibleMonolithicDiffMapHistory();
+    }
+
     /**
-     * Create instance as manage process. <br>
+     * Create instance as manage process e.g. LoadDataReverse, SchemaPolicyCheck, AlterCheck. <br>
+     * CraftDiff settings are not set here. 
+     * @param dataSource The data source of the database. (NotNull)
+     * @param schemaXml The XML file to output meta info of the schema. (NotNull)
+     * @return The new instance. (NotNull)
+     */
+    public static DfSchemaXmlSerializer createAsManage(DfSchemaSource dataSource, String schemaXml) {
+        return createAsManage(dataSource, schemaXml, /*historyFile*/null);
+    }
+
+    /**
+     * Create instance as manage process e.g. SchemaSyncCheck. <br>
      * CraftDiff settings are not set here. 
      * @param dataSource The data source of the database. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
@@ -249,12 +266,14 @@ public class DfSchemaXmlSerializer {
      * @return The new instance. (NotNull)
      */
     public static DfSchemaXmlSerializer createAsManage(DfSchemaSource dataSource, String schemaXml, String historyFile) {
-        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml // converting to factory
+                , historyFile != null ? () -> DfSchemaHistory.createAsMonolithic(historyFile) : null);
         return serializer.suppressExceptTarget().suppressAdditionalSchema();
     }
 
-    protected static DfSchemaXmlSerializer newSerializer(DfSchemaSource dataSource, String schemaXml, String historyFile) {
-        return new DfSchemaXmlSerializer(dataSource, schemaXml, historyFile);
+    protected static DfSchemaXmlSerializer newSerializer(DfSchemaSource dataSource, String schemaXml,
+            Supplier<DfSchemaHistory> historyFactory) {
+        return new DfSchemaXmlSerializer(dataSource, schemaXml, historyFactory);
     }
 
     protected DfSchemaXmlSerializer suppressExceptTarget() {
@@ -415,8 +434,7 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
-    protected void processTable(final Connection conn, final DatabaseMetaData metaData, final List<DfTableMeta> tableList)
-            throws SQLException {
+    protected void processTable(Connection conn, DatabaseMetaData metaData, List<DfTableMeta> tableList) throws SQLException {
         _log.info("");
         _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = =");
         _log.info("$ [Table List]");
@@ -443,7 +461,7 @@ public class DfSchemaXmlSerializer {
         return prop.getMetaDataCountDownRaceRunnerCount();
     }
 
-    protected void countDownRaceProcessTable(final List<DfTableMeta> tableList, int runnerCount, final DfFittingDataSource fittingDs) {
+    protected void countDownRaceProcessTable(List<DfTableMeta> tableList, int runnerCount, DfFittingDataSource fittingDs) {
         final CountDownRace fireMan = new CountDownRace(runnerCount);
         fireMan.readyGo(new CountDownRaceExecution() {
             public void execute(CountDownRaceRunner resource) {
@@ -478,7 +496,7 @@ public class DfSchemaXmlSerializer {
                 }
             }
 
-            protected void prepareThreadDataSource(final DfFittingDataSource fittingDs, final Connection runnerConn) {
+            protected void prepareThreadDataSource(DfFittingDataSource fittingDs, Connection runnerConn) {
                 if (DfDataSourceContext.isExistDataSource()) {
                     return;
                 }
@@ -558,20 +576,20 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                                Column
     //                                                ------
-    protected void processColumnName(final DfColumnMeta columnMeta, final Element columnElement) {
+    protected void processColumnName(DfColumnMeta columnMeta, Element columnElement) {
         final String columnName = columnMeta.getColumnName();
         columnElement.setAttribute("name", columnName);
     }
 
-    protected void processColumnType(final DfColumnMeta columnMeta, final Element columnElement) {
+    protected void processColumnType(DfColumnMeta columnMeta, Element columnElement) {
         columnElement.setAttribute("type", getColumnJdbcType(columnMeta));
     }
 
-    protected void processColumnDbType(final DfColumnMeta columnMeta, final Element columnElement) {
+    protected void processColumnDbType(DfColumnMeta columnMeta, Element columnElement) {
         columnElement.setAttribute("dbType", columnMeta.getDbTypeName());
     }
 
-    protected void processColumnJavaType(final DfColumnMeta columnMeta, final Element columnElement) {
+    protected void processColumnJavaType(DfColumnMeta columnMeta, Element columnElement) {
         final String jdbcType = getColumnJdbcType(columnMeta);
         final int columnSize = columnMeta.getColumnSize();
         final int decimalDigits = columnMeta.getDecimalDigits();
@@ -1522,10 +1540,19 @@ public class DfSchemaXmlSerializer {
     //                                                                         Schema Diff
     //                                                                         ===========
     protected void loadPreviousSchema() {
-        if (_historyFile == null) {
-            return;
+        if (isSchemaDiffEnabled()) {
+            doLoadPreviousSchema();
         }
-        doLoadPreviousSchema();
+    }
+
+    protected void loadNextSchema() {
+        if (isSchemaDiffEnabled()) {
+            doLoadNextSchema();
+        }
+    }
+
+    protected boolean isSchemaDiffEnabled() {
+        return _historyFactory != null;
     }
 
     protected void doLoadPreviousSchema() {
@@ -1536,14 +1563,7 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void loadNextSchema() {
-        if (_historyFile == null) {
-            return;
-        }
-        doLoadNextSchema();
-    }
-
-    protected void doLoadNextSchema() {
+    protected void doLoadNextSchema() { // needs history factory
         if (!_schemaDiff.canReadNext()) {
             return;
         }
@@ -1553,7 +1573,7 @@ public class DfSchemaXmlSerializer {
         if (_schemaDiff.hasDiff()) {
             try {
                 _log.info(" -> different from previous (schema diff)");
-                final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(_historyFile);
+                final DfSchemaHistory schemaHistory = createSchemaHistory();
                 _log.info("...Serializing schema-diff:");
                 _log.info("  filePath = " + schemaHistory.getHistoryFile());
                 schemaHistory.serializeSchemaDiff(_schemaDiff);
@@ -1564,6 +1584,10 @@ public class DfSchemaXmlSerializer {
         } else {
             _log.info(" -> same as previous (schema diff)");
         }
+    }
+
+    protected DfSchemaHistory createSchemaHistory() {
+        return _historyFactory.get();
     }
 
     // ===================================================================================
