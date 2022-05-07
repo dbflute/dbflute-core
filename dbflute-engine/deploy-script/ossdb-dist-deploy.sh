@@ -14,6 +14,8 @@ ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
 # to manage indivisually
+#ant -f build.xml reflect-to-example-on-play2java
+#ant -f build.xml reflect-to-example-on-springboot
 #ant -f build.xml reflect-to-example-with-non-rdb
 #ant -f build.xml reflect-to-example-with-remoteapi-gen
 ant -f build.xml reflect-to-howto
