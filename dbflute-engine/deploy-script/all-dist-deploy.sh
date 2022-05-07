@@ -20,6 +20,7 @@ ant -f build.xml reflect-to-example-on-parade
 ant -f build.xml reflect-to-example-on-springboot
 ant -f build.xml reflect-to-example-on-play2java
 ant -f build.xml reflect-to-example-with-non-rdb
+ant -f build.xml reflect-to-example-with-remoteapi-gen
 ant -f build.xml reflect-to-example-with-doma
 ant -f build.xml reflect-to-howto
 
@@ -132,6 +133,12 @@ cd ..
 mvn -e compile
 
 cd ../dbflute-example-with-non-rdb/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal,freegen
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-with-remoteapi-gen/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal,freegen
 cd ..
