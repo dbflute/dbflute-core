@@ -244,8 +244,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     public void test_toLocalDate_withTimeZone() {
-        TimeZone jstZone = TimeZone.getTimeZone("JST");
-        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+        Date gmtDate = toDate("2014/01/01", TimeZone.getTimeZone("GMT")); // 2014/01/01 00:00:00
+        assertEquals(LocalDate.of(2014, 01, 01), toLocalDate(gmtDate, TimeZone.getTimeZone("JST")));
     }
 
     public void test_toLocalDate_withTimeZoneLocale() {
@@ -404,8 +404,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     public void test_toLocalDateTime_withTimeZone() {
-        TimeZone jstZone = TimeZone.getTimeZone("JST");
-        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+        Date gmtDate = toDate("2014/01/01", TimeZone.getTimeZone("GMT")); // 2014/01/01 00:00:00
+        assertEquals(LocalDateTime.of(2014, 01, 01, 9, 0, 0), toLocalDateTime(gmtDate, TimeZone.getTimeZone("JST")));
     }
 
     public void test_toLocalDateTime_withTimeZoneLocale() {

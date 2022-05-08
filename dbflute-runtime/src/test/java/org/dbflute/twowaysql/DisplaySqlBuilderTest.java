@@ -137,7 +137,7 @@ public class DisplaySqlBuilderTest extends RuntimeTestCase {
     public void test_buildDisplaySql_timestamp_timeZone() {
         // ## Arrange ##
         String sql = "select * from where FOO_DATE = ?";
-        Timestamp fooDate = DfTypeUtil.toTimestamp("2010/12/12 12:34:56");
+        Timestamp fooDate = DfTypeUtil.toTimestamp("2010/12/12 12:34:56", TimeZone.getTimeZone("GMT"));
         DisplaySqlBuilder builder = createTargetWithTimeZone(() -> TimeZone.getTimeZone("GMT+3"));
 
         // ## Act ##
@@ -145,7 +145,7 @@ public class DisplaySqlBuilderTest extends RuntimeTestCase {
 
         // ## Assert ##
         log(actual);
-        assertTrue(actual.contains("FOO_DATE = '2010-12-12 06:34:56.000'"));
+        assertTrue(actual.contains("FOO_DATE = '2010-12-12 15:34:56.000'"));
     }
 
     public void test_buildDisplaySql_time_basic() {
