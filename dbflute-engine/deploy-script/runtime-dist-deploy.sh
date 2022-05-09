@@ -8,6 +8,7 @@
 # o gpg key is needed as first argument of this shell
 # _/_/_/_/_/_/_/_/_/_/
 
+# dbflute-runtime's java version is fixed
 if [ `uname` = "Darwin" ]; then
   export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 fi
