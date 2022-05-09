@@ -15,7 +15,6 @@
 	<property name="workspace.base" value="../.." />
 	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
 	<property name="dbflute.howto.dir" value="${workspace.base}/dbflute-howto" />
-	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
 	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="test.dbms.stage.base" value="${workspace.base}" />
 	<property name="test.option.stage.base" value="${workspace.base}" />
@@ -28,7 +27,6 @@
 	<property name="embedded" value="embedded" />
 	<property name="runtime.dir" value="${dbflute.base}/dbflute-runtime" />
 	<property name="extraction.dir" value="${dist}/extraction" />
-	<property name="stage.dir" value="${dbflute.www.base}/download" />
 
 	<!-- Jar Files -->
 	<property name="engine.jar" value="dbflute.jar" />
@@ -217,15 +215,6 @@
 			<exclude name="**/*.vmnet" />
 		</fixcrlf>
 		<fixcrlf srcdir="${embedded}/templates/om/csharp" eol="crlf" encoding="UTF-8" />
-	</target>
-
-	<!-- ============================================================================= -->
-	<!--                                                            S T A G E  T A S K -->
-	<!--                                                            ================== -->
-
-	<target name="stage">
-		<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/${module.build.zip}" overwrite="true">
-		</copy>
 	</target>
 
 	<!-- ============================================================================= -->

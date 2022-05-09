@@ -14,7 +14,6 @@
 	<property name="dist" value="dist/net"/>
 	<property name="embedded" value="embedded"/>
 	<property name="extraction.dir" value="${dist}/extraction"/>
-	<property name="stage.dir" value="${workspace.base}/dbflute.net-www/download"/>
 
 	<!-- Jar Files -->
 	<property name="engine.jar" value="dbflute.jar"/>
@@ -161,14 +160,6 @@
 				<include name="product-is-dbflute.net-${version}"/>
 			</zipfileset>
 		</zip>
-	</target>
-
-	<!-- ============================================================================= -->
-	<!--                                                            S T A G E  T A S K -->
-	<!--                                                            ================== -->
-
-	<target name="stage">
-		<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/${module.build.zip}" overwrite="true"></copy>
 	</target>
 
 	<!-- ============================================================================= -->
