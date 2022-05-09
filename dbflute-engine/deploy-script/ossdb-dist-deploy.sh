@@ -7,7 +7,7 @@
 # full tasks are execute in the target projects
 #
 # precondition:
-# o targert projects are git-cloned at the next directory of dbflute-core 
+# o target projects are git-cloned at the next directory of dbflute-core 
 # _/_/_/_/_/_/_/_/_/_/
 
 # should be java8 when deploy script

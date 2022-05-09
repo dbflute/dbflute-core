@@ -6,7 +6,7 @@
 # for easy test while deplopment so simple process only
 #
 # precondition:
-# o targert projects are git-cloned at the next directory of dbflute-core 
+# o target projects are git-cloned at the next directory of dbflute-core 
 # o the first ReplaceSchema after clone is already executed
 # _/_/_/_/_/_/_/_/_/_/
 
