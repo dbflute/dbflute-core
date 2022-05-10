@@ -217,15 +217,19 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toLocalDate_fromUtilDate_timeZone() {
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt2hour);
-        LocalDate localDate = toLocalDate(pureDate, gmt2hour);
-        assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt2localDate = toLocalDate(pureDate, gmt2hour);
+        assertEquals("2009-12-13", gmt2localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt0localDate = toLocalDate(pureDate, TimeZone.getTimeZone("GMT"));
+        assertEquals("2009-12-12", gmt0localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
     public void test_toLocalDate_fromUtilDate_gmt9hour() {
         TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt9hour);
-        LocalDate localDate = toLocalDate(pureDate, gmt9hour);
-        assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt9localDate = toLocalDate(pureDate, gmt9hour);
+        assertEquals("2009-12-13", gmt9localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt7localDate = toLocalDate(pureDate, TimeZone.getTimeZone("GMT+7"));
+        assertEquals("2009-12-12", gmt7localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
     public void test_toLocalDate_fromStringDate_basic() {
