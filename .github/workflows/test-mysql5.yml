@@ -1,0 +1,62 @@
+name: Test with MySQL 5
+
+on:
+  push:
+    branches:
+    - master
+    - develop
+    - "feature/*"
+  pull_request:
+    branches:
+    - master
+    - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8' ]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'temurin'
+        cache: maven
+    - name: Download
+      run: |
+        git clone https://github.com/dbflute-test/dbflute-test-dbms-mysql.git
+        cd dbflute-test-dbms-mysql
+        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
+        git branch
+    - name: Run MySQL
+      run: |
+        docker run -p 43306:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_DATABASE=maihamadb -e MYSQL_USER=maihamadb -e MYSQL_PASSWORD=maihamadb -d mysql:5.7.11 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --lower-case-table-names=1
+    - name: Build
+      run: |
+        base_dir=$(pwd)
+        cd dbflute-runtime
+        mvn -DskipTests=true -B package --file pom.xml
+        cd ../dbflute-engine
+        ant -f build.xml dist
+        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-dbms-mysql
+    - name: Test on dbms-mysql
+      run: |
+        export answer=y
+        cd dbflute-test-dbms-mysql/dbflute_maihamadb
+        echo "my-secret-pw" > dfprop/system-password.txt
+        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        /bin/bash ./nextdb-renewal.sh
+        /bin/bash ./slave-replace-schema.sh
+        /bin/bash ./manage.sh renewal
+        /bin/bash ./manage.sh load-data-reverse
+        cd ../dbflute_resortlinedb
+        echo "my-secret-pw" > dfprop/system-password.txt
+        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        /bin/bash ./manage.sh renewal
+        cd ..
+        mvn -e compile
