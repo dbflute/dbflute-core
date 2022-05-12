@@ -1,4 +1,4 @@
-name: Test with MySQL 5
+name: Test with MySQL
 
 on:
   push:
@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         java: [ '8' ]
+        dbms: [ '5.7.11', '8.0.29' ]
 
     steps:
     - uses: actions/checkout@v3
@@ -35,7 +36,7 @@ jobs:
         git branch
     - name: Run MySQL
       run: |
-        docker run -p 43306:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_DATABASE=maihamadb -e MYSQL_USER=maihamadb -e MYSQL_PASSWORD=maihamadb -d mysql:5.7.11 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --lower-case-table-names=1
+        docker run -p 43306:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_DATABASE=maihamadb -e MYSQL_USER=maihamadb -e MYSQL_PASSWORD=maihamadb -d mysql:${{ matrix.dbms }} --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --lower-case-table-names=1
     - name: Build
       run: |
         base_dir=$(pwd)
