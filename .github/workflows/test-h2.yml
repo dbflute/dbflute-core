@@ -1,0 +1,105 @@
+name: Test with H2 Database
+
+on:
+  push:
+    branches:
+    - master
+    - develop
+    - "feature/*"
+  pull_request:
+    branches:
+    - master
+    - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11', '17' ]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'temurin'
+        cache: maven
+    - name: Download
+      run: |
+        git clone https://github.com/dbflute-test/dbflute-test-active-dockside.git
+        cd dbflute-test-active-dockside
+        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
+        git branch
+        cd ..
+        git clone https://github.com/dbflute-test/dbflute-test-active-hangar.git
+        cd dbflute-test-active-hangar
+        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
+        git branch
+#        cd ..
+#        git clone https://github.com/dbflute-test/dbflute-test-option-compatible10x.git
+#        cd dbflute-test-option-compatible10x
+#        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
+#        git branch
+#        cd ..
+#        git clone https://github.com/dbflute/dbflute-howto.git
+#        cd dbflute-howto
+#        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
+#        git branch
+    - name: Build
+      run: |
+        base_dir=$(pwd)
+        cd dbflute-runtime
+        mvn -DskipTests=true -B package --file pom.xml
+        cd ../dbflute-engine
+        ant -f build.xml dist
+        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-dockside
+        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-hangar
+#        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-option-compatible10x
+#        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-howto
+    - name: Test on dbflute-test-active-dockside
+      run: |
+        export answer=y
+        cd dbflute-test-active-dockside/dbflute_maihamadb
+        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        /bin/bash ./manage.sh replace-schema
+        /bin/bash ./manage.sh jdbc,doc
+        /bin/bash ./manage.sh generate,outside-sql-test,sql2entity
+        cd ..
+        mvn -e compile
+    - name: Test on dbflute-test-active-hangar
+      run: |
+        export answer=y
+        cd dbflute-test-active-hangar/dbflute_maihamadb
+        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        /bin/bash ./manage.sh renewal
+        /bin/bash ./manage.sh freegen
+        /bin/bash ./diffworld-test.sh
+        /bin/bash ./lrevworld-test.sh
+        /bin/bash ./syncworld-test.sh
+        cd ../dbflute_resortlinedb
+        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        /bin/bash ./manage.sh renewal
+        cd ..
+        mvn -e compile
+#    - name: Test on dbflute-test-option-compatible10x
+#      run: |
+#        export answer=y
+#        cd dbflute-test-option-compatible10x/dbflute_maihamadb
+#        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+#        /bin/bash ./manage.sh renewal
+#        cd ..
+#        mvn -e compile
+#    - name: Test on dbflute-howto
+#      run: |
+#        export answer=y
+#        cd dbflute-howto/dbflute_maihamadb
+#        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+#        /bin/bash ./manage.sh replace-schema
+#        /bin/bash ./manage.sh jdbc,doc
+#        /bin/bash ./manage.sh generate,sql2entity,outside-sql-test
+#        cd ..
+#        mvn -e compile
+
