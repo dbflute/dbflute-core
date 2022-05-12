@@ -53,12 +53,6 @@ jobs:
           git clone https://github.com/dbflute-test/dbflute-test-option-compatible10x.git
           cd dbflute-test-option-compatible10x
           git branch
-          #
-          # example project for developers
-          cd ..
-          git clone https://github.com/dbflute/dbflute-howto.git
-          cd dbflute-howto
-          git branch
         fi
     - name: Build
       run: |
@@ -70,8 +64,7 @@ jobs:
         ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-dockside
         ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-hangar
         if [[ ${{ matrix.java }} == 8 ]] ; then
-          ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-option-compatible10x
-          ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-howto
+          ant -f build.xml -Dtest.option.stage.base=${base_dir} reflect-to-test-option-compatible10x
         fi
     - name: Test on dbflute-test-active-dockside
       run: |
@@ -109,15 +102,4 @@ jobs:
           /bin/bash ./manage.sh renewal
           cd ..
           mvn -e compile
-        fi
-    - name: Test on dbflute-howto
-      run: |
-        if [[ ${{ matrix.java }} = 8 ]] ; then
-          export answer=y
-          cd dbflute-howto/dbflute_maihamadb
-          /bin/bash ./manage.sh replace-schema
-          /bin/bash ./manage.sh jdbc,doc
-          /bin/bash ./manage.sh generate,sql2entity,outside-sql-test
-          cd ..
-         mvn -e compile
         fi
