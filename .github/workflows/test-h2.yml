@@ -71,7 +71,7 @@ jobs:
         ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-hangar
         if [[ ${{ matrix.java }} == 8 ]] ; then
           ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-option-compatible10x
-          ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-howto
+          ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-howto
         fi
     - name: Test on dbflute-test-active-dockside
       run: |
