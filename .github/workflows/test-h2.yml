@@ -29,25 +29,37 @@ jobs:
         cache: maven
     - name: Download
       run: |
+        #
+        # test project for standard environment and generated classes
+        # having java version branch e.g. java11, java17
         git clone https://github.com/dbflute-test/dbflute-test-active-dockside.git
         cd dbflute-test-active-dockside
         if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
         git branch
+        #
+        # test project for various dfprop options
+        # having java version branch e.g. java11, java17
         cd ..
         git clone https://github.com/dbflute-test/dbflute-test-active-hangar.git
         cd dbflute-test-active-hangar
         if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
         git branch
-#        cd ..
-#        git clone https://github.com/dbflute-test/dbflute-test-option-compatible10x.git
-#        cd dbflute-test-option-compatible10x
-#        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
-#        git branch
-#        cd ..
-#        git clone https://github.com/dbflute/dbflute-howto.git
-#        cd dbflute-howto
-#        if [[ ${{ matrix.java }} != 8 ]] ; then git checkout -b java${{ matrix.java }} origin/java${{ matrix.java }}; fi
-#        git branch
+        #
+        # as only java8 (main version), sub test projects so enough
+        if [[ ${{ matrix.java }} == 8 ]] ; then
+          #
+          # test project for compatible options for 1.0.x
+          cd ..
+          git clone https://github.com/dbflute-test/dbflute-test-option-compatible10x.git
+          cd dbflute-test-option-compatible10x
+          git branch
+          #
+          # example project for developers
+          cd ..
+          git clone https://github.com/dbflute/dbflute-howto.git
+          cd dbflute-howto
+          git branch
+        fi
     - name: Build
       run: |
         base_dir=$(pwd)
@@ -57,13 +69,16 @@ jobs:
         ant -f build.xml dist
         ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-dockside
         ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-active-hangar
-#        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-option-compatible10x
-#        ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-howto
+        if [[ ${{ matrix.java }} == 8 ]] ; then
+          ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-option-compatible10x
+          ant -f build.xml -Dtest.active.stage.base=${base_dir} reflect-to-test-howto
+        fi
     - name: Test on dbflute-test-active-dockside
       run: |
         export answer=y
         cd dbflute-test-active-dockside/dbflute_maihamadb
-        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        # no use and also test environment without javascript engine
+        #if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh sai; fi
         /bin/bash ./manage.sh replace-schema
         /bin/bash ./manage.sh jdbc,doc
         /bin/bash ./manage.sh generate,outside-sql-test,sql2entity
@@ -73,33 +88,36 @@ jobs:
       run: |
         export answer=y
         cd dbflute-test-active-hangar/dbflute_maihamadb
-        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        # javascript engine for FreeGen
+        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh sai; fi
         /bin/bash ./manage.sh renewal
         /bin/bash ./manage.sh freegen
         /bin/bash ./diffworld-test.sh
         /bin/bash ./lrevworld-test.sh
         /bin/bash ./syncworld-test.sh
         cd ../dbflute_resortlinedb
-        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
+        # no use
+        #if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh sai; fi
         /bin/bash ./manage.sh renewal
         cd ..
         mvn -e compile
-#    - name: Test on dbflute-test-option-compatible10x
-#      run: |
-#        export answer=y
-#        cd dbflute-test-option-compatible10x/dbflute_maihamadb
-#        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
-#        /bin/bash ./manage.sh renewal
-#        cd ..
-#        mvn -e compile
-#    - name: Test on dbflute-howto
-#      run: |
-#        export answer=y
-#        cd dbflute-howto/dbflute_maihamadb
-#        if [[ ${{ matrix.java }} = 17 ]] ; then /bin/bash ./manage.sh 31; fi
-#        /bin/bash ./manage.sh replace-schema
-#        /bin/bash ./manage.sh jdbc,doc
-#        /bin/bash ./manage.sh generate,sql2entity,outside-sql-test
-#        cd ..
-#        mvn -e compile
-
+    - name: Test on dbflute-test-option-compatible10x
+      run: |
+        if [[ ${{ matrix.java }} = 8 ]] ; then
+          export answer=y
+          cd dbflute-test-option-compatible10x/dbflute_maihamadb
+          /bin/bash ./manage.sh renewal
+          cd ..
+          mvn -e compile
+        fi
+    - name: Test on dbflute-howto
+      run: |
+        if [[ ${{ matrix.java }} = 8 ]] ; then
+          export answer=y
+          cd dbflute-howto/dbflute_maihamadb
+          /bin/bash ./manage.sh replace-schema
+          /bin/bash ./manage.sh jdbc,doc
+          /bin/bash ./manage.sh generate,sql2entity,outside-sql-test
+          cd ..
+         mvn -e compile
+        fi
