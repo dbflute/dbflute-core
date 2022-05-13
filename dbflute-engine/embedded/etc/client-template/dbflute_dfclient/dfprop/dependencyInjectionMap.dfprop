@@ -51,7 +51,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteBeansPackageName (NotRequired - Default null)
+    # o dbfluteBeansPackageName: (NotRequired - Default null)
     #  The default attribute expression of DBFlute DI configuration for Spring and Lucy.
     #
     # @SpringOnly
@@ -59,7 +59,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDBFluteBeansGeneratedAsJavaConfig (NotRequired - Default true since 1.1)
+    # o isDBFluteBeansGeneratedAsJavaConfig: (NotRequired - Default true since 1.1)
     #  Does it generate JavaConfig for DBFluteBeans? (not use XML configuration)
     #
     # @SpringOnly
@@ -67,7 +67,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteBeansPackageName (NotRequired - Default '../resources')
+    # o dbfluteBeansPackageName: (NotRequired - Default '../resources')
     #  The package name(output directory) of DBFlute DI configuration for Spring and Lucy.
     #
     # @SpringOnly
@@ -78,7 +78,7 @@ map:{
     #                                                                                Guice
     #                                                                                =====
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDBFluteModuleGuiceRuntimeComponentByName (NotRequired - Default false)
+    # o isDBFluteModuleGuiceRuntimeComponentByName: (NotRequired - Default false)
     #  Are runtime components registered as byName in DBFluteModule for Google Guice?
     #
     # @GuiceOnly
