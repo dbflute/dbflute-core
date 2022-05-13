@@ -58,7 +58,7 @@ map:{
         #  But you can specify the '@gen' suffix that means generate-only except.
         #  A table with the mark can be treated as documents but no generating classes.
         #
-        #; tableExceptList = list:{FOO_TABLE@gen ; prefix:FOO_@gen ; suffix:_FOO ; contain:_FOO_}
+        #; tableExceptList = list:{suffix:TABLE_EXCEPT_GEN_ONLY@gen ; WHITE_TABLE_EXCEPT_NOMETA}
 
         # o tableTargetList: (NotRequired - Default list:{})
         #  If you want to include some tables in generating target expressly,
@@ -76,7 +76,8 @@ map:{
         #  This is only for the main schema. Additional schemas are unconcerned.
         #
         #; columnExceptMap = map:{
-        #    ; FOO_TABLE = list:{FOO_COLUMN ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
+        #    ; VENDOR_CHECK = list:{COLUMN_EXCEPT_TEST}
+        #    ; WHITE_COLUMN_EXCEPT_GEN_ONLY = list:{suffix:GEN_ONLY@gen}
         #}
 
         # o additionalSchemaMap: (NotRequired - Default map:{})
@@ -87,7 +88,7 @@ map:{
         #  tableTargetList, and columnExceptMap.
         #  They have the same specification as ones of the main schema.
         #  Elements of this map are as below: 
-        #    o objectTypeTargetList: (NotRequired - Default 'map:{TABLE;VIEW}')
+        #    o objectTypeTargetList: (NotRequired - Default map:{TABLE;VIEW})
         #    o tableExceptList: (NotRequired - Default list:{})
         #    o tableTargetList: (NotRequired - Default list:{})
         #    o columnExceptMap: (NotRequired - Default map:{})
@@ -95,15 +96,18 @@ map:{
         #    o isSuppressProcedure: (NotRequired - Default false)
         #
         #; additionalSchemaMap = map:{
-        #    ; NEXTEXAMPLEDB = map:{
+        #    ; nextexampledb.$$NoNameSchema$$ = map:{
         #        ; objectTypeTargetList=list:{TABLE ; VIEW}
-        #        ; tableExceptList=list:{FOO_TABLE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
-        #        ; tableTargetList=list:{FOO_TABLE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
+        #        ; tableExceptList=list:{}
+        #        ; tableTargetList=list:{}
         #        ; columnExceptMap=map:{
-        #            ; FOO_TABLE = list:{FOO_COLUMN ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
+        #            ; NEXT_SCHEMA_PRODUCT = list:{
+        #                ; COLUMN_EXCEPT_TEST
+        #                ; COLUMN_EXCEPT_GEN_ONLY_TEST@gen
+        #            }
         #        }
-        #        ; isSuppressCommonColumn=false
-        #        ; isSuppressProcedure=false
+        #        ; isSuppressCommonColumn=true
+        #        ; isSuppressProcedure=true
         #    }
         #}
 
