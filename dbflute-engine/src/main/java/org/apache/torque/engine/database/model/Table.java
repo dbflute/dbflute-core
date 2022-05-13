@@ -3881,17 +3881,6 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                               Adding Schema/Catalog
-    //                                                               =====================
-    protected boolean isAvailableAddingSchemaToTableSqlName() {
-        return getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
-    }
-
-    protected boolean isAvailableAddingCatalogToTableSqlName() {
-        return getLittleAdjustmentProperties().isAvailableAddingCatalogToTableSqlName();
-    }
-
-    // ===================================================================================
     //                                                                Convert Empty String
     //                                                                ====================
     public boolean hasEntityConvertEmptyStringToNull() {
