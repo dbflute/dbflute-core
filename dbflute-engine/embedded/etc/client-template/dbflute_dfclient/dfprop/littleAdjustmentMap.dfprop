@@ -38,6 +38,7 @@ map:{
     # o isAvailableAddingCatalogToTableSqlName: (NotRequired - Default false)
     #   [true]
     #     Add catalog to table SQL name. (The table name on query is CATALOG.SCHEMA.TABLE)
+    #     This property works only when isAvailableAddingSchemaToTableSqlName is true.
     #
     #; isAvailableAddingCatalogToTableSqlName = false
     # - - - - - - - - - -/
