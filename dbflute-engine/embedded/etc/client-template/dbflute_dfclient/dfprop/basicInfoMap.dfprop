@@ -41,7 +41,7 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetLanguage: (Required)
-    #  The target language.
+    #  The target language for generated classes.
     #  Your possible choices are:
     #
     #       java, csharp, scala
@@ -51,7 +51,7 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetContainer: (Required)
-    #  The target DI container.
+    #  The target DI container for DBFlute components.
     #  Your possible choices are:
     #
     #       spring, guice, cdi, seasar, lasta_di
