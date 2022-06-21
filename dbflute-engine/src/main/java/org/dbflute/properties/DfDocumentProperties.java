@@ -335,7 +335,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                               -----------------------
     protected Map<String, Map<String, Object>> _neighborhoodSchemaHtmlMap;
 
-    protected Map<String, Map<String, Object>> getNeighborhoodSchemaHtmlMap() { // closet
+    protected Map<String, Map<String, Object>> getNeighborhoodSchemaHtmlMap() {
         if (_neighborhoodSchemaHtmlMap != null) {
             return _neighborhoodSchemaHtmlMap;
         }
@@ -375,7 +375,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                        --------------
     protected Map<String, Map<String, Object>> _schemaDiagramMap;
 
-    protected Map<String, Map<String, Object>> getSchemaDiagramMap() { // closet
+    protected Map<String, Map<String, Object>> getSchemaDiagramMap() {
         if (_schemaDiagramMap != null) {
             return _schemaDiagramMap;
         }
