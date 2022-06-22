@@ -131,6 +131,7 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o neighborhoodSchemaHtmlMap: (NotRequired - map:{})
     #  You can add links to other SchemaHtmls on your SchemaHtml.
+    #  The path is relative from your SchemaHtml.
     #
     #; neighborhoodSchemaHtmlMap = map:{
     #    ; dockside_maihama = map:{
@@ -142,6 +143,7 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o schemaDiagramMap: (NotRequired - map:{})
     #  You can display your ER diagram on your SchemaHtml.
+    #  The path is relative from your SchemaHtml.
     #
     #; schemaDiagramMap = map:{
     #    ; sea_erd = map:{
