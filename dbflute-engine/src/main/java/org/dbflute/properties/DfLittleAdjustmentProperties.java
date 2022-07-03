@@ -1654,10 +1654,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     // -----------------------------------------------------
-    //                           System Random Default Value
-    //                           ---------------------------
-    public boolean isFilterSystemRandomDefaultValue() { // closet
+    //                              System Random Management
+    //                              ------------------------
+    public boolean isFilterSystemRandomDefaultValue() { // closet, for H2 database first
         return isProperty("isFilterSystemRandomDefaultValue", false);
+    }
+
+    public boolean isSuppressSystemRandomSequence() { // closet, for H2 database first
+        return isProperty("isSuppressSystemRandomSequence", false);
     }
 
     // ===================================================================================

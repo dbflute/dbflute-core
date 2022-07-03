@@ -21,6 +21,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.Srl;
 
@@ -155,6 +157,17 @@ public abstract class DfAbstractMetaDataExtractor {
         return getDatabaseProperties().isRetryCaseInsensitiveIndex();
     }
 
+    // -----------------------------------------------------
+    //                                      Other Properties
+    //                                      ----------------
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
+    protected DfTypeMappingProperties getTypeMappingProperties() {
+        return getProperties().getTypeMappingProperties();
+    }
+    
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
