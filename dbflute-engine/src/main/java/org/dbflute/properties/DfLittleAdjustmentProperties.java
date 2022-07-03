@@ -1653,6 +1653,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
 
+    // -----------------------------------------------------
+    //                           System Random Default Value
+    //                           ---------------------------
+    public boolean isFilterSystemRandomDefaultValue() { // closet
+        return isProperty("isFilterSystemRandomDefaultValue", false);
+    }
+
     // ===================================================================================
     //                                                                               S2Dao
     //                                                                               =====

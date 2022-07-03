@@ -29,8 +29,10 @@ import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,6 +206,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         }
 
         defaultValue = removeDefaultValueQuotation(defaultValue);
+        defaultValue = filterSystemRandomDefaultValueIfNeeds(defaultValue);
         return defaultValue;
     }
 
@@ -226,6 +229,24 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
             map.put(columnInfo.getColumnName(), columnInfo);
         }
         return map;
+    }
+
+    protected String filterSystemRandomDefaultValueIfNeeds(String defaultValue) {
+        if (isDatabaseH2()) {
+            // H2 database has sequence name of random characters on default value
+            //  e.g. NEXT VALUE FOR "PUBLIC"."SYSTEM_SEQUENCE_64BC7B99_6ACA_463D_BB16_13E87C28AA63"
+            // very noisy differences on git so you can remove it if you don't need default values
+            // (basically only used as document on DBFlute) by jflute (2022/07/03)
+            final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+            if (prop.isFilterSystemRandomDefaultValue()) {
+                final String delimiter = "SYSTEM_SEQUENCE_";
+                if (defaultValue.startsWith("NEXT VALUE FOR") && defaultValue.contains(delimiter)) {
+                    final String base = Srl.substringFirstFront(defaultValue, delimiter);
+                    return base + delimiter + "random_filtered";
+                }
+            }
+        }
+        return defaultValue;
     }
 
     // ===================================================================================
@@ -355,7 +376,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     public boolean isMySQLDatetime(final String dbTypeName) {
         return getJdbcTypeMapper().isMySQLDatetime(dbTypeName);
     }
-    
+
     public boolean isPostgreSQLSerialFamily(final String dbTypeName) {
         return getJdbcTypeMapper().isPostgreSQLSerialFamily(dbTypeName);
     }
