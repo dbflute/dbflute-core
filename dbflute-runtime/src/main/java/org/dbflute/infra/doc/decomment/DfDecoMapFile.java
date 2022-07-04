@@ -51,6 +51,7 @@ import org.dbflute.util.DfTypeUtil;
 // done cabos add copyright in source file header like this class to classes of infra.doc.decomment by jflute (2017/11/11)
 
 /**
+ * The file handler for decomment as Map style. (e.g. piece, pickup)
  * @author cabos
  * @author hakiba
  * @author jflute
@@ -80,7 +81,7 @@ public class DfDecoMapFile {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final Supplier<LocalDateTime> currentDatetimeSupplier;
+    private final Supplier<LocalDateTime> currentDatetimeSupplier; // not null
 
     // ===================================================================================
     //                                                                         Constructor
@@ -301,7 +302,7 @@ public class DfDecoMapFile {
      * e.g. table decomment : decomment-piece-TABLE_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
      * e.g. column decomment : decomment-piece-TABLE_NAME-COLUMN_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
      * @param decoMapPiece Decoment piece map (NotNull)
-     * @return piece file name
+     * @return The pure name, without directory path, including extension. (NotNull)
      */
     protected String buildPieceFileName(DfDecoMapPiece decoMapPiece) {
         String tableName = decoMapPiece.getTableName();
@@ -515,12 +516,10 @@ public class DfDecoMapFile {
      */
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> outputPieceList,
             List<DfDecoMapMapping> outputMappingList) {
-
         final List<DfDecoMapMapping> allMappingList = extractAllMappingList(optPickup, outputMappingList);
         final List<DfDecoMapMapping> filteredMappingPartList = filterMergedMapping(allMappingList);
         final Map<String, List<DfDecoMapMappingPart>> mappingPartListMap =
                 groupingByOldStatusAndMergeSameNewStatus(filteredMappingPartList);
-
         final List<DfDecoMapTablePart> allTablePartList = extractAllTableList(optPickup, outputPieceList);
         final Stream<DfDecoMapTablePart> correctNameTableStream = defineMappingToCorrectName(allTablePartList.stream(), mappingPartListMap);
         final Stream<DfDecoMapTablePart> mergedTableStream = defineSameNameMerging(correctNameTableStream);
@@ -534,7 +533,7 @@ public class DfDecoMapFile {
      * extract mapping list from pickup and output mapping
      * @param optPickup Decomment pickup map (NotNull: If pickup map file not exists, Empty allowed)
      * @param outputMappingList Decomment mapping maps in piece directory (NotNull: If mapping map file not exists, Empty allowed)
-     * @return all mapping list in pickup and piece (Not Null)
+     * @return all mapping list in pickup and piece (NotNull)
      */
     private List<DfDecoMapMapping> extractAllMappingList(OptionalThing<DfDecoMapPickup> optPickup,
             List<DfDecoMapMapping> outputMappingList) {
@@ -547,7 +546,7 @@ public class DfDecoMapFile {
      * Define extracting mapping in pickup map
      *
      * @param optPickup Decomment pickup map (NotNull: If pickup map file not exists, Empty allowed)
-     * @return mapping stream (Not Null)
+     * @return mapping stream (NotNull)
      */
     private Stream<DfDecoMapMapping> defineExtractingMappingInPickup(OptionalThing<DfDecoMapPickup> optPickup) {
         return optPickup.map(pickup -> {
@@ -570,8 +569,8 @@ public class DfDecoMapFile {
     /**
      * filter merged mappings
      *
-     * @param allMappingList mapping list extracted mapping and pickup
-     * @return mapping list filtered by previous mapping
+     * @param allMappingList mapping list extracted mapping and pickup (NotNull)
+     * @return mapping list filtered by previous mapping (NotNull)
      */
     private List<DfDecoMapMapping> filterMergedMapping(List<DfDecoMapMapping> allMappingList) {
         Set<String> mappingCodeSet =
@@ -584,8 +583,8 @@ public class DfDecoMapFile {
     /**
      * grouping by old status and merge same new status mapping
      *
-     * @param mappingList filtered mapping list (Not Null)
-     * @return mapping part list map for merge process (Not Null)
+     * @param mappingList filtered mapping list (NotNull)
+     * @return mapping part list map for merge process (NotNull)
      */
     private Map<String, List<DfDecoMapMappingPart>> groupingByOldStatusAndMergeSameNewStatus(List<DfDecoMapMapping> mappingList) {
         Map<String, List<DfDecoMapMapping>> mappingListByOldStatusHash =
@@ -608,9 +607,9 @@ public class DfDecoMapFile {
     /**
      * merge previous mapping and author
      *
-     * @param m1 same status mapping 1
-     * @param m2 same status mapping 2
-     * @return merged mapping of m1, m2
+     * @param m1 same status mapping 1 (NotNull)
+     * @param m2 same status mapping 2 (NotNull)
+     * @return merged mapping of m1, m2 (NotNull)
      */
     private DfDecoMapMapping mergeMapping(DfDecoMapMapping m1, DfDecoMapMapping m2) {
         final Set<String> authorSet = Stream.concat(m1.getAuthorList().stream(), m2.getAuthorList().stream()).collect(Collectors.toSet());
@@ -626,7 +625,7 @@ public class DfDecoMapFile {
      * extract mapping list from pickup and output piece
      * @param optPickup Decomment pickup map (NotNull: If pickup map file not exists, Empty allowed)
      * @param outputPieceList Decoment piece maps in piece directory (NotNull: If piece map file not exists, Empty allowed)
-     * @return all table list in pickup and piece (Not Null)
+     * @return all table list in pickup and piece (NotNull)
      */
     private List<DfDecoMapTablePart> extractAllTableList(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> outputPieceList) {
         final Stream<DfDecoMapTablePart> pickupTableStream = defineConvertPickupToTable(optPickup);
@@ -655,10 +654,9 @@ public class DfDecoMapFile {
     }
 
     private DfDecoMapPropertyPart convertToProperty(DfDecoMapPiece piece) {
-        DfDecoMapPropertyPart property =
-                new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), piece.getCommentVersion(),
-                        piece.getAuthorList(), piece.getPieceCode(), piece.getPieceDatetime(), piece.getPieceOwner(),
-                        piece.getPieceGitBranch(), piece.getPreviousPieceList());
+        DfDecoMapPropertyPart property = new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(),
+                piece.getCommentVersion(), piece.getAuthorList(), piece.getPieceCode(), piece.getPieceDatetime(), piece.getPieceOwner(),
+                piece.getPieceGitBranch(), piece.getPreviousPieceList());
         return property;
     }
 
@@ -670,9 +668,9 @@ public class DfDecoMapFile {
 
     /**
      * Define mapping to correct name
-     * @param tableStream table list stream
-     * @param mappingPartListMap mapping info store
-     * @return table stream defined mapping correct name
+     * @param tableStream table list stream (NotNull)
+     * @param mappingPartListMap mapping info store (NotNull)
+     * @return table stream defined mapping correct name (NotNull)
      */
     private Stream<DfDecoMapTablePart> defineMappingToCorrectName(Stream<DfDecoMapTablePart> tableStream,
             Map<String, List<DfDecoMapMappingPart>> mappingPartListMap) {
@@ -717,9 +715,8 @@ public class DfDecoMapFile {
 
     /**
      * Define merge same table name or column name
-     *
-     * @param tableStream correct table name stream
-     * @return table stream defined merging same name
+     * @param tableStream correct table name stream (NotNull)
+     * @return table stream defined merging same name (NotNull)
      */
     private Stream<DfDecoMapTablePart> defineSameNameMerging(Stream<DfDecoMapTablePart> tableStream) {
         return tableStream.collect(Collectors.groupingBy(table -> table.getTableName())).entrySet().stream().map(tableEntry -> {
@@ -753,10 +750,9 @@ public class DfDecoMapFile {
 
     /**
      * Define filter already merged property
-     *
-     * @param tableStream correct table name stream
-     * @param allTablePartList all table part list
-     * @return table stream defined merging same name
+     * @param tableStream correct table name stream (NotNull)
+     * @param allTablePartList all table part list (NotNull)
+     * @return table stream defined merging same name (NotNull)
      */
     private Stream<DfDecoMapTablePart> defineFilteringMergedProperty(Stream<DfDecoMapTablePart> tableStream,
             List<DfDecoMapTablePart> allTablePartList) {
