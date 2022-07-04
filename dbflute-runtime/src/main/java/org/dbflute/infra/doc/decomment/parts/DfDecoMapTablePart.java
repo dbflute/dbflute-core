@@ -24,16 +24,17 @@ import java.util.stream.Collectors;
 /**
  * @author hakiba
  * @author cabos
+ * @author jflute
  */
 public class DfDecoMapTablePart {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String tableName;
-    protected final List<DfDecoMapMappingPart> mappingList;
-    protected final List<DfDecoMapPropertyPart> propertyList;
-    protected final List<DfDecoMapColumnPart> columnList;
+    protected final String tableName; // not null
+    protected final List<DfDecoMapMappingPart> mappingList; // not null
+    protected final List<DfDecoMapPropertyPart> propertyList; // not null
+    protected final List<DfDecoMapColumnPart> columnList; // not null
 
     // ===================================================================================
     //                                                           Constructor and Converter
@@ -75,6 +76,22 @@ public class DfDecoMapTablePart {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "tablePart:{" + tableName //
+                + ", mappings=" + toSizeExp(mappingList) //
+                + ", properties=" + toSizeExp(propertyList) //
+                + ", columns=" + toSizeExp(columnList) //
+                + "}";
+    }
+
+    protected String toSizeExp(List<?> list) {
+        return list != null ? String.valueOf(list.size()) : "null"; // just in case
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getTableName() {
@@ -86,7 +103,7 @@ public class DfDecoMapTablePart {
     }
 
     public List<DfDecoMapPropertyPart> getPropertyList() {
-        return Collections.unmodifiableList(this.propertyList);
+        return Collections.unmodifiableList(propertyList);
     }
 
     public List<DfDecoMapColumnPart> getColumnList() {
