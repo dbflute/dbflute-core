@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -587,7 +588,8 @@ public class DfDecoMapFile {
      * @return mapping part list map for merge process (NotNull)
      */
     private Map<String, List<DfDecoMapMappingPart>> groupingByOldStatusAndMergeSameNewStatus(List<DfDecoMapMapping> mappingList) {
-        Map<String, List<DfDecoMapMapping>> mappingListByOldStatusHash =
+        // no need to keep order because of only dictionary use by jflute (2022/07/04)
+        final Map<String, List<DfDecoMapMapping>> mappingListByOldStatusHash =
                 mappingList.stream().collect(Collectors.groupingBy(mapping -> generateOldStateHash(mapping)));
         return mappingListByOldStatusHash.entrySet().stream().collect(Collectors.toMap(entry -> {
             return entry.getKey();
@@ -719,31 +721,29 @@ public class DfDecoMapFile {
      * @return table stream defined merging same name (NotNull)
      */
     private Stream<DfDecoMapTablePart> defineSameNameMerging(Stream<DfDecoMapTablePart> tableStream) {
-        return tableStream.collect(Collectors.groupingBy(table -> table.getTableName())).entrySet().stream().map(tableEntry -> {
+        // needs to keep order for small git differences by jflute (2022/07/04)
+        final Map<String, List<DfDecoMapTablePart>> groupedTableMap =
+                tableStream.collect(Collectors.groupingBy(table -> table.getTableName(), () -> new LinkedHashMap<>(), Collectors.toList()));
+        return groupedTableMap.entrySet().stream().map(tableEntry -> {
             final String tableName = tableEntry.getKey();
             final List<DfDecoMapTablePart> sameTableNameList = tableEntry.getValue();
             final List<DfDecoMapPropertyPart> tablePropertyList =
                     tableEntry.getValue().stream().flatMap(table -> table.getPropertyList().stream()).collect(Collectors.toList());
             final List<DfDecoMapMappingPart> tableMappingPartList =
                     tableEntry.getValue().stream().flatMap(table -> table.getMappingList().stream()).collect(Collectors.toList());
-            final List<DfDecoMapColumnPart> columnList = sameTableNameList.stream()
+
+            // don't know whether keeping order is needed or not but keep it just in case (2022/07/04)
+            final Map<String, List<DfDecoMapColumnPart>> groupedColumnMap = sameTableNameList.stream()
                     .flatMap(table -> table.getColumnList().stream())
-                    .collect(Collectors.groupingBy(column -> column.getColumnName()))
-                    .entrySet()
-                    .stream()
-                    .map(columnEntry -> {
-                        final String columnName = columnEntry.getKey();
-                        final List<DfDecoMapMappingPart> columnMappingPartList = columnEntry.getValue()
-                                .stream()
-                                .flatMap(column -> column.getMappingList().stream())
-                                .collect(Collectors.toList());
-                        final List<DfDecoMapPropertyPart> columnPropertyList = columnEntry.getValue()
-                                .stream()
-                                .flatMap(column -> column.getPropertyList().stream())
-                                .collect(Collectors.toList());
-                        return new DfDecoMapColumnPart(columnName, columnMappingPartList, columnPropertyList);
-                    })
-                    .collect(Collectors.toList());
+                    .collect(Collectors.groupingBy(column -> column.getColumnName(), () -> new LinkedHashMap<>(), Collectors.toList()));
+            final List<DfDecoMapColumnPart> columnList = groupedColumnMap.entrySet().stream().map(columnEntry -> {
+                final String columnName = columnEntry.getKey();
+                final List<DfDecoMapMappingPart> columnMappingPartList =
+                        columnEntry.getValue().stream().flatMap(column -> column.getMappingList().stream()).collect(Collectors.toList());
+                final List<DfDecoMapPropertyPart> columnPropertyList =
+                        columnEntry.getValue().stream().flatMap(column -> column.getPropertyList().stream()).collect(Collectors.toList());
+                return new DfDecoMapColumnPart(columnName, columnMappingPartList, columnPropertyList);
+            }).collect(Collectors.toList());
             return new DfDecoMapTablePart(tableName, tableMappingPartList, tablePropertyList, columnList);
         });
     }
