@@ -65,17 +65,18 @@ public class DfDecoMapFile {
     //                                                                          ==========
     // e.g. dbflute_maihamadb/scheme/decomment/
     private static final String BASE_DECOMMENT_DIR_PATH = "/schema/decomment/";
+
     // e.g. dbflute_maihamadb/scheme/decomment/piece/
     private static final String BASE_PICKUP_DIR_PATH = BASE_DECOMMENT_DIR_PATH + "piece/";
+
     // e.g. dbflute_maihamadb/scheme/decomment/pickup/decomment-pickup.dfmap
     private static final String BASE_PIECE_FILE_PATH = BASE_DECOMMENT_DIR_PATH + "pickup/decomment-pickup.dfmap";
 
     private static final Map<String, String> REPLACE_CHAR_MAP;
-
     static {
         // done cabos add spaces and replaceChar should be underscore? by jflute (2017/09/07)
-        List<String> notAvailableCharList = Arrays.asList("/", "\\", "<", ">", "*", "?", "\"", "|", ":", ";", "\0", " ");
-        String replaceChar = "_";
+        final List<String> notAvailableCharList = Arrays.asList("/", "\\", "<", ">", "*", "?", "\"", "|", ":", ";", "\0", " ");
+        final String replaceChar = "_";
         REPLACE_CHAR_MAP = notAvailableCharList.stream().collect(Collectors.toMap(ch -> ch, ch -> replaceChar));
     }
 
@@ -108,7 +109,7 @@ public class DfDecoMapFile {
      */
     public List<DfDecoMapPiece> readPieceList(String clientDirPath) {
         assertClientDirPath(clientDirPath);
-        String pieceDirPath = buildPieceDirPath(clientDirPath);
+        final String pieceDirPath = buildPieceDirPath(clientDirPath);
         if (Files.notExists(Paths.get(pieceDirPath))) {
             return Collections.emptyList();
         }
@@ -130,7 +131,7 @@ public class DfDecoMapFile {
     private DfDecoMapPiece doReadPiece(Path path) {
         final DfMapFile mapFile = createDfMapFile();
         try {
-            Map<String, Object> map = mapFile.readMap(Files.newInputStream(path));
+            final Map<String, Object> map = mapFile.readMap(Files.newInputStream(path));
             return mappingToDecoMapPiece(map);
         } catch (RuntimeException | IOException e) {
             throwDecoMapReadFailureException(path.toString(), e);
@@ -140,21 +141,21 @@ public class DfDecoMapFile {
 
     // done hakiba cast check by hakiba (2017/07/29)
     private DfDecoMapPiece mappingToDecoMapPiece(Map<String, Object> map) {
-        String formatVersion = (String) map.get("formatVersion");
-        String tableName = (String) map.get("tableName");
-        String columnName = (String) map.get("columnName");
-        DfDecoMapPieceTargetType targetType = DfDecoMapPieceTargetType.of(map.get("targetType")).get();
-        String decomment = (String) map.get("decomment");
-        String databaseComment = (String) map.get("databaseComment");
-        Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
+        final String formatVersion = (String) map.get("formatVersion");
+        final String tableName = (String) map.get("tableName");
+        final String columnName = (String) map.get("columnName");
+        final DfDecoMapPieceTargetType targetType = DfDecoMapPieceTargetType.of(map.get("targetType")).get();
+        final String decomment = (String) map.get("decomment");
+        final String databaseComment = (String) map.get("databaseComment");
+        final Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
         @SuppressWarnings("unchecked")
-        List<String> authorList = (List<String>) map.get("authorList");
-        String pieceCode = (String) map.get("pieceCode");
-        LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
-        String pieceOwner = (String) map.get("pieceOwner");
-        String pieceGitBranch = (String) map.get("pieceGitBranch");
+        final List<String> authorList = (List<String>) map.get("authorList");
+        final String pieceCode = (String) map.get("pieceCode");
+        final LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
+        final String pieceOwner = (String) map.get("pieceOwner");
+        final String pieceGitBranch = (String) map.get("pieceGitBranch");
         @SuppressWarnings("unchecked")
-        List<String> previousPieceList = (List<String>) map.get("previousPieceList");
+        final List<String> previousPieceList = (List<String>) map.get("previousPieceList");
         return new DfDecoMapPiece(formatVersion, tableName, columnName, targetType, decomment, databaseComment, commentVersion, authorList,
                 pieceCode, pieceDatetime, pieceOwner, pieceGitBranch, previousPieceList);
     }
@@ -171,7 +172,7 @@ public class DfDecoMapFile {
      */
     public OptionalThing<DfDecoMapPickup> readPickup(String clientDirPath) {
         assertClientDirPath(clientDirPath);
-        String filePath = buildPickupFilePath(clientDirPath);
+        final String filePath = buildPickupFilePath(clientDirPath);
         if (Files.notExists(Paths.get(filePath))) {
             // done hakiba null pointer so use optional thing and stream empty by jflute (2017/10/05)
             return OptionalThing.empty();
@@ -191,18 +192,19 @@ public class DfDecoMapFile {
     }
 
     private DfDecoMapPickup mappingToDecoMapPickup(Map<String, Object> map) {
-        String formatVersion = (String) map.getOrDefault("formatVersion", DfDecoMapPickup.DEFAULT_FORMAT_VERSION);
-        LocalDateTime pickupDatetime = DfTypeUtil.toLocalDateTime(map.get("pickupDatetime"));
+        final String formatVersion = (String) map.getOrDefault("formatVersion", DfDecoMapPickup.DEFAULT_FORMAT_VERSION);
+        final LocalDateTime pickupDatetime = DfTypeUtil.toLocalDateTime(map.get("pickupDatetime"));
 
         @SuppressWarnings("unchecked")
-        Map<String, List<Map<String, Object>>> decoMap =
+        final Map<String, List<Map<String, Object>>> decoMap =
                 (Map<String, List<Map<String, Object>>>) map.getOrDefault(DfDecoMapPickup.DECO_MAP_KEY_DECOMAP, Collections.emptyMap());
         if (decoMap.isEmpty()) {
             return new DfDecoMapPickup(formatVersion, Collections.emptyList(), pickupDatetime);
         }
 
-        List<Map<String, Object>> tableMapList = decoMap.getOrDefault(DfDecoMapPickup.DECO_MAP_KEY_TABLE_LIST, Collections.emptyList());
-        List<DfDecoMapTablePart> tableList = tableMapList.stream().map(tablePartMap -> {
+        final List<Map<String, Object>> tableMapList =
+                decoMap.getOrDefault(DfDecoMapPickup.DECO_MAP_KEY_TABLE_LIST, Collections.emptyList());
+        final List<DfDecoMapTablePart> tableList = tableMapList.stream().map(tablePartMap -> {
             return new DfDecoMapTablePart(tablePartMap);
         }).collect(Collectors.toList());
         return new DfDecoMapPickup(formatVersion, tableList, pickupDatetime);
@@ -218,7 +220,7 @@ public class DfDecoMapFile {
      */
     public List<DfDecoMapMapping> readMappingList(String clientDirPath) {
         assertClientDirPath(clientDirPath);
-        String pieceDirPath = buildPieceDirPath(clientDirPath);
+        final String pieceDirPath = buildPieceDirPath(clientDirPath);
         if (Files.notExists(Paths.get(pieceDirPath))) {
             return Collections.emptyList();
         }
@@ -250,19 +252,19 @@ public class DfDecoMapFile {
 
     // done hakiba cast check by hakiba (2017/07/29)
     private DfDecoMapMapping mappingToDecoMapMapping(Map<String, Object> map) {
-        String formatVersion = (String) map.get("formatVersion");
-        String oldTableName = (String) map.get("oldTableName");
-        String oldColumnName = (String) map.get("oldColumnName");
-        String newTableName = (String) map.get("newTableName");
-        String newColumnName = (String) map.get("newColumnName");
-        DfDecoMapPieceTargetType targetType = DfDecoMapPieceTargetType.of(map.get("targetType")).get();
+        final String formatVersion = (String) map.get("formatVersion");
+        final String oldTableName = (String) map.get("oldTableName");
+        final String oldColumnName = (String) map.get("oldColumnName");
+        final String newTableName = (String) map.get("newTableName");
+        final String newColumnName = (String) map.get("newColumnName");
+        final DfDecoMapPieceTargetType targetType = DfDecoMapPieceTargetType.of(map.get("targetType")).get();
         @SuppressWarnings("unchecked")
-        List<String> authorList = (List<String>) map.get("authorList");
-        String mappingCode = (String) map.get("mappingCode");
-        LocalDateTime mappingDatetime = new HandyDate((String) map.get("mappingDatetime")).getLocalDateTime();
-        String mappingOwner = (String) map.get("mappingOwner");
+        final List<String> authorList = (List<String>) map.get("authorList");
+        final String mappingCode = (String) map.get("mappingCode");
+        final LocalDateTime mappingDatetime = new HandyDate((String) map.get("mappingDatetime")).getLocalDateTime();
+        final String mappingOwner = (String) map.get("mappingOwner");
         @SuppressWarnings("unchecked")
-        List<String> previousMappingList = (List<String>) map.get("previousMappingList");
+        final List<String> previousMappingList = (List<String>) map.get("previousMappingList");
         return new DfDecoMapMapping(formatVersion, oldTableName, oldColumnName, newTableName, newColumnName, targetType, authorList,
                 mappingCode, mappingOwner, mappingDatetime, previousMappingList);
     }
@@ -292,7 +294,7 @@ public class DfDecoMapFile {
      */
     public void writePiece(String clientDirPath, DfDecoMapPiece decoMapPiece) {
         assertClientDirPath(clientDirPath);
-        String pieceMapPath = buildPieceDirPath(clientDirPath) + buildPieceFileName(decoMapPiece);
+        final String pieceMapPath = buildPieceDirPath(clientDirPath) + buildPieceFileName(decoMapPiece);
         // done cabos remove 'df' from variable name by jflute (2017/08/10)
         // done cabos make and throw PhysicalCabosException (application exception) see ClientNotFoundException by jflute (2017/08/10)
         doWritePiece(pieceMapPath, decoMapPiece);
@@ -306,10 +308,10 @@ public class DfDecoMapFile {
      * @return The pure name, without directory path, including extension. (NotNull)
      */
     protected String buildPieceFileName(DfDecoMapPiece decoMapPiece) {
-        String tableName = decoMapPiece.getTableName();
-        String columnName = decoMapPiece.getColumnName();
-        String owner = decoMapPiece.getPieceOwner();
-        String pieceCode = decoMapPiece.getPieceCode();
+        final String tableName = decoMapPiece.getTableName();
+        final String columnName = decoMapPiece.getColumnName();
+        final String owner = decoMapPiece.getPieceOwner();
+        final String pieceCode = decoMapPiece.getPieceCode();
         if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Table) {
             // e.g. decomment-piece-MEMBER-20171015-161718-199-jflute-HF7ELSE.dfmap
             return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode + ".dfmap";
@@ -331,7 +333,7 @@ public class DfDecoMapFile {
     }
 
     private void doWritePiece(String pieceFilePath, DfDecoMapPiece decoMapPiece) {
-        File pieceMapFile = new File(pieceFilePath);
+        final File pieceMapFile = new File(pieceFilePath);
         if (pieceMapFile.exists()) { // no way, but just in case
             pieceMapFile.delete(); // simply delete old file
         }
@@ -360,7 +362,7 @@ public class DfDecoMapFile {
     }
 
     protected void doWritePickup(String pickupFilePath, DfDecoMapPickup decoMapPickup) {
-        File pickupMapFile = new File(pickupFilePath);
+        final File pickupMapFile = new File(pickupFilePath);
         if (pickupMapFile.exists()) { // no way, but just in case
             pickupMapFile.delete(); // simply delete old file
         }
@@ -385,17 +387,17 @@ public class DfDecoMapFile {
     //                                               -------
     public void writeMapping(String clientDirPath, DfDecoMapMapping decoMapMapping) {
         assertClientDirPath(clientDirPath);
-        String mappingFilePath = buildPieceDirPath(clientDirPath) + buildMappingFileName(decoMapMapping);
+        final String mappingFilePath = buildPieceDirPath(clientDirPath) + buildMappingFileName(decoMapMapping);
         doWriteMapping(mappingFilePath, decoMapMapping);
     }
 
     protected String buildMappingFileName(DfDecoMapMapping decoMapMapping) {
-        String oldTableName = decoMapMapping.getOldTableName();
-        String oldColumnName = decoMapMapping.getOldColumnName();
-        String newTableName = decoMapMapping.getNewTableName();
-        String newColumnName = decoMapMapping.getNewColumnName();
-        String owner = decoMapMapping.getMappingOwner();
-        String mappingCode = decoMapMapping.getMappingCode();
+        final String oldTableName = decoMapMapping.getOldTableName();
+        final String oldColumnName = decoMapMapping.getOldColumnName();
+        final String newTableName = decoMapMapping.getNewTableName();
+        final String newColumnName = decoMapMapping.getNewColumnName();
+        final String owner = decoMapMapping.getMappingOwner();
+        final String mappingCode = decoMapMapping.getMappingCode();
         // done cabos fix comment by jflute (2018/02/22)
         if (decoMapMapping.getTargetType() == DfDecoMapPieceTargetType.Table) {
             // e.g. decomment-mapping-OLD_TABLE-NEW_TABLE-20180318-142935-095-cabos-890e4e07.dfmap
@@ -411,7 +413,7 @@ public class DfDecoMapFile {
     }
 
     protected void doWriteMapping(String mappingFilePath, DfDecoMapMapping decoMapMapping) {
-        File mappingMapFile = new File(mappingFilePath);
+        final File mappingMapFile = new File(mappingFilePath);
         if (mappingMapFile.exists()) { // no way, but just in case
             mappingMapFile.delete(); // simply delete old file
         }
@@ -538,8 +540,8 @@ public class DfDecoMapFile {
      */
     private List<DfDecoMapMapping> extractAllMappingList(OptionalThing<DfDecoMapPickup> optPickup,
             List<DfDecoMapMapping> outputMappingList) {
-        Stream<DfDecoMapMapping> pickupMappingStream = defineExtractingMappingInPickup(optPickup);
-        Stream<DfDecoMapMapping> pieceMappingStream = outputMappingList.stream();
+        final Stream<DfDecoMapMapping> pickupMappingStream = defineExtractingMappingInPickup(optPickup);
+        final Stream<DfDecoMapMapping> pieceMappingStream = outputMappingList.stream();
         return Stream.concat(pickupMappingStream, pieceMappingStream).collect(Collectors.toList());
     }
 
@@ -551,12 +553,12 @@ public class DfDecoMapFile {
      */
     private Stream<DfDecoMapMapping> defineExtractingMappingInPickup(OptionalThing<DfDecoMapPickup> optPickup) {
         return optPickup.map(pickup -> {
-            Stream<DfDecoMapMapping> tableMappingStream = pickup.getTableList().stream().flatMap(table -> {
+            final Stream<DfDecoMapMapping> tableMappingStream = pickup.getTableList().stream().flatMap(table -> {
                 return table.getMappingList().stream().map(mapping -> {
                     return new DfDecoMapMapping(table.getTableName(), null, DfDecoMapPieceTargetType.Table, mapping);
                 });
             });
-            Stream<DfDecoMapMapping> columnMappingStream = pickup.getTableList().stream().flatMap(table -> {
+            final Stream<DfDecoMapMapping> columnMappingStream = pickup.getTableList().stream().flatMap(table -> {
                 return table.getColumnList().stream().flatMap(column -> {
                     return column.getMappingList().stream().map(mapping -> {
                         return new DfDecoMapMapping(table.getTableName(), column.getColumnName(), DfDecoMapPieceTargetType.Column, mapping);
@@ -574,7 +576,7 @@ public class DfDecoMapFile {
      * @return mapping list filtered by previous mapping (NotNull)
      */
     private List<DfDecoMapMapping> filterMergedMapping(List<DfDecoMapMapping> allMappingList) {
-        Set<String> mappingCodeSet =
+        final Set<String> mappingCodeSet =
                 allMappingList.stream().flatMap(mapping -> mapping.getPreviousMappingList().stream()).collect(Collectors.toSet());
         return allMappingList.stream().filter(mapping -> {
             return !mappingCodeSet.contains(mapping.getMappingCode());
@@ -686,7 +688,7 @@ public class DfDecoMapFile {
         final List<DfDecoMapMappingPart> mappingPartList =
                 mappingPartListMap.getOrDefault(generateTableStateHash(tablePart), Collections.emptyList());
 
-        DfDecoMapTablePart part;
+        final DfDecoMapTablePart part;
         if (mappingPartList.size() == 1) {
             final DfDecoMapMappingPart mappingPart = mappingPartList.get(0);
             part = new DfDecoMapTablePart(mappingPart.getNewTableName(), Collections.emptyList(), tablePart.getPropertyList(),
@@ -779,9 +781,9 @@ public class DfDecoMapFile {
 
     private Set<String> extractAllMergedPieceCode(List<DfDecoMapTablePart> tableList) {
         return tableList.stream().flatMap(table -> {
-            Stream<String> previousTablePieceStream =
+            final Stream<String> previousTablePieceStream =
                     table.getPropertyList().stream().flatMap(property -> property.getPreviousPieceList().stream());
-            Stream<String> previousColumnPieceStream = table.getColumnList()
+            final Stream<String> previousColumnPieceStream = table.getColumnList()
                     .stream()
                     .flatMap(column -> column.getPropertyList().stream())
                     .flatMap(property -> property.getPreviousPieceList().stream());
@@ -823,12 +825,12 @@ public class DfDecoMapFile {
     //                                                 Piece
     //                                                 -----
     public void deletePiece(String clientPath) {
-        String pieceDirPath = buildPieceDirPath(clientPath);
+        final String pieceDirPath = buildPieceDirPath(clientPath);
         doDeletePiece(pieceDirPath);
     }
 
     private void doDeletePiece(String piecePath) {
-        File pieceDir = new File(piecePath);
+        final File pieceDir = new File(piecePath);
         if (pieceDir.isDirectory()) {
             for (File pieceFile : pieceDir.listFiles()) {
                 if (pieceFile.isFile()) {

@@ -30,6 +30,7 @@ import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author hakiba
@@ -145,9 +146,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
                 Collections.singletonList("SAMPLEPI"));
         final DfDecoMapPiece piece3 = preparePieceColumn(tableName, columnName, "cabos", Arrays.asList("deco", "hakiba"), "AYOOOOO",
                 Collections.singletonList("ECECODED"));
-        final DfDecoMapPiece piece4 =
-                preparePieceColumn(tableName, columnName, "jflute", Arrays.asList("deco", "hakiba", "cabos"), "SLEEPY00",
-                        Collections.singletonList("AYOOOOO"));
+        final DfDecoMapPiece piece4 = preparePieceColumn(tableName, columnName, "jflute", Arrays.asList("deco", "hakiba", "cabos"),
+                "SLEEPY00", Collections.singletonList("AYOOOOO"));
         final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3, piece4);
 
         // ## Act ##
@@ -317,6 +317,147 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         }
     }
 
+    // -----------------------------------------------------
+    //                                        Existence Case
+    //                                        --------------
+    public void test_merge_existenceCase_allEmpty() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup("/detarame");
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, Collections.emptyList(), Collections.emptyList());
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        assertHasZeroElement(mergedPickup.getTableList());
+    }
+
+    public void test_merge_existenceCase_allStars() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
+        final List<DfDecoMapMapping> mappingList = decoMapFile.readMappingList(buildTestResourcePath());
+        assertHasAnyElement(pieceList);
+        assertHasAnyElement(mappingList);
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup(buildTestResourcePath());
+        assertTrue(optPickUp.isPresent());
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, pieceList, mappingList);
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        List<DfDecoMapTablePart> tableList = mergedPickup.getTableList();
+        assertHasAnyElement(tableList);
+        List<String> tableNameList = tableList.stream().map(table -> table.getTableName()).collect(Collectors.toList());
+        log(tableNameList);
+        assertTrue(Srl.containsElementAll(tableNameList, "MEMBER", "SERVICE_RANK"));
+    }
+
+    public void test_merge_existenceCase_pickupOnly() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup(buildTestResourcePath());
+        assertTrue(optPickUp.isPresent());
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, Collections.emptyList(), Collections.emptyList());
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        List<DfDecoMapTablePart> tableList = mergedPickup.getTableList();
+        assertHasAnyElement(tableList);
+        List<String> tableNameList = tableList.stream().map(table -> table.getTableName()).collect(Collectors.toList());
+        log(tableNameList);
+        assertTrue(tableNameList.contains("MEMBER"));
+    }
+
+    public void test_merge_existenceCase_pieceOnly() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
+        assertHasAnyElement(pieceList);
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup("/detarame");
+        assertFalse(optPickUp.isPresent());
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, pieceList, Collections.emptyList());
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        List<DfDecoMapTablePart> tableList = mergedPickup.getTableList();
+        assertHasAnyElement(tableList);
+        List<String> tableNameList = tableList.stream().map(table -> table.getTableName()).collect(Collectors.toList());
+        log(tableNameList);
+        assertTrue(Srl.containsElementAll(tableNameList, "MEMBER", "SERVICE_RANK"));
+    }
+
+    public void test_merge_existenceCase_mappingOnly() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final List<DfDecoMapMapping> mappingList = decoMapFile.readMappingList(buildTestResourcePath());
+        assertHasAnyElement(mappingList);
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup("/detarame");
+        assertFalse(optPickUp.isPresent());
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, Collections.emptyList(), mappingList);
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        assertHasZeroElement(mergedPickup.getTableList());
+    }
+
+    public void test_merge_existenceCase_piece_and_mapping() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
+        final List<DfDecoMapMapping> mappingList = decoMapFile.readMappingList(buildTestResourcePath());
+        assertHasAnyElement(pieceList);
+        assertHasAnyElement(mappingList);
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup("/detarame");
+        assertFalse(optPickUp.isPresent());
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, pieceList, mappingList);
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        List<DfDecoMapTablePart> tableList = mergedPickup.getTableList();
+        assertHasAnyElement(tableList);
+        List<String> tableNameList = tableList.stream().map(table -> table.getTableName()).collect(Collectors.toList());
+        log(tableNameList);
+        assertTrue(Srl.containsElementAll(tableNameList, "MEMBER", "SERVICE_RANK"));
+    }
+
+    public void test_merge_existenceCase_pickup_and_piece() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
+        assertHasAnyElement(pieceList);
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup("/detarame");
+        assertFalse(optPickUp.isPresent());
+
+        // ## Act ##
+        final DfDecoMapPickup mergedPickup = decoMapFile.merge(optPickUp, pieceList, Collections.emptyList());
+
+        // ## Assert ##
+        assertNotNull(mergedPickup);
+        log(mergedPickup);
+        List<DfDecoMapTablePart> tableList = mergedPickup.getTableList();
+        assertHasAnyElement(tableList);
+        List<String> tableNameList = tableList.stream().map(table -> table.getTableName()).collect(Collectors.toList());
+        log(tableNameList);
+        assertTrue(Srl.containsElementAll(tableNameList, "MEMBER", "SERVICE_RANK"));
+    }
+
     // ===================================================================================
     //                                                                           file name
     //                                                                           =========
@@ -363,9 +504,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         };
 
         // e.g decomment-piece-TABLE_NAME-20170316-123456-789-authorName.dfmap
-        final String expFileName =
-                "decomment-piece-" + sampleTableName + "-" + sampleColumnName + "-" + currentDateStr + "-" + sampleAuthor + "-"
-                        + samplePieceCode + ".dfmap";
+        final String expFileName = "decomment-piece-" + sampleTableName + "-" + sampleColumnName + "-" + currentDateStr + "-" + sampleAuthor
+                + "-" + samplePieceCode + ".dfmap";
 
         // ## Act ##
         final String fileName = decoMapFile.buildPieceFileName(piece);

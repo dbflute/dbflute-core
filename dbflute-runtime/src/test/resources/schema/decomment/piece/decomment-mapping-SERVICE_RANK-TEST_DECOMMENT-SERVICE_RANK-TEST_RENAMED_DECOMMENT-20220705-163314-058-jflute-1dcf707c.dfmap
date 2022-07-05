@@ -1,0 +1,15 @@
+map:{
+    ; formatVersion = 1.1
+    ; oldTableName = SERVICE_RANK
+    ; oldColumnName = TEST_DECOMMENT
+    ; newTableName = SERVICE_RANK
+    ; newColumnName = TEST_RENAMED_DECOMMENT
+    ; targetType = COLUMN
+    ; authorList = list:{
+        ; jflute
+    }
+    ; mappingCode = 1dcf707c
+    ; mappingOwner = jflute
+    ; mappingDatetime = 2022-07-05T16:33:14.058
+    ; previousMappingList = list:{}
+}

@@ -48,22 +48,25 @@ public class DfDecoMapPickup {
     //                                                                           Attribute
     //                                                                           =========
     // done cabos add pickupDatetime by jflute (2017/11/11)
-    protected final String formatVersion;
-    protected final LocalDateTime pickupDatetime;
+    protected final String formatVersion; // not null
+    protected final LocalDateTime pickupDatetime; // not null
+
     // -----------------------------------------------------
     //                                               decoMap
     //                                               -------
-    protected final List<DfDecoMapTablePart> tableList;
+    protected final List<DfDecoMapTablePart> tableList; // not null
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    // for read existing pickup
     public DfDecoMapPickup(String formatVersion, List<DfDecoMapTablePart> tableList, LocalDateTime pickupDatetime) {
         this.formatVersion = formatVersion;
         this.pickupDatetime = pickupDatetime;
         this.tableList = tableList;
     }
 
+    // for new pickup
     public DfDecoMapPickup(List<DfDecoMapTablePart> tableList, LocalDateTime pickupDatetime) {
         this.formatVersion = DEFAULT_FORMAT_VERSION;
         this.pickupDatetime = pickupDatetime;
@@ -136,24 +139,28 @@ public class DfDecoMapPickup {
     //     }
     // }
     public Map<String, Object> convertToMap() {
-        final Map<String, List<Map<String, Object>>> decoMap = new LinkedHashMap<>();
-        final List<Map<String, Object>> convertedTableList =
-                this.tableList.stream().map(DfDecoMapTablePart::convertPickupMap).collect(Collectors.toList());
-        decoMap.put(DECO_MAP_KEY_TABLE_LIST, convertedTableList);
-        Map<String, Object> map = new LinkedHashMap<>();
+        final Map<String, Object> map = new LinkedHashMap<>();
         map.put("formatVersion", formatVersion);
         map.put("pickupDatetime", pickupDatetime);
-        map.put(DECO_MAP_KEY_DECOMAP, decoMap);
+        map.put(DECO_MAP_KEY_DECOMAP, prepareDecoMap());
         return map;
+    }
+
+    private Map<String, List<Map<String, Object>>> prepareDecoMap() {
+        final Map<String, List<Map<String, Object>>> decoMap = new LinkedHashMap<>();
+        final List<Map<String, Object>> convertedTableList =
+                tableList.stream().map(DfDecoMapTablePart::convertPickupMap).collect(Collectors.toList());
+        decoMap.put(DECO_MAP_KEY_TABLE_LIST, convertedTableList);
+        return decoMap;
     }
 
     // done hakiba move to before Accessor by jflute (2017/08/17)
     // ===================================================================================
-    //                                                                            Override
-    //                                                                            ========
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
-        return new DfMapStyle().toMapString(this.convertToMap());
+        return new DfMapStyle().toMapString(convertToMap());
     }
 
     // ===================================================================================
@@ -168,6 +175,6 @@ public class DfDecoMapPickup {
     }
 
     public List<DfDecoMapTablePart> getTableList() {
-        return Collections.unmodifiableList(this.tableList);
+        return Collections.unmodifiableList(tableList);
     }
 }
