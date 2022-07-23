@@ -40,6 +40,7 @@ import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.QueryInsertSetupper;
 import org.dbflute.bhv.writable.UpdateOption;
+import org.dbflute.bhv.writable.WritableOption;
 import org.dbflute.bhv.writable.WritableOptionCall;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.scoping.SpecifyQuery;
@@ -1533,27 +1534,57 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             UpdateOption<? extends ConditionBean> option, boolean nonstrict) {
         assertObjectNotNull("entityList", entityList);
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
+        boolean hasPrimaryKeyValueAtLeastOne = false;
+        boolean hasUniqueByCallAtLeastOne = false;
         for (ELEMENT entity : entityList) {
             adjustEntityBeforeUpdate(entity, optOption);
             if (!nonstrict) {
                 assertEntityHasOptimisticLockValue(entity);
             }
+            if (entity.hasPrimaryKeyValue()) {
+                hasPrimaryKeyValueAtLeastOne = true;
+            }
+            if (!entity.myuniqueDrivenProperties().isEmpty()) { // uniqueBy() called
+                hasUniqueByCallAtLeastOne = true;
+            }
         }
+        assertEntityListBeforeBatchUniqueBy(entityList, option, hasPrimaryKeyValueAtLeastOne, hasUniqueByCallAtLeastOne);
     }
 
     protected <ELEMENT extends Entity> List<ELEMENT> adjustEntityListBeforeBatchDelete(List<ELEMENT> entityList,
             DeleteOption<? extends ConditionBean> option, boolean nonstrict) {
+        // #for_now jflute no recycle with update for careful release (2022/07/23)
         assertObjectNotNull("entityList", entityList);
         final OptionalThing<DeleteOption<? extends ConditionBean>> optOption = createOptionalDeleteOption(option);
+        boolean hasPrimaryKeyValueAtLeastOne = false;
+        boolean hasUniqueByCallAtLeastOne = false;
         final List<ELEMENT> filteredList = new ArrayList<ELEMENT>(entityList.size());
         for (ELEMENT entity : entityList) {
             adjustEntityBeforeDelete(entity, optOption);
             if (!nonstrict) {
                 assertEntityHasOptimisticLockValue(entity);
             }
+            if (entity.hasPrimaryKeyValue()) {
+                hasPrimaryKeyValueAtLeastOne = true;
+            }
+            if (!entity.myuniqueDrivenProperties().isEmpty()) { // uniqueBy() called
+                hasUniqueByCallAtLeastOne = true;
+            }
             filteredList.add(entity);
         }
-        return filteredList;
+        assertEntityListBeforeBatchUniqueBy(entityList, option, hasPrimaryKeyValueAtLeastOne, hasUniqueByCallAtLeastOne);
+        return filteredList; // #for_now existing filtering process looks unneeded by jflute (2022/07/23)
+    }
+
+    protected <ELEMENT extends Entity> void assertEntityListBeforeBatchUniqueBy(List<ELEMENT> entityList,
+            WritableOption<? extends ConditionBean> option, boolean hasPrimaryKeyValueAtLeastOne, boolean hasUniqueByCallAtLeastOne) {
+        // no check if all entities have PKs for compatible
+        // and also if part of entities have PK for careful release
+        if (!hasPrimaryKeyValueAtLeastOne // all records are "PK = null" (nonsense SQL)
+                && hasUniqueByCallAtLeastOne // unsupported uniqueBy() of BatchUpdate
+                && !asDBMeta().getUniqueInfoList().isEmpty()) { // maybe unneeded but just in case
+            createBhvExThrower().throwBatchUpdateUniqueByUnsupportedException(entityList, option);
+        }
     }
 
     // ===================================================================================

@@ -25,6 +25,7 @@ import org.dbflute.bhv.writable.WritableOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.dbflute.cbean.paging.PagingBean;
+import org.dbflute.exception.BatchUpdateUniqueByUnsupportedException;
 import org.dbflute.exception.DangerousResultSizeException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
@@ -358,6 +359,9 @@ public class BehaviorExceptionThrower implements Serializable {
         throw new EntityDuplicatedException(msg); // basically no way if you use PK constraint
     }
 
+    // -----------------------------------------------------
+    //                                       Optimistic Lock
+    //                                       ---------------
     public void throwVersionNoValueNullException(Entity entity) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Not found the value of 'version no' on the entity!");
@@ -418,6 +422,52 @@ public class BehaviorExceptionThrower implements Serializable {
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                          Batch Update
+    //                                          ------------
+    public <ENTITY extends Entity> void throwBatchUpdateUniqueByUnsupportedException(List<ENTITY> entityList,
+            WritableOption<? extends ConditionBean> option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The uniqueBy() of batch-update/delete is unsupported.");
+        br.addItem("Advice");
+        br.addElement("The uniqueBy() is only for entity-update.");
+        br.addElement("So use primary key instead of unique column.");
+        br.addElement("Or use entity-update.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    for (...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.uniqueBy(memberAccount); // *Bad");
+        br.addElement("        ...");
+        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList);");
+        br.addElement("  (o):");
+        br.addElement("    for (...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.setMemberId(memberId); // Good: using PK");
+        br.addElement("        member.setMemberAccount(memberAccount);");
+        br.addElement("        ...");
+        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList);");
+        br.addElement("  (o):");
+        br.addElement("    for (...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.uniqueBy(memberAccount);");
+        br.addElement("        ...");
+        br.addElement("        memberBhv.update(member); // Good: entity-update");
+        br.addElement("    }");
+        br.addItem("Entity List");
+        for (ENTITY entity : entityList) {
+            br.addElement(entity.toStringWithRelation());
+        }
+        setupOptionElement(br, option);
+        final String msg = br.buildExceptionMessage();
+        throw new BatchUpdateUniqueByUnsupportedException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                          Query Update
+    //                                          ------------
     public <ENTITY extends Entity> void throwNonQueryUpdateNotAllowedException(ENTITY entity, ConditionBean cb,
             UpdateOption<? extends ConditionBean> option) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -467,6 +517,9 @@ public class BehaviorExceptionThrower implements Serializable {
         throw new NonQueryDeleteNotAllowedException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                           Setup Logic
+    //                                           -----------
     protected void setupEntityElement(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Entity");
         try {
