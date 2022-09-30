@@ -62,35 +62,7 @@ import ${myDBMetaPackageName}.*;
 import ${glPackageCB}.*;
 
 /**
- * The behavior of ${table.basicInfoDispString}. <br>
- * <pre>
- * [primary key]
- *     ${table.primaryKeyNameCommaString}
- *
- * [column]
- *     ${table.columnNameCommaString}
- *
- * [sequence]
- *     ${table.definedSequenceName}
- *
- * [identity]
- *     ${table.identityColumnName}
- *
- * [version-no]
- *     ${table.versionNoColumnName}
- *
- * [foreign table]
- *     ${table.foreignTableNameCommaString}
- *
- * [referrer table]
- *     ${table.referrerTableNameCommaString}
- *
- * [foreign property]
- *     ${table.foreignPropertyNameCommaString}
- *
- * [referrer property]
- *     ${table.referrerPropertyNameCommaString}
- * </pre>
+ * The behavior of ${table.basicInfoDispString}.
  * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {

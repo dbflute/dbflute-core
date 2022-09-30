@@ -70,49 +70,16 @@ import ${table.relationalNullObjectProviderPackage}.*;
 #set ($myEntityInterfaceDef = "${myEntityInterfaceDef}, ColumnNullObjectable")
 #end
 
+#set ($commentForJavaDocValid = $table.isCommentForJavaDocValid())
+#set ($javadocFirstLineRear = "")
+#if ($commentForJavaDocValid)
+#set ($javadocFirstLineRear = " <br>")
+#end
 /**
- * The entity of ${table.basicInfoDispString}. <br>
-#if ($table.isCommentForJavaDocValid())
+ * The entity of ${table.basicInfoDispString}.${javadocFirstLineRear}
+#if ($commentForJavaDocValid)
  * ${table.commentForJavaDoc}
 #end
- * <pre>
- * [primary-key]
- *     ${table.primaryKeyNameCommaString}
- *
- * [column]
- *     ${table.columnNameCommaString}
- *
- * [sequence]
- *     ${table.definedSequenceName}
- *
- * [identity]
- *     ${table.identityColumnName}
- *
- * [version-no]
- *     ${table.versionNoColumnName}
- *
- * [foreign table]
- *     ${table.foreignTableNameCommaString}
- *
- * [referrer table]
- *     ${table.referrerTableNameCommaString}
- *
- * [foreign property]
- *     ${table.foreignPropertyNameCommaString}
- *
- * [referrer property]
- *     ${table.referrerPropertyNameCommaString}
- *
- * [get/set template]
- * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-#foreach ($col in $table.columns)
- * ${col.javaNative} ${col.uncapitalisedJavaName} = entity.get${col.javaName}();
-#end
-#foreach ($col in $table.columns)
- * entity.set${col.javaName}(${col.uncapitalisedJavaName});
-#end
- * = = = = = = = = = =/
- * </pre>
  * @author ${database.classAuthor}
  */
 public abstract class $myClassName extends AbstractEntity implements ${myEntityInterfaceDef} {
