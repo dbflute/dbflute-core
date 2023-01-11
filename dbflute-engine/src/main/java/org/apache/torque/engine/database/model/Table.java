@@ -160,6 +160,7 @@ import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.dbflute.logic.generate.table.DfSerialSequenceExtractor;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.dbflute.optional.OptionalThing;
@@ -3127,32 +3128,12 @@ public class Table {
     }
 
     /**
-     * Extract sequence name of postgreSQL serial type column.
-     * @return Sequence name of postgreSQL serial type column. (NullAllowed: If null, not found)
+     * Extract sequence name of postgreSQL serial type column (from default value).
+     * @return The name of sequence containing schema prefix if needed. (NullAllowed: if null, not found)
      */
     protected String extractPostgreSQLSerialSequenceName() {
-        final DfBasicProperties basicProperties = getBasicProperties();
-        if (!basicProperties.isDatabasePostgreSQL() || !hasAutoIncrementColumn()) {
-            return null;
-        }
-        final Column autoIncrementColumn = getAutoIncrementColumn();
-        if (autoIncrementColumn == null) {
-            return null;
-        }
-        final String defaultValue = autoIncrementColumn.getDefaultValue();
-        if (defaultValue == null) {
-            return null;
-        }
-        final String prefix = "nextval('";
-        if (!defaultValue.startsWith(prefix)) {
-            return null;
-        }
-        final String excludedPrefixString = defaultValue.substring(prefix.length());
-        final int endIndex = excludedPrefixString.indexOf("'");
-        if (endIndex < 0) {
-            return null;
-        }
-        return excludedPrefixString.substring(0, endIndex);
+        final DfSerialSequenceExtractor extractor = new DfSerialSequenceExtractor();
+        return extractor.extractPostgreSQLSerialSequenceName(() -> hasAutoIncrementColumn(), () -> getAutoIncrementColumn());
     }
 
     /**
