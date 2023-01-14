@@ -3132,7 +3132,7 @@ public class Table {
      * @return The name of sequence containing schema prefix if needed. (NullAllowed: if null, not found)
      */
     protected String extractPostgreSQLSerialSequenceName() {
-        final DfSerialSequenceExtractor extractor = new DfSerialSequenceExtractor();
+        final DfSerialSequenceExtractor extractor = new DfSerialSequenceExtractor(_unifiedSchema);
         return extractor.extractPostgreSQLSerialSequenceName(() -> hasAutoIncrementColumn(), () -> getAutoIncrementColumn());
     }
 

@@ -18,6 +18,7 @@ package org.dbflute.logic.generate.table;
 import java.util.function.Supplier;
 
 import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBasicProperties;
 
@@ -26,6 +27,18 @@ import org.dbflute.properties.DfBasicProperties;
  * @since 1.2.7 (2023/01/11 Wednesday at roppongi japanese) (split it from Table class)
  */
 public class DfSerialSequenceExtractor {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final UnifiedSchema _unifiedSchema; // null allowed
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSerialSequenceExtractor(UnifiedSchema unifiedSchema) {
+        _unifiedSchema = unifiedSchema;
+    }
 
     // ===================================================================================
     //                                                               Extract Sequence Name
@@ -58,7 +71,21 @@ public class DfSerialSequenceExtractor {
         if (endIndex < 0) {
             return null;
         }
-        return excludedPrefixString.substring(0, endIndex);
+        final String extractedSequenceName = excludedPrefixString.substring(0, endIndex);
+        return filterExtractedSequenceName(extractedSequenceName);
+    }
+
+    protected String filterExtractedSequenceName(String extractedSequenceName) {
+        if (_unifiedSchema != null && needsSchemaPrefixFilter(extractedSequenceName)) {
+            return _unifiedSchema.buildSqlName(extractedSequenceName);
+        } else {
+            return extractedSequenceName;
+        }
+    }
+
+    protected boolean needsSchemaPrefixFilter(String extractedSequenceName) {
+        // #for_now jflute catalog prefix for next schema is unsupported yet (2023/01/15)
+        return !extractedSequenceName.contains(".");
     }
 
     // ===================================================================================
