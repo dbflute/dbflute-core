@@ -29,35 +29,7 @@ import ${glPackageCB}.*;
 #end
 
 /**
- * The referrer loader of ${table.basicInfoDispString}. <br>
- * <pre>
- * [primary key]
- *     ${table.primaryKeyNameCommaString}
- *
- * [column]
- *     ${table.columnNameCommaString}
- *
- * [sequence]
- *     ${table.definedSequenceName}
- *
- * [identity]
- *     ${table.identityColumnName}
- *
- * [version-no]
- *     ${table.versionNoColumnName}
- *
- * [foreign table]
- *     ${table.foreignTableNameCommaString}
- *
- * [referrer table]
- *     ${table.referrerTableNameCommaString}
- *
- * [foreign property]
- *     ${table.foreignPropertyNameCommaString}
- *
- * [referrer property]
- *     ${table.referrerPropertyNameCommaString}
- * </pre>
+ * The referrer loader of ${table.basicInfoDispString}.
  * @author ${database.classAuthor}
  */
 public class ${myClassName} {
