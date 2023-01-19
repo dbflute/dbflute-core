@@ -248,8 +248,10 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void doExecuteMvnTestDocument(String path) {
-        final ProcessBuilder processBuilder =
-                createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*LastaDocTest#test_document");
+        // "test_*" means that it executes all tests on [App]LastaDocTest.java.
+        // so it also contains test_swagger() since 2022/01/19
+        final String dtestExp = "-Dtest=*LastaDocTest#test_*";
+        final ProcessBuilder processBuilder = createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", dtestExp);
         final Path basePath = Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base");
         final File directory = Files.exists(basePath) ? basePath.toFile() : new File(path);
         processBuilder.directory(directory);
@@ -267,8 +269,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void doExecuteGradleTestDocument(Map<String, Object> tableMap) {
-        final ProcessBuilder processBuilder =
-                createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*LastaDocTest.test_document");
+        // same as MvnTest, see the method for the detail
+        final String testsExp = "*LastaDocTest.test*";
+        final ProcessBuilder processBuilder = createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", testsExp);
         final File directory = Paths.get((String) tableMap.get("path")).toFile();
         processBuilder.directory(directory);
         _log.info("...Executing gradle test: " + directory);
