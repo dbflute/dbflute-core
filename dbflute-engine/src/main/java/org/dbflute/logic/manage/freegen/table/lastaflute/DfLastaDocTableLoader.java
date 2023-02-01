@@ -66,7 +66,13 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfLastaDocTableLoader.class);
 
-    private static boolean mvnTestDocumentExecuted;
+    /**
+     * Is maven test for document already executed in the DBFlute process? <br>
+     * Maven project of LastaFlute has base project so only one execution is needed.
+     * So it needs to suppress duplicate execution. <br>
+     * (DBFlute can treat one project of LastaFlute at one execution so static is no problem)
+     */
+    private static boolean _mvnTestDocumentExecuted;
 
     // ===================================================================================
     //                                                                          Load Table
@@ -219,8 +225,8 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     // -----------------------------------------------------
-    //                                  Execute Maven/Gradle
-    //                                  --------------------
+    //                                 Execute Test Document
+    //                                 ---------------------
     protected void executeTestDocument(Map<String, Object> tableMap) {
         try {
             if (getLastaFluteProperties().isLastaDocMavenGeared()) {
@@ -234,33 +240,46 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         }
     }
 
+    // -----------------------------------------------------
+    //                                            Maven Test
+    //                                            ----------
     protected void executeMvnTestDocument(Map<String, Object> tableMap) {
-        if (mvnTestDocumentExecuted) {
+        if (_mvnTestDocumentExecuted) { // see the field comment for the detail
             return;
         }
         final String path = (String) tableMap.get("path");
         if (Files.exists(Paths.get(path, "pom.xml"))) {
-            mvnTestDocumentExecuted = true;
+            _mvnTestDocumentExecuted = true;
             DfFreeGenTask.regsiterLazyCall(() -> {
                 new Thread(() -> doExecuteMvnTestDocument(path)).start();
             });
         }
     }
 
-    protected void doExecuteMvnTestDocument(String path) {
+    protected void doExecuteMvnTestDocument(String path) { // path may be ".." (if common project)
         // "test_*" means that it executes all tests on [App]LastaDocTest.java.
         // so it also contains test_swagger() since 2022/01/19
         final String dtestExp = "-Dtest=*LastaDocTest#test_*";
         final ProcessBuilder processBuilder = createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", dtestExp);
-        final Path basePath = Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base");
-        final File directory = Files.exists(basePath) ? basePath.toFile() : new File(path);
+        final File directory = prepareMvnTestProcessDirectory(path); // basically base project
         processBuilder.directory(directory);
         _log.info("...Executing mvn test: " + directory);
         executeCommand(processBuilder);
         _log.info("*Done mvn test: " + directory);
     }
 
+    protected File prepareMvnTestProcessDirectory(String path) {
+        final String currentAppProjectName = new File(path).getName(); // e.g. maihama-dockside
+        final String pureProjectName = DfStringUtil.substringLastFront(currentAppProjectName, "-"); // e.g. maihama
+        final Path basePath = Paths.get(path, "../" + pureProjectName + "-base"); // e.g. ../../maihama-dockside/../maihama-base
+        return Files.exists(basePath) ? basePath.toFile() : new File(path);
+    }
+
+    // -----------------------------------------------------
+    //                                           Gradle Test
+    //                                           -----------
     protected void executeGradleTestDocument(Map<String, Object> tableMap) {
+        // gradle executes each application so no static boolean like Maven
         if (Files.exists(Paths.get((String) tableMap.get("path"), "gradlew"))) {
             DfFreeGenTask.regsiterLazyCall(() -> {
                 new Thread(() -> doExecuteGradleTestDocument(tableMap)).start();
@@ -279,6 +298,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         _log.info("*Done gradle test: " + directory);
     }
 
+    // -----------------------------------------------------
+    //                                      Process Handling
+    //                                      ----------------
     protected ProcessBuilder createProcessBuilder(String... command) {
         final List<String> list = DfCollectionUtil.newArrayList();
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
@@ -311,6 +333,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         LastaDoc File
+    //                                         -------------
     protected Path acceptLastaDocFile(Map<String, Object> tableMap) {
         final List<Path> candidateList = DfCollectionUtil.newArrayList();
         final String path = (String) tableMap.get("path");

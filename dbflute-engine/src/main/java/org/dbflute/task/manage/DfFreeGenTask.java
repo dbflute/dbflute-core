@@ -46,9 +46,17 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfFreeGenTask.class);
-    protected static final String CONTROL_FREEGEN_VM = "ControlFreeGen.vm";
-    protected static List<IndependentProcessor> lazyCallList = new ArrayList<IndependentProcessor>();
 
+    /** The velocity template as entry for FreeGen (NotNull) */
+    protected static final String CONTROL_FREEGEN_VM = "ControlFreeGen.vm";
+
+    // -----------------------------------------------------
+    //                                             Lazy Call
+    //                                             ---------
+    /** for tricky process of FreeGen (NotNull) */
+    protected static final List<IndependentProcessor> lazyCallList = new ArrayList<IndependentProcessor>();
+
+    // executed after all processes of FreeGen
     public static void regsiterLazyCall(IndependentProcessor processor) {
         lazyCallList.add(processor);
     }
