@@ -112,7 +112,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
     public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
-        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).get());
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).orElse(null));
     }
 #end
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
@@ -578,7 +578,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
     public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
-        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).get());
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).orElse(null));
     }
 #end
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
