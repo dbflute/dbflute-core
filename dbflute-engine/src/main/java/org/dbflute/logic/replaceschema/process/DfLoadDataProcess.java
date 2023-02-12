@@ -64,7 +64,6 @@ public class DfLoadDataProcess extends DfAbstractRepsProcess {
 
     protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;
     protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
-    protected static final String FIRSTTSV_FILE_TYPE = DfLoadedDataInfo.FIRSTTSV_FILE_TYPE;
     protected static final String REVERSEXLS_FILE_TYPE = DfLoadedDataInfo.REVERSEXLS_FILE_TYPE;
     protected static final String REVERSETSV_FILE_TYPE = DfLoadedDataInfo.REVERSETSV_FILE_TYPE;
     protected static final String TSV_FILE_TYPE = DfLoadedDataInfo.TSV_FILE_TYPE;

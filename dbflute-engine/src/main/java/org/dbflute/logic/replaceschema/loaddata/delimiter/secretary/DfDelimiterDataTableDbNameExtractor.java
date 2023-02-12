@@ -21,7 +21,7 @@ package org.dbflute.logic.replaceschema.loaddata.delimiter.secretary;
  */
 public class DfDelimiterDataTableDbNameExtractor {
 
-    protected final String _filePath;
+    protected final String _filePath; // not null
 
     public DfDelimiterDataTableDbNameExtractor(String filePath) {
         _filePath = filePath;
@@ -30,8 +30,17 @@ public class DfDelimiterDataTableDbNameExtractor {
     public String extractTableDbName() {
         final String tableDbName;
         {
+            // slash is option, dot is required
+            // e.g.
+            //  ./HANGAR_MYSTIC.tsv => HANGAR_MYSTIC
+            //  ./sea/HANGAR_MYSTIC.tsv => HANGAR_MYSTIC
+            //  HANGAR_MYSTIC.tsv => HANGAR_MYSTIC
+            //  ./sea-HANGAR_MYSTIC.tsv => HANGAR_MYSTIC
             String tmp = _filePath.substring(_filePath.lastIndexOf("/") + 1, _filePath.lastIndexOf("."));
             if (tmp.indexOf("-") >= 0) {
+                // first hyphen is delimiter here (long specification so keep)
+                // e.g.
+                //  ./sea-lostriver-HANGAR_MYSTIC.tsv => lostriver-HANGAR_MYSTIC
                 tmp = tmp.substring(tmp.indexOf("-") + "-".length());
             }
             tableDbName = tmp;

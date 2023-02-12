@@ -16,12 +16,10 @@
 package org.dbflute.properties;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +157,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     // ===================================================================================
     //                                                                         Schema Data
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                              Base Directory specified
+    //                              ------------------------
+    // also can be used for ApplicationPlaySql
     public String getSchemaDataDir(String baseDir) {
         return baseDir + "/data";
     }
@@ -171,11 +173,24 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return getSchemaDataDir(baseDir) + "/" + loadType + "/" + typeName;
     }
 
-    // non-ApplicationPlaySql below
-
+    // -----------------------------------------------------
+    //                              playsql common Directory
+    //                              ------------------------
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // these definitions are not only one in DBFlute Engine
+    // (for example, DfLoadDataProcess uses own definition for now...)
+    // _/_/_/_/_/_/_/_/_/_/
     public String getMainCommonDataDir() {
         final String playSqlDirectory = getPlaySqlDir();
         return playSqlDirectory + "/data/common";
+    }
+
+    public String getMainCommonReverseTsvDataDir() {
+        return getMainCommonDataDir() + "/reversetsv";
+    }
+
+    public String getMainCommonTsvDataDir() {
+        return getMainCommonDataDir() + "/tsv";
     }
 
     public String getMainCommonFirstXlsDataDir() {
@@ -190,16 +205,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return getMainCommonDataDir() + "/xls";
     }
 
-    protected String getMainCurrentLoadTypeDataDir() {
-        final String playSqlDirectory = getPlaySqlDir();
-        final String dataLoadingType = getRepsEnvType();
-        return playSqlDirectory + "/data/" + dataLoadingType;
-    }
-
-    public String getMainCurrentLoadTypeDataDir(String fileType) {
-        return getMainCurrentLoadTypeDataDir() + "/" + fileType;
-    }
-
+    // -----------------------------------------------------
+    //                              playsql Current LoadType
+    //                              ------------------------
     public String getMainCurrentLoadTypeFirstXlsDataDir() {
         return getMainCurrentLoadTypeDataDir() + "/firstxls";
     }
@@ -236,29 +244,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return getMainCurrentLoadTypeDataDir() + "/xls";
     }
 
-    public List<File> findSchemaDataAllList(String sqlRootDir) { // contains data-prop
-        final File sqlRoot = new File(sqlRootDir);
-        final List<File> fileList = new ArrayList<File>();
-        doFindHierarchyFileList(fileList, sqlRoot);
-        return fileList;
-    }
-
-    protected void doFindHierarchyFileList(final List<File> fileList, File baseDir) {
-        if (baseDir.getName().startsWith(".")) { // closed directory
-            return; // e.g. .svn
-        }
-        final File[] listFiles = baseDir.listFiles(new FileFilter() {
-            public boolean accept(File subFile) {
-                if (subFile.isDirectory()) {
-                    doFindHierarchyFileList(fileList, subFile);
-                    return false;
-                }
-                return true;
-            }
-        });
-        if (listFiles != null) {
-            fileList.addAll(Arrays.asList(listFiles));
-        }
+    protected String getMainCurrentLoadTypeDataDir() {
+        final String playSqlDirectory = getPlaySqlDir();
+        final String dataLoadingType = getRepsEnvType();
+        return playSqlDirectory + "/data/" + dataLoadingType;
     }
 
     // ===================================================================================
