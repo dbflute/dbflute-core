@@ -268,11 +268,23 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         _log.info("*Done mvn test: " + directory);
     }
 
-    protected File prepareMvnTestProcessDirectory(String path) {
-        final String currentAppProjectName = new File(path).getName(); // e.g. maihama-dockside
-        final String pureProjectName = DfStringUtil.substringLastFront(currentAppProjectName, "-"); // e.g. maihama
-        final Path basePath = Paths.get(path, "../" + pureProjectName + "-base"); // e.g. ../../maihama-dockside/../maihama-base
+    protected File prepareMvnTestProcessDirectory(String path) { // e.g. ../../maihama-dockside
+        final String appName = extractAppNameFromPath(path); // e.g. maihama
+        final Path basePath = Paths.get(path, "../" + appName + "-base"); // e.g. ../../maihama-dockside/../maihama-base
         return Files.exists(basePath) ? basePath.toFile() : new File(path);
+    }
+
+    protected String extractAppNameFromPath(String path) {
+        final String currentProjectName;
+        try {
+            // the path may be ".." e.g. common project
+            // so it uses canonical path to get project name certainly
+            final String canonicalPath = new File(path).getCanonicalPath();
+            currentProjectName = Srl.substringLastRear(canonicalPath, "/"); // e.g. maihama-dockside, maihama-common
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to get canonical path from the path: " + path, e);
+        }
+        return DfStringUtil.substringLastFront(currentProjectName, "-"); // e.g. maihama
     }
 
     // -----------------------------------------------------
