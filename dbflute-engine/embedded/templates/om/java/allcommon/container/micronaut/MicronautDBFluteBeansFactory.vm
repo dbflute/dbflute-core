@@ -16,8 +16,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 #set ($jakartaPackage = $database.currentJakartaPackage)
 
-import javax.sql.DataSource;
-
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Factory;
 import ${jakartaPackage}.inject.Inject;
