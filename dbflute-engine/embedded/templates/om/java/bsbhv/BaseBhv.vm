@@ -1979,20 +1979,23 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     //                                                                            Accessor
     //                                                                            ========
     @Override
-    @javax.annotation.Resource(name="${database.behaviorCommandInvokerComponentName}")
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("${database.behaviorCommandInvokerComponentName}")
     public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
         super.setBehaviorCommandInvoker(behaviorCommandInvoker);
     }
 
     @Override
-    @javax.annotation.Resource(name="${database.behaviorSelectorComponentName}")
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("${database.behaviorSelectorComponentName}")
     public void setBehaviorSelector(BehaviorSelector behaviorSelector) {
         super.setBehaviorSelector(behaviorSelector);
     }
 #if ($table.isWritable())
 
     @Override
-    @javax.annotation.Resource(name="${database.commonColumnAutoSetupperComponentName}")
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("${database.commonColumnAutoSetupperComponentName}")
     public void setCommonColumnAutoSetupper(CommonColumnAutoSetupper commonColumnAutoSetupper) {
         super.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
     }
