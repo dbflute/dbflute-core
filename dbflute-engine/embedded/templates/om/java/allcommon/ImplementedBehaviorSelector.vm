@@ -14,12 +14,13 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 #if ($database.isTargetContainerLastaDi())
-import javax.annotation.Resource;
+import ${jakartaPackage}.annotation.Resource;
 #end
 
 import org.slf4j.Logger;
@@ -44,9 +45,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 #end
 #if ($database.isTargetContainerCDI())
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
+import ${jakartaPackage}.enterprise.context.spi.CreationalContext;
+import ${jakartaPackage}.enterprise.inject.spi.Bean;
+import ${jakartaPackage}.enterprise.inject.spi.BeanManager;
 #end
 #if ($database.isTargetContainerLastaDi())
 import org.lastaflute.di.core.LaContainer;

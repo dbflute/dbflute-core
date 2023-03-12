@@ -1,4 +1,5 @@
 ${manager.allClassCopyright}package ${request.package}.allcommon;
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.annotation.Resource;
+import ${jakartaPackage}.annotation.Resource;
 
 import ${request.package}.allcommon.EsAbstractEntity;
 import ${request.package}.allcommon.EsAbstractEntity.DocMeta;

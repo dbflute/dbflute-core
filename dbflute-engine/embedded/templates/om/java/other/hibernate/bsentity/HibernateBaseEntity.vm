@@ -15,12 +15,13 @@
 ##
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import java.io.Serializable;
 #if ($table.hasReferrerAsMany())
 import java.util.List;
 #end
-import javax.persistence.*;
+import ${jakartaPackage}.persistence.*;
 
 #if ($table.hasAllCommonColumn())
 import ${glPackageBaseCommon}.${glCommonColumnAutoSetupper};

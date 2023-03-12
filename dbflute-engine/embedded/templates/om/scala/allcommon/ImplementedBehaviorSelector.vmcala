@@ -14,6 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import scala.collection.JavaConverters._
 
@@ -49,9 +50,9 @@ import com.google.inject.Injector;
 import org.slim3.container.S3Container;
 #end
 #if ($database.isTargetContainerCDI())
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
+import ${jakartaPackage}.enterprise.context.spi.CreationalContext;
+import ${jakartaPackage}.enterprise.inject.spi.Bean;
+import ${jakartaPackage}.enterprise.inject.spi.BeanManager;
 #end
 
 /**

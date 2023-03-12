@@ -15,8 +15,9 @@
 ##
 ${database.allClassCopyright}package ${myExtendedEntityPackageName};
 #set ($myClassName = "${myExtendedObjectClassName}")
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
-import javax.persistence.*;
+import ${jakartaPackage}.persistence.*;
 
 import ${myBaseEntityPackageName}.${myBaseObjectClassName};
 

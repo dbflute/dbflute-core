@@ -14,9 +14,10 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 #if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
-import javax.annotation.Resource;
+import ${jakartaPackage}.annotation.Resource;
 #end
 import javax.sql.DataSource;
 

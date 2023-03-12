@@ -2302,13 +2302,6 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                       Lasta Migration
-    //                                       ---------------
-    public boolean isLastaMigrationAlsoGenearteDiXml() {
-        return getLittleAdjustmentProperties().isLastaMigrationAlsoGenearteDiXml();
-    }
-
-    // -----------------------------------------------------
     //                                       Optional Entity
     //                                       ---------------
     public String getBasicOptionalEntityClassName() {
@@ -2329,6 +2322,20 @@ public class Database {
 
     public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
         return getLittleAdjustmentProperties().isRelationOptionalEntityDBFluteEmbeddedClass();
+    }
+
+    // -----------------------------------------------------
+    //                                            LastaFlute
+    //                                            ----------
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return getLittleAdjustmentProperties().isLastaMigrationAlsoGenearteDiXml();
+    }
+
+    // -----------------------------------------------------
+    //                                       Jakarta Package
+    //                                       ---------------
+    public String getCurrentJakartaPackage() {
+        return getLittleAdjustmentProperties().getCurrentJakartaPackage();
     }
 
     // ===================================================================================

@@ -14,6 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -32,22 +33,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
-import javax.enterprise.inject.UnsatisfiedResolutionException;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.AnnotatedType;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.enterprise.inject.spi.InjectionTarget;
-import javax.enterprise.util.AnnotationLiteral;
-import javax.inject.Qualifier;
+import ${jakartaPackage}.enterprise.context.ApplicationScoped;
+import ${jakartaPackage}.enterprise.context.spi.CreationalContext;
+import ${jakartaPackage}.enterprise.event.Observes;
+import ${jakartaPackage}.enterprise.inject.Any;
+import ${jakartaPackage}.enterprise.inject.Default;
+import ${jakartaPackage}.enterprise.inject.UnsatisfiedResolutionException;
+import ${jakartaPackage}.enterprise.inject.spi.AfterBeanDiscovery;
+import ${jakartaPackage}.enterprise.inject.spi.AfterDeploymentValidation;
+import ${jakartaPackage}.enterprise.inject.spi.AnnotatedType;
+import ${jakartaPackage}.enterprise.inject.spi.Bean;
+import ${jakartaPackage}.enterprise.inject.spi.BeanManager;
+import ${jakartaPackage}.enterprise.inject.spi.Extension;
+import ${jakartaPackage}.enterprise.inject.spi.InjectionPoint;
+import ${jakartaPackage}.enterprise.inject.spi.InjectionTarget;
+import ${jakartaPackage}.enterprise.util.AnnotationLiteral;
+import ${jakartaPackage}.inject.Qualifier;
 import javax.sql.DataSource;
 
 import org.dbflute.bhv.AbstractBehaviorReadable;

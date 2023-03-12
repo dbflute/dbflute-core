@@ -1680,17 +1680,31 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     // ===================================================================================
-    //                                                                          LastaFlute
-    //                                                                          ==========
-    public boolean isLastaMigrationAlsoGenearteDiXml() { // closet
-        return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
-    }
-
-    // ===================================================================================
     //                                                                             FreeGen
     //                                                                             =======
     public boolean isFreeGenJavaScriptEngineNashorn() { // closet, for emergency debug
         return isProperty("isFreeGenJavaScriptEngineNashorn", false);
+    }
+
+    // ===================================================================================
+    //                                                                          LastaFlute
+    //                                                                          ==========
+    public boolean isLastaMigrationAlsoGenearteDiXml() { // closet
+        // generate Di xml even if other DI container to gradually migrate to LastaFlute
+        return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
+    }
+
+    // ===================================================================================
+    //                                                                     Jakarta Package
+    //                                                                     ===============
+    public String getCurrentJakartaPackage() {
+        return isMigrateOldJavaxToJakarta() ? /*new*/"jakarta" : /*old*/"javax";
+    }
+
+    protected boolean isMigrateOldJavaxToJakarta() { // closet
+        // many javax packages are moved to jakarta packages from since Tomcat10
+        // this property is for compatible velocity templates
+        return isProperty("isMigrateOldJavaxToJakarta", false); // will be true for the future
     }
 
     // ===================================================================================

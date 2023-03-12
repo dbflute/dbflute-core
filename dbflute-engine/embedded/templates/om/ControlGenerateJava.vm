@@ -176,6 +176,7 @@ $database.info("}")
 ##                                                                     ContainerConfig
 ##                                                                     ===============
 $database.info("public void parseContainerConfig() {")
+#set ($jakartaPackage = $database.currentJakartaPackage)
 #if ($database.isTargetContainerSeasar())
 #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
   #set ($path = "${dbfluteDiconPackageName}" )
@@ -214,7 +215,7 @@ $database.info("public void parseContainerConfig() {")
 
   #set ( $path = "${database.getMetaInfOutputDirectory()}/services" )
   $database.makeDirectory($path)
-  #set ( $path = "${database.getMetaInfOutputDirectory()}/services/javax.enterprise.inject.spi.Extension" )
+  #set ( $path = "${database.getMetaInfOutputDirectory()}/services/${jakartaPackage}.enterprise.inject.spi.Extension" )
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/ExtensionConfig.${glTemplateFileExtension}", $path, "", "")
 #end
