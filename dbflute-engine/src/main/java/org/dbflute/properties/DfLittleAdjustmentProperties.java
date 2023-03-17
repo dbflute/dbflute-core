@@ -429,6 +429,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return Integer.valueOf(getProperty("keyableUniqueColumnLimit", defaultValue)); // if minus, no limit
     }
 
+    // -----------------------------------------------------
+    //                                               JavaDoc
+    //                                               -------
+    public boolean isGenerateTableDetailJavaDoc() { // closet, since 1.2.7
+        // there are "get/set template" users so add option here (2023/03/17)
+        // thanks pair programing, yukiyoko san! (good naming for this property)
+        return isProperty("isGenerateTableDetailJavaDoc", false);
+    }
+
     // ===================================================================================
     //                                                                       ConditionBean
     //                                                                       =============

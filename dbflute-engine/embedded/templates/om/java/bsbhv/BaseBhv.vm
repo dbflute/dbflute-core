@@ -63,6 +63,46 @@ import ${glPackageCB}.*;
 
 /**
  * The behavior of ${table.basicInfoDispString}.
+#if ($table.isGenerateTableDetailJavaDoc())
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ *
+ * [column]
+ *     ${table.columnNameCommaString}
+ *
+ * [sequence]
+ *     ${table.definedSequenceName}
+ *
+ * [identity]
+ *     ${table.identityColumnName}
+ *
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ *
+ * [foreign table]
+ *     ${table.foreignTableNameCommaString}
+ *
+ * [referrer table]
+ *     ${table.referrerTableNameCommaString}
+ *
+ * [foreign property]
+ *     ${table.foreignPropertyNameCommaString}
+ *
+ * [referrer property]
+ *     ${table.referrerPropertyNameCommaString}
+ *
+ * [get/set template]
+ * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#foreach ($col in $table.columns)
+ * ${col.javaNative} ${col.uncapitalisedJavaName} = entity.get${col.javaName}();
+#end
+#foreach ($col in $table.columns)
+ * entity.set${col.javaName}(${col.uncapitalisedJavaName});
+#end
+ * = = = = = = = = = =/
+ * </pre>
+#end
  * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {

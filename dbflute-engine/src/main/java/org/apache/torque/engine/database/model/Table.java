@@ -641,6 +641,10 @@ public class Table {
         return comment != null ? comment : "";
     }
 
+    public boolean isGenerateTableDetailJavaDoc() {
+        return getLittleAdjustmentProperties().isGenerateTableDetailJavaDoc();
+    }
+
     // -----------------------------------------------------
     //                                               Display
     //                                               -------
