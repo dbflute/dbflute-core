@@ -297,6 +297,9 @@ public final class DfLastaFluteProperties extends DfAbstractDBFluteProperties {
     // -----------------------------------------------------
     //                                                DfMark
     //                                                ------
+    // for injecting your own document link (replace it at your process)
+    // for example, RemoteApiGen actually uses this mark
+    // so don't change the mark for compatible
     public String getLastaDocHtmlMarkFreeGenDocNaviLink() {
         return "<!-- df:markFreeGenDocNaviLink -->";
     }
