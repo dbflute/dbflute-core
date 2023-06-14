@@ -31,6 +31,7 @@ import ${referredCDefFqcn};
 #end
 #end
 
+#set ($isMakeSimpleDeterminationMethod = $optionMap.isMakeSimpleDeterminationMethod)
 #set ($isMakeCDefOldStyleCodeOfMethod = $optionMap.isMakeCDefOldStyleCodeOfMethod)
 #set ($isMakeCDefOldStyleNameOfMethod = $optionMap.isMakeCDefOldStyleNameOfMethod)
 #set ($isMakeCDefOldStyleListOfMethod = $optionMap.isMakeCDefOldStyleListOfMethod)
@@ -132,6 +133,21 @@ public interface ${glCDef} extends Classification {
             return (${subItemType})subItemMap().get("${regularSubItem.subItemName}");
 #end
         }
+#end
+#if ($isMakeSimpleDeterminationMethod)
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+        /**
+         * Is the classification ${classificationElement.name}? <br>
+#if ($classificationElement.hasCommentDisp())
+         * ${classificationElement.commentForJavaDocNest} <br>
+#end
+         * @return The determination, true or false.
+         */
+#if ($classificationElement.isDeprecated())
+        @Deprecated
+#end
+        public boolean is${classificationElement.name}() { return ${classificationElement.name}.equals(this); }
+#end
 #end
 #foreach ($group in $classificationTop.groupList)
         /**

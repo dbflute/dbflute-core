@@ -717,7 +717,8 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
-        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, "namedcls", optionMap); // namedcls-common settings
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap); // per theme e.g. vinci_cls
     }
 
     // -----------------------------------------------------
@@ -757,6 +758,7 @@ public final class DfLastaFluteFreeGenReflector {
     //                                  --------------------
     protected void doSetupCDefOldStyleOption(Map<String, Object> lastafluteMap, String appName, String clsTheme,
             Map<String, Object> optionMap) {
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeSimpleDeterminationMethod", optionMap);
         overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleCodeOfMethod", optionMap);
         overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleNameOfMethod", optionMap);
         overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleListOfMethod", optionMap);
