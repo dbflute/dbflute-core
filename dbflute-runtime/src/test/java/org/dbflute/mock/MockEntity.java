@@ -37,7 +37,7 @@ public class MockEntity implements Entity {
     //                                                                      Implementation
     //                                                                      ==============
     public DBMeta asDBMeta() {
-        return null;
+        return new MockDBMeta();
     }
 
     public String asTableDbName() {

@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core.context;
 
+import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
 import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 
@@ -35,16 +36,20 @@ public class ResourceParameter {
     // -----------------------------------------------------
     //                                          Mapping Date
     //                                          ------------
-    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
+    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider; // null allowed
 
     // -----------------------------------------------------
     //                                     Log Display Style
     //                                     -----------------
-    // every one null allowed
-    protected String _logDatePattern;
-    protected String _logTimestampPattern;
-    protected String _logTimePattern;
-    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
+    protected String _logDatePattern; // null allowed
+    protected String _logTimestampPattern; // null allowed
+    protected String _logTimePattern; // null allowed
+    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider; // null allowed
+
+    // -----------------------------------------------------
+    //                                        Error Log Mark
+    //                                        --------------
+    protected ErrorLogMaskProvider _errorLogMaskProvider; // null allowed
 
     // -----------------------------------------------------
     //                                        Internal Debug
@@ -109,6 +114,17 @@ public class ResourceParameter {
 
     public void setLogTimeZoneProvider(BoundDateDisplayTimeZoneProvider logTimeZoneProvider) {
         _logTimeZoneProvider = logTimeZoneProvider;
+    }
+
+    // -----------------------------------------------------
+    //                                        Error Log Mark
+    //                                        --------------
+    public ErrorLogMaskProvider getErrorLogMaskProvider() {
+        return _errorLogMaskProvider;
+    }
+
+    public void setErrorLogMaskProvider(ErrorLogMaskProvider errorLogMaskProvider) {
+        _errorLogMaskProvider = errorLogMaskProvider;
     }
 
     // -----------------------------------------------------

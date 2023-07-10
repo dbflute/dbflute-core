@@ -25,6 +25,7 @@ import org.dbflute.dbway.DBDef;
 #if ($database.isTargetContainerSpring())
 import org.dbflute.jdbc.DataSourceHandler;
 #end
+import org.dbflute.hook.PrologueHook;
 import org.dbflute.system.DBFluteSystem;
 
 import org.slf4j.Logger;
@@ -45,8 +46,13 @@ public class ${glDBFluteInitializer} {
     //                                                                           Attribute
     //                                                                           =========
 #if ($database.isTargetContainerSpring())
-    protected final String _dataSourceFqcn;
+    protected final String _dataSourceFqcn; // to determine DataSource, not null
+
 #end
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    protected PrologueHook _prologueHook; // null allowed
 
     // ===================================================================================
     //                                                                         Constructor
@@ -71,6 +77,21 @@ public class ${glDBFluteInitializer} {
         standBy();
     }
 
+    /**
+     * Hook the prologue process as you like it. <br>
+     * (basically for your original DBFluteConfig settings)
+     * @param prologueHook The hook interface of prologue process. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glDBFluteInitializer} hookPrologue(PrologueHook prologueHook) {
+        if (prologueHook == null) {
+            String msg = "The argument 'prologueHook' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        _prologueHook = prologueHook;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                             Curtain
     //                                                                             =======
@@ -87,6 +108,9 @@ public class ${glDBFluteInitializer} {
      * with calling super.prologue() in it.
      */
     protected void prologue() {
+        if (_prologueHook != null) {
+            _prologueHook.hookBefore();
+        }
 #if ($database.isTargetContainerSeasar())
         loadCoolClasses();
 #elseif ($database.isTargetContainerSpring())

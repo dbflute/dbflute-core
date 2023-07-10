@@ -27,11 +27,14 @@ import javax.sql.DataSource;
 
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.bhv.core.context.ResourceParameter;
+import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
 import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.exception.EntityAlreadyUpdatedException;
+import org.dbflute.exception.EntityAlreadyUpdatedException.AlreadyUpdatedBeanMaskMan;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
@@ -133,6 +136,32 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     }
 
     protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {
+        AlreadyUpdatedBeanMaskMan maskMan = findBeanMaskMan();
+        if (maskMan != null) {
+            return newEntityAlreadyUpdatedException(bean, rows, maskMan);
+        } else {
+            return newEntityAlreadyUpdatedException(bean, rows);
+        }
+    }
+
+    protected AlreadyUpdatedBeanMaskMan findBeanMaskMan() {
+        AlreadyUpdatedBeanMaskMan maskMan = null;
+        if (ResourceContext.isExistResourceContextOnThread()) {
+            final ResourceContext context = ResourceContext.getResourceContextOnThread();
+            final ResourceParameter parameter = context.getResourceParameter();
+            final ErrorLogMaskProvider provider = parameter.getErrorLogMaskProvider();
+            if (provider != null) {
+                maskMan = provider.provideAlreadyUpdatedBeanMaskMan();
+            }
+        }
+        return maskMan;
+    }
+
+    protected EntityAlreadyUpdatedException newEntityAlreadyUpdatedException(Object bean, int rows, AlreadyUpdatedBeanMaskMan maskMan) {
+        return new EntityAlreadyUpdatedException(bean, rows, maskMan);
+    }
+
+    protected EntityAlreadyUpdatedException newEntityAlreadyUpdatedException(Object bean, int rows) {
         return new EntityAlreadyUpdatedException(bean, rows);
     }
 

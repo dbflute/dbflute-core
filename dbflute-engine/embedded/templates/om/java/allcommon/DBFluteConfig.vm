@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
+import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
 import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.dbflute.cbean.garnish.SpecifyColumnRequiredExceptDeterminer;
 import org.dbflute.cbean.cipher.GearedCipherManager;
@@ -94,9 +95,9 @@ public class ${glDBFluteConfig} {
     protected boolean _emptyStringParameterAllowed = ${database.isEmptyStringParameterAllowed()};
     protected boolean _overridingQueryAllowed = ${database.isOverridingQueryAllowed()};
     protected boolean _nonSpecifiedColumnAccessAllowed = ${database.isNonSpecifiedColumnAccessAllowed()};
-    protected boolean _specifyColumnRequired = ${database.isSpecifyColumnRequired()};
-    protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
-    protected boolean _specifyColumnRequiredWarningOnly = false;
+    protected boolean _specifyColumnRequired = ${database.isSpecifyColumnRequired()}; // since 1.1.2
+    protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer; // since 1.1.7
+    protected boolean _specifyColumnRequiredWarningOnly = false; // since 1.2.0
     protected boolean _columnNullObjectAllowed = ${database.isColumnNullObjectAllowed()};
     protected boolean _columnNullObjectGearedToSpecify = ${database.isColumnNullObjectGearedToSpecify()};
     protected boolean _datetimePrecisionTruncationOfCondition = ${database.isDatetimePrecisionTruncationOfCondition()};
@@ -110,6 +111,7 @@ public class ${glDBFluteConfig} {
     protected String _logTimestampPattern;
     protected String _logTimePattern;
     protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
+    protected ErrorLogMaskProvider _errorLogMaskProvider; // since 1.2.7
 
     // environment
     protected StatementConfig _defaultStatementConfig;
@@ -121,7 +123,7 @@ public class ${glDBFluteConfig} {
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
     protected String _outsideSqlPackage = ${database.outsideSqlPackageExp};
-    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
+    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider; // since 1.1.0
 
     // extension
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
@@ -354,7 +356,7 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                              SpecifyColumn Required
     //                                                              ======================
-    public boolean isSpecifyColumnRequired() {
+    public boolean isSpecifyColumnRequired() { // since 1.1.2
         return _specifyColumnRequired;
     }
 
@@ -366,7 +368,7 @@ public class ${glDBFluteConfig} {
         _specifyColumnRequired = specifyColumnRequired;
     }
 
-    public SpecifyColumnRequiredExceptDeterminer getSpecifyColumnRequiredExceptDeterminer() {
+    public SpecifyColumnRequiredExceptDeterminer getSpecifyColumnRequiredExceptDeterminer() { // since 1.1.7
         return _specifyColumnRequiredExceptDeterminer;
     }
 
@@ -378,7 +380,7 @@ public class ${glDBFluteConfig} {
         _specifyColumnRequiredExceptDeterminer = specifyColumnRequiredExceptDeterminer;
     }
 
-    public boolean isSpecifyColumnRequiredWarningOnly() {
+    public boolean isSpecifyColumnRequiredWarningOnly() { // since 1.2.0
         return _specifyColumnRequiredWarningOnly;
     }
 
@@ -555,6 +557,21 @@ public class ${glDBFluteConfig} {
     }
 
     // ===================================================================================
+    //                                                                      Error Log Mask
+    //                                                                      ==============
+    public ErrorLogMaskProvider getErrorLogMaskProvider() { // since 1.2.7
+        return _errorLogMaskProvider;
+    }
+
+    public void setErrorLogMaskProvider(ErrorLogMaskProvider errorLogMaskProvider) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting errorLogMaskProvider: " + errorLogMaskProvider);
+        }
+        _errorLogMaskProvider = errorLogMaskProvider;
+    }
+
+    // ===================================================================================
     //                                                             Default StatementConfig
     //                                                             =======================
     public StatementConfig getDefaultStatementConfig() {
@@ -723,7 +740,7 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                               Mapping Date TimeZone
     //                                                               =====================
-    public MappingDateTimeZoneProvider getMappingDateTimeZoneProvider() {
+    public MappingDateTimeZoneProvider getMappingDateTimeZoneProvider() { // since 1.1.0
         return _mappingDateTimeZoneProvider;
     }
 

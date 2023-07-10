@@ -27,19 +27,31 @@ public class BatchEntityAlreadyUpdatedException extends EntityAlreadyUpdatedExce
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Integer _batchUpdateCount;
+    protected final Integer _batchUpdateCount; // keep Integer for compatible, just in case (2023/07/09)
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
+     * Constructor without bean mask.
      * @param bean The instance of entity. (NotNull)
-     * @param rows The row count returned by update process. (basically zero)
-     * @param batchUpdateCount Batch update count(Total).
+     * @param rows The count of actually-updated rows, returned by update process. (basically zero when entity update)
+     * @param batchUpdateCount Actually-updated count in all rows, batch result total. (NotNull)
      */
     public BatchEntityAlreadyUpdatedException(Object bean, int rows, Integer batchUpdateCount) {
-        super(bean, rows);
+        this(bean, rows, batchUpdateCount, /*maskMan*/null);
+    }
+
+    // #needs_fix jflute rows means batchUpdateCount? (2023/07/09)
+    /**
+     * Constructor with bean mask.
+     * @param bean The instance of entity. (NotNull)
+     * @param rows The count of actually-updated rows, returned by update process. (basically zero when entity update)
+     * @param batchUpdateCount Actually-updated count in all rows, batch result total. (NotNull)
+     * @param maskMan The callback to mask the bean information on exception message. (NullAllowed: if null, show all)
+     */
+    public BatchEntityAlreadyUpdatedException(Object bean, int rows, Integer batchUpdateCount, AlreadyUpdatedBeanMaskMan maskMan) { // DBFlute uses
+        super(bean, rows, maskMan);
         _batchUpdateCount = batchUpdateCount;
     }
 

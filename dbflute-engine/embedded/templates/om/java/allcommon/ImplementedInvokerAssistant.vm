@@ -471,11 +471,12 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected ResourceParameter createResourceParameter() {
         ResourceParameter parameter = newResourceParameter();
         parameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
-        parameter.setMappingDateTimeZoneProvider(${glDBFluteConfig}.getInstance().getMappingDateTimeZoneProvider());
+        parameter.setMappingDateTimeZoneProvider(${glDBFluteConfig}.getInstance().getMappingDateTimeZoneProvider()); // since 1.1.0
         parameter.setLogDatePattern(${glDBFluteConfig}.getInstance().getLogDatePattern());
         parameter.setLogTimestampPattern(${glDBFluteConfig}.getInstance().getLogTimestampPattern());
         parameter.setLogTimePattern(${glDBFluteConfig}.getInstance().getLogTimePattern());
         parameter.setLogTimeZoneProvider(${glDBFluteConfig}.getInstance().getLogTimeZoneProvider());
+        parameter.setErrorLogMaskProvider(${glDBFluteConfig}.getInstance().getErrorLogMaskProvider()); // since 1.2.7
         parameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return parameter;
     }
