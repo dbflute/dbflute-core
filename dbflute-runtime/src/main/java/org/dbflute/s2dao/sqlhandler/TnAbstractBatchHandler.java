@@ -300,7 +300,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         final int entityCount = list.size();
         if (updateCount < entityCount) {
             if (_optimisticLockHandling) {
-                throw new BatchEntityAlreadyUpdatedException(list.get(0), 0, updateCount);
+                final Object firstBean = list.get(0); // because of unknown failure bean
+                throw new BatchEntityAlreadyUpdatedException(firstBean, updateCount, updateCount, entityCount);
             } else {
                 String msg = "The entity was NOT found! (might be deleted?):";
                 msg = msg + " updateCount=" + updateCount;
@@ -340,11 +341,12 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             for (int oneUpdateCount : updatedCountArray) {
                 updateCount = updateCount + oneUpdateCount;
             }
+            final Object failureBean = list.get(index);
             if (_optimisticLockHandling) {
-                throw new BatchEntityAlreadyUpdatedException(list.get(index), 0, updateCount);
+                throw new BatchEntityAlreadyUpdatedException(failureBean, updateCount, updateCount, updatedCountArray.length);
             } else {
                 String msg = "The entity was NOT found! (might be deleted?):";
-                msg = msg + " entity=" + list.get(index);
+                msg = msg + " entity=" + failureBean;
                 msg = msg + " updateCount=" + updateCount;
                 msg = msg + " allEntities=" + list;
                 throw new EntityAlreadyDeletedException(msg);
