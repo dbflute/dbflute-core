@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core.context.logmask;
 
+import org.dbflute.bhv.exception.SQLExceptionHandler.SQLExceptionDisplaySqlMaskMan;
 import org.dbflute.exception.EntityAlreadyUpdatedException.AlreadyUpdatedBeanMaskMan;
 
 /**
@@ -27,6 +28,13 @@ public interface ErrorLogMaskProvider {
      * @return The callback to mark EntityAlreadyUpdatedException bean. (NullAllowed: if null, no mask)
      */
     default AlreadyUpdatedBeanMaskMan provideAlreadyUpdatedBeanMaskMan() {
+        return null; // as default
+    }
+
+    /**
+     * @return The callback to mark SQLException displaySQl. (NullAllowed: if null, no mask)
+     */
+    default SQLExceptionDisplaySqlMaskMan provideSQLExceptionDisplaySqlMaskMan() {
         return null; // as default
     }
 }

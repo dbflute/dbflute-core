@@ -30,8 +30,8 @@ public class SQLExceptionResource {
 
     protected final List<String> _noticeList = new ArrayList<String>(2);
     protected final Map<String, List<Object>> _resourceMap = new LinkedHashMap<String, List<Object>>(4);
-    protected String _executedSql;
-    protected String _displaySql;
+    protected String _executedSql; // basically not null
+    protected String _displaySql; // null allowed if making failure
     protected boolean _uniqueConstraintHandling;
     protected boolean _displaySqlPartHandling;
 

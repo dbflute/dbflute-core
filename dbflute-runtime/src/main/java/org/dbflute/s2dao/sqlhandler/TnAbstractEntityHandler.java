@@ -136,7 +136,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     }
 
     protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {
-        AlreadyUpdatedBeanMaskMan maskMan = findBeanMaskMan();
+        final AlreadyUpdatedBeanMaskMan maskMan = findBeanMaskMan();
         if (maskMan != null) {
             return newEntityAlreadyUpdatedException(bean, rows, maskMan);
         } else {

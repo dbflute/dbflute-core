@@ -39,7 +39,7 @@ public class EntityAlreadyUpdatedException extends RuntimeException implements E
      * @param bean The instance of updated entity containing new values. (NotNull)
      * @param rows The count of actually-updated rows, returned by update process. (basically zero when entity update)
      */
-    public EntityAlreadyUpdatedException(Object bean, int rows) { // keep compatible for application use
+    public EntityAlreadyUpdatedException(Object bean, int rows) { // without no mask, keep compatible for application use
         this(bean, rows, /*maskMan*/null);
     }
 
@@ -61,6 +61,7 @@ public class EntityAlreadyUpdatedException extends RuntimeException implements E
 
     /**
      * @author jflute
+     * @since 1.2.7
      */
     public static interface AlreadyUpdatedBeanMaskMan {
 
