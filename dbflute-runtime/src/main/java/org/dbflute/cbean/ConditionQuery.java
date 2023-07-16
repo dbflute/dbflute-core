@@ -67,19 +67,37 @@ public interface ConditionQuery {
     ColumnSqlName toColumnSqlName(String columnDbName);
 
     /**
-     * Get the base condition-bean.
+     * Get the base condition-bean of current query.
+     * <pre>
+     * e.g. if current is ServiceRankCQ, base condition-bean is MemberCB
+     *  memberBhv.selectList(cb -&gt; {
+     *      cb.query().queryMemberServiceAsOne().queryServiceRank()...;
+     *  }
+     * </pre>
      * @return The base condition-bean of this query. (NotNull)
      */
     ConditionBean xgetBaseCB();
 
     /**
-     * Get the base query.
+     * Get the base (root) condition-query of current query.
+     * <pre>
+     * e.g. if current is ServiceRankCQ, base condition-query is MemberCQ
+     *  memberBhv.selectList(cb -&gt; {
+     *      cb.query().queryMemberServiceAsOne().queryServiceRank()...;
+     *  }
+     * </pre>
      * @return The condition-query of base table. (NotNull: if this is base query, returns this)
      */
     ConditionQuery xgetBaseQuery();
 
     /**
-     * Get the referrer query.
+     * Get the condition-query as previously referrer.
+     * <pre>
+     * e.g. if current is ServiceRankCQ, base condition-query is MemberServiceCQ
+     *  memberBhv.selectList(cb -&gt; {
+     *      cb.query().queryMemberServiceAsOne().queryServiceRank()...;
+     *  }
+     * </pre>
      * @return The condition-query of referrer table. (NullAllowed: if null, this is base query)
      */
     ConditionQuery xgetReferrerQuery();

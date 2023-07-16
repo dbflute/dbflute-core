@@ -60,8 +60,9 @@ public class ConditionKeyLessThan extends ConditionKey {
             return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
+            final boolean sameAsPrevious = cvalue.equalLessThan(value); // should be before overriding
             cvalue.overrideLessThan(value);
-            return chooseResultAlreadyExists(cvalue.equalLessThan(value));
+            return chooseResultAlreadyExists(sameAsPrevious);
         }
         return RESULT_NEW_QUERY;
     }

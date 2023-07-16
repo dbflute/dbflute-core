@@ -1018,8 +1018,8 @@ public interface SqlClause {
     ColumnRealName getSpecifiedResolvedColumnRealNameAsOne();
 
     // ===================================================================================
-    //                                                                  Invalid Query Info
-    //                                                                  ==================
+    //                                                                       Invalid Query
+    //                                                                       =============
     // -----------------------------------------------------
     //                                     NullOrEmpty Query
     //                                     -----------------
@@ -1039,18 +1039,6 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isNullOrEmptyQueryChecked();
-
-    /**
-     * Get the list of invalid query. (basically for logging)
-     * @return The list of invalid query. (NotNull, ReadOnly)
-     */
-    List<HpInvalidQueryInfo> getInvalidQueryList();
-
-    /**
-     * Save the invalid query.
-     * @param invalidQueryInfo The information of invalid query. (NotNull)
-     */
-    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
 
     // -----------------------------------------------------
     //                                          Empty String
@@ -1089,6 +1077,44 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isOverridingQueryAllowed();
+
+    // -----------------------------------------------------
+    //                                   InvalidQuery Saving
+    //                                   -------------------
+    // actually only for nullOrEmpty query for now (2023/07/16)
+    /**
+     * Get the list of invalid query. (basically for logging)
+     * @return The list of invalid query. (NotNull, ReadOnly)
+     */
+    List<HpInvalidQueryInfo> getInvalidQueryList();
+
+    /**
+     * Save the invalid query.
+     * @param invalidQueryInfo The information of invalid query. (NotNull)
+     */
+    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
+
+    // -----------------------------------------------------
+    //                                  InvalidQuery Warning
+    //                                  --------------------
+    // since 1.2.7
+    // for various invalid-query e.g. nullOrEmpty-query, overriding-query (2023/07/16)
+    /**
+     * Enable warning log when invalid-query allowed. (default is disabled, means no logging)
+     */
+    void enableInvalidQueryAllowedWarning();
+
+    /**
+     * Disable warning log when invalid-query allowed.
+     */
+    void disableInvalidQueryAllowedWarning();
+
+    /**
+     * Does it show warning log when invalid-query allowed? <br>
+     * It contains nullOrEmpty-query, overriding-query, and so on...
+     * @return The determination, true or false.
+     */
+    boolean isInvalidQueryAllowedWarning();
 
     // [DBFlute-0.8.6]
     // ===================================================================================

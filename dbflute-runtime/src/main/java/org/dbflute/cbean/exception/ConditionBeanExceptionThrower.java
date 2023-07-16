@@ -17,6 +17,7 @@ package org.dbflute.cbean.exception;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.cbean.garnish.logger.InvalidQueryAllowedWLog;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
@@ -72,10 +74,13 @@ import org.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.dbflute.exception.SpecifyThatsBadTimingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
+ * Having throwing-exception methods for condition-bean. <br>
+ * Also it contains warning methods.
  * @author jflute
  */
 public class ConditionBeanExceptionThrower implements Serializable {
@@ -792,6 +797,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
+    // -----------------------------------------------------
+    //                                       Illegal Purpose
+    //                                       ---------------
     public void throwQueryIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call query().");
@@ -827,6 +835,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new QueryIllegalPurposeException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                            Bad Timing
+    //                                            ----------
     public void throwQueryThatsBadTimingException(ConditionBean lockedCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("That's bad timing for Query.");
@@ -850,6 +861,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new QueryThatsBadTimingException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
     public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Already registered the query. (cannot override it)");
@@ -883,6 +897,19 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new QueryAlreadyRegisteredException(msg);
     }
 
+    public void showOverridingQueryAllowedWarning(ConditionBean baseCB, ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) { // since 1.2.7
+        // unfortunately we cannot get previous value (overridden value)
+        // beacause already overridden here so new value only for now
+        final String hashtag = "#invalid_query #overriding_query";
+        final String cbExp = DfTypeUtil.toClassTitle(baseCB) + " (for " + baseCB.getPurpose() + ")";
+        final String queryExp = "column=" + columnDbName + ", conditionKey=" + key + ", newValue=" + value;
+        InvalidQueryAllowedWLog.log("The " + hashtag + " occurred at the condition-bean: " + cbExp + ": " + queryExp);
+    }
+
+    // -----------------------------------------------------
+    //                                         Invalid Query
+    //                                         -------------
     public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Registered the invalid query. (null or empty)");
@@ -906,6 +933,20 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new InvalidQueryRegisteredException(msg);
     }
 
+    // you can define warning methods in this class by jflute (2023/07/16)
+    public void showNullOrEmptyQueryAllowedWarning(ConditionBean baseCB, HpInvalidQueryInfo... invalidQueryInfoAry) { // since 1.2.7
+        final String hashtag = "#invalid_query #nullOrEmpty_query";
+        final String cbExp = DfTypeUtil.toClassTitle(baseCB) + " (for " + baseCB.getPurpose() + ")";
+        final List<String> queryExpList = DfCollectionUtil.newArrayList();
+        for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
+            queryExpList.add(invalidQueryInfo.buildDisplay());
+        }
+        InvalidQueryAllowedWLog.log("The " + hashtag + " occurred at the condition-bean: " + cbExp + ": query=" + queryExpList);
+    }
+
+    // -----------------------------------------------------
+    //                                            LikeSearch
+    //                                            ----------
     public void throwLikeSearchOptionNotFoundException(String colName, String value, DBMeta dbmeta) {
         final String capPropName = initCap(dbmeta.findColumnInfo(colName).getPropertyName());
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -919,6 +960,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new RequiredOptionNotFoundException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                               OrderBy
+    //                                               -------
     public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call order-by.");

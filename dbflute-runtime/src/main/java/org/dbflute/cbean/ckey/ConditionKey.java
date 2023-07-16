@@ -127,10 +127,10 @@ public abstract class ConditionKey implements Serializable {
     //                                                                           Attribute
     //                                                                           =========
     // not final because of no time of refactoring...
-    /** The key name of the condition. (NotNull: initialized in constructor of sub-class) */
+    /** The key name of the condition. e.g. equal, greaterThan (NotNull: initialized in constructor of sub-class) */
     protected String _conditionKey;
 
-    /** The string of operand, used in SQL. (NotNull: initialized in constructor of sub-class) */
+    /** The string of operand, used in SQL. e.g. "=", ">" (NotNull: initialized in constructor of sub-class) */
     protected String _operand;
 
     // ===================================================================================
@@ -160,8 +160,8 @@ public abstract class ConditionKey implements Serializable {
     // -----------------------------------------------------
     //                                         Choose Result
     //                                         -------------
-    protected ConditionKeyPrepareResult chooseResultAlreadyExists(boolean equalValue) {
-        return equalValue ? RESULT_DUPLICATE_QUERY : RESULT_OVERRIDING_QUERY;
+    protected ConditionKeyPrepareResult chooseResultAlreadyExists(boolean sameAsPrevious) {
+        return sameAsPrevious ? RESULT_DUPLICATE_QUERY : RESULT_OVERRIDING_QUERY;
     }
 
     protected ConditionKeyPrepareResult chooseResultNonValue(ConditionValue cvalue) {
@@ -558,16 +558,14 @@ public abstract class ConditionKey implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get condition-key.
-     * @return Condition-key.
+     * @return The key name of the condition. e.g. equal, greaterThan (NotNull)
      */
     public String getConditionKey() {
         return _conditionKey;
     }
 
     /**
-     * Get operand.
-     * @return Operand.
+     * @return The string of operand, used in SQL. e.g. "=", ">". (NotNull)
      */
     public String getOperand() {
         return _operand;

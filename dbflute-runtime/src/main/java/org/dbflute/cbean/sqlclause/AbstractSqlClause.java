@@ -180,7 +180,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     protected Map<String, String> _selectColumnKeyNameMap;
 
-    // TODO jflute xxxx (2022/04/19)
     /** Is use select index? e.g. select MEMBER_NAME as c1, Default value is true. */
     protected boolean _useSelectIndex = true;
 
@@ -271,14 +270,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it check an invalid query? (save-only attribute) */
     protected boolean _nullOrEmptyChecked;
 
-    /** The list of invalid query info. (NullAllowed: lazy-load) (save-only attribute) */
-    protected List<HpInvalidQueryInfo> _invalidQueryList;
-
     /** Does it accept an empty string for query? (save-only attribute) */
     protected boolean _emptyStringQueryAllowed;
 
     /** Does it allow overriding query? (save-only attribute) */
     protected boolean _overridingQueryAllowed;
+
+    /** Does it show warning log when invalid-query allowed? (save-only attribute) */
+    protected boolean _invalidQueryAllowedWarning;
+
+    /** The list of invalid query info. (NullAllowed: lazy-load) (save-only attribute) */
+    protected List<HpInvalidQueryInfo> _invalidQueryList;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -2963,30 +2965,71 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                  Invalid Query Info
-    //                                                                  ==================
+    //                                                                       Invalid Query
+    //                                                                       =============
     // -----------------------------------------------------
     //                                     NullOrEmpty Query
     //                                     -----------------
+    /** {@inheritDoc} */
     public void checkNullOrEmptyQuery() {
         _nullOrEmptyChecked = true;
     }
 
+    /** {@inheritDoc} */
     public void ignoreNullOrEmptyQuery() {
         _nullOrEmptyChecked = false;
     }
 
+    /** {@inheritDoc} */
     public boolean isNullOrEmptyQueryChecked() {
         return _nullOrEmptyChecked;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    // -----------------------------------------------------
+    //                                          Empty String
+    //                                          ------------
+    /** {@inheritDoc} */
+    public void enableEmptyStringQuery() {
+        _emptyStringQueryAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableEmptyStringQuery() {
+        _emptyStringQueryAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isEmptyStringQueryAllowed() {
+        return _emptyStringQueryAllowed;
+    }
+
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
+    /** {@inheritDoc} */
+    public void enableOverridingQuery() {
+        _overridingQueryAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableOverridingQuery() {
+        _overridingQueryAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isOverridingQueryAllowed() {
+        return _overridingQueryAllowed;
+    }
+
+    // -----------------------------------------------------
+    //                                   InvalidQuery Saving
+    //                                   -------------------
+    /** {@inheritDoc} */
     public List<HpInvalidQueryInfo> getInvalidQueryList() {
         return new ArrayList<HpInvalidQueryInfo>(doGetInvalidQueryList());
     }
 
+    /** {@inheritDoc} */
     public void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo) {
         doGetInvalidQueryList().add(invalidQueryInfo);
     }
@@ -2999,33 +3042,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                          Empty String
-    //                                          ------------
-    public void enableEmptyStringQuery() {
-        _emptyStringQueryAllowed = true;
+    //                                  InvalidQuery Warning
+    //                                  --------------------
+    // since 1.2.7
+    /** {@inheritDoc} */
+    public void enableInvalidQueryAllowedWarning() {
+        _invalidQueryAllowedWarning = true;
     }
 
-    public void disableEmptyStringQuery() {
-        _emptyStringQueryAllowed = false;
+    /** {@inheritDoc} */
+    public void disableInvalidQueryAllowedWarning() {
+        _invalidQueryAllowedWarning = false;
     }
 
-    public boolean isEmptyStringQueryAllowed() {
-        return _emptyStringQueryAllowed;
-    }
-
-    // -----------------------------------------------------
-    //                                      Overriding Query
-    //                                      ----------------
-    public void enableOverridingQuery() {
-        _overridingQueryAllowed = true;
-    }
-
-    public void disableOverridingQuery() {
-        _overridingQueryAllowed = false;
-    }
-
-    public boolean isOverridingQueryAllowed() {
-        return _overridingQueryAllowed;
+    /** {@inheritDoc} */
+    public boolean isInvalidQueryAllowedWarning() {
+        return _invalidQueryAllowedWarning;
     }
 
     // ===================================================================================

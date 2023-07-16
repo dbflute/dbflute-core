@@ -52,8 +52,9 @@ public class ConditionKeyEqual extends ConditionKey {
             return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
+            final boolean sameAsPrevious = cvalue.equalEqual(value); // should be before overriding
             cvalue.overrideEqual(value);
-            return chooseResultAlreadyExists(cvalue.equalEqual(value));
+            return chooseResultAlreadyExists(sameAsPrevious);
         }
         return RESULT_NEW_QUERY;
     }

@@ -60,8 +60,9 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
             return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
+            final boolean sameAsPrevious = cvalue.equalGreaterEqual(value); // should be before overriding
             cvalue.overrideGreaterEqual(value);
-            return chooseResultAlreadyExists(cvalue.equalGreaterEqual(value));
+            return chooseResultAlreadyExists(sameAsPrevious);
         }
         return RESULT_NEW_QUERY;
     }

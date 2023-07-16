@@ -175,10 +175,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-    /** Is it the in-line. */
+    /** Is this query in the in-line. Basically this query is CIQ class if true */
     protected boolean _inline;
 
-    /** Is it on-clause. */
+    /** Is this query in the on-clause. Also inline is true if this is true. */
     protected boolean _onClause;
 
     // -----------------------------------------------------
@@ -200,7 +200,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
      * @param referrerQuery The instance of referrer query. (NullAllowed: If null, this is base query)
      * @param sqlClause The instance of SQL clause. (NotNull)
      * @param aliasName The alias name for this query. (NotNull)
@@ -376,6 +375,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
+    // added to confirm internal state so no interface method for now by jflute (2023/07/16)
+    public boolean xisInline() { // since 1.2.7
+        return _inline;
+    }
+
+    public boolean xisOnClause() { // since 1.2.7
+        return _onClause;
+    }
+
     public void xsetOnClause(boolean onClause) {
         _onClause = onClause;
     }
@@ -642,23 +650,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * @param key The condition key for the query. (NotNull)
      * @param value The value of the condition. (NotNull)
-     * @param cvalue The object of condition value. (NotNull)
+     * @param cvalue The object of condition value to keep the value. (NotNull)
      * @param columnDbName The DB name of column for the query. (NotNull)
      * @return The result of the preparation for the condition key. (NotNull)
      */
     protected ConditionKeyPrepareResult prepareQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xdoPrepareQuery(key, value, cvalue, columnDbName, true);
+        return xdoPrepareQuery(key, value, cvalue, columnDbName, /*invalidChecked*/true);
     }
 
     /**
      * @param key The condition key for the query. (NotNull)
      * @param value The value of the condition. (NotNull)
-     * @param cvalue The object of condition value. (NotNull)
+     * @param cvalue The object of condition value to keep the value. (NotNull)
      * @param columnDbName The DB name of column for the query. (NotNull)
      * @return The result of the preparation for the condition key. (NotNull)
      */
     protected ConditionKeyPrepareResult prepareQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xdoPrepareQuery(key, value, cvalue, columnDbName, false);
+        return xdoPrepareQuery(key, value, cvalue, columnDbName, /*invalidChecked*/false);
     }
 
     protected ConditionKeyPrepareResult xdoPrepareQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
@@ -681,6 +689,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                    ================
     protected void handleOverridingQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (isOverrideQueryAllowed(key, value, cvalue, columnDbName)) {
+            if (xgetSqlClause().isInvalidQueryAllowedWarning()) { // since 1.2.7
+                showOverridingQueryAllowedWarning(xgetBaseCB(), key, value, cvalue, columnDbName);
+            }
             return;
         }
         throwQueryAlreadyRegisteredException(key, value, cvalue, columnDbName);
@@ -692,7 +703,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void noticeRegistered(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (_log.isDebugEnabled()) {
-            _log.debug("*Found the duplicate query: target=" + columnDbName + "." + key + " value=" + value);
+            _log.debug("*Found the duplicate query: target=" + columnDbName + "." + key + ", value=" + value);
         }
     }
 
@@ -724,6 +735,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (xgetSqlClause().isNullOrEmptyQueryChecked()) {
             throwInvalidQueryRegisteredException(invalidQueryInfoAry);
         } else {
+            if (xgetSqlClause().isInvalidQueryAllowedWarning()) { // since 1.2.7
+                showNullOrEmptyQueryAllowedWarning(xgetBaseCB(), invalidQueryInfoAry);
+            }
             for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
                 xgetSqlClause().saveInvalidQuery(invalidQueryInfo);
             }
@@ -736,7 +750,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final HpInvalidQueryInfo invalidQueryInfo = new HpInvalidQueryInfo(locationBase, targetColumn, key, value);
         if (_inline) {
             invalidQueryInfo.inlineView();
-        } else if (_onClause) {
+        }
+        if (_onClause) { // also inline is true
             invalidQueryInfo.onClause();
         }
         return invalidQueryInfo;
@@ -762,8 +777,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         createCBExThrower().throwQueryAlreadyRegisteredException(key, value, cvalue, columnDbName);
     }
 
+    public void showOverridingQueryAllowedWarning(ConditionBean baseCB, ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) { // since 1.2.7
+        createCBExThrower().showOverridingQueryAllowedWarning(baseCB, key, value, cvalue, columnDbName);
+    }
+
     protected void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfoAry);
+    }
+
+    public void showNullOrEmptyQueryAllowedWarning(ConditionBean baseCB, HpInvalidQueryInfo... invalidQueryInfoAry) { // since 1.2.7
+        createCBExThrower().showNullOrEmptyQueryAllowedWarning(baseCB, invalidQueryInfoAry);
     }
 
     // ===================================================================================

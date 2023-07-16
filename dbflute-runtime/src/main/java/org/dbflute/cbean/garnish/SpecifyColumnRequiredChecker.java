@@ -23,22 +23,16 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.garnish.logger.SpecifyColumnRequiredWLog;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
 import org.dbflute.exception.RequiredSpecifyColumnNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  * @since 1.1.2 (2016/12/31 Saturday)
  */
 public class SpecifyColumnRequiredChecker {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(SpecifyColumnRequiredChecker.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -110,6 +104,6 @@ public class SpecifyColumnRequiredChecker {
 
     protected void warnNonSpecified(RequiredSpecifyColumnNotFoundException e) {
         // needs stack-trace to know application caller
-        _log.warn("*Found the violation of SpecifyColumnRequired", e);
+        SpecifyColumnRequiredWLog.log("*Found the violation of SpecifyColumnRequired", e);
     }
 }

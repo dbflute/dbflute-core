@@ -461,6 +461,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     public boolean isNullOrEmptyQueryAllowed() { // closet
+        // invalid-query means abstract concept, so rename it
         final boolean defaultValue = isProperty("isInvalidQueryChecked", !isCompatibleBeforeJava8());
         return isProperty("isNullOrEmptyQueryAllowed", !defaultValue);
     }
@@ -475,6 +476,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
 
     public boolean isOverridingQueryAllowed() { // closet
         return isProperty("isOverridingQueryAllowed", isCompatibleBeforeJava8());
+    }
+
+    public boolean isInvalidQueryAllowedWarning() { // closet
+        return isProperty("isInvalidQueryAllowedWarning", false);
     }
 
     public boolean isNonSpecifiedColumnAccessAllowed() { // closet

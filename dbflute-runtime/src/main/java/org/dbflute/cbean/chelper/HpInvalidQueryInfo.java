@@ -81,9 +81,11 @@ public class HpInvalidQueryInfo {
         sb.append(" {value=").append(_invalidValue).append("}");
         sb.append(" : ").append(buildLocationDisp());
         if (_inlineView) {
-            sb.append("(").append("inlineView").append(")");
-        } else if (_onClause) {
-            sb.append("(").append("onClause").append(")");
+            if (_onClause) {
+                sb.append("(").append("onClause").append(")");
+            } else {
+                sb.append("(").append("inlineView").append(")");
+            }
         }
         return sb.toString();
     }
