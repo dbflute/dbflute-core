@@ -127,10 +127,10 @@ public abstract class ConditionKey implements Serializable {
     //                                                                           Attribute
     //                                                                           =========
     // not final because of no time of refactoring...
-    /** The key name of the condition. e.g. equal, greaterThan (NotNull: initialized in constructor of sub-class) */
+    /** The key name of the condition. e.g. equal, greaterThan, isNull (NotNull: initialized in constructor of sub-class) */
     protected String _conditionKey;
 
-    /** The string of operand, used in SQL. e.g. "=", ">" (NotNull: initialized in constructor of sub-class) */
+    /** The string of operand, used in SQL. e.g. "=", "&gt;", "is null" (NotNull: initialized in constructor of sub-class) */
     protected String _operand;
 
     // ===================================================================================
@@ -558,14 +558,14 @@ public abstract class ConditionKey implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * @return The key name of the condition. e.g. equal, greaterThan (NotNull)
+     * @return The key name of the condition. e.g. equal, greaterThan, isNull (NotNull)
      */
     public String getConditionKey() {
         return _conditionKey;
     }
 
     /**
-     * @return The string of operand, used in SQL. e.g. "=", ">". (NotNull)
+     * @return The string of operand, used in SQL. e.g. "=", "&gt;", "is null". (NotNull)
      */
     public String getOperand() {
         return _operand;
