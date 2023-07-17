@@ -2111,13 +2111,17 @@ public class Database {
     public boolean isOverridingQueryAllowed() {
         return getLittleAdjustmentProperties().isOverridingQueryAllowed();
     }
-    
+
     public boolean isInvalidQueryAllowedWarning() {
         return getLittleAdjustmentProperties().isInvalidQueryAllowedWarning();
     }
 
     public boolean isNonSpecifiedColumnAccessAllowed() {
         return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessAllowed();
+    }
+
+    public boolean isNonSpecifiedColumnAccessWarningOnly() {
+        return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessWarningOnly();
     }
 
     public boolean isDatetimePrecisionTruncationOfCondition() {

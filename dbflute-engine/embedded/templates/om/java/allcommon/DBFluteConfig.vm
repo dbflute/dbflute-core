@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.dbflute.FunCustodial;
 import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
 import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
@@ -94,8 +95,9 @@ public class ${glDBFluteConfig} {
     protected boolean _emptyStringQueryAllowed = ${database.isEmptyStringQueryAllowed()};
     protected boolean _emptyStringParameterAllowed = ${database.isEmptyStringParameterAllowed()};
     protected boolean _overridingQueryAllowed = ${database.isOverridingQueryAllowed()};
-    protected boolean _invalidQueryAllowedWarning = ${database.isInvalidQueryAllowedWarning()};
+    protected boolean _invalidQueryAllowedWarning = ${database.isInvalidQueryAllowedWarning()}; // since 1.2.7
     protected boolean _nonSpecifiedColumnAccessAllowed = ${database.isNonSpecifiedColumnAccessAllowed()};
+    protected boolean _nonSpecifiedColumnAccessWarningOnly = ${database.isNonSpecifiedColumnAccessWarningOnly()}; // since 1.2.7
     protected boolean _specifyColumnRequired = ${database.isSpecifyColumnRequired()}; // since 1.1.2
     protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer; // since 1.1.7
     protected boolean _specifyColumnRequiredWarningOnly = false; // since 1.2.0
@@ -187,6 +189,12 @@ public class ${glDBFluteConfig} {
         TnValueTypes.registerPluginValueType(DBDef.Oracle, "oracleDateType", new ${implementedOracleDate}());
 #end
 #end
+
+        if (_nonSpecifiedColumnAccessWarningOnly) { // since 1.2.7
+            FunCustodial.unlock();
+            FunCustodial.setNonSpecifiedColumnAccessWarningOnly(true);
+            FunCustodial.lock();
+        }
     }
 
     // ===================================================================================
@@ -370,6 +378,11 @@ public class ${glDBFluteConfig} {
         }
         _nonSpecifiedColumnAccessAllowed = nonSpecifiedColumnAccessAllowed;
     }
+
+    public boolean isNonSpecifiedColumnAccessWarningOnly() { // since 1.2.7
+        return _nonSpecifiedColumnAccessWarningOnly;
+    }
+    // no setter because the option is complete in initialization process
 
     // ===================================================================================
     //                                                              SpecifyColumn Required

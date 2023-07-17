@@ -486,6 +486,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isNonSpecifiedColumnAccessWarningOnly() { // closet, since 1.2.7
+        return isProperty("isNonSpecifiedColumnAccessWarningOnly", false);
+    }
+
     public boolean isDatetimePrecisionTruncationOfCondition() { // closet
         return isProperty("isDatetimePrecisionTruncationOfCondition", false);
     }
@@ -626,12 +630,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         final ClassificationUndefinedHandlingType undefinedHandlingType = prop.getClassificationUndefinedHandlingType();
         if (prop.hasClassificationUndefinedHandlingTypeProperty() && undefinedHandlingType.isChecked()) {
-            return true;
+            return true; // explicitly check setting in dfprop
         }
         if (prop.isSuppressDefaultCheckClassificationCode()) {
-            return false;
+            return false; // compatible option
         }
-        return undefinedHandlingType.isChecked();
+        return undefinedHandlingType.isChecked(); // as default of dfprop (logging after java8)
     }
 
     public boolean isSuppressDefaultCheckClassificationCode() { // closet
