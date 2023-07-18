@@ -247,8 +247,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
             final String titleName = DfTypeUtil.toClassTitle(this);
             throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
         }
-        if (isLocked()) {
-            createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
+        if (isLocked()) { // detected
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                createCBExThrower().showSetupSelectThatsBadTimingWarning(this, foreignPropertyName);
+            } else { // basically here
+                createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
+            }
         }
     }
 
@@ -280,7 +284,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
             throwSpecifyIllegalPurposeException();
         }
         if (isLocked() && !xisDreamCruiseShip()) { // DreamCruise might call specify() and query()
-            createCBExThrower().throwSpecifyThatsBadTimingException(this);
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                createCBExThrower().showSpecifyThatsBadTimingWarning(this);
+            } else { // basically here
+                createCBExThrower().throwSpecifyThatsBadTimingException(this);
+            }
         }
     }
 
@@ -300,8 +308,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
         if (_purpose.isNoQuery()) {
             throwQueryIllegalPurposeException();
         }
-        if (isLocked()) {
-            createCBExThrower().throwQueryThatsBadTimingException(this);
+        if (isLocked()) { // detected
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                createCBExThrower().showQueryThatsBadTimingWarning(this);
+            } else { // basically here
+                createCBExThrower().throwQueryThatsBadTimingException(this);
+            }
         }
     }
 
@@ -1996,8 +2008,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void assertOptionThatBadTiming(String optionName) {
-        if (isLocked()) {
-            createCBExThrower().throwOptionThatsBadTimingException(this, optionName);
+        if (isLocked()) { // detected
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                createCBExThrower().showOptionThatsBadTimingWarning(this, optionName);
+            } else { // basically here
+                createCBExThrower().throwOptionThatsBadTimingException(this, optionName);
+            }
         }
     }
 

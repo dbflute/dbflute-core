@@ -2092,6 +2092,10 @@ public class Database {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
 
+    public boolean isThatsBadTimingWarningOnly() {
+        return getLittleAdjustmentProperties().isThatsBadTimingWarningOnly();
+    }
+
     public boolean isSpecifyColumnRequired() {
         return getLittleAdjustmentProperties().isSpecifyColumnRequired();
     }

@@ -738,6 +738,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isThatsBadTimingDetect", defaultValue);
     }
 
+    public boolean isThatsBadTimingWarningOnly() { // closet since 1.2.7
+        return isProperty("isThatsBadTimingWarningOnly", false); // precondition: detect=true
+    }
+
     // ===================================================================================
     //                                                              Display Name UpperCase
     //                                                              ======================

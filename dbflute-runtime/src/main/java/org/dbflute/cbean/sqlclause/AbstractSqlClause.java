@@ -351,8 +351,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Is the clause object locked? e.g. true if in sub-query process. (save-only attribute) */
     protected boolean _locked;
 
-    /** Does it allow "that's bad timing" check? (save-only attribute) */
+    /** Does it detect "that's bad timing"? (save-only attribute) */
     protected boolean _thatsBadTimingDetectEffective;
+
+    /** Is "that's bad timing" warning-only? (save-only attribute) */
+    protected boolean _thatsBadTimingWarningOnlyEffective;
 
     // -----------------------------------------------------
     //                                        Lazy Reflector
@@ -3638,36 +3641,66 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    /** {@inheritDoc} */
     public HpCBPurpose getPurpose() {
         return _purpose;
     }
 
+    /** {@inheritDoc} */
     public void setPurpose(HpCBPurpose purpose) {
         _purpose = purpose;
     }
 
-    public boolean isLocked() {
+    // -----------------------------------------------------
+    //                                          Purpose Lock
+    //                                          ------------
+    /** {@inheritDoc} */
+    public boolean isLocked() { // geared with batd-timing-detect
+        // #for_now jflute wants to split this method but no change for calm (2023/07/18)
         return _thatsBadTimingDetectEffective && _locked;
     }
 
+    /** {@inheritDoc} */
     public void lock() {
         _locked = true;
     }
 
+    /** {@inheritDoc} */
     public void unlock() {
         _locked = false;
     }
 
-    public boolean isThatsBadTimingDetectAllowed() {
-        return _thatsBadTimingDetectEffective;
-    }
-
+    // -----------------------------------------------------
+    //                                    That's Bad Timming
+    //                                    ------------------
+    /** {@inheritDoc} */
     public void enableThatsBadTimingDetect() {
         _thatsBadTimingDetectEffective = true;
     }
 
+    /** {@inheritDoc} */
     public void disableThatsBadTimingDetect() {
         _thatsBadTimingDetectEffective = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isThatsBadTimingDetectAllowed() {
+        return _thatsBadTimingDetectEffective;
+    }
+
+    /** {@inheritDoc} */
+    public void enableThatsBadTimingWarningOnly() {
+        _thatsBadTimingWarningOnlyEffective = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableThatsBadTimingWarningOnly() {
+        _thatsBadTimingWarningOnlyEffective = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isThatsBadTimingWarningOnly() {
+        return _thatsBadTimingWarningOnlyEffective;
     }
 
     // [DBFlute-0.9.4]

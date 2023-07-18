@@ -20,15 +20,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
- * @since 1.2.7 (2023/07/16 Sunday at roppongi japanese)
+ * @since 1.2.7 (2023/07/18 Tuesday at ichihara)
  */
-public class InvalidQueryAllowedWLog {
+public class ThatsBadTimingWLog {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(InvalidQueryAllowedWLog.class);
+    private static final Logger _log = LoggerFactory.getLogger(ThatsBadTimingWLog.class);
 
     protected static boolean _warningLogLevelInfo;
     protected static boolean _loggingInHolidayMood;
@@ -37,11 +37,11 @@ public class InvalidQueryAllowedWLog {
     // ===================================================================================
     //                                                                     Warning Logging
     //                                                                     ===============
-    public static void log(String msg) { // very Internal
+    public static void log(String msg, RuntimeException cause) { // very Internal
         if (_warningLogLevelInfo) {
-            _log.info(msg);
+            _log.info(msg, cause);
         } else {
-            _log.warn(msg);
+            _log.warn(msg, cause);
         }
     }
 

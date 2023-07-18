@@ -176,6 +176,9 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         if (isThatsBadTimingDetect()) {
             sqlClause.enableThatsBadTimingDetect();
         }
+        if (isThatsBadTimingWarningOnly()) {
+            sqlClause.enableThatsBadTimingWarningOnly();
+        }
     }
 
     protected void doSetupSqlClauseNullOrEmptyQuery(SqlClause sqlClause) {
@@ -251,6 +254,10 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected boolean isThatsBadTimingDetect() {
         return ${glDBFluteConfig}.getInstance().isThatsBadTimingDetect();
+    }
+
+    protected boolean isThatsBadTimingWarningOnly() {
+        return ${glDBFluteConfig}.getInstance().isThatsBadTimingWarningOnly();
     }
 
     protected boolean isNullOrEmptyQueryAllowed() {

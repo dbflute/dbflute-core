@@ -1366,6 +1366,9 @@ public interface SqlClause {
      */
     void setPurpose(HpCBPurpose purpose);
 
+    // -----------------------------------------------------
+    //                                          Purpose Lock
+    //                                          ------------
     /**
      * Is the clause object locked? e.g. true if in sub-query process and check allowed <br>
      * Java8 cannot use the same name as lambda argument with already existing name in the scope.
@@ -1382,7 +1385,7 @@ public interface SqlClause {
      *
      * @return The determination, true or false.
      */
-    boolean isLocked();
+    boolean isLocked(); // contains that's-bad-timing determination
 
     /**
      * Lock the clause object. <br>
@@ -1395,6 +1398,9 @@ public interface SqlClause {
      */
     void unlock();
 
+    // -----------------------------------------------------
+    //                                    That's Bad Timming
+    //                                    ------------------
     /**
      * Enable "that's-bad-timing" detect.
      */
@@ -1407,10 +1413,26 @@ public interface SqlClause {
     void disableThatsBadTimingDetect();
 
     /**
-     * Does it allow "that's-bad-timing" detect?
+     * Does it detect "that's-bad-timing"?
      * @return The determination, true or false.
      */
-    boolean isThatsBadTimingDetectAllowed();
+    boolean isThatsBadTimingDetectAllowed(); // means "DetectEffective"
+
+    /**
+     * Enable "that's-bad-timing" warning-only.
+     */
+    void enableThatsBadTimingWarningOnly();
+
+    /**
+     * Disable "that's-bad-timing" warning-only. (default is disabled) <br>
+     */
+    void disableThatsBadTimingWarningOnly();
+
+    /**
+     * Is "that's-bad-timing" warning-only?
+     * @return The determination, true or false.
+     */
+    boolean isThatsBadTimingWarningOnly();
 
     // [DBFlute-0.9.4]
     // ===================================================================================

@@ -91,6 +91,7 @@ public class ${glDBFluteConfig} {
     protected boolean _pagingCountLeastJoin = ${database.isPagingCountLeastJoin()};
     protected boolean _innerJoinAutoDetect = ${database.isInnerJoinAutoDetect()};
     protected boolean _thatsBadTimingDetect = ${database.isThatsBadTimingDetect()};
+    protected boolean _thatsBadTimingWarningOnly = ${database.isThatsBadTimingWarningOnly()};
     protected boolean _nullOrEmptyQueryAllowed = ${database.isNullOrEmptyQueryAllowed()};
     protected boolean _emptyStringQueryAllowed = ${database.isEmptyStringQueryAllowed()};
     protected boolean _emptyStringParameterAllowed = ${database.isEmptyStringParameterAllowed()};
@@ -263,6 +264,18 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting thatsBadTimingDetect: " + thatsBadTimingDetect);
         }
         _thatsBadTimingDetect = thatsBadTimingDetect;
+    }
+
+    public boolean isThatsBadTimingWarningOnly() { // since 1.2.7
+        return _thatsBadTimingWarningOnly;
+    }
+
+    public void setThatsBadTimingWarningOnly(boolean thatsBadTimingWarningOnly) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting thatsBadTimingWarningOnly: " + thatsBadTimingWarningOnly);
+        }
+        _thatsBadTimingWarningOnly = thatsBadTimingWarningOnly;
     }
 
     // ===================================================================================

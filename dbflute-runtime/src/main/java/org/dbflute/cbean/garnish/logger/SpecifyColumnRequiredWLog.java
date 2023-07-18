@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
- * @since 1.2.7 (Sunday at roppongi japanese)
+ * @since 1.2.7 (2023/07/16 Sunday at roppongi japanese)
  */
 public class SpecifyColumnRequiredWLog {
 
