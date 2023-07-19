@@ -197,6 +197,7 @@ public interface ${glCDef} extends Classification {
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
          * @deprecated use byName(name) instead.
          */
+        @Deprecated
         public static ${classificationName} nameOf(String name) { return _slimmer.nameOf(name, nm -> valueOf(nm)); }
 #end
         /**
@@ -224,6 +225,7 @@ public interface ${glCDef} extends Classification {
          * @return The snapshot list of classification elements in the code list. (NotNull, EmptyAllowed: when empty specified)
          * @deprecated use e.g. Stream API with of() instead.
          */
+        @Deprecated
         public static List<${classificationName}> listOf(Collection<String> codeList) { return _slimmer.listOf(codeList); }
 #end
 #foreach ($group in $classificationTop.groupList)
@@ -246,6 +248,7 @@ public interface ${glCDef} extends Classification {
          * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if the group is not found)
          * @deprecated use listByGroup(groupName) instead.
          */
+        @Deprecated
 #if ($classificationTop.hasGroup())
         public static List<${classificationName}> groupOf(String groupName) {
 #foreach ($group in $classificationTop.groupList)
