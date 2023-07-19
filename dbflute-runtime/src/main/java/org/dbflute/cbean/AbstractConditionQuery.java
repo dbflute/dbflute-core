@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 
 import org.dbflute.FunCustodial;
+import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -1824,9 +1825,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertOrderByPurpose(String columnDbName) {
-        if (xgetSqlClause().getPurpose().isNoOrderBy()) {
-            throwOrderByIllegalPurposeException(columnDbName);
+        final SqlClause sqlClause = xgetSqlClause();
+        final HpCBPurpose purpose = sqlClause.getPurpose();
+        if (purpose.isNoOrderBy()) {
+            if (HpCBPurpose.OR_SCOPE_QUERY.equals(purpose) && sqlClause.isOrScopeQueryPurposeCheckWarningOnly()) {
+                showOrderByIllegalPurposeWarning(columnDbName);
+            } else {
+                throwOrderByIllegalPurposeException(columnDbName);
+            }
         }
+    }
+
+    protected void showOrderByIllegalPurposeWarning(String columnDbName) {
+        createCBExThrower().showOrderByIllegalPurposeWarning(xgetSqlClause().getPurpose(), xgetBaseCB(), asTableDbName(), columnDbName);
     }
 
     protected void throwOrderByIllegalPurposeException(String columnDbName) {

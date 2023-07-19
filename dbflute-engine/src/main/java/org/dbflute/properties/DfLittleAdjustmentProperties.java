@@ -733,6 +733,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
+    // ===================================================================================
+    //                                                                          CB Purpose
+    //                                                                          ==========
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() { // closet since 1.2.7
+        return isProperty("isOrScopeQueryPurposeCheckWarningOnly", false);
+    }
+
     public boolean isThatsBadTimingDetect() { // closet
         final boolean defaultValue = !isCompatibleBeforeJava8();
         return isProperty("isThatsBadTimingDetect", defaultValue);

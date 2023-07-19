@@ -90,6 +90,7 @@ public class ${glDBFluteConfig} {
     protected boolean _pagingCountLater = ${database.isPagingCountLater()};
     protected boolean _pagingCountLeastJoin = ${database.isPagingCountLeastJoin()};
     protected boolean _innerJoinAutoDetect = ${database.isInnerJoinAutoDetect()};
+    protected boolean _orScopeQueryPurposeCheckWarningOnly = ${database.isOrScopeQueryPurposeCheckWarningOnly()}; // since 1.2.7
     protected boolean _thatsBadTimingDetect = ${database.isThatsBadTimingDetect()};
     protected boolean _thatsBadTimingWarningOnly = ${database.isThatsBadTimingWarningOnly()};
     protected boolean _nullOrEmptyQueryAllowed = ${database.isNullOrEmptyQueryAllowed()};
@@ -249,6 +250,21 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting innerJoinAutoDetect: " + innerJoinAutoDetect);
         }
         _innerJoinAutoDetect = innerJoinAutoDetect;
+    }
+
+    // ===================================================================================
+    //                                                                    CB Purpose Check
+    //                                                                    ================
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() { // since 1.2.7
+        return _orScopeQueryPurposeCheckWarningOnly;
+    }
+
+    public void setOrScopeQueryPurposeCheckWarningOnly(boolean orScopeQueryPurposeCheckWarningOnly) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting orScopeQueryPurposeCheckWarningOnly: " + orScopeQueryPurposeCheckWarningOnly);
+        }
+        _orScopeQueryPurposeCheckWarningOnly = orScopeQueryPurposeCheckWarningOnly;
     }
 
     // ===================================================================================

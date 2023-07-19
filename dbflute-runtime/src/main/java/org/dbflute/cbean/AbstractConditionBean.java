@@ -245,19 +245,35 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected void assertSetupSelectPurpose(String foreignPropertyName) { // called by setupSelect_...() of sub-class
         if (_purpose.isNoSetupSelect()) {
             final String titleName = DfTypeUtil.toClassTitle(this);
-            throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
+            if (HpCBPurpose.OR_SCOPE_QUERY.equals(_purpose) && getSqlClause().isOrScopeQueryPurposeCheckWarningOnly()) {
+                showSetupSelectIllegalPurposeWarning(titleName, foreignPropertyName);
+            } else {
+                throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
+            }
         }
         if (isLocked()) { // detected
             if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
-                createCBExThrower().showSetupSelectThatsBadTimingWarning(this, foreignPropertyName);
+                showSetupSelectThatsBadTimingWarning(foreignPropertyName);
             } else { // basically here
-                createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
+                throwSetupSelectThatsBadTimingException(foreignPropertyName);
             }
         }
     }
 
+    protected void showSetupSelectIllegalPurposeWarning(String className, String foreignPropertyName) {
+        createCBExThrower().showSetupSelectIllegalPurposeWarning(_purpose, this, foreignPropertyName);
+    }
+
     protected void throwSetupSelectIllegalPurposeException(String className, String foreignPropertyName) {
         createCBExThrower().throwSetupSelectIllegalPurposeException(_purpose, this, foreignPropertyName);
+    }
+
+    protected void showSetupSelectThatsBadTimingWarning(String foreignPropertyName) {
+        createCBExThrower().showSetupSelectThatsBadTimingWarning(this, foreignPropertyName);
+    }
+
+    protected void throwSetupSelectThatsBadTimingException(String foreignPropertyName) {
+        createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
     }
 
     // unused because it has been allowed
@@ -281,19 +297,35 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected void assertSpecifyPurpose() { // called by specify() of sub-class
         if (_purpose.isNoSpecify()) {
-            throwSpecifyIllegalPurposeException();
+            if (HpCBPurpose.OR_SCOPE_QUERY.equals(_purpose) && getSqlClause().isOrScopeQueryPurposeCheckWarningOnly()) {
+                showSpecifyIllegalPurposeWarning();
+            } else {
+                throwSpecifyIllegalPurposeException();
+            }
         }
         if (isLocked() && !xisDreamCruiseShip()) { // DreamCruise might call specify() and query()
             if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
-                createCBExThrower().showSpecifyThatsBadTimingWarning(this);
+                showSpecifyThatsBadTimingWarning();
             } else { // basically here
-                createCBExThrower().throwSpecifyThatsBadTimingException(this);
+                throwSpecifyThatsBadTimingException();
             }
         }
     }
 
+    protected void showSpecifyIllegalPurposeWarning() {
+        createCBExThrower().showSpecifyIllegalPurposeWarning(_purpose, this);
+    }
+
     protected void throwSpecifyIllegalPurposeException() {
         createCBExThrower().throwSpecifyIllegalPurposeException(_purpose, this);
+    }
+
+    protected void showSpecifyThatsBadTimingWarning() {
+        createCBExThrower().showSpecifyThatsBadTimingWarning(this);
+    }
+
+    protected void throwSpecifyThatsBadTimingException() {
+        createCBExThrower().throwSpecifyThatsBadTimingException(this);
     }
 
     @Deprecated
@@ -310,15 +342,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
         }
         if (isLocked()) { // detected
             if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
-                createCBExThrower().showQueryThatsBadTimingWarning(this);
+                showQueryThatsBadTimingWarning();
             } else { // basically here
-                createCBExThrower().throwQueryThatsBadTimingException(this);
+                throwQueryThatsBadTimingException();
             }
         }
     }
 
     protected void throwQueryIllegalPurposeException() {
         createCBExThrower().throwQueryIllegalPurposeException(_purpose, this);
+    }
+
+    protected void showQueryThatsBadTimingWarning() {
+        createCBExThrower().showQueryThatsBadTimingWarning(this);
+    }
+
+    protected void throwQueryThatsBadTimingException() {
+        createCBExThrower().throwQueryThatsBadTimingException(this);
     }
 
     // -----------------------------------------------------

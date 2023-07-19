@@ -2088,6 +2088,10 @@ public class Database {
         return getLittleAdjustmentProperties().isInnerJoinAutoDetect();
     }
 
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() {
+        return getLittleAdjustmentProperties().isOrScopeQueryPurposeCheckWarningOnly();
+    }
+
     public boolean isThatsBadTimingDetect() {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }

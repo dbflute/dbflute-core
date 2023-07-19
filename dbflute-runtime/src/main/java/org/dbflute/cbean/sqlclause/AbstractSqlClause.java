@@ -348,6 +348,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The purpose of condition-bean for check at condition-query. (NotNull) (save-only attribute) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
+    /** Is "orScopeQuery purpose check" warning-only? (save-only attribute) */
+    protected boolean _orScopeQueryPurposeCheckWarningOnly;
+
     /** Is the clause object locked? e.g. true if in sub-query process. (save-only attribute) */
     protected boolean _locked;
 
@@ -3649,6 +3652,24 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** {@inheritDoc} */
     public void setPurpose(HpCBPurpose purpose) {
         _purpose = purpose;
+    }
+
+    // -----------------------------------------------------
+    //                                         Purpose Check
+    //                                         -------------
+    /** {@inheritDoc} */
+    public void enableOrScopeQueryPurposeCheckWarningOnly() {
+        _orScopeQueryPurposeCheckWarningOnly = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableOrScopeQueryPurposeCheckWarningOnly() {
+        _orScopeQueryPurposeCheckWarningOnly = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() {
+        return _orScopeQueryPurposeCheckWarningOnly;
     }
 
     // -----------------------------------------------------

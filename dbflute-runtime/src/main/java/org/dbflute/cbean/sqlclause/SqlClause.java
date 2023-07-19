@@ -1367,6 +1367,25 @@ public interface SqlClause {
     void setPurpose(HpCBPurpose purpose);
 
     // -----------------------------------------------------
+    //                                         Purpose Check
+    //                                         -------------
+    /**
+     * Enable "orScopeQuery purpose check" warning-only.
+     */
+    void enableOrScopeQueryPurposeCheckWarningOnly(); // since 1.2.7
+
+    /**
+     * Disable "orScopeQuery purpose check" warning-only. (default is disabled)
+     */
+    void disableOrScopeQueryPurposeCheckWarningOnly();
+
+    /**
+     * Is "orScopeQuery purpose check" warning-only?
+     * @return The determination, true or false.
+     */
+    boolean isOrScopeQueryPurposeCheckWarningOnly();
+
+    // -----------------------------------------------------
     //                                          Purpose Lock
     //                                          ------------
     /**
@@ -1402,34 +1421,34 @@ public interface SqlClause {
     //                                    That's Bad Timming
     //                                    ------------------
     /**
-     * Enable "that's-bad-timing" detect.
+     * Enable "that's bad timing" detect.
      */
     void enableThatsBadTimingDetect();
 
     /**
-     * Disable "that's-bad-timing" detect for compatible. <br>
+     * Disable "that's bad timing" detect for compatible. <br>
      * If disabled, isLocked() always returns false.
      */
     void disableThatsBadTimingDetect();
 
     /**
-     * Does it detect "that's-bad-timing"?
+     * Does it detect "that's bad timing"?
      * @return The determination, true or false.
      */
     boolean isThatsBadTimingDetectAllowed(); // means "DetectEffective"
 
     /**
-     * Enable "that's-bad-timing" warning-only.
+     * Enable "that's bad timing" warning-only.
      */
-    void enableThatsBadTimingWarningOnly();
+    void enableThatsBadTimingWarningOnly(); // since 1.2.7
 
     /**
-     * Disable "that's-bad-timing" warning-only. (default is disabled) <br>
+     * Disable "that's bad timing" warning-only. (default is disabled)
      */
     void disableThatsBadTimingWarningOnly();
 
     /**
-     * Is "that's-bad-timing" warning-only?
+     * Is "that's bad timing" warning-only?
      * @return The determination, true or false.
      */
     boolean isThatsBadTimingWarningOnly();
