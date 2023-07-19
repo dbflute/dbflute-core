@@ -382,7 +382,7 @@ public class FunctionFilterOption implements ParameterOption {
             _tmpTrunc = "day";
         }
         return null;
-        // e.g. trunc(FOO_DATE, 'month')
+        // e.g. date_trunc(FOO_DATE, 'month')
     }
 
     protected String doProcessTruncPurposeDateTypeOracle(String functionExp) {
