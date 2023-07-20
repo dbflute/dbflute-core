@@ -22,7 +22,7 @@ package org.dbflute.dbway.topic;
 public interface ExtensionOperand {
 
     /**
-     * @return The value of operand. e.g. "ilike", "&@" (NullAllowed: if no extension)
+     * @return The value of operand. e.g. "ilike", "@@" (NullAllowed: if no extension)
      */
     String operand();
 }
