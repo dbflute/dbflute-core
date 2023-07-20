@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.optional.OptionalThing;
 
 /**
@@ -93,7 +95,27 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
     //                                                                Extension Definition
     //                                                                ====================
     public enum OperandOfLikeSearch implements ExtensionOperand {
-        BASIC("like"), CASE_INSENSITIVE("ilike"), FULL_TEXT_SEARCH("%%"), OLD_FULL_TEXT_SEARCH("@@");
+        /** normal */
+        BASIC("like")
+
+        /** regular expression */
+        , CASE_INSENSITIVE("ilike")
+
+        /** MeCab+textsearch–ja */
+        , MECAB_TEXTSEARCH_JA_FULL_TEXT_SEARCH("@@") // since 1.2.7
+
+        // #for_now jflute other operands "&~", "&@~" are unsupported, consider when feedback (2023/07/20)
+        // because maybe I needs to study PGroonga more to adjust framework design for it
+        /** PGroonga as basic operand. */
+        , PGROONGA_BASIC_FULL_TEXT_SEARCH("&@") // since 1.2.7
+
+        // #hope jflute rename to concrete name or remove (2023/07/21)
+        /** new Ludia+Senna */
+        , FULL_TEXT_SEARCH("%%") // traditional but default to keep compatible
+
+        /** old Ludia+Senna */
+        ,OLD_FULL_TEXT_SEARCH("@@") // traditional and may be unused
+        ;
 
         private static final Map<String, OperandOfLikeSearch> _codeValueMap = new HashMap<String, OperandOfLikeSearch>();
         static {
@@ -101,7 +123,7 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
                 _codeValueMap.put(value.code().toLowerCase(), value);
             }
         }
-        private String _code;
+        private final String _code;
 
         private OperandOfLikeSearch(String code) {
             _code = code;

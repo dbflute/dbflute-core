@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.dbflute.dbway.topic.OnQueryStringConnector;
+
 /**
  * The DB-way of Sybase.
  * @author jflute

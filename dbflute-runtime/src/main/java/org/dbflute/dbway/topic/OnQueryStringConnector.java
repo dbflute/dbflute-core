@@ -13,17 +13,18 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.dbway;
+package org.dbflute.dbway.topic;
 
 /**
- * The operand for extension.
+ * The connector of string literal or string column on query.
  * @author jflute
  */
-public interface ExtensionOperand {
+public interface OnQueryStringConnector {
 
     /**
-     * Get the value of operand.
-     * @return The value of operand. (NullAllowed)
+     * Connect the elements as string.
+     * @param elements The array of elements. (NotNull)
+     * @return The connected string. (NotNull)
      */
-    String operand();
+    String connect(Object... elements);
 }

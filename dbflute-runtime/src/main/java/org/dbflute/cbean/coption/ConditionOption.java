@@ -20,8 +20,8 @@ import java.util.List;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
-import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 
 /**
  * The interface of condition-option.

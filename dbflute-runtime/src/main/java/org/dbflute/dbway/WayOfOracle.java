@@ -19,6 +19,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dbflute.dbway.topic.OnQueryStringConnector;
+
 /**
  * The DB-way of Oracle.
  * @author jflute

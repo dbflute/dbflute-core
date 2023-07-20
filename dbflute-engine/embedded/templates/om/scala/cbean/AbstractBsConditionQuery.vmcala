@@ -1532,7 +1532,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     }
 
     @Override
-    protected def xgetPostgreSQLMatchOperand(): org.dbflute.dbway.ExtensionOperand = {
+    protected def xgetPostgreSQLMatchOperand(): org.dbflute.dbway.topic.ExtensionOperand = {
         return ${glDBFluteConfig}.getFullTextSearchOperand();
     }
 #end

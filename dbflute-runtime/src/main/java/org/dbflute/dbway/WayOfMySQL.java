@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.optional.OptionalThing;
 
 /**

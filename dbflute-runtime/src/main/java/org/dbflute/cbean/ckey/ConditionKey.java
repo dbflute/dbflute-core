@@ -35,8 +35,8 @@ import org.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
-import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**

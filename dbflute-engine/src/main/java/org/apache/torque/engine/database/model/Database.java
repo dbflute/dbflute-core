@@ -2056,6 +2056,10 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
+    public boolean isUseFullTextSearchPGroongaBasic() {
+        return getLittleAdjustmentProperties().isUseFullTextSearchPGroongaBasic();
+    }
+
     public boolean isMakeCDefOldStyleCodeOfMethod() {
         return getLittleAdjustmentProperties().isMakeCDefOldStyleCodeOfMethod();
     }

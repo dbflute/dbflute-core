@@ -123,6 +123,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isAvailableDatabaseDependency", false);
     }
 
+    public boolean isUseFullTextSearchPGroongaBasic() { // closet, since 1.2.7
+        return isProperty("isUseFullTextSearchPGroongaBasic", false);
+    }
+
     // ===================================================================================
     //                                                                         Native JDBC
     //                                                                         ===========

@@ -17,6 +17,8 @@ package org.dbflute.dbway;
 
 import java.util.List;
 
+import org.dbflute.dbway.topic.OnQueryStringConnector;
+
 /**
  * The interface of DB-way.
  * @author jflute

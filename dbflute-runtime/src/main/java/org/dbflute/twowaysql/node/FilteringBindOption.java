@@ -15,7 +15,7 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 
 /**
  * @author jflute
