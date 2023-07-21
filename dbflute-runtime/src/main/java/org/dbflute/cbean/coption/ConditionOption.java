@@ -30,12 +30,18 @@ import org.dbflute.dbway.topic.OnQueryStringConnector;
  */
 public interface ConditionOption {
 
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
     /**
      * Get the string expression of rear option.
      * @return The string for rear option. (NotNull, EmptyAllowed)
      */
     String getRearOption();
 
+    // ===================================================================================
+    //                                                                     Compound Column
+    //                                                                     ===============
     /**
      * Does the option have compound columns?
      * @return The determination, true or false.
@@ -44,7 +50,7 @@ public interface ConditionOption {
 
     /**
      * Get the list of compound columns.
-     * @return The list of specified column. (NotNull, EmptyAllowed)
+     * @return The read-only list of specified column. (NotNull, EmptyAllowed)
      */
     List<SpecifiedColumn> getCompoundColumnList();
 
@@ -64,25 +70,28 @@ public interface ConditionOption {
 
     /**
      * Get the string connector basically for compound columns?
-     * @return The object of string connector. (NullAllowed)
+     * @return The interface providing string connector on query. (NullAllowed: if null, no compound anyway)
      */
     OnQueryStringConnector getStringConnector();
 
+    // ===================================================================================
+    //                                                                   Clause Adjustment
+    //                                                                   =================
     /**
-     * Get the extension operand.
-     * @return The object of the extension operand. (NullAllowed)
+     * Get the extension operand. (e.g. use "ilike" instead of "like")
+     * @return The interface providing operand. (NullAllowed: if null, it means no extension)
      */
     ExtensionOperand getExtensionOperand();
 
     /**
-     * Get the arranger of query clause.
-     * @return The object of the arranger. (NullAllowed)
+     * Get the arranger of query clause. (e.g. use "collate")
+     * @return The interface providing arranged clause. (NullAllowed: if null, it means no arrangement)
      */
     QueryClauseArranger getWhereClauseArranger();
 
     /**
      * Get the manager of geared cipher. (basically for compound columns)
-     * @return The manager of geared cipher. (NullAllowed)
+     * @return The manager of geared cipher. (NullAllowed: if null, it means no cipher)
      */
     GearedCipherManager getGearedCipherManager();
 }

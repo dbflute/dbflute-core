@@ -22,8 +22,8 @@ package org.dbflute.dbway.topic;
 public interface OnQueryStringConnector {
 
     /**
-     * Connect the elements as string.
-     * @param elements The array of elements. (NotNull)
+     * Connect the query elements as string.
+     * @param elements The array of elements to be connected. (NotNull)
      * @return The connected string. (NotNull)
      */
     String connect(Object... elements);

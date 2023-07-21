@@ -17,6 +17,7 @@ package org.dbflute.cbean.coption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.dbflute.cbean.cipher.GearedCipherManager;
@@ -25,10 +26,12 @@ import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.topic.ExtensionOperand;
 import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.twowaysql.node.FilteringBindOption;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
+// very memorable code for me
 /**
- * The option of like search.
+ * The condition option of like-search.
  * <pre>
  * e.g.
  *  new LikeSearchOption().likePrefix()  : PrefixSearch
@@ -50,15 +53,28 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _like;
-    protected String _escape;
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    protected String _like; // null allowed
+    protected String _escape; // null allowed
     protected boolean _asOrSplit;
-    protected List<String> _originalWildCardList;
-    protected List<SpecifiedColumn> _compoundColumnList;
-    protected List<Integer> _compoundColumnSizeList;
+
+    // -----------------------------------------------------
+    //                                       Compound Column
+    //                                       ---------------
+    protected List<SpecifiedColumn> _compoundColumnList; // null allowed
+    protected List<Integer> _compoundColumnSizeList; // null allowed
     protected boolean _nullCompoundedAsEmpty;
-    protected OnQueryStringConnector _stringConnector;
-    protected GearedCipherManager _cipherManager;;
+    protected OnQueryStringConnector _stringConnector; // null allowed
+
+    // -----------------------------------------------------
+    //                                     Clause Adjustment
+    //                                     -----------------
+    protected List<String> _originalWildCardList; // null allowed
+    protected ExtensionOperand _extensionOperand; // null allowed, since 1.2.7
+    protected QueryClauseArranger _whereClauseArranger; // null allowed, since 1.2.7
+    protected GearedCipherManager _cipherManager; // null allowed
 
     // ===================================================================================
     //                                                                         Constructor
@@ -273,9 +289,6 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     // ===================================================================================
     //                                                                     Compound Column
     //                                                                     ===============
-    // -----------------------------------------------------
-    //                                          Dream Cruise
-    //                                          ------------
     /**
      * Add compound column connected to main column. {Dream Cruise}
      * <pre>
@@ -327,11 +340,16 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
 
     @Override
     public List<SpecifiedColumn> getCompoundColumnList() {
-        return _compoundColumnList;
+        return _compoundColumnList != null ? Collections.unmodifiableList(_compoundColumnList) : DfCollectionUtil.emptyList();
     }
 
-    public void compoundsNullAsEmpty() {
+    /**
+     * Use coalesce() for compound columns to filter null as empty.
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption compoundsNullAsEmpty() {
         _nullCompoundedAsEmpty = true;
+        return this;
     }
 
     @Override
@@ -354,6 +372,16 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     /**
      * Optimize compound columns by fixed size. <br>
      * The columns specified their sizes should be fixed-size string type 'char'. (but no check so attention)
+     * <pre>
+     * e.g. SEA_FIRST char(9), SEA_SECOND char(20)
+     *  cb.query().setSeaFirst_LikeSearch("StojkovicPix", op -> {
+     *      op.likePrefix();
+     *      op.addCompoundColumn(dreamCruiseCB.specify().columnSeaSecond());
+     *      op.optimizeCompoundColumnByFixedSize(9, 20);
+     *  });
+     * // where dfloc.SEA_FIRST = 'Stojkovic'
+     * //   and dfloc.SEA_SECOND like 'Pix%' escape '|'
+     * </pre>
      * @param sizes The array of column size for main column and compound columns. (NotNull)
      * @return this. (NotNull)
      */
@@ -380,28 +408,106 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
         return _compoundColumnSizeList != null && !_compoundColumnSizeList.isEmpty();
     }
 
-    public List<Integer> getCompoundColumnSizeList() {
-        return _compoundColumnSizeList;
+    public List<Integer> getCompoundColumnSizeList() { // read-only
+        return _compoundColumnSizeList != null ? Collections.unmodifiableList(_compoundColumnSizeList) : DfCollectionUtil.emptyList();
     }
 
     // -----------------------------------------------------
     //                                       StringConnector
     //                                       ---------------
-    // called after being set to condition-query or parameter-bean
+    // should be called after being set to condition-query or parameter-bean
     // for DBMS that has original string connection way
     //  e.g. MySQL, SQLServer
-
     public LikeSearchOption acceptStringConnector(OnQueryStringConnector stringConnector) {
         _stringConnector = stringConnector;
         return this;
     }
 
+    @Override
     public boolean hasStringConnector() {
         return _stringConnector != null;
     }
 
+    @Override
     public OnQueryStringConnector getStringConnector() {
         return _stringConnector;
+    }
+
+    // ===================================================================================
+    //                                                                   Clause Adjustment
+    //                                                                   =================
+    // -----------------------------------------------------
+    //                                      Orginal WildCard
+    //                                      ----------------
+    // should be called after being set to condition-query or parameter-bean
+    // for DBMS that does not ignore an unused escape character
+    //  e.g. Oracle, Apache Derby
+    /**
+     * Accept the list of your original wild-card for e.g. DBMS customization.
+     * @param originalWildCardList The list of string wild-card. (NullAllowed)
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption acceptOriginalWildCardList(List<String> originalWildCardList) {
+        _originalWildCardList = originalWildCardList;
+        return this;
+    }
+
+    public List<String> getOriginalWildCardList() { // read-only
+        return _originalWildCardList != null ? Collections.unmodifiableList(_originalWildCardList) : DfCollectionUtil.emptyList();
+    }
+
+    // -----------------------------------------------------
+    //                                     Extension Operand
+    //                                     -----------------
+    /**
+     * Accept your original operand as application extension instead of "like".
+     * @param extensionOperand The interface that provides your operand. (NullAllowed)
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption acceptExtensionOperand(ExtensionOperand extensionOperand) { // since 1.2.7
+        _extensionOperand = extensionOperand;
+        return this;
+    }
+
+    @Override
+    public ExtensionOperand getExtensionOperand() {
+        return _extensionOperand;
+    }
+
+    // -----------------------------------------------------
+    //                                 Where Clause Arranger
+    //                                 ---------------------
+    /**
+     * Accept arranger of query clause (like clause) for e.g. collate.
+     * @param whereClauseArranger The interface that arranges your clause. (NullAllowed)
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption acceptWhereClauseArranger(QueryClauseArranger whereClauseArranger) { // since 1.2.7
+        _whereClauseArranger = whereClauseArranger;
+        return this;
+    }
+
+    @Override
+    public QueryClauseArranger getWhereClauseArranger() {
+        return _whereClauseArranger;
+    }
+
+    // -----------------------------------------------------
+    //                                         Geared Cipher
+    //                                         -------------
+    /**
+     * Accept the manager of geared cipher. (basically for compound columns)
+     * @param cipherManager The manager of geared cipher. (NullAllowed)
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption acceptGearedCipherManager(GearedCipherManager cipherManager) {
+        _cipherManager = cipherManager;
+        return this;
+    }
+
+    @Override
+    public GearedCipherManager getGearedCipherManager() {
+        return _cipherManager;
     }
 
     // ===================================================================================
@@ -446,27 +552,19 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
         return replace(target, wildCard, _escape + wildCard);
     }
 
-    // called after being set to condition-query or parameter-bean
-    // for DBMS that does not ignore an unused escape character
-    //  e.g. Oracle, Apache Derby
-
-    public LikeSearchOption acceptOriginalWildCardList(List<String> originalWildCardList) {
-        _originalWildCardList = originalWildCardList;
-        return this;
-    }
-
     // ===================================================================================
     //                                                                           Deep Copy
     //                                                                           =========
     @Override
     public LikeSearchOption createDeepCopy() {
         final LikeSearchOption copy = (LikeSearchOption) super.createDeepCopy();
+
+        // basic
         copy._like = _like;
         copy._escape = _escape;
         copy._asOrSplit = _asOrSplit;
-        if (_originalWildCardList != null) {
-            copy._originalWildCardList = new ArrayList<String>(_originalWildCardList);
-        }
+
+        // compound column
         if (_compoundColumnList != null) {
             copy._compoundColumnList = new ArrayList<SpecifiedColumn>(_compoundColumnList);
         }
@@ -474,6 +572,17 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
             copy._compoundColumnSizeList = new ArrayList<Integer>(_compoundColumnSizeList);
         }
         copy._stringConnector = _stringConnector;
+
+        // clause adjustment
+        if (_originalWildCardList != null) {
+            copy._originalWildCardList = new ArrayList<String>(_originalWildCardList);
+        } else {
+            copy._originalWildCardList = null;
+        }
+        copy._extensionOperand = _extensionOperand;
+        copy._whereClauseArranger = _whereClauseArranger;
+        copy._cipherManager = _cipherManager;
+
         return copy;
     }
 
@@ -483,50 +592,10 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     }
 
     // ===================================================================================
-    //                                                                   Extension Operand
-    //                                                                   =================
-    /**
-     * Get the operand for extension.
-     * @return The operand for extension. (NullAllowed: If the value is null, it means no extension)
-     */
-    @Override
-    public ExtensionOperand getExtensionOperand() { // for application extension
-        return null; // as default
-    }
-
-    // ===================================================================================
-    //                                                               Where Clause Arranger
-    //                                                               =====================
-    /**
-     * Get the arranger of where clause.
-     * @return The arranger of where clause. (NullAllowed: If the value is null, it means no arrangement)
-     */
-    @Override
-    public QueryClauseArranger getWhereClauseArranger() { // for application extension
-        return null; // as default
-    }
-
-    // ===================================================================================
-    //                                                                       Geared Cipher
-    //                                                                       =============
-    /**
-     * Accept the manager of geared cipher. (basically for compound columns)
-     * @param cipherManager The manager of geared cipher. (NullAllowed)
-     */
-    public void acceptGearedCipherManager(GearedCipherManager cipherManager) {
-        _cipherManager = cipherManager;
-    }
-
-    @Override
-    public GearedCipherManager getGearedCipherManager() {
-        return _cipherManager;
-    }
-
-    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
-    public String toString() {
+    public String toString() { // main items only
         final String title = DfTypeUtil.toClassTitle(this);
         final String split = (isSplit() ? (_asOrSplit ? "true(or)" : "true(and)") : "false");
         return title + ":{like=" + _like + ", escape=" + _escape + ", split=" + split + "}";

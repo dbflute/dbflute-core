@@ -98,7 +98,7 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
         /** normal */
         BASIC("like")
 
-        /** regular expression */
+        /** like-search with ignoring case (like is case-sensitive on PostgreSQL) */
         , CASE_INSENSITIVE("ilike")
 
         /** MeCab+textsearch–ja */

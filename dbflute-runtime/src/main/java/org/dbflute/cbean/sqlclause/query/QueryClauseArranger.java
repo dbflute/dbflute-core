@@ -18,7 +18,7 @@ package org.dbflute.cbean.sqlclause.query;
 import org.dbflute.dbmeta.name.ColumnRealName;
 
 /**
- * The arranger of query clause.
+ * The arranger of query clause, for e.g. collate option.
  * @author jflute
  */
 public interface QueryClauseArranger {
