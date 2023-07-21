@@ -15,7 +15,6 @@
  */
 package org.dbflute.cbean;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +47,7 @@ import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.garnish.SpecifyColumnRequiredChecker;
 import org.dbflute.cbean.garnish.SpecifyColumnRequiredExceptDeterminer;
+import org.dbflute.cbean.garnish.invoking.InvokingCBeanAgent;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
@@ -73,19 +73,14 @@ import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
-import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
-import org.dbflute.helper.beans.DfBeanDesc;
-import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
-import org.dbflute.util.DfReflectionUtil;
-import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -1566,82 +1561,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                 ===================
     /** {@inheritDoc} */
     public void invokeSetupSelect(String foreignPropertyNamePath) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyNamePath", foreignPropertyNamePath);
-        final String delimiter = ".";
-        Object currentObj = this;
-        String remainder = foreignPropertyNamePath;
-        int count = 0;
-        boolean last = false;
-        while (true) {
-            final int deimiterIndex = remainder.indexOf(delimiter);
-            final String propertyName;
-            if (deimiterIndex < 0) {
-                propertyName = remainder;
-                last = true;
-            } else {
-                propertyName = remainder.substring(0, deimiterIndex);
-                remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
-            }
-            final Class<?> targetType = currentObj.getClass();
-            final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = xhelpGettingCBChainMethod(targetType, methodName, (Class<?>[]) null);
-            if (method == null) {
-                String msg = "Not found the method for setupSelect:";
-                msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
-                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg);
-            }
-            try {
-                currentObj = DfReflectionUtil.invoke(method, currentObj, (Object[]) null);
-            } catch (ReflectionFailureException e) {
-                String msg = "Failed to invoke the method:";
-                msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
-                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg, e);
-            }
-            ++count;
-            if (last) {
-                break;
-            }
-        }
+        createInvokingCBeanAgent().invokeSetupSelect(foreignPropertyNamePath);
     }
 
     /** {@inheritDoc} */
     public SpecifiedColumn invokeSpecifyColumn(String columnPropertyPath) {
-        final String delimiter = ".";
-        Object currentObj = localSp();
-        String remainder = columnPropertyPath;
-        boolean last = false;
-        while (true) {
-            final int deimiterIndex = remainder.indexOf(delimiter);
-            final String propertyName;
-            if (deimiterIndex < 0) {
-                propertyName = remainder; // hard to get relation DB meta so plain name
-                last = true;
-            } else {
-                propertyName = remainder.substring(0, deimiterIndex);
-                remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
-            }
-            final Class<?> targetType = currentObj.getClass();
-            final String methodName = (last ? "column" : "specify") + initCap(propertyName);
-            final Method method = xhelpGettingCBChainMethod(targetType, methodName, (Class<?>[]) null);
-            if (method == null) {
-                String msg = "Not found the method for SpecifyColumn:";
-                msg = msg + " columnPropertyPath=" + columnPropertyPath + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg);
-            }
-            try {
-                currentObj = DfReflectionUtil.invoke(method, currentObj, (Object[]) null);
-            } catch (ReflectionFailureException e) {
-                String msg = "Failed to invoke the method:";
-                msg = msg + " columnPropertyPath=" + columnPropertyPath + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg, e);
-            }
-            if (last) {
-                break;
-            }
-        }
-        return (SpecifiedColumn) currentObj;
+        return createInvokingCBeanAgent().invokeSpecifyColumn(localSp(), columnPropertyPath);
+    }
+
+    protected InvokingCBeanAgent createInvokingCBeanAgent() {
+        return new InvokingCBeanAgent(this);
     }
 
     /** {@inheritDoc} */
@@ -1652,15 +1581,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** {@inheritDoc} */
     public void invokeOrScopeQueryAndPart(AndQuery<ConditionBean> andQuery) {
         xorSQAP(this, andQuery);
-    }
-
-    protected Method xhelpGettingCBChainMethod(Class<?> type, String methodName, Class<?>[] argTypes) {
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(type);
-        return beanDesc.getMethodNoException(methodName, argTypes);
-    }
-
-    protected Object xhelpInvokingCBChainMethod(Class<?> type, Method method, Object[] args) {
-        return DfReflectionUtil.invokeForcedly(method, type, args);
     }
 
     // ===================================================================================
