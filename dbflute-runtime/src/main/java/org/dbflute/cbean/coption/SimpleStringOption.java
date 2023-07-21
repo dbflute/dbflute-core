@@ -27,7 +27,7 @@ import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
- * The class of simple-string-option.
+ * The option of simple string, e.g. LikeSearch.
  * @author jflute
  */
 public class SimpleStringOption implements ConditionOption {

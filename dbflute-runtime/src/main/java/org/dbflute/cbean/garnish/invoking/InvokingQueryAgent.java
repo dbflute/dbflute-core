@@ -27,6 +27,9 @@ import java.util.List;
 
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.coption.ConditionOption;
+import org.dbflute.cbean.coption.FromToOption;
+import org.dbflute.cbean.coption.LikeSearchOption;
+import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
@@ -69,7 +72,7 @@ public class InvokingQueryAgent {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final String columnCapPropName = initCap(dbmeta.findColumnInfo(columnFlexibleName).getPropertyName());
         final String methodName = "xdfget" + columnCapPropName;
-        final Method method = xhelpGettingCQMethod(_rootQuery, methodName, (Class<?>[]) null);
+        final Method method = searchSimpleCQMethod(_rootQuery, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingGetMethodNotFoundException(columnFlexibleName, methodName);
             return null; // unreachable
@@ -124,8 +127,8 @@ public class InvokingQueryAgent {
         }
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(colName);
         final String flexibleName = container.getFlexibleName();
-        final ConditionQuery cq = container.getConditionQuery();
-        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(cq.asTableDbName());
+        final ConditionQuery declaringCQ = container.getConditionQuery();
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(declaringCQ.asTableDbName());
         final ColumnInfo columnInfo;
         try {
             columnInfo = dbmeta.findColumnInfo(flexibleName);
@@ -171,23 +174,23 @@ public class InvokingQueryAgent {
                 }
             }
         }
-        if (option != null) {
+        if (option != null) { // always last argument (is implementation policy)
             typeList.add(option.getClass());
         }
         final List<Class<?>> filteredTypeList = newArrayListSized(typeList.size());
         for (Class<?> parameterType : typeList) {
             filteredTypeList.add(xfilterInvokeQueryParameterType(colName, ckey, parameterType));
         }
-        final Class<?>[] parameterTypes = filteredTypeList.toArray(new Class<?>[filteredTypeList.size()]);
-        final Method method = xhelpGettingCQMethod(cq, methodName, parameterTypes);
+        final Class<?>[] argTypes = filteredTypeList.toArray(new Class<?>[filteredTypeList.size()]);
+        final Method method = searchQuerySetMethod(declaringCQ, methodName, argTypes, option);
         if (method == null) {
-            throwConditionInvokingSetMethodNotFoundException(colName, ckey, value, option, methodName, parameterTypes);
+            throwConditionInvokingSetMethodNotFoundException(colName, ckey, value, option, methodName, argTypes);
         }
         try {
             final List<Object> argList = newArrayList();
             if (fromTo || rangeOf) {
                 if (!(value instanceof List<?>)) { // check type
-                    throwConditionInvokingDateFromToValueInvalidException(colName, ckey, value, option, methodName, parameterTypes);
+                    throwConditionInvokingDateFromToValueInvalidException(colName, ckey, value, option, methodName, argTypes);
                 }
                 argList.addAll((List<?>) value);
             } else {
@@ -202,24 +205,95 @@ public class InvokingQueryAgent {
             for (Object arg : argList) {
                 filteredArgList.add(xfilterInvokeQueryParameterValue(colName, ckey, arg));
             }
-            xhelpInvokingCQMethod(cq, method, filteredArgList.toArray());
+            xhelpInvokingCQMethod(declaringCQ, method, filteredArgList.toArray());
         } catch (ReflectionFailureException e) {
-            throwConditionInvokingSetReflectionFailureException(colName, ckey, value, option, methodName, parameterTypes, e);
+            throwConditionInvokingSetReflectionFailureException(colName, ckey, value, option, methodName, argTypes, e);
         }
     }
 
+    // -----------------------------------------------------
+    //                                           Method Name
+    //                                           -----------
     protected String xbuildQuerySetMethodName(String ckey, String columnCapPropName) {
         return "set" + columnCapPropName + "_" + initCap(ckey);
     }
 
+    // -----------------------------------------------------
+    //                                        Parameter Type
+    //                                        --------------
     protected Class<?> xfilterInvokeQueryParameterType(String colName, String ckey, Class<?> parameterType) {
         return parameterType; // no filter as default (e.g. overridden by Scala to convert to immutable list)
     }
 
+    // -----------------------------------------------------
+    //                                         Method Search
+    //                                         -------------
+    protected Method searchQuerySetMethod(ConditionQuery declaringCQ, String methodName, Class<?>[] argTypes, ConditionOption option) {
+        Method found = findCQPublicMethod(declaringCQ, methodName, argTypes);
+        if (found != null) { // e.g. simple set method (without option), setSea_Equal(), setLand_GreaterThan()
+            return found;
+        }
+        // maybe non public method here (basically option-setting method)
+        // e.g. protected void setSea_LikeSearch(String, LikeSearchOption)
+        // (ConditionOptionCall<LikeSearchOption> is public, LikeSearchOption is protected since 1.1.0)
+
+        // retry for callback way of option-setting method
+        if (option != null) { // e.g. LikeSearch
+            // option is always last argument (is implementation policy)
+            Class<?>[] retryArgType = null;
+            if (isLastArgConditionOptionExtended(LikeSearchOption.class, argTypes)) {
+                retryArgType = deriveRetryArgType(argTypes, LikeSearchOption.class);
+            } else if (isLastArgConditionOptionExtended(RangeOfOption.class, argTypes)) {
+                retryArgType = deriveRetryArgType(argTypes, RangeOfOption.class);
+            } else if (isLastArgConditionOptionExtended(FromToOption.class, argTypes)) {
+                retryArgType = deriveRetryArgType(argTypes, FromToOption.class);
+            }
+            if (retryArgType != null) {
+                found = findCQWholeMethod(declaringCQ, methodName, retryArgType);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        // so next, searching all protected, private methods
+        // non-cache #for_now e.g. native method of classification
+        // (but cache of Class.class can be available)
+        return findCQWholeMethod(declaringCQ, methodName, argTypes);
+    }
+
+    protected boolean isLastArgConditionOptionExtended(Class<?> pureOptionType, Class<?>[] argTypes) {
+        if (argTypes.length == 0) {
+            return false;
+        }
+        final Class<?> lastType = argTypes[argTypes.length - 1]; // actual type from specified option instance
+        return pureOptionType.isAssignableFrom(lastType) && !pureOptionType.equals(lastType);
+    }
+
+    protected Class<?>[] deriveRetryArgType(Class<?>[] argTypes, Class<?> pureOptionType) {
+        final Class<?>[] retryArgTypes = new Class<?>[argTypes.length];
+        int index = 0;
+        for (Class<?> argType : argTypes) {
+            if (index == argTypes.length - 1) { // last loop
+                retryArgTypes[index] = pureOptionType;
+            } else {
+                retryArgTypes[index] = argType;
+            }
+            ++index;
+        }
+        return retryArgTypes;
+    }
+
+    // -----------------------------------------------------
+    //                                       Parameter Value
+    //                                       ---------------
     protected Object xfilterInvokeQueryParameterValue(String colName, String ckey, Object parameterValue) {
         return parameterValue; // no filter as default (e.g. overridden by Scala to convert to immutable list)
     }
 
+    // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
     protected void throwConditionInvokingColumnFindFailureException(String columnFlexibleName, String conditionKeyName,
             Object conditionValue, ConditionOption conditionOption, RuntimeException cause) {
         final String notice = "Failed to find the column in the table.";
@@ -235,29 +309,29 @@ public class InvokingQueryAgent {
     }
 
     protected void throwConditionInvokingSetMethodNotFoundException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes) {
+            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] argTypes) {
         final String notice = "Not found the method for setting the condition.";
         doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, methodName,
-                parameterTypes, null);
+                argTypes, null);
     }
 
     protected void throwConditionInvokingDateFromToValueInvalidException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes) {
+            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] argTypes) {
         final String notice = "The conditionValue should be List that has 2 elements, fromDate and toDate.";
         doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, methodName,
-                parameterTypes, null);
+                argTypes, null);
     }
 
     protected void throwConditionInvokingSetReflectionFailureException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes,
+            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] argTypes,
             ReflectionFailureException cause) {
         final String notice = "Failed to invoke the method for setting the condition.";
         doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, methodName,
-                parameterTypes, cause);
+                argTypes, cause);
     }
 
     protected void doThrowConditionInvokingFailureException(String notice, String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes, RuntimeException cause) {
+            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] argTypes, RuntimeException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Table");
@@ -273,13 +347,13 @@ public class InvokingQueryAgent {
         br.addElement(conditionOption);
         if (methodName != null) {
             final StringBuilder sb = new StringBuilder();
-            if (parameterTypes != null) {
+            if (argTypes != null) {
                 int index = 0;
-                for (Class<?> parameterType : parameterTypes) {
+                for (Class<?> argType : argTypes) {
                     if (index > 0) {
                         sb.append(", ");
                     }
-                    sb.append(DfTypeUtil.toClassTitle(parameterType));
+                    sb.append(DfTypeUtil.toClassTitle(argType));
                     ++index;
                 }
             }
@@ -306,7 +380,7 @@ public class InvokingQueryAgent {
         final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(cq.asTableDbName());
         final String columnCapPropName = initCap(dbmeta.findColumnInfo(flexibleName).getPropertyName());
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
+        final Method method = searchSimpleCQMethod(cq, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingOrderMethodNotFoundException(columnFlexibleName, isAsc, methodName);
         }
@@ -367,7 +441,7 @@ public class InvokingQueryAgent {
     protected ConditionQuery doInvokeForeignCQ(ConditionQuery foreignCQ, String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "query" + initCap(foreignPropertyName);
-        final Method method = xhelpGettingCQMethod(foreignCQ, methodName, (Class<?>[]) null);
+        final Method method = searchSimpleCQMethod(foreignCQ, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingForeignQueryMethodNotFoundException(foreignCQ, foreignPropertyName, methodName);
             return null; // unreachable
@@ -432,7 +506,7 @@ public class InvokingQueryAgent {
     protected boolean doInvokeHasForeignCQ(ConditionQuery foreignCQ, String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
-        final Method method = xhelpGettingCQMethod(foreignCQ, methodName, (Class<?>[]) null);
+        final Method method = searchSimpleCQMethod(foreignCQ, methodName, (Class<?>[]) null);
         if (method == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found the method for determining a foreign condition query.");
@@ -460,6 +534,9 @@ public class InvokingQueryAgent {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                         Property Name
+    //                                         -------------
     protected PropertyNameCQContainer xhelpExtractingPropertyNameCQContainer(String chainedColumnName) {
         final String[] strings = chainedColumnName.split("\\.");
         final int length = strings.length;
@@ -496,20 +573,27 @@ public class InvokingQueryAgent {
         }
     }
 
-    protected Method xhelpGettingCQMethod(ConditionQuery declaringCQ, String methodName, Class<?>[] argTypes) {
-        final Class<? extends ConditionQuery> cqType = declaringCQ.getClass();
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(cqType);
-        final Method found = beanDesc.getMethodNoException(methodName, argTypes); // public only
+    // -----------------------------------------------------
+    //                                         Method Search
+    //                                         -------------
+    protected Method searchSimpleCQMethod(ConditionQuery declaringCQ, String methodName, Class<?>[] argTypes) {
+        Method found = findCQPublicMethod(declaringCQ, methodName, argTypes);
         if (found != null) { // e.g. simple set method (without option), setSea_Equal(), setLand_GreaterThan()
             return found;
         }
-        // maybe non public method here (option-setting method e.g. LikeSearch)
-        // ConditionOptionCall<LikeSearchOption> is public, LikeSearchOption is protected since 1.1.0
-        // so next, searching also protected, private
+        // non public so searching all protected, private methods
+        // non-cache #for_now (but cache of Class.class can be available)
+        return findCQWholeMethod(declaringCQ, methodName, argTypes);
+    }
 
-        // non-cache #for_now e.g. native method of classification or protected option method
-        // (but cache of Class.class can be available)
-        return DfReflectionUtil.getWholeMethod(cqType, methodName, argTypes);
+    protected Method findCQPublicMethod(ConditionQuery declaringCQ, String methodName, Class<?>[] argTypes) {
+        final Class<? extends ConditionQuery> cqType = declaringCQ.getClass();
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(cqType);
+        return beanDesc.getMethodNoException(methodName, argTypes); // public only
+    }
+
+    protected Method findCQWholeMethod(ConditionQuery declaringCQ, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getWholeMethod(declaringCQ.getClass(), methodName, argTypes);
     }
 
     protected Object xhelpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
