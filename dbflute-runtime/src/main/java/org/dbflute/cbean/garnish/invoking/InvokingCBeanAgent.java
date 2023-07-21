@@ -51,7 +51,7 @@ public class InvokingCBeanAgent {
     public void invokeSetupSelect(String foreignPropertyNamePath) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyNamePath", foreignPropertyNamePath);
         final String delimiter = ".";
-        Object currentObj = this;
+        Object currentObj = _rootBean;
         String remainder = foreignPropertyNamePath;
         int count = 0;
         boolean last = false;
