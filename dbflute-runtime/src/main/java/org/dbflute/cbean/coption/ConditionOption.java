@@ -26,7 +26,7 @@ import org.dbflute.dbway.topic.OnQueryStringConnector;
 /**
  * The interface of condition-option.
  * @author jflute
- * @author h-funaki added treatsCompoundColumnNullAsEmpty()
+ * @author h-funaki added isNullCompoundedAsEmpty()
  */
 public interface ConditionOption {
 
