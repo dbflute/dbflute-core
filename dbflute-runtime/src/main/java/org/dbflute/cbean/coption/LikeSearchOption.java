@@ -373,14 +373,14 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      * Optimize compound columns by fixed size. <br>
      * The columns specified their sizes should be fixed-size string type 'char'. (but no check so attention)
      * <pre>
-     * e.g. SEA_FIRST char(9), SEA_SECOND char(20)
-     *  cb.query().setSeaFirst_LikeSearch("StojkovicPix", op -> {
+     * e.g. SEA_MYSTIC char(9), LAND_ONEMAN char(20)
+     *  cb.query().setSeaMystic_LikeSearch("StojkovicPix", op -&gt; {
      *      op.likePrefix();
-     *      op.addCompoundColumn(dreamCruiseCB.specify().columnSeaSecond());
+     *      op.addCompoundColumn(dreamCruiseCB.specify().columnLandOneman());
      *      op.optimizeCompoundColumnByFixedSize(9, 20);
      *  });
-     * // where dfloc.SEA_FIRST = 'Stojkovic'
-     * //   and dfloc.SEA_SECOND like 'Pix%' escape '|'
+     * // where dfloc.SEA_MYSTIC = 'Stojkovic'
+     * //   and dfloc.LAND_ONEMAN like 'Pix%' escape '|'
      * </pre>
      * @param sizes The array of column size for main column and compound columns. (NotNull)
      * @return this. (NotNull)
