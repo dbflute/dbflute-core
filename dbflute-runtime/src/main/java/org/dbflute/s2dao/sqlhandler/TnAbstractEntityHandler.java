@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.core.context.ResourceParameter;
-import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
+import org.dbflute.bhv.core.context.logmask.BehaviorLogMaskProvider;
 import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.UpdateOption;
@@ -149,7 +149,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
         if (ResourceContext.isExistResourceContextOnThread()) {
             final ResourceContext context = ResourceContext.getResourceContextOnThread();
             final ResourceParameter parameter = context.getResourceParameter();
-            final ErrorLogMaskProvider provider = parameter.getErrorLogMaskProvider();
+            final BehaviorLogMaskProvider provider = parameter.getBehaviorLogMaskProvider();
             if (provider != null) {
                 maskMan = provider.provideAlreadyUpdatedBeanMaskMan();
             }

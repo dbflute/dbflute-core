@@ -15,7 +15,7 @@
  */
 package org.dbflute.bhv.core.context;
 
-import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
+import org.dbflute.bhv.core.context.logmask.BehaviorLogMaskProvider;
 import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 
@@ -47,9 +47,9 @@ public class ResourceParameter {
     protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider; // null allowed
 
     // -----------------------------------------------------
-    //                                        Error Log Mark
-    //                                        --------------
-    protected ErrorLogMaskProvider _errorLogMaskProvider; // null allowed
+    //                                     Behavior Log Mark
+    //                                     -----------------
+    protected BehaviorLogMaskProvider _behaviorLogMaskProvider; // null allowed
 
     // -----------------------------------------------------
     //                                        Internal Debug
@@ -117,14 +117,14 @@ public class ResourceParameter {
     }
 
     // -----------------------------------------------------
-    //                                        Error Log Mark
-    //                                        --------------
-    public ErrorLogMaskProvider getErrorLogMaskProvider() {
-        return _errorLogMaskProvider;
+    //                                     Behavior Log Mark
+    //                                     -----------------
+    public BehaviorLogMaskProvider getBehaviorLogMaskProvider() {
+        return _behaviorLogMaskProvider;
     }
 
-    public void setErrorLogMaskProvider(ErrorLogMaskProvider errorLogMaskProvider) {
-        _errorLogMaskProvider = errorLogMaskProvider;
+    public void setBehaviorLogMaskProvider(BehaviorLogMaskProvider errorLogMaskProvider) {
+        _behaviorLogMaskProvider = errorLogMaskProvider;
     }
 
     // -----------------------------------------------------

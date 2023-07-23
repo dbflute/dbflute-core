@@ -22,7 +22,7 @@ import org.dbflute.exception.EntityAlreadyUpdatedException.AlreadyUpdatedBeanMas
  * @author jflute
  * @since 1.2.7 (2023/07/09 Sunday at roppongi japanese)
  */
-public interface ErrorLogMaskProvider {
+public interface BehaviorLogMaskProvider {
 
     /**
      * @return The callback to mark EntityAlreadyUpdatedException bean. (NullAllowed: if null, no mask)

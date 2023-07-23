@@ -25,7 +25,7 @@ import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.core.context.ResourceParameter;
-import org.dbflute.bhv.core.context.logmask.ErrorLogMaskProvider;
+import org.dbflute.bhv.core.context.logmask.BehaviorLogMaskProvider;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.EntityAlreadyExistsException;
@@ -257,7 +257,7 @@ public class SQLExceptionHandler {
         if (ResourceContext.isExistResourceContextOnThread()) { // basically true, just in case
             final ResourceContext context = ResourceContext.getResourceContextOnThread();
             final ResourceParameter parameter = context.getResourceParameter();
-            final ErrorLogMaskProvider provider = parameter.getErrorLogMaskProvider();
+            final BehaviorLogMaskProvider provider = parameter.getBehaviorLogMaskProvider();
             if (provider != null) {
                 maskMan = provider.provideSQLExceptionDisplaySqlMaskMan(); // null allowed
             }

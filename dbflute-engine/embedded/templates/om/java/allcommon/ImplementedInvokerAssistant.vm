@@ -476,7 +476,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         parameter.setLogTimestampPattern(${glDBFluteConfig}.getInstance().getLogTimestampPattern());
         parameter.setLogTimePattern(${glDBFluteConfig}.getInstance().getLogTimePattern());
         parameter.setLogTimeZoneProvider(${glDBFluteConfig}.getInstance().getLogTimeZoneProvider());
-        parameter.setErrorLogMaskProvider(${glDBFluteConfig}.getInstance().getErrorLogMaskProvider()); // since 1.2.7
+        parameter.setBehaviorLogMaskProvider(${glDBFluteConfig}.getInstance().getBehaviorLogMaskProvider()); // since 1.2.7
         parameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return parameter;
     }
