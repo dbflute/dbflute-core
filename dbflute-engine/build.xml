@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.2.7" />
-	<property name="build.version" value="${version}-H-SNAPSHOT" />
+	<property name="build.version" value="${version}-I-SNAPSHOT" />
 	<property name="runtime.version" value="1.2.7" />
-	<property name="runtime.build.version" value="${runtime.version}-H-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-I-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
