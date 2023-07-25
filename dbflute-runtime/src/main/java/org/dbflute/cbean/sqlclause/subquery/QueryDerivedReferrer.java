@@ -89,6 +89,9 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                              Right Clause DreamCruise
+    //                              ------------------------
     protected void buildRightClauseDreamCruiseExp(StringBuilder sb) {
         final SpecifiedColumn specifiedColumn = (SpecifiedColumn) _value;
         final String columnExp = specifiedColumn.toColumnRealName().toString();
@@ -103,6 +106,9 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         sb.append(appended);
     }
 
+    // -----------------------------------------------------
+    //                                   Right Clause Normal
+    //                                   -------------------
     protected void buildRightClauseNormalValue(final StringBuilder sb) {
         final String prefix = "/*pmb.";
         final String suffix = "*/null";
@@ -129,6 +135,9 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         return prefix + _parameterPath + ".get(" + index + ")" + suffix;
     }
 
+    // -----------------------------------------------------
+    //                                      Assert/Exception
+    //                                      ----------------
     @Override
     protected void throwDerivedReferrerInvalidColumnSpecificationException(String function) {
         createCBExThrower().throwQueryDerivedReferrerInvalidColumnSpecificationException(function);

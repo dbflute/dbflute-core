@@ -63,11 +63,11 @@ import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.cbean.sqlclause.query.ColumnQueryClauseCreator;
 import org.dbflute.cbean.sqlclause.query.QueryClause;
 import org.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.dbflute.cbean.sqlclause.select.DreamSetupSelectSynchronizer;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
@@ -579,29 +579,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void xdoSetupSelectDreamCruiseJourneyLogBook() {
-        // small waste exists but simple logic is best here
-        final ConditionBean departurePort = xgetDreamCruiseDeparturePort();
-        for (String relationPath : _dreamCruiseJourneyLogBook) {
-            final List<String> relNoExpList = Srl.splitList(relationPath, "_"); // e.g. _2_5
-            final StringBuilder sb = new StringBuilder();
-            DBMeta currentMeta = asDBMeta();
-            int index = 0;
-            for (String relNoExp : relNoExpList) {
-                if ("".equals(relNoExp)) {
-                    continue;
-                }
-                final Integer relationNo = Integer.valueOf(relNoExp);
-                final ForeignInfo foreignInfo = currentMeta.findForeignInfo(relationNo);
-                final String foreignPropertyName = foreignInfo.getForeignPropertyName();
-                if (index > 0) {
-                    sb.append(".");
-                }
-                sb.append(foreignPropertyName);
-                currentMeta = foreignInfo.getForeignDBMeta();
-                ++index;
-            }
-            departurePort.invokeSetupSelect(sb.toString());
-        }
+        final DreamSetupSelectSynchronizer synchronizer = createDreamSetupSelectSynchronizer();
+        synchronizer.setupSelectDreamCruiseJourneyLogBook(asDBMeta(), xgetDreamCruiseDeparturePort(), _dreamCruiseJourneyLogBook);
+    }
+
+    protected DreamSetupSelectSynchronizer createDreamSetupSelectSynchronizer() {
+        return new DreamSetupSelectSynchronizer();
     }
 
     protected void xassertDreamCruiseShip() {
