@@ -1359,6 +1359,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isReadOnlySchema", false);
     }
 
+    // e.g. littleAdjustmentMap.dfprop
+    //  ; readOnlyTableNameList = list:{
+    //      ; prefix:PURCHASE
+    //  
+    //      ; !PURCHASE_PAYMENT
+    //  }
+    // => PURCHASE is readable, PURCHASE_PAYMENT is writable
     protected List<String> _readOnlyTableNameList;
     protected Set<String> _exceptReadOnlyTableNameSet;
 
