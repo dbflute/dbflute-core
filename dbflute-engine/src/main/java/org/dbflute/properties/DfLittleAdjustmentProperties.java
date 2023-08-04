@@ -17,7 +17,6 @@ package org.dbflute.properties;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1371,7 +1370,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         final Object obj = getLittleAdjustmentMap().get(key);
         final List<String> plainList = obj != null ? castToList(obj, key) : new ArrayList<String>();
         _readOnlyTableNameList = new ArrayList<String>();
-        _exceptReadOnlyTableNameSet = new LinkedHashSet<String>();
+        _exceptReadOnlyTableNameSet = StringSet.createAsFlexible(); // fit with name-hint logic
         for (String element : plainList) {
             if (element.startsWith("!")) {
                 _exceptReadOnlyTableNameSet.add(Srl.ltrim(element, "!"));
