@@ -51,6 +51,8 @@ public class DfClsTopLiteralArranger {
     //                                        Process Method
     //                                        --------------
     public void arrangeClassificationTopFromLiteral(DfClassificationTop classificationTop, Map<?, ?> elementMap) {
+        // #thinking jflute while analyzing literal, we don't know table or implict classification (2023/08/17)
+        // so you cannot determine e.g. isCheckImplicitSet correctly (but small problem so keep it for now)
         classificationTop.acceptBasicItem(elementMap);
         classificationTop.setCheckClassificationCode(isElementMapCheckClassificationCode(elementMap));
         classificationTop.setUndefinedHandlingType(getElementMapUndefinedHandlingType(elementMap));
