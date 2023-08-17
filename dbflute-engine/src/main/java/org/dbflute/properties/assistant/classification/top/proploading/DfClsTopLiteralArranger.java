@@ -76,6 +76,7 @@ public class DfClsTopLiteralArranger {
             return checked; // e.g. explicitly undefinedHandlingType=[something]
         }
         if (hasElementMapCheckImplicitSetProperty(elementMap) && !isElementMapCheckImplicitSet(elementMap)) {
+            // #for_now jflute isCheckImplicitSet, no determination whether table classification or not (2023/08/17)
             return false; // explicitly isCheckImplicitSet=false
         }
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
@@ -100,6 +101,8 @@ public class DfClsTopLiteralArranger {
     @SuppressWarnings("unchecked")
     protected ClassificationUndefinedHandlingType getElementMapUndefinedHandlingType(Map<?, ?> elementMap) {
         if (isElementMapCheckImplicitSet(elementMap)) {
+            // #for_now jflute isCheckImplicitSet, no determination whether table classification or not (2023/08/17)
+            // so here even if isCheckImplicitSet=true in table classification
             return ClassificationUndefinedHandlingType.EXCEPTION;
         }
         final String key = DfClassificationTop.KEY_UNDEFINED_HANDLING_TYPE;
@@ -150,6 +153,7 @@ public class DfClsTopLiteralArranger {
     @SuppressWarnings("unchecked")
     protected boolean isElementMapCheckImplicitSet(Map<?, ?> elementMap) { // has been existed since old
         // table classification determination is set at DfClassificationTop
+        // #hope jflute isCheckImplicitSet, should determine table classification here (2023/08/17)
         final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
         return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
     }

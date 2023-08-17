@@ -642,10 +642,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     public boolean isSuppressDefaultCheckClassificationCode() { // closet
+        // for new classification code check (existing code or not)
+        // the check is on entity if undefinedHandlingType is LOGGING or EXCEPTION
+        // but you can suppress the check if implicit setting (means default) in dfprop
         return isProperty("isSuppressDefaultCheckClassificationCode", isCompatibleBeforeJava8());
     }
 
-    // old style
+    // old style, checking on dbmeta
     protected static final String KEY_isCheckSelectedClassification = "isCheckSelectedClassification";
 
     public boolean hasCheckSelectedClassificationProperty() {
