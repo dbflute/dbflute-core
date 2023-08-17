@@ -251,6 +251,7 @@ public class FunCustodial {
         br.addItem("Advice");
         br.addElement("Confirm the value of the classification column on your database,");
         br.addElement("or setting value to your entity.");
+        br.addElement(" #undefinedCls");
         br.addElement("The code is NOT one of classification code defined on DBFlute.");
         br.addElement("");
         br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
@@ -295,7 +296,7 @@ public class FunCustodial {
         if (_clsMetaLog.isInfoEnabled()) {
             final String classificationName = meta.classificationName();
             final String exp = classificationName + "." + code + " of " + tableDbName + "." + columnDbName;
-            _clsMetaLog.info("*Undefined classification code was set: " + exp); // one line because of many called
+            _clsMetaLog.info("*Undefined classification code #undefinedCls was set: " + exp); // one line because of many called
         }
     }
 
