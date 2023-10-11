@@ -165,6 +165,10 @@ public class DfTableXlsWriterTest extends EngineTestCase {
     }
 
     protected void refresh() throws IOException {
-        new DfRefreshResourceRequest(Arrays.asList("dbflute"), "http://localhost:8386/").refreshResources();
+        try {
+            new DfRefreshResourceRequest(Arrays.asList("dbflute"), "http://localhost:8386/").refreshResources();
+        } catch (IOException e) {
+            log("*Cannot refresh the resources on your project");
+        }
     }
 }
