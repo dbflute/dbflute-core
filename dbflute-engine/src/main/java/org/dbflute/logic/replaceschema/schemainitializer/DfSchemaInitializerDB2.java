@@ -62,7 +62,7 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
         }
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select SEQNAME as ").append(sequenceColumnName).append(" from SYSCAT.SEQUENCES");

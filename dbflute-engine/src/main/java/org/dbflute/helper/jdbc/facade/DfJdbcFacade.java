@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Super simple facade for JDBC.
+ * Super? simple facade for JDBC.
  * @author jflute
  * @author p1us2er0
  */
@@ -51,8 +51,7 @@ public class DfJdbcFacade {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DataSource _dataSource;
-    protected final Connection _conn;
+    protected final DataSource _dataSource; // not null
     protected boolean _useTransaction;
     protected boolean _debugRetryable;
 
@@ -61,13 +60,14 @@ public class DfJdbcFacade {
     //                                                                         ===========
     public DfJdbcFacade(DataSource dataSource) {
         _dataSource = dataSource;
-        _conn = null;
     }
 
-    public DfJdbcFacade(Connection conn) {
-        _dataSource = null;
-        _conn = conn;
-    }
+    // this was dangerous constructor, your active connection is closed here by jflute (2023/10/18)
+    // you should always set your active data source for correct connection lifecycle 
+    //public DfJdbcFacade(Connection conn) {
+    //    _dataSource = null;
+    //    _conn = conn;
+    //}
 
     // ===================================================================================
     //                                                                              Select
@@ -313,11 +313,7 @@ public class DfJdbcFacade {
     //                                                                          Connection
     //                                                                          ==========
     protected Connection getConnection() throws SQLException {
-        if (_dataSource != null) {
-            return _dataSource.getConnection();
-        } else {
-            return _conn;
-        }
+        return _dataSource.getConnection();
     }
 
     // ===================================================================================

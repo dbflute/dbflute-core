@@ -179,7 +179,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         if (_initializeFirstSqlList == null || _initializeFirstSqlList.isEmpty()) {
             return;
         }
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         for (String firstSql : _initializeFirstSqlList) {
             logReplaceSql(firstSql);
             jdbcFacade.execute(firstSql);
@@ -579,8 +579,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                         JDBC Helper
+    //                                                                         ===========
+    protected DfJdbcFacade createJdbcFacade() {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // cannot use same connection for meta data (even if logically) by jflute (2023/10/18)
+        // for example, additionalDrop may use native connection
+        // so the connection for meta data will be closed if same connection
+        // (meta data handling is not related to transaction so no problem)
+        // _/_/_/_/_/_/_/_/_/_/
+        return new DfJdbcFacade(_dataSource);
+    }
+
     protected void closeResource(ResultSet rs, Statement st) {
         closeResultSet(rs);
         closeStatement(st);

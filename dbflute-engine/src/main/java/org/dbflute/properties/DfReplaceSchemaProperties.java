@@ -581,6 +581,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return _additionalDropMapList;
     }
 
+    // -----------------------------------------------------
+    //                                 Basic Connection Info
+    //                                 ---------------------
     public String getAdditionalDropUrl(Map<String, Object> additionalDropMap) {
         final Object obj = additionalDropMap.get("url");
         if (obj == null) {
@@ -621,6 +624,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return prop;
     }
 
+    // -----------------------------------------------------
+    //                          UnifiedSchema for Additional
+    //                          ----------------------------
     public UnifiedSchema getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
         final String url = getAdditionalDropUrl(additionalDropMap);
         final String catalog;
@@ -641,14 +647,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
             return null;
         }
         final String schema = castToString(obj, "additionalDropMapList.schema");
-        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
-        return unifiedSchema;
+        return UnifiedSchema.createAsDynamicSchema(catalog, schema);
     }
 
     protected boolean isDatabaseAsSchemaSpecificationOmittable() {
         return getBasicProperties().isDatabaseAsSchemaSpecificationOmittable();
     }
 
+    // -----------------------------------------------------
+    //                                    Object Type Target
+    //                                    ------------------
     public List<String> getAdditionalDropObjectTypeList(Map<String, Object> additionalDropMap) {
         Object obj = additionalDropMap.get("objectTypeTargetList");
         if (obj == null) {
@@ -663,6 +671,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         return castToList(obj, "additionalDropMapList.objectTypeTargetList");
     }
 
+    // -----------------------------------------------------
+    //                             Connection for Additional
+    //                             -------------------------
     public Connection createAdditionalDropConnection(Map<String, Object> additionalDropMap) throws SQLException {
         final String driver = getDatabaseProperties().getDatabaseDriver();
         String url = getAdditionalDropUrl(additionalDropMap);
@@ -694,6 +705,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         }
     }
 
+    // -----------------------------------------------------
+    //                                    Connection Failure
+    //                                    ------------------
     public boolean isSuppressAdditionalDropSchemaConnectionFailure(Map<String, Object> additionalDropMap) {
         return isProperty("isSuppressConnectionFailure", false, additionalDropMap);
     }

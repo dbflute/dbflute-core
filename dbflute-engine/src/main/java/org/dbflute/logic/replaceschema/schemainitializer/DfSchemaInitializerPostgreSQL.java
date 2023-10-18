@@ -67,7 +67,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     @Override
     protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList, List<DfTableMeta> otherList) {
         // order for inherit tables
-        final List<Map<String, String>> resultList = selectInheritList(conn);
+        final List<Map<String, String>> resultList = selectInheritList();
         final Set<String> childSet = StringSet.createAsCaseInsensitive();
         for (Map<String, String> elementMap : resultList) {
             childSet.add(elementMap.get("child_name"));
@@ -99,7 +99,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         return sortedList;
     }
 
-    protected List<Map<String, String>> selectInheritList(Connection conn) {
+    protected List<Map<String, String>> selectInheritList() {
         final StringBuilder sb = new StringBuilder();
         sb.append("select rits.inhrelid, child_cls.relname as child_name");
         sb.append(", rits.inhparent, parent_cls.relname as parent_name, inhseqno");
@@ -108,7 +108,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         sb.append(" left outer join pg_class parent_cls on rits.inhparent = parent_cls.oid");
         final String sql = sb.toString();
         final List<String> colList = Arrays.asList("inhrelid", "child_name", "inhparent", "parent_name", "inhseqno");
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         try {
             return jdbcFacade.selectStringList(sql, colList);
         } catch (RuntimeException continued) {
@@ -125,7 +125,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");

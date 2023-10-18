@@ -166,7 +166,7 @@ public class DfSchemaInitializerFactory {
             initializer.setUnifiedSchema(unifiedSchema);
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
             initializer.setSuppressConnectionFailure(isSuppressAdditionalDropSchemaConnectionFailure(_additionalDropMap));
-            // unsupported for additional
+            // #for_now jflute unsupported for additional from old days (2023/10/18)
             //initializer.setInitializeFirstSqlList(null);
             //initializer.setDropTableExceptList(null);
             //initializer.setDropSequenceExceptList(null);
@@ -175,12 +175,14 @@ public class DfSchemaInitializerFactory {
         }
 
         String msg = "Unknown initialize type: " + _initializeType;
-        throw new IllegalStateException(msg);
+        throw new IllegalStateException(msg); // no way
     }
 
     protected DataSource getAdditionalDataSource() {
         return new DfCushionDataSource() {
             public Connection getConnection() throws SQLException {
+                // create new connection per call here
+                // but no problem because basically additional is one shot use 
                 return _replaceSchemaProperties.createAdditionalDropConnection(_additionalDropMap);
             }
         };
