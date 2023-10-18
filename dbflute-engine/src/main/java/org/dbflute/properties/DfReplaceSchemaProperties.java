@@ -627,24 +627,24 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     // -----------------------------------------------------
     //                          UnifiedSchema for Additional
     //                          ----------------------------
-    public UnifiedSchema getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
+    public UnifiedSchema getAdditionalDropSchema(Map<String, Object> additionalDropMap) { // not null
         final String url = getAdditionalDropUrl(additionalDropMap);
         final String catalog;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(url)) {
             final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), url);
             final DfUrlAnalyzer analyzer = factory.createAnalyzer();
-            catalog = analyzer.extractCatalog();
+            catalog = analyzer.extractCatalog(); // null allowed
         } else {
-            catalog = getDatabaseProperties().getDatabaseCatalog();
+            catalog = getDatabaseProperties().getDatabaseCatalog(); // null allowed
         }
-        final Object obj = additionalDropMap.get("schema");
+        final Object obj = additionalDropMap.get("schema"); // required property
         if (obj == null) {
             if (!isDatabaseAsSchemaSpecificationOmittable()) {
-                String msg = "The schema is required:";
-                msg = msg + " additionalDropMap=" + additionalDropMap;
+                String msg = "The schema is required: additionalDropMap=" + additionalDropMap;
                 throw new DfRequiredPropertyNotFoundException(msg);
             }
-            return null;
+            // catalog only unified schema (or both null)
+            return UnifiedSchema.createAsDynamicSchema(catalog, null);
         }
         final String schema = castToString(obj, "additionalDropMapList.schema");
         return UnifiedSchema.createAsDynamicSchema(catalog, schema);

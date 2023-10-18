@@ -95,8 +95,15 @@ public class UnifiedSchema {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _catalog;
-    protected final String _schema;
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // basically not null if the DBMS support it
+    // e.g. 
+    //  catalog is not null but schema is null if MySQL
+    //  catalog is null but schema is not null if Oracle
+    // _/_/_/_/_/_/_/_/_/_/
+    protected final String _catalog; // null allowed (e.g. no catalog DBMS, unsupported DBMS)
+    protected final String _schema; // null allowed (e.g. no schema DBMS, unsupported DBMS)
+
     protected boolean _mainSchema;
     protected boolean _additionalSchema;
     protected boolean _unknownSchema;
