@@ -155,9 +155,9 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
-        final String expression = "(" + buildProcedureArgExpression(metaInfo) + ")";
-        return super.buildProcedureSqlName(metaInfo) + expression;
+    protected String buildDropProcedureSqlName(DfProcedureMeta metaInfo) {
+        final String expression = "(" + buildDropProcedureArgExpression(metaInfo) + ")";
+        return super.buildDropProcedureSqlName(metaInfo) + expression;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         return true; // because PostgreSQL supports function only
     }
 
-    protected String buildProcedureArgExpression(DfProcedureMeta metaInfo) {
+    protected String buildDropProcedureArgExpression(DfProcedureMeta metaInfo) {
         final List<DfProcedureColumnMeta> metaInfoList = metaInfo.getProcedureColumnList();
         final StringBuilder sb = new StringBuilder();
         for (DfProcedureColumnMeta columnMetaInfo : metaInfoList) {
@@ -178,7 +178,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(columnName);
+            sb.append(filterDropProcedureArgumentName(columnName));
             if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
                 sb.append(" in ");
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
@@ -191,5 +191,17 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             sb.append(dbTypeName);
         }
         return sb.toString();
+    }
+
+    protected String filterDropProcedureArgumentName(String columnName) {
+        // cannot drop no-name function without filtering by jflute (2023/10/19)
+        // https://www.postgresql.org/docs/current/sql-dropfunction.html
+        // says argument name is not related to function's identity so we can use dummy value
+        if (columnName != null && columnName.startsWith("$")) {
+            final String dummyPrefix = "df"; // means DBFlute
+            return dummyPrefix + Srl.removePrefix(columnName, "$");
+        } else {
+            return columnName;
+        }
     }
 }

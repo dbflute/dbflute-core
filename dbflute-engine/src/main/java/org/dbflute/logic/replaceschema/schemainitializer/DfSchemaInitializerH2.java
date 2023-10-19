@@ -73,7 +73,7 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
         return new DfDropProcedureByJdbcDefaultCallback() {
             @Override
             public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
-                return "drop alias " + buildProcedureSqlName(procedureMeta);
+                return "drop alias " + buildDropProcedureSqlName(procedureMeta);
             }
         };
     }

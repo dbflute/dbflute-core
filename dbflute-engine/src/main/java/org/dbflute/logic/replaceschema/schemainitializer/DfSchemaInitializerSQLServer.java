@@ -41,8 +41,8 @@ public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildProcedureSqlName(DfProcedureMeta procedureMeta) {
-        final String sqlName = removeSemicolonSuffixIfExists(super.buildProcedureSqlName(procedureMeta));
+    protected String buildDropProcedureSqlName(DfProcedureMeta procedureMeta) {
+        final String sqlName = removeSemicolonSuffixIfExists(super.buildDropProcedureSqlName(procedureMeta));
         if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
             return filterLocalDBDropProcedureSqlName(procedureMeta, sqlName);
         } else { // mainly here

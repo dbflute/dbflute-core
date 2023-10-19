@@ -450,11 +450,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected class DfDropProcedureByJdbcDefaultCallback implements DfDropProcedureByJdbcCallback {
         public String buildDropProcedureSql(DfProcedureMeta procedureMeta) {
-            return "drop procedure " + buildProcedureSqlName(procedureMeta);
+            return "drop procedure " + buildDropProcedureSqlName(procedureMeta);
         }
 
         public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
-            return "drop function " + buildProcedureSqlName(procedureMeta);
+            return "drop function " + buildDropProcedureSqlName(procedureMeta);
         }
 
         public String buildDropPackageSql(DfProcedureMeta procedureMeta) {
@@ -462,7 +462,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
+    protected String buildDropProcedureSqlName(DfProcedureMeta metaInfo) {
         // procedure has complex rule to call
         // so it uses SQL name despite whether it uses an own connection
         return metaInfo.buildProcedureSqlName();
