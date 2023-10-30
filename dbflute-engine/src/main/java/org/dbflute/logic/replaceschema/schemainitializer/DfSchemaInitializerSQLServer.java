@@ -75,7 +75,7 @@ public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected String buildDropTableSqlName(DfTableMeta tableMeta) {
+    protected String buildTableSqlNameOnDropSql(DfTableMeta tableMeta) {
         final String tableSqlName = tableMeta.getTableSqlName();
         if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
             return filterLocalDBDropTableSqlName(tableMeta, tableSqlName);

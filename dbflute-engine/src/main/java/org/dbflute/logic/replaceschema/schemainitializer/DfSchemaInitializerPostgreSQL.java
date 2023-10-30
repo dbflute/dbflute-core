@@ -117,6 +117,14 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         }
     }
 
+    @Override
+    protected void buildDropViewSql(StringBuilder currentSb, String tableSqlName) {
+        // it needs cascade to resolve PostgreSQL view dependencies
+        // https://github.com/dbflute/dbflute-core/issues/196
+        // and it needs if-exsits to skip view already-dropped by cascade option
+        currentSb.append("drop view if exists ").append(tableSqlName).append(" cascade");
+    }
+
     // ===================================================================================
     //                                                                       Drop Sequence
     //                                                                       =============

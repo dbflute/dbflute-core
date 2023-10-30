@@ -367,15 +367,25 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMeta tableMeta) {
-        final String tableName = buildDropTableSqlName(tableMeta);
+        final String tableSqlName = buildTableSqlNameOnDropSql(tableMeta);
+        final StringBuilder currentSb = new StringBuilder();
         if (tableMeta.isTableTypeView()) {
-            sb.append("drop view ").append(tableName);
+            buildDropViewSql(currentSb, tableSqlName);
         } else {
-            sb.append("drop table ").append(tableName);
+            buildDropTableSql(currentSb, tableSqlName);
         }
+        sb.append(currentSb);
     }
 
-    protected String buildDropTableSqlName(DfTableMeta tableMeta) {
+    protected void buildDropViewSql(StringBuilder currentSb, String tableSqlName) {
+        currentSb.append("drop view ").append(tableSqlName);
+    }
+
+    protected void buildDropTableSql(StringBuilder currentSb, String tableSqlName) {
+        currentSb.append("drop table ").append(tableSqlName);
+    }
+
+    protected String buildTableSqlNameOnDropSql(DfTableMeta tableMeta) {
         return tableMeta.getTableSqlName();
     }
 
