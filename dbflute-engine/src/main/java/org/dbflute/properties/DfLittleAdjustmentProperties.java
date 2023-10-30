@@ -883,6 +883,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     // ===================================================================================
     //                                                                          Quote Name
     //                                                                          ==========
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // #for_now jflute too difficult to quote catalog and schema names so unsupported for now (2023/10/30)
+    // _/_/_/_/_/_/_/_/_/_/
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----

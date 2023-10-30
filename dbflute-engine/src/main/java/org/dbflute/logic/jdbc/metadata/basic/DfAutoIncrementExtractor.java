@@ -83,10 +83,10 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                Analyze by ResultSet
     //                                                                ====================
-    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName) throws SQLException {
-        final String tableSqlName = tableInfo.getTableSqlName();
+    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableMeta, String primaryKeyColumnName) throws SQLException {
+        final String tableSqlName = tableMeta.getTableSqlName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableSqlName);
-        return executeAutoIncrementQuery(conn, tableInfo, primaryKeyColumnName, tableSqlName, sql);
+        return executeAutoIncrementQuery(conn, tableMeta, primaryKeyColumnName, tableSqlName, sql);
     }
 
     protected boolean executeAutoIncrementQuery(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName, String tableSqlName,
@@ -107,8 +107,8 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected String buildMetaDataSql(String pkName, String tableName) {
-        return "select " + quoteColumnNameIfNeedsDirectUse(pkName) + " from " + tableName + " where 0 = 1";
+    protected String buildMetaDataSql(String pkName, String tableSqlName) {
+        return "select " + quoteColumnNameIfNeedsDirectUse(pkName) + " from " + tableSqlName + " where 0 = 1";
     }
 
     protected String quoteColumnNameIfNeedsDirectUse(String pkName) {
