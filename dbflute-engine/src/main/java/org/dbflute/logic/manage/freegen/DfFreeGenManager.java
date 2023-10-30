@@ -33,6 +33,7 @@ import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -88,6 +89,9 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                          Basic Info
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                      Traget Container
+    //                                      ----------------
     public boolean isTargetContainerSeasar() {
         return getBasicProperties().isTargetContainerSeasar();
     }
@@ -132,6 +136,16 @@ public class DfFreeGenManager {
 
     public String getLastaDocHtmlMarkFreeGenDocBody() {
         return getLastaFluteProperties().getLastaDocHtmlMarkFreeGenDocBody();
+    }
+
+    // ===================================================================================
+    //                                                                           Migration
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                       Jakarta Package
+    //                                       ---------------
+    public String getCurrentJakartaPackage() {
+        return getLittleAdjustmentProperties().getCurrentJakartaPackage();
     }
 
     // ===================================================================================
@@ -239,6 +253,10 @@ public class DfFreeGenManager {
 
     protected DfAllClassCopyrightProperties getAllClassCopyrightProperties() {
         return getProperties().getAllClassCopyrightProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     protected DfLastaFluteProperties getLastaFluteProperties() {
