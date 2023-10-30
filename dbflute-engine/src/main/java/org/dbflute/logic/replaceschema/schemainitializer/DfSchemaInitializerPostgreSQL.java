@@ -155,9 +155,9 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildDropProcedureSqlName(DfProcedureMeta metaInfo) {
-        final String expression = "(" + buildDropProcedureArgExpression(metaInfo) + ")";
-        return super.buildDropProcedureSqlName(metaInfo) + expression;
+    protected String buildDropProcedureSqlName(DfProcedureMeta procedureMeta) {
+        final String expression = "(" + buildDropProcedureArgExpression(procedureMeta) + ")";
+        return super.buildDropProcedureSqlName(procedureMeta) + expression;
     }
 
     @Override
@@ -165,13 +165,13 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         return true; // because PostgreSQL supports function only
     }
 
-    protected String buildDropProcedureArgExpression(DfProcedureMeta metaInfo) {
-        final List<DfProcedureColumnMeta> metaInfoList = metaInfo.getProcedureColumnList();
+    protected String buildDropProcedureArgExpression(DfProcedureMeta procedureMeta) {
+        final List<DfProcedureColumnMeta> metaList = procedureMeta.getProcedureColumnList();
         final StringBuilder sb = new StringBuilder();
-        for (DfProcedureColumnMeta columnMetaInfo : metaInfoList) {
-            final String dbTypeName = columnMetaInfo.getDbTypeName();
-            final String columnName = columnMetaInfo.getColumnName();
-            final DfProcedureColumnType columnType = columnMetaInfo.getProcedureColumnType();
+        for (DfProcedureColumnMeta columnMeta : metaList) {
+            final String dbTypeName = columnMeta.getDbTypeName();
+            final String columnName = columnMeta.getColumnName();
+            final DfProcedureColumnType columnType = columnMeta.getProcedureColumnType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
                 continue;
             }

@@ -32,20 +32,27 @@ public class DfProcedureColumnMeta {
     //                                                                           Attribute
     //                                                                           =========
     protected String _columnName;
+    protected DfProcedureColumnType _procedureColumnType;
     protected int _jdbcDefType;
     protected String _dbTypeName;
     protected Integer _columnSize;
     protected Integer _decimalDigits;
     protected Integer _overloadNo; // for example, Oracle's package procedure (by supplement meta)
     protected String _columnComment;
-    protected DfProcedureColumnType _procedureColumnType;
+    protected String _columnSpecificName; // not required (depending on DBMS?)
 
+    // -----------------------------------------------------
+    //                                    MultipleValue Type
+    //                                    ------------------
     // if the informations can be extracted
     // (if these attributes are null, it's not always true that these are other types)
     protected Map<String, DfColumnMeta> _resultSetColumnInfoMap; // when ResultSet type (by execution meta)
     protected DfTypeArrayInfo _typeArrayInfo; // when ARRAY type (by supplement meta)
     protected DfTypeStructInfo _typeStructInfo; // when STRUCT type (by supplement meta)
 
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor(); // for type determination
 
     // ===================================================================================
@@ -305,6 +312,7 @@ public class DfProcedureColumnMeta {
     public enum DfProcedureColumnType {
         procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut(
                 "Out"), procedureColumnReturn("Return"), procedureColumnResult("Result");
+
         private final String _alias;
 
         private DfProcedureColumnType(String alias) {
@@ -383,12 +391,23 @@ public class DfProcedureColumnMeta {
         this._columnComment = columnComment;
     }
 
+    public String getColumnSpecificName() {
+        return _columnSpecificName;
+    }
+
+    public void setColumnSpecificName(String columnSpecificName) {
+        _columnSpecificName = columnSpecificName;
+    }
+
+    // -----------------------------------------------------
+    //                                    MultipleValue Type
+    //                                    ------------------
     public Map<String, DfColumnMeta> getResultSetColumnInfoMap() {
         return _resultSetColumnInfoMap;
     }
 
     public void setResultSetColumnInfoMap(Map<String, DfColumnMeta> resultSetColumnInfoMap) {
-        this._resultSetColumnInfoMap = resultSetColumnInfoMap;
+        _resultSetColumnInfoMap = resultSetColumnInfoMap;
     }
 
     public DfTypeArrayInfo getTypeArrayInfo() {
@@ -396,7 +415,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setTypeArrayInfo(DfTypeArrayInfo typeArrayInfo) {
-        this._typeArrayInfo = typeArrayInfo;
+        _typeArrayInfo = typeArrayInfo;
     }
 
     public DfTypeStructInfo getTypeStructInfo() {
@@ -404,6 +423,6 @@ public class DfProcedureColumnMeta {
     }
 
     public void setTypeStructInfo(DfTypeStructInfo typeStructInfo) {
-        this._typeStructInfo = typeStructInfo;
+        _typeStructInfo = typeStructInfo;
     }
 }

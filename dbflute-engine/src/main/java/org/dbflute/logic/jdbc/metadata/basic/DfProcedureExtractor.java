@@ -434,7 +434,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The list of procedure meta information. (NotNull)
      */
     public List<DfProcedureMeta> getPlainProcedureList(DataSource dataSource, UnifiedSchema unifiedSchema) throws SQLException {
-        final List<DfProcedureMeta> metaInfoList = new ArrayList<DfProcedureMeta>();
+        final List<DfProcedureMeta> procedureMetaList = new ArrayList<DfProcedureMeta>();
         String procedureName = null;
         Connection conn = null;
         ResultSet procedureRs = null;
@@ -442,13 +442,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             conn = dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             procedureRs = doGetProcedures(metaData, unifiedSchema);
-            setupProcedureMeta(metaInfoList, procedureRs, unifiedSchema);
-            for (DfProcedureMeta metaInfo : metaInfoList) {
-                procedureName = metaInfo.getProcedureName();
+            setupProcedureMeta(procedureMetaList, procedureRs, unifiedSchema);
+            for (DfProcedureMeta procedureMeta : procedureMetaList) {
+                procedureName = procedureMeta.getProcedureName();
                 ResultSet columnRs = null;
                 try {
-                    columnRs = doGetProcedureColumns(metaData, metaInfo);
-                    setupProcedureColumnMeta(metaInfo, columnRs);
+                    columnRs = doGetProcedureColumns(metaData, procedureMeta);
+                    setupProcedureColumnMeta(procedureMeta, columnRs);
                 } catch (SQLException e) {
                     throw e;
                 } finally {
@@ -465,7 +465,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             closeResult(procedureRs);
             closeConnection(conn);
         }
-        return metaInfoList;
+        return procedureMetaList;
     }
 
     // -----------------------------------------------------
@@ -480,7 +480,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                        Procedure Meta
     //                                        --------------
-    protected void setupProcedureMeta(List<DfProcedureMeta> procedureMetaInfoList, ResultSet procedureRs, UnifiedSchema unifiedSchema)
+    protected void setupProcedureMeta(List<DfProcedureMeta> procedureMetaList, ResultSet procedureRs, UnifiedSchema unifiedSchema)
             throws SQLException {
         boolean skippedPgCatalog = false;
         while (procedureRs.next()) {
@@ -528,6 +528,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             }
             final Integer procedureType = Integer.valueOf(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
+            final String procedureSpecificName = prepareProcedureSpecificName(procedureRs, procedureName); // null allowed
 
             final DfProcedureMeta procedureMeta = new DfProcedureMeta();
             procedureMeta.setProcedureCatalog(procedureCatalog);
@@ -545,13 +546,35 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             }
             procedureMeta.setProcedureComment(procedureComment);
             procedureMeta.setProcedurePackage(procedurePackage);
+            procedureMeta.setProcedureSpecificName(procedureSpecificName);
             procedureMeta.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(procedureMeta));
             procedureMeta.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(procedureMeta));
-            procedureMetaInfoList.add(procedureMeta);
+            procedureMetaList.add(procedureMeta);
         }
         if (skippedPgCatalog) {
             _log.info("*Skipped pg_catalog's procedures");
         }
+    }
+
+    protected String prepareProcedureSpecificName(ResultSet procedureRs, String procedureName) {
+        final String specificNameLabel = "SPECIFIC_NAME";
+        String procedureSpecificName = null; // not required
+        try {
+            // at least MySQL, PostgreSQL always return valid names (2023/10/30)
+            procedureSpecificName = procedureRs.getString(specificNameLabel);
+        } catch (Exception e) { // just in case, needs confirmation per DBMSs
+            final String causeMsg = e.getMessage();
+            _log.debug("Cannot get the value of " + specificNameLabel + " for the procedure: " + procedureName + " // " + causeMsg);
+        }
+        return procedureSpecificName;
+    }
+
+    protected String buildProcedureFullQualifiedName(DfProcedureMeta procedureMeta) {
+        return procedureMeta.getProcedureSchema().buildFullQualifiedName(procedureMeta.getProcedureName());
+    }
+
+    protected String buildProcedureSchemaQualifiedName(DfProcedureMeta procedureMeta) {
+        return procedureMeta.getProcedureSchema().buildSchemaQualifiedName(procedureMeta.getProcedureName());
     }
 
     // -----------------------------------------------------
@@ -588,14 +611,10 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             // (see DfTableHandler.java)
             // - - - - - - - - - -/
 
+            // _/_/_/_/_/_/_/_/_/_/_/_/
+            // prepare basic attributes
+            // _/_/_/_/_/
             final String columnName = columnRs.getString("COLUMN_NAME");
-
-            // filter duplicated informations
-            // because Oracle package procedure may return them
-            if (uniqueSet.contains(columnName)) {
-                continue;
-            }
-            uniqueSet.add(columnName);
 
             final Integer procedureColumnType;
             {
@@ -655,7 +674,26 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 }
             }
             final String columnComment = columnRs.getString("REMARKS");
+            final String columnSpecificName = prepareColumnSpecificName(columnRs, procedureMeta, columnName); // null allowed
 
+            // _/_/_/_/_/_/_/_/_/_/_/_/
+            // filtering arguments
+            // _/_/_/_/_/
+            if (determineOverloadDifferentColumn(procedureMeta, columnSpecificName)) {
+                // filter other overload procedure's parameters
+                // (because JDBC method parameters are only name search)
+                continue;
+            }
+            if (uniqueSet.contains(columnName)) {
+                // filter duplicated informations because Oracle package procedure may return them
+                // should be after specificName determination for no-name argument overload
+                continue;
+            }
+            uniqueSet.add(columnName);
+
+            // _/_/_/_/_/_/_/_/_/_/_/_/
+            // setting to meta object
+            // _/_/_/_/_/
             final DfProcedureColumnMeta procedureColumnMeta = new DfProcedureColumnMeta();
             procedureColumnMeta.setColumnName(columnName);
             if (procedureColumnType == DatabaseMetaData.procedureColumnUnknown) {
@@ -678,6 +716,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             procedureColumnMeta.setColumnSize(columnSize);
             procedureColumnMeta.setDecimalDigits(decimalDigits);
             procedureColumnMeta.setColumnComment(columnComment);
+            procedureColumnMeta.setColumnSpecificName(columnSpecificName);
             procedureMeta.addProcedureColumn(procedureColumnMeta);
         }
         adjustProcedureColumnList(procedureMeta);
@@ -693,14 +732,51 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected String buildProcedureFullQualifiedName(DfProcedureMeta procedureMeta) {
-        return procedureMeta.getProcedureSchema().buildFullQualifiedName(procedureMeta.getProcedureName());
+    // -----------------------------------------------------
+    //                             Overload Different Column
+    //                             -------------------------
+    protected String prepareColumnSpecificName(ResultSet columnRs, DfProcedureMeta procedureMeta, String columnName) {
+        // the JDBC internal attribute to identify overload procedures by jflute (2023/10/30)
+        // it depends on DBMS so it needs confirmation
+        final String specificNameLabel = "SPECIFIC_NAME";
+        String columnSpecificName = null; // not required
+        try {
+            // at least MySQL, PostgreSQL always return valid names (2023/10/30)
+            columnSpecificName = columnRs.getString(specificNameLabel);
+        } catch (Exception e) { // just in case, needs confirmation per DBMSs
+            final String exceptionMessage = e.getMessage();
+            _log.debug("Cannot get the value of " + specificNameLabel + " for the procedure column: " + procedureMeta.getProcedureName()
+                    + "." + columnName + " // " + exceptionMessage);
+        }
+        return columnSpecificName;
     }
 
-    protected String buildProcedureSchemaQualifiedName(DfProcedureMeta procedureMeta) {
-        return procedureMeta.getProcedureSchema().buildSchemaQualifiedName(procedureMeta.getProcedureName());
+    protected boolean determineOverloadDifferentColumn(DfProcedureMeta procedureMeta, String columnSpecificName) {
+        if (columnSpecificName == null) {
+            return false;
+        }
+        final String procedureSpecificName = procedureMeta.getProcedureSpecificName();
+        if (procedureSpecificName == null) {
+            return false;
+        }
+        if (isSpecificNameOverloadIdentification()) {
+            if (!procedureSpecificName.equals(columnSpecificName)) {
+                // e.g. sp_in_out_parameter_24581, sp_in_out_parameter_24582
+                // different column for other overload procedures
+                return true;
+            }
+        }
+        return false;
     }
 
+    protected boolean isSpecificNameOverloadIdentification() {
+        // #for_now jflute confirmed DBMS and overload-supported DBMS only (2023/10/30)
+        return isDatabasePostgreSQL();
+    }
+
+    // -----------------------------------------------------
+    //                                 ColumnList Adjustment
+    //                                 ---------------------
     protected void adjustProcedureColumnList(DfProcedureMeta procedureMeta) {
         adjustPostgreSQLResultSetParameter(procedureMeta);
         adjustPostgreSQLVoidReturn(procedureMeta);

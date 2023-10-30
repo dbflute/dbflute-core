@@ -462,10 +462,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected String buildDropProcedureSqlName(DfProcedureMeta metaInfo) {
+    protected String buildDropProcedureSqlName(DfProcedureMeta procedureMeta) {
         // procedure has complex rule to call
         // so it uses SQL name despite whether it uses an own connection
-        return metaInfo.buildProcedureSqlName();
+        return procedureMeta.buildProcedureSqlName();
     }
 
     public static interface DfDropProcedureByJdbcCallback {
