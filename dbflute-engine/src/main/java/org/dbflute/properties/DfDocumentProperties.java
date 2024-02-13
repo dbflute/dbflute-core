@@ -453,6 +453,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isCheckProcedureDiff", false, getDocumentMap());
     }
 
+    public boolean isIgnoreViewNotNullDiff() { // since 1.2.8 (2024/02/13)
+        // view's not null constraint is very unstable and uncontrollable by developers
+        // https://github.com/dbflute/dbflute-core/issues/200
+        final boolean defaultValue = false; // compatible for now
+        return isProperty("isIgnoreViewNotNullDiff", defaultValue, getDocumentMap());
+    }
+
     // -----------------------------------------------------
     //                                             CraftDiff
     //                                             ---------

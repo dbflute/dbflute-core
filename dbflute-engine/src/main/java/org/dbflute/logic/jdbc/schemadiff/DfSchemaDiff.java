@@ -231,7 +231,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                Option
     //                                                ------
     protected boolean _checkColumnDefOrder; // depends on DBFlute property
-    protected boolean _checkDbComment; // depends on DBFlute property
+    protected boolean _checkDbComment; // me too
+    protected boolean _ignoreViewNotNull; // me too
     protected boolean _suppressSchema; // basically for SchemaSyncCheck
 
     // -----------------------------------------------------
@@ -345,28 +346,34 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public static DfSchemaDiff createAsHistory() {
         final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsCoreToManage();
-        return newReader(reader);
+        return newByOneReader(reader);
     }
 
     public static DfSchemaDiff createAsSerializer(String schemaXml) {
         final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsFlexibleToManage(schemaXml);
-        return prepareDiffOption(newReader(reader));
+        return prepareDiffOption(newByOneReader(reader));
     }
 
     public static DfSchemaDiff createAsAlterCheck(String previousXml, String nextXml) {
         final DfSchemaXmlReader previousReader = DfSchemaXmlReader.createAsFlexibleToManage(previousXml);
         final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsFlexibleToManage(nextXml);
-        return prepareDiffOption(newReader(previousReader, nextReader));
+        return prepareDiffOption(newByNextPreviousReader(previousReader, nextReader));
     }
 
-    protected static DfSchemaDiff newReader(DfSchemaXmlReader reader) {
+    // -----------------------------------------------------
+    //                                             by Reader
+    //                                             ---------
+    protected static DfSchemaDiff newByOneReader(DfSchemaXmlReader reader) {
         return new DfSchemaDiff(reader, reader);
     }
 
-    protected static DfSchemaDiff newReader(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
+    protected static DfSchemaDiff newByNextPreviousReader(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
         return new DfSchemaDiff(previousReader, nextReader);
     }
 
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     protected static DfSchemaDiff prepareDiffOption(DfSchemaDiff schemaDiff) {
         // all diff processes are depends on the DBFlute property
         // (CraftDiff settings are set later)
@@ -376,6 +383,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
         if (prop.isCheckDbCommentDiff()) {
             schemaDiff.checkDbComment();
+        }
+        if (prop.isIgnoreViewNotNullDiff()) {
+            schemaDiff.ignoreViewNotNull();
         }
         return schemaDiff;
     }
@@ -857,6 +867,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processNotNull(Column next, Column previous, DfColumnDiff columnDiff) {
+        if (_ignoreViewNotNull && next.getTable().isTypeView()) {
+            // view's not null constraint is very unstable and uncontrollable by developers
+            // https://github.com/dbflute/dbflute-core/issues/200
+            return;
+        }
         diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
             public Boolean provide(Column obj) {
                 return obj.isNotNull();
@@ -1616,6 +1631,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public void checkDbComment() {
         _checkDbComment = true;
+    }
+
+    public void ignoreViewNotNull() {
+        _ignoreViewNotNull = true;
     }
 
     public void suppressSchema() {
