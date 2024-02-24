@@ -825,8 +825,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     }
 
     // ===================================================================================
-    //                                                        Suppress Initializing Schema
-    //                                                        ============================
+    //                                                                 Initializing Schema
+    //                                                                 ===================
     public boolean isSuppressTruncateTable() {
         return isProperty("isSuppressTruncateTable", false, getReplaceSchemaMap());
     }
@@ -849,6 +849,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
 
     public boolean isSuppressDropDBLink() {
         return isProperty("isSuppressDropDBLink", false, getReplaceSchemaMap());
+    }
+
+    // -----------------------------------------------------
+    //                                       DBMS Adjustment
+    //                                       ---------------
+    public boolean isUseDropTableCascadeAsPossible() {
+        return isProperty("isUseDropTableCascadeAsPossible", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================

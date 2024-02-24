@@ -67,16 +67,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected List<String> _dropProcedureExceptList;
     protected final StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
 
-    // /= = = = = = = = = = = = =
-    // Detail execution handling!
-    // = = = = = = = = = =/
+    // -----------------------------------------------------
+    //                             Detail Execution Handling
+    //                             -------------------------
     protected boolean _suppressTruncateTable;
     protected boolean _suppressDropForeignKey;
     protected boolean _suppressDropTable;
     protected boolean _suppressDropSequence;
     protected boolean _suppressDropProcedure;
     protected boolean _suppressDropDBLink;
+    protected boolean _useDropTableCascadeAsPossible;
     protected boolean _suppressLoggingSql;
+
+    // -----------------------------------------------------
+    //                                    Connection Failure
+    //                                    ------------------
     protected boolean _suppressConnectionFailure; // basically for additional drop
 
     // ===================================================================================
@@ -673,10 +678,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _dropProcedureExceptList = dropProcedureExceptList;
     }
 
-    // /= = = = = = = = = = = = =
-    // Detail execution handling!
-    // = = = = = = = = = =/
-
+    // -----------------------------------------------------
+    //                             Detail Execution Handling
+    //                             -------------------------
     public boolean isSuppressTruncateTable() {
         return _suppressTruncateTable;
     }
@@ -725,6 +729,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _suppressDropDBLink = suppressDropDBLink;
     }
 
+    public boolean isUseDropTableCascadeAsPossible() {
+        return _useDropTableCascadeAsPossible;
+    }
+
+    public void setUseDropTableCascadeAsPossible(boolean useDropTableCascadeAsPossible) {
+        _useDropTableCascadeAsPossible = useDropTableCascadeAsPossible;
+    }
+
     public boolean isSuppressLoggingSql() {
         return _suppressLoggingSql;
     }
@@ -733,6 +745,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _suppressLoggingSql = suppressLoggingSql;
     }
 
+    // -----------------------------------------------------
+    //                                    Connection Failure
+    //                                    ------------------
     public boolean isSuppressConnectionFailure() {
         return _suppressConnectionFailure;
     }
