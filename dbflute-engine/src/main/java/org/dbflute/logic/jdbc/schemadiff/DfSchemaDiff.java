@@ -232,6 +232,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                ------
     protected boolean _checkColumnDefOrder; // depends on DBFlute property
     protected boolean _checkDbComment; // me too
+    protected boolean _ignoreViewDefault; // me too
     protected boolean _ignoreViewNotNull; // me too
     protected boolean _suppressSchema; // basically for SchemaSyncCheck
 
@@ -383,6 +384,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
         if (prop.isCheckDbCommentDiff()) {
             schemaDiff.checkDbComment();
+        }
+        if (prop.isIgnoreViewDefaultDiff()) {
+            schemaDiff.ignoreViewDefault();
         }
         if (prop.isIgnoreViewNotNullDiff()) {
             schemaDiff.ignoreViewNotNull();
@@ -832,6 +836,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processDefaultValue(Column next, Column previous, DfColumnDiff columnDiff) {
+        if (_ignoreViewDefault && next.getTable().isTypeView()) {
+            // view's default constraint is very unstable and uncontrollable by developers
+            // https://github.com/dbflute/dbflute-core/issues/203
+            return;
+        }
         diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
             public String provide(Column obj) {
                 return obj.getDefaultValue();
@@ -1631,6 +1640,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public void checkDbComment() {
         _checkDbComment = true;
+    }
+
+    public void ignoreViewDefault() {
+        _ignoreViewDefault = true;
     }
 
     public void ignoreViewNotNull() {
