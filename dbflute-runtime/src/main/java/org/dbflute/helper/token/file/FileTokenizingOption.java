@@ -32,6 +32,7 @@ public class FileTokenizingOption {
     protected String _encoding;
     protected boolean _beginFirstLine;
     protected boolean _handleEmptyAsNull;
+    protected boolean _removeUTF8Bom; // since 1.2.8
 
     // =====================================================================================
     //                                                                           Easy-to-Use
@@ -82,12 +83,19 @@ public class FileTokenizingOption {
         return this;
     }
 
+    public FileTokenizingOption removeUTF8Bom() {
+        _removeUTF8Bom = true;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _delimiter + ", " + _encoding + ", " + _beginFirstLine + ", " + _handleEmptyAsNull + "}";
+        return "{delimiter=" + _delimiter + ", encoding=" + _encoding //
+                + ", beginFirstLine=" + _beginFirstLine + ", handleEmptyAsNull=" + _handleEmptyAsNull //
+                + ", removeUTF8Bom=" + _removeUTF8Bom + "}";
     }
 
     // =====================================================================================
@@ -115,5 +123,9 @@ public class FileTokenizingOption {
 
     public boolean isHandleEmptyAsNull() {
         return _handleEmptyAsNull;
+    }
+
+    public boolean isRemoveUTF8Bom() {
+        return _removeUTF8Bom;
     }
 }

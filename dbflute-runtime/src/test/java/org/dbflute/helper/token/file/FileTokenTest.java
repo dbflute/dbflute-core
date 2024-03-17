@@ -197,6 +197,76 @@ public class FileTokenTest extends RuntimeTestCase {
         assertTrue(markSet.contains("done"));
     }
 
+    // -----------------------------------------------------
+    //                                             UTF-8 Bom
+    //                                             ---------
+    public void test_tokenize_utf8bom_basic() throws Exception {
+        // ## Arrange ##
+        FileToken impl = new FileToken();
+        final String header = '\uFEFF' + "A, B, C, D, E"; // Bom!
+        final String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
+        final String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
+        final String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
+        String all = header + ln() + first + ln() + second + ln() + third;
+        ByteArrayInputStream ins = new ByteArrayInputStream(all.getBytes("UTF-8"));
+
+        // ## Act ##
+        final Set<String> markSet = new HashSet<String>();
+        impl.tokenize(ins, new FileTokenizingCallback() {
+            int index = 0;
+
+            public void handleRow(FileTokenizingRowResource resource) {
+                // ## Assert ##
+                List<String> valueList = resource.getValueList();
+                log(valueList);
+                if (index == 0) {
+                    assertEquals("a", valueList.get(0));
+                    assertEquals("b,", valueList.get(1));
+                    assertEquals("cc", valueList.get(2));
+                    assertEquals("\"", valueList.get(3));
+                    assertEquals("e\n,\n,\n\",,", valueList.get(4));
+                    assertEquals(first, resource.getRowString());
+                    Map<String, String> columnValueMap = resource.toColumnValueMap();
+                    assertEquals(columnValueMap.get("A"), valueList.get(0));
+                    assertEquals(columnValueMap.get("B"), valueList.get(1));
+                    assertEquals(columnValueMap.get("C"), valueList.get(2));
+                    assertEquals(columnValueMap.get("D"), valueList.get(3));
+                    assertEquals(columnValueMap.get("E"), valueList.get(4));
+                } else if (index == 1) {
+                    assertEquals("a", valueList.get(0));
+                    assertEquals("", valueList.get(1));
+                    assertEquals("c\"c", valueList.get(2));
+                    assertEquals("d\"", valueList.get(3));
+                    assertEquals("e", valueList.get(4));
+                    assertEquals(second, resource.getRowString());
+                    Map<String, String> columnValueMap = resource.toColumnValueMap();
+                    assertEquals(columnValueMap.get("A"), valueList.get(0));
+                    assertEquals(columnValueMap.get("B"), valueList.get(1));
+                    assertEquals(columnValueMap.get("C"), valueList.get(2));
+                    assertEquals(columnValueMap.get("D"), valueList.get(3));
+                    assertEquals(columnValueMap.get("E"), valueList.get(4));
+                } else if (index == 2) {
+                    assertEquals("a", valueList.get(0));
+                    assertEquals("b,b", valueList.get(1));
+                    assertEquals("c\",c", valueList.get(2));
+                    assertEquals("d\n", valueList.get(3));
+                    assertEquals("e", valueList.get(4));
+                    assertEquals(third, resource.getRowString());
+                    Map<String, String> columnValueMap = resource.toColumnValueMap();
+                    assertEquals(columnValueMap.get("A"), valueList.get(0));
+                    assertEquals(columnValueMap.get("B"), valueList.get(1));
+                    assertEquals(columnValueMap.get("C"), valueList.get(2));
+                    assertEquals(columnValueMap.get("D"), valueList.get(3));
+                    assertEquals(columnValueMap.get("E"), valueList.get(4));
+                    markSet.add("done");
+                }
+
+                ++index;
+            }
+        }, op -> op.delimitateByComma().encodeAsUTF8().removeUTF8Bom());
+        assertTrue(markSet.contains("done"));
+    }
+
     // ===================================================================================
     //                                                                                Make
     //                                                                                ====

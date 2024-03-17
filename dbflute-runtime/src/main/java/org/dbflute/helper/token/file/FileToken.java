@@ -199,7 +199,8 @@ public class FileToken {
                 if (lineString == null) {
                     break;
                 }
-                if (count == 0) {
+                if (count == 0) { // first line
+                    lineString = removeUTF8BomIfNeeds(lineString, option);
                     if (option.isBeginFirstLine()) {
                         headerInfo = createFileTokenizingHeaderInfo(); // as empty
                     } else {
@@ -449,6 +450,17 @@ public class FileToken {
 
         public void setContinueNextLine(boolean continueNextLine) {
             _continueNextLine = continueNextLine;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                             UTF-8 BOM
+    //                                             ---------
+    protected String removeUTF8BomIfNeeds(String text, FileTokenizingOption option) {
+        if (option.isRemoveUTF8Bom() && text != null && !text.isEmpty() && text.charAt(0) == '\uFEFF') {
+            return text.substring(1);
+        } else {
+            return text;
         }
     }
 
