@@ -979,7 +979,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         br.addItem("Table");
         br.addElement(getTableDbName());
         br.addItem(keyName);
-        br.addElement(value);
+        final Class<? extends Object> valueType = value != null ? value.getClass() : null;
+        br.addElement(value + " :: " + valueType);
         br.addItem("Existing KeySet");
         br.addElement(keySet);
         final String msg = br.buildExceptionMessage();

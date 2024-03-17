@@ -1213,21 +1213,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                      ExistsReferrer
     //                                                                      ==============
-    protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName, String propertyName,
-            String referrerPropertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, false);
+    protected void registerExistsReferrer(ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
+            String propertyName, String referrerPropertyName) {
+        registerExistsReferrer(subQuery, localColumnDbName, relatedColumnDbName, propertyName, referrerPropertyName, false);
     }
 
-    protected void registerNotExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName, String propertyName,
-            String referrerPropertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, true);
+    protected void registerNotExistsReferrer(ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
+            String propertyName, String referrerPropertyName) {
+        registerExistsReferrer(subQuery, localColumnDbName, relatedColumnDbName, propertyName, referrerPropertyName, true);
     }
 
-    protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
+    protected void registerExistsReferrer(final ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName, boolean notExists) {
         assertSubQueryNotNull("ExistsReferrer", relatedColumnDbName, subQuery);
         if (subQuery.xgetSqlClause().isUseInScopeSubQueryForExistsReferrer()) {
-            registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, notExists);
+            registerInScopeRelation(subQuery, localColumnDbName, relatedColumnDbName, propertyName, referrerPropertyName, notExists);
             return;
         }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
@@ -1242,7 +1242,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
         final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
         final String existsOption = notExists ? "not" : null;
-        final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, correlatedFixedCondition, existsOption);
+        final String clause =
+                existsReferrer.buildExistsReferrer(localColumnDbName, relatedColumnDbName, correlatedFixedCondition, existsOption);
 
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // Exists -> possible to be inner
@@ -1305,9 +1306,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     InScopeRelation
     //                                                                     ===============
     // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
+    protected void registerInScopeRelation(final ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
             String propertyName, String relationPropertyName, boolean notInScope) {
-        assertSubQueryNotNull("InScopeRelation", columnDbName, subQuery);
+        assertSubQueryNotNull("InScopeRelation", localColumnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
@@ -1322,7 +1323,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String correlatedFixedCondition = xbuildForeignCorrelatedFixedCondition(subQuery, relationPropertyName);
         final String inScopeOption = notInScope ? "not" : null;
         final String clause =
-                inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, correlatedFixedCondition, inScopeOption);
+                inScopeRelation.buildInScopeRelation(localColumnDbName, relatedColumnDbName, correlatedFixedCondition, inScopeOption);
         registerWhereClause(clause);
     }
 
