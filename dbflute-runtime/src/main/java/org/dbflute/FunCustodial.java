@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The FunCustodial provides small services to your entities.
+ * The FunCustodial provides small services to your entities. <br>
+ * DBFluteConfig uses this so don't rename this class easyly.
  * @author jflute
  * @since 1.1.0 (2014/10/18 Saturday)
  */
@@ -45,8 +46,18 @@ public class FunCustodial {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    /** The instance of logging object for general use. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(FunCustodial.class);
+
     /** The instance of logging object for classification meta. (NotNull) */
     private static final Logger _clsMetaLog = LoggerFactory.getLogger(ClassificationMeta.class);
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    // no volatile, because basically it changes before application open (and not severe logic)
+    protected static boolean _nonSpecifiedColumnAccessWarningOnly; // since 1.2.7
+    protected static boolean _locked = true; // since 1.2.7
 
     // ===================================================================================
     //                                                                    Value Conversion
@@ -149,6 +160,7 @@ public class FunCustodial {
         br.addNotice("Non-specified column was accessed.");
         br.addItem("Advice");
         br.addElement("To get non-specified column from entity is not allowd.");
+        br.addElement(" #nonSpecifiedColumn_access");
         br.addElement("Non-specified means using SpecifyColumn but the column is non-specified.");
         br.addElement("Mistake? Or specify the column by your condition-bean if you need it.");
         br.addElement("For example:");
@@ -179,7 +191,13 @@ public class FunCustodial {
         br.addItem("Specified Column in the Table");
         br.addElement(specifiedProperties);
         final String msg = br.buildExceptionMessage();
-        throw new NonSpecifiedColumnAccessException(msg);
+        final NonSpecifiedColumnAccessException ex = new NonSpecifiedColumnAccessException(msg);
+        if (_nonSpecifiedColumnAccessWarningOnly) { // since 1.2.7
+            // #for_now jflute too difficult to implement the option by smart way (2023/07/17)
+            _log.warn("Treated as warning only. See the exception message.", ex);
+        } else {
+            throw ex;
+        }
     }
 
     protected static void buildExceptionTableInfo(ExceptionMessageBuilder br, Entity entity) {
@@ -204,7 +222,7 @@ public class FunCustodial {
         if (!undefinedHandlingType.isChecked()) { // basically no way (not called if no check)
             return;
         }
-        if (meta.codeOf(code) != null) {
+        if (meta.of(code).isPresent()) {
             return;
         }
         final boolean allowedByOption = entity.myundefinedClassificationAccessAllowed();
@@ -233,6 +251,7 @@ public class FunCustodial {
         br.addItem("Advice");
         br.addElement("Confirm the value of the classification column on your database,");
         br.addElement("or setting value to your entity.");
+        br.addElement(" #undefined_cls");
         br.addElement("The code is NOT one of classification code defined on DBFlute.");
         br.addElement("");
         br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
@@ -277,7 +296,7 @@ public class FunCustodial {
         if (_clsMetaLog.isInfoEnabled()) {
             final String classificationName = meta.classificationName();
             final String exp = classificationName + "." + code + " of " + tableDbName + "." + columnDbName;
-            _clsMetaLog.info("*Undefined classification code was set: " + exp); // one line because of many called
+            _clsMetaLog.info("*Undefined classification code #undefined_cls was set: " + exp); // one line because of many called
         }
     }
 
@@ -321,5 +340,60 @@ public class FunCustodial {
             return result;
         }
         return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
+    }
+
+    // ===================================================================================
+    //                                                                   Option Adjustment
+    //                                                                   =================
+    // -----------------------------------------------------
+    //                                  Non-Specified Column
+    //                                  --------------------
+    // since 1.2.7
+    public static boolean isNonSpecifiedColumnAccessWarningOnly() {
+        return _nonSpecifiedColumnAccessWarningOnly;
+    }
+
+    public static void setNonSpecifiedColumnAccessWarningOnly(boolean nonSpecifiedColumnAccessWarningOnly) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting nonSpecifiedColumnAccessWarningOnly: " + nonSpecifiedColumnAccessWarningOnly);
+        }
+        _nonSpecifiedColumnAccessWarningOnly = nonSpecifiedColumnAccessWarningOnly;
+        lock(); // auto-lock here, because of deep world
+    }
+
+    // ===================================================================================
+    //                                                                         Option Lock
+    //                                                                         ===========
+    // since 1.2.7
+    public static boolean isLocked() {
+        return _locked;
+    }
+
+    public static void lock() {
+        if (_locked) {
+            return;
+        }
+        if (_log.isInfoEnabled()) {
+            _log.info("...Locking the object for fun-custodial!");
+        }
+        _locked = true;
+    }
+
+    public static void unlock() {
+        if (!_locked) {
+            return;
+        }
+        if (_log.isInfoEnabled()) {
+            _log.info("...Unlocking the object for fun-custodial!");
+        }
+        _locked = false;
+    }
+
+    protected static void assertUnlocked() {
+        if (!isLocked()) {
+            return;
+        }
+        throw new IllegalStateException("The fun-custodial is locked.");
     }
 }

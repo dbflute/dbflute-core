@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.dbflute.cbean;
 
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 
 import org.dbflute.FunCustodial;
+import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -58,6 +58,7 @@ import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.garnish.datefitting.DateConditionAdjuster;
+import org.dbflute.cbean.garnish.invoking.InvokingQueryAgent;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.ordering.ManualOrderOptionCall;
 import org.dbflute.cbean.scoping.SubQuery;
@@ -89,13 +90,10 @@ import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.dbmeta.name.ColumnSqlNameProvider;
-import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.WayOfMySQL;
-import org.dbflute.exception.ConditionInvokingFailureException;
+import org.dbflute.dbway.topic.ExtensionOperand;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
-import org.dbflute.helper.beans.DfBeanDesc;
-import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
@@ -103,8 +101,6 @@ import org.dbflute.jdbc.ShortCharHandlingMode;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
 import org.dbflute.util.DfCollectionUtil;
-import org.dbflute.util.DfReflectionUtil;
-import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -175,10 +171,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-    /** Is it the in-line. */
+    /** Is this query in the in-line. Basically this query is CIQ class if true */
     protected boolean _inline;
 
-    /** Is it on-clause. */
+    /** Is this query in the on-clause. Also inline is true if this is true. */
     protected boolean _onClause;
 
     // -----------------------------------------------------
@@ -200,7 +196,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
      * @param referrerQuery The instance of referrer query. (NullAllowed: If null, this is base query)
      * @param sqlClause The instance of SQL clause. (NotNull)
      * @param aliasName The alias name for this query. (NotNull)
@@ -231,13 +226,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     DBMeta Provider
     //                                                                     ===============
     /**
-     * Get the provider of DB meta.
      * @return The provider of DB meta. (NotNull)
      */
     protected abstract DBMetaProvider xgetDBMetaProvider();
 
     /**
-     * Find the DB meta.
+     * Find the DB meta by table name flexibly.
      * @param tableFlexibleName The table flexible name. (NotNull)
      * @return The DB meta of the table. (NotNull)
      */
@@ -246,7 +240,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * Get the local DB meta.
      * @return The instance of local DB meta. (NotNull)
      */
     protected DBMeta xgetLocalDBMeta() {
@@ -256,16 +249,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionBean xgetBaseCB() {
         return _baseCB;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionQuery xgetBaseQuery() {
         ConditionQuery currentQuery = this;
         while (true) {
@@ -278,37 +267,27 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return currentQuery;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionQuery xgetReferrerQuery() {
         return _referrerQuery;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SqlClause xgetSqlClause() {
         return _sqlClause;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String xgetAliasName() {
         return _aliasName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int xgetNestLevel() {
         return _nestLevel;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int xgetNextNestLevel() {
         return _nestLevel + 1;
     }
@@ -317,9 +296,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return xgetNextNestLevel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isBaseQuery() {
         return (xgetReferrerQuery() == null);
     }
@@ -327,23 +304,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnRealName toColumnRealName(String columnDbName) { // with finding DBMeta
         return ColumnRealName.create(xgetAliasName(), toColumnSqlName(columnDbName));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnRealName toColumnRealName(ColumnInfo columnInfo) { // without finding DBMeta
         return ColumnRealName.create(xgetAliasName(), columnInfo.getColumnSqlName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnSqlName toColumnSqlName(String columnDbName) { // with finding DBMeta
         return xgetLocalDBMeta().findColumnInfo(columnDbName).getColumnSqlName();
     }
@@ -351,9 +322,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Foreign Info
     //                                          ------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String xgetForeignPropertyName() {
         return _foreignPropertyName;
     }
@@ -362,9 +331,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         this._foreignPropertyName = foreignPropertyName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String xgetRelationPath() {
         return _relationPath;
     }
@@ -376,6 +343,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
+    // added to confirm internal state so no interface method for now by jflute (2023/07/16)
+    public boolean xisInline() { // since 1.2.7
+        return _inline;
+    }
+
+    public boolean xisOnClause() { // since 1.2.7
+        return _onClause;
+    }
+
     public void xsetOnClause(boolean onClause) {
         _onClause = onClause;
     }
@@ -383,9 +359,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                              Location
     //                                              --------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String xgetLocationBase() {
         final StringBuilder sb = new StringBuilder();
         ConditionQuery query = this;
@@ -642,23 +616,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * @param key The condition key for the query. (NotNull)
      * @param value The value of the condition. (NotNull)
-     * @param cvalue The object of condition value. (NotNull)
+     * @param cvalue The object of condition value to keep the value. (NotNull)
      * @param columnDbName The DB name of column for the query. (NotNull)
      * @return The result of the preparation for the condition key. (NotNull)
      */
     protected ConditionKeyPrepareResult prepareQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xdoPrepareQuery(key, value, cvalue, columnDbName, true);
+        return xdoPrepareQuery(key, value, cvalue, columnDbName, /*invalidChecked*/true);
     }
 
     /**
      * @param key The condition key for the query. (NotNull)
      * @param value The value of the condition. (NotNull)
-     * @param cvalue The object of condition value. (NotNull)
+     * @param cvalue The object of condition value to keep the value. (NotNull)
      * @param columnDbName The DB name of column for the query. (NotNull)
      * @return The result of the preparation for the condition key. (NotNull)
      */
     protected ConditionKeyPrepareResult prepareQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xdoPrepareQuery(key, value, cvalue, columnDbName, false);
+        return xdoPrepareQuery(key, value, cvalue, columnDbName, /*invalidChecked*/false);
     }
 
     protected ConditionKeyPrepareResult xdoPrepareQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
@@ -681,6 +655,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                    ================
     protected void handleOverridingQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (isOverrideQueryAllowed(key, value, cvalue, columnDbName)) {
+            if (xgetSqlClause().isInvalidQueryAllowedWarning()) { // since 1.2.7
+                showOverridingQueryAllowedWarning(xgetBaseCB(), key, value, cvalue, columnDbName);
+            }
             return;
         }
         throwQueryAlreadyRegisteredException(key, value, cvalue, columnDbName);
@@ -692,7 +669,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void noticeRegistered(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (_log.isDebugEnabled()) {
-            _log.debug("*Found the duplicate query: target=" + columnDbName + "." + key + " value=" + value);
+            _log.debug("*Found the duplicate query: target=" + columnDbName + "." + key + ", value=" + value);
         }
     }
 
@@ -724,6 +701,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (xgetSqlClause().isNullOrEmptyQueryChecked()) {
             throwInvalidQueryRegisteredException(invalidQueryInfoAry);
         } else {
+            if (xgetSqlClause().isInvalidQueryAllowedWarning()) { // since 1.2.7
+                showNullOrEmptyQueryAllowedWarning(xgetBaseCB(), invalidQueryInfoAry);
+            }
             for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
                 xgetSqlClause().saveInvalidQuery(invalidQueryInfo);
             }
@@ -736,7 +716,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final HpInvalidQueryInfo invalidQueryInfo = new HpInvalidQueryInfo(locationBase, targetColumn, key, value);
         if (_inline) {
             invalidQueryInfo.inlineView();
-        } else if (_onClause) {
+        }
+        if (_onClause) { // also inline is true
             invalidQueryInfo.onClause();
         }
         return invalidQueryInfo;
@@ -762,8 +743,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         createCBExThrower().throwQueryAlreadyRegisteredException(key, value, cvalue, columnDbName);
     }
 
+    public void showOverridingQueryAllowedWarning(ConditionBean baseCB, ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) { // since 1.2.7
+        createCBExThrower().showOverridingQueryAllowedWarning(baseCB, key, value, cvalue, columnDbName);
+    }
+
     protected void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfoAry);
+    }
+
+    public void showNullOrEmptyQueryAllowedWarning(ConditionBean baseCB, HpInvalidQueryInfo... invalidQueryInfoAry) { // since 1.2.7
+        createCBExThrower().showNullOrEmptyQueryAllowedWarning(baseCB, invalidQueryInfoAry);
     }
 
     // ===================================================================================
@@ -1223,21 +1213,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                      ExistsReferrer
     //                                                                      ==============
-    protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName, String propertyName,
-            String referrerPropertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, false);
+    protected void registerExistsReferrer(ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
+            String propertyName, String referrerPropertyName) {
+        registerExistsReferrer(subQuery, localColumnDbName, relatedColumnDbName, propertyName, referrerPropertyName, false);
     }
 
-    protected void registerNotExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName, String propertyName,
-            String referrerPropertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, true);
+    protected void registerNotExistsReferrer(ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
+            String propertyName, String referrerPropertyName) {
+        registerExistsReferrer(subQuery, localColumnDbName, relatedColumnDbName, propertyName, referrerPropertyName, true);
     }
 
-    protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
+    protected void registerExistsReferrer(final ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName, boolean notExists) {
         assertSubQueryNotNull("ExistsReferrer", relatedColumnDbName, subQuery);
         if (subQuery.xgetSqlClause().isUseInScopeSubQueryForExistsReferrer()) {
-            registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, notExists);
+            registerInScopeRelation(subQuery, localColumnDbName, relatedColumnDbName, propertyName, referrerPropertyName, notExists);
             return;
         }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
@@ -1252,7 +1242,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
         final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
         final String existsOption = notExists ? "not" : null;
-        final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, correlatedFixedCondition, existsOption);
+        final String clause =
+                existsReferrer.buildExistsReferrer(localColumnDbName, relatedColumnDbName, correlatedFixedCondition, existsOption);
 
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // Exists -> possible to be inner
@@ -1315,9 +1306,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     InScopeRelation
     //                                                                     ===============
     // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
+    protected void registerInScopeRelation(final ConditionQuery subQuery, String localColumnDbName, String relatedColumnDbName,
             String propertyName, String relationPropertyName, boolean notInScope) {
-        assertSubQueryNotNull("InScopeRelation", columnDbName, subQuery);
+        assertSubQueryNotNull("InScopeRelation", localColumnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
@@ -1332,7 +1323,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String correlatedFixedCondition = xbuildForeignCorrelatedFixedCondition(subQuery, relationPropertyName);
         final String inScopeOption = notInScope ? "not" : null;
         final String clause =
-                inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, correlatedFixedCondition, inScopeOption);
+                inScopeRelation.buildInScopeRelation(localColumnDbName, relatedColumnDbName, correlatedFixedCondition, inScopeOption);
         registerWhereClause(clause);
     }
 
@@ -1800,9 +1791,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertOrderByPurpose(String columnDbName) {
-        if (xgetSqlClause().getPurpose().isNoOrderBy()) {
-            throwOrderByIllegalPurposeException(columnDbName);
+        final SqlClause sqlClause = xgetSqlClause();
+        final HpCBPurpose purpose = sqlClause.getPurpose();
+        if (purpose.isNoOrderBy()) {
+            if (HpCBPurpose.OR_SCOPE_QUERY.equals(purpose) && sqlClause.isOrScopeQueryPurposeCheckWarningOnly()) {
+                showOrderByIllegalPurposeWarning(columnDbName);
+            } else {
+                throwOrderByIllegalPurposeException(columnDbName);
+            }
         }
+    }
+
+    protected void showOrderByIllegalPurposeWarning(String columnDbName) {
+        createCBExThrower().showOrderByIllegalPurposeWarning(xgetSqlClause().getPurpose(), xgetBaseCB(), asTableDbName(), columnDbName);
     }
 
     protected void throwOrderByIllegalPurposeException(String columnDbName) {
@@ -1927,7 +1928,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                       Name Resolver
     //                                                                       =============
     /**
-     * Resolve relation no.
+     * Resolve relation path (relation no) for the next relationship.
      * @param localTableName The name of local table. (NotNull)
      * @param foreignPropertyName The property name of foreign relation. (NotNull)
      * @return The resolved relation No.
@@ -1963,48 +1964,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
+    // -----------------------------------------------------
+    //                                       Condition Value
+    //                                       ---------------
     /** {@inheritDoc} */
     public ConditionValue invokeValue(String columnFlexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        final DBMeta dbmeta = xgetLocalDBMeta();
-        final String columnCapPropName = initCap(dbmeta.findColumnInfo(columnFlexibleName).getPropertyName());
-        final String methodName = "xdfget" + columnCapPropName;
-        final Method method = xhelpGettingCQMethod(this, methodName, (Class<?>[]) null);
-        if (method == null) {
-            throwConditionInvokingGetMethodNotFoundException(columnFlexibleName, methodName);
-            return null; // unreachable
-        }
-        try {
-            return (ConditionValue) xhelpInvokingCQMethod(this, method, (Object[]) null);
-        } catch (ReflectionFailureException e) {
-            throwConditionInvokingGetReflectionFailureException(columnFlexibleName, methodName, e);
-            return null; // unreachable
-        }
+        return xcreateInvokingQueryAgent().invokeValue(xgetLocalDBMeta(), columnFlexibleName);
     }
 
-    protected void throwConditionInvokingGetMethodNotFoundException(String columnFlexibleName, String methodName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the method for getting the condition.");
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("methodName");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg);
-    }
-
-    protected void throwConditionInvokingGetReflectionFailureException(String columnFlexibleName, String methodName,
-            ReflectionFailureException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to invoke the method for getting value.");
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("methodName");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg, e);
-    }
-
+    // -----------------------------------------------------
+    //                                             Query Set
+    //                                             ---------
     /** {@inheritDoc} */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue) {
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, null);
@@ -2012,407 +1982,55 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /** {@inheritDoc} */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue, ConditionOption conditionOption) {
-        assertObjectNotNull("conditionOption", conditionOption);
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, conditionOption);
     }
 
     protected void doInvokeQuery(String colName, String ckey, Object value, ConditionOption option) {
-        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", colName);
-        assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", ckey);
-        final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
-        if (!noArg && (value == null || "".equals(value))) {
-            if (xgetSqlClause().isNullOrEmptyQueryChecked()) { // as default
-                String msg = "The conditionValue is required but null or empty: column=" + colName + " value=" + value;
-                throw new IllegalConditionBeanOperationException(msg);
-            } else { // e.g. when cb.ignoreNullOrEmptyQuery()
-                return;
-            }
-        }
-        final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(colName);
-        final String flexibleName = container.getFlexibleName();
-        final ConditionQuery cq = container.getConditionQuery();
-        final DBMeta dbmeta = findDBMeta(cq.asTableDbName());
-        final ColumnInfo columnInfo;
-        try {
-            columnInfo = dbmeta.findColumnInfo(flexibleName);
-        } catch (RuntimeException e) {
-            throwConditionInvokingColumnFindFailureException(colName, ckey, value, option, e);
-            return; // unreachable (to avoid compile error)
-        }
-        final String columnCapPropName = initCap(columnInfo.getPropertyName());
-        final boolean rangeOf = Srl.equalsIgnoreCase(ckey, "RangeOf");
-        final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
-        final boolean inScope = Srl.equalsIgnoreCase(ckey, "InScope");
-        if (!noArg) {
-            try {
-                value = columnInfo.convertToObjectNativeType(value); // convert type
-            } catch (RuntimeException e) {
-                throwConditionInvokingValueConvertFailureException(colName, ckey, value, option, e);
-            }
-        }
-        final String methodName = xbuildQuerySetMethodName(ckey, columnCapPropName);
-        final List<Class<?>> typeList = newArrayListSized(4);
-        final Class<?> propertyType = columnInfo.getObjectNativeType();
-        if (fromTo) {
-            if (LocalDate.class.isAssignableFrom(propertyType)) { // #date_parade
-                typeList.add(propertyType);
-                typeList.add(propertyType);
-            } else if (LocalDateTime.class.isAssignableFrom(propertyType)) {
-                typeList.add(propertyType);
-                typeList.add(propertyType);
-            } else { // fixedly util.Date
-                typeList.add(Date.class);
-                typeList.add(Date.class);
-            }
-        } else if (rangeOf) {
-            typeList.add(propertyType);
-            typeList.add(propertyType);
-        } else {
-            if (!noArg) {
-                final Class<?> instanceType = value.getClass();
-                if (inScope && Collection.class.isAssignableFrom(instanceType)) { // double check just in case
-                    typeList.add(Collection.class); // inScope's argument is fixed type
-                } else {
-                    typeList.add(instanceType);
-                }
-            }
-        }
-        if (option != null) {
-            typeList.add(option.getClass());
-        }
-        final List<Class<?>> filteredTypeList = newArrayListSized(typeList.size());
-        for (Class<?> parameterType : typeList) {
-            filteredTypeList.add(xfilterInvokeQueryParameterType(colName, ckey, parameterType));
-        }
-        final Class<?>[] parameterTypes = filteredTypeList.toArray(new Class<?>[filteredTypeList.size()]);
-        final Method method = xhelpGettingCQMethod(cq, methodName, parameterTypes);
-        if (method == null) {
-            throwConditionInvokingSetMethodNotFoundException(colName, ckey, value, option, methodName, parameterTypes);
-        }
-        try {
-            final List<Object> argList = newArrayList();
-            if (fromTo || rangeOf) {
-                if (!(value instanceof List<?>)) { // check type
-                    throwConditionInvokingDateFromToValueInvalidException(colName, ckey, value, option, methodName, parameterTypes);
-                }
-                argList.addAll((List<?>) value);
-            } else {
-                if (!noArg) {
-                    argList.add(value);
-                }
-            }
-            if (option != null) {
-                argList.add(option);
-            }
-            final List<Object> filteredArgList = newArrayListSized(argList.size());
-            for (Object arg : argList) {
-                filteredArgList.add(xfilterInvokeQueryParameterValue(colName, ckey, arg));
-            }
-            xhelpInvokingCQMethod(cq, method, filteredArgList.toArray());
-        } catch (ReflectionFailureException e) {
-            throwConditionInvokingSetReflectionFailureException(colName, ckey, value, option, methodName, parameterTypes, e);
-        }
+        xcreateInvokingQueryAgent().invokeQuery(colName, ckey, value, option);
     }
 
-    protected String xbuildQuerySetMethodName(String ckey, String columnCapPropName) {
-        return "set" + columnCapPropName + "_" + initCap(ckey);
-    }
-
-    protected Class<?> xfilterInvokeQueryParameterType(String colName, String ckey, Class<?> parameterType) {
-        return parameterType; // no filter as default (e.g. overridden by Scala to convert to immutable list)
-    }
-
-    protected Object xfilterInvokeQueryParameterValue(String colName, String ckey, Object parameterValue) {
-        return parameterValue; // no filter as default (e.g. overridden by Scala to convert to immutable list)
-    }
-
-    protected void throwConditionInvokingColumnFindFailureException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, RuntimeException cause) {
-        final String notice = "Failed to find the column in the table.";
-        doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, null, null,
-                cause);
-    }
-
-    protected void throwConditionInvokingValueConvertFailureException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, RuntimeException cause) {
-        final String notice = "Failed to convert the value to property type.";
-        doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, null, null,
-                cause);
-    }
-
-    protected void throwConditionInvokingSetMethodNotFoundException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes) {
-        final String notice = "Not found the method for setting the condition.";
-        doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, methodName,
-                parameterTypes, null);
-    }
-
-    protected void throwConditionInvokingDateFromToValueInvalidException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes) {
-        final String notice = "The conditionValue should be List that has 2 elements, fromDate and toDate.";
-        doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, methodName,
-                parameterTypes, null);
-    }
-
-    protected void throwConditionInvokingSetReflectionFailureException(String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes,
-            ReflectionFailureException cause) {
-        final String notice = "Failed to invoke the method for setting the condition.";
-        doThrowConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue, conditionOption, methodName,
-                parameterTypes, cause);
-    }
-
-    protected void doThrowConditionInvokingFailureException(String notice, String columnFlexibleName, String conditionKeyName,
-            Object conditionValue, ConditionOption conditionOption, String methodName, Class<?>[] parameterTypes, RuntimeException cause) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice(notice);
-        br.addItem("Table");
-        br.addElement(asTableDbName());
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("conditionKeyName");
-        br.addElement(conditionKeyName);
-        br.addItem("conditionValue");
-        br.addElement(conditionValue);
-        br.addElement(conditionValue != null ? conditionValue.getClass() : null);
-        br.addItem("conditionOption");
-        br.addElement(conditionOption);
-        if (methodName != null) {
-            final StringBuilder sb = new StringBuilder();
-            if (parameterTypes != null) {
-                int index = 0;
-                for (Class<?> parameterType : parameterTypes) {
-                    if (index > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append(DfTypeUtil.toClassTitle(parameterType));
-                    ++index;
-                }
-            }
-            br.addItem("Method");
-            br.addElement(methodName + "(" + sb.toString() + ")");
-        }
-        final String msg = br.buildExceptionMessage();
-        if (cause != null) {
-            throw new ConditionInvokingFailureException(msg, cause);
-        } else {
-            throw new ConditionInvokingFailureException(msg);
-        }
-    }
-
+    // -----------------------------------------------------
+    //                                           Query Equal
+    //                                           -----------
     /** {@inheritDoc} */
     public void invokeQueryEqual(String columnFlexibleName, Object value) {
         invokeQuery(columnFlexibleName, CK_EQ.getConditionKey(), value);
     }
 
+    // -----------------------------------------------------
+    //                                        Query NotEqual
+    //                                        --------------
     /** {@inheritDoc} */
     public void invokeQueryNotEqual(String columnFlexibleName, Object value) {
         invokeQuery(columnFlexibleName, CK_NES.getConditionKey(), value);
     }
 
+    // -----------------------------------------------------
+    //                                              Order By
+    //                                              --------
     /** {@inheritDoc} */
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
-        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(columnFlexibleName);
-        final String flexibleName = container.getFlexibleName();
-        final ConditionQuery cq = container.getConditionQuery();
-        final String ascDesc = isAsc ? "Asc" : "Desc";
-        final DBMeta dbmeta = findDBMeta(cq.asTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findColumnInfo(flexibleName).getPropertyName());
-        final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
-        if (method == null) {
-            throwConditionInvokingOrderMethodNotFoundException(columnFlexibleName, isAsc, methodName);
-        }
-        try {
-            xhelpInvokingCQMethod(cq, method, (Object[]) null);
-        } catch (ReflectionFailureException e) {
-            throwConditionInvokingOrderReflectionFailureException(columnFlexibleName, isAsc, methodName, e);
-        }
+        xcreateInvokingQueryAgent().invokeOrderBy(columnFlexibleName, isAsc);
     }
 
-    protected void throwConditionInvokingOrderMethodNotFoundException(String columnFlexibleName, boolean isAsc, String methodName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the method for adding the order-by condition.");
-        br.addItem("Table");
-        br.addElement(asTableDbName());
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("isAsc");
-        br.addElement(isAsc);
-        br.addItem("Method");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg);
-    }
-
-    protected void throwConditionInvokingOrderReflectionFailureException(String columnFlexibleName, boolean isAsc, String methodName,
-            ReflectionFailureException cause) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to invoke the method for setting the order-by condition.");
-        br.addItem("Table");
-        br.addElement(asTableDbName());
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("isAsc");
-        br.addElement(isAsc);
-        br.addItem("Method");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg, cause);
-    }
-
+    // -----------------------------------------------------
+    //                                         Foreign Query
+    //                                         -------------
     /** {@inheritDoc} */
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final List<String> traceList = Srl.splitList(foreignPropertyName, ".");
-        ConditionQuery foreignCQ = this;
-        for (String trace : traceList) {
-            foreignCQ = doInvokeForeignCQ(foreignCQ, trace);
-        }
-        return foreignCQ;
-    }
-
-    protected ConditionQuery doInvokeForeignCQ(ConditionQuery cq, String foreignPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = "query" + initCap(foreignPropertyName);
-        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
-        if (method == null) {
-            throwConditionInvokingForeignQueryMethodNotFoundException(cq, foreignPropertyName, methodName);
-            return null; // unreachable
-        }
-        try {
-            return (ConditionQuery) xhelpInvokingCQMethod(cq, method, (Object[]) null);
-        } catch (ReflectionFailureException e) {
-            throwConditionInvokingForeignQueryReflectionFailureException(cq, foreignPropertyName, methodName, e);
-            return null; // unreachable
-        }
-    }
-
-    protected void throwConditionInvokingForeignQueryMethodNotFoundException(ConditionQuery cq, String foreignPropertyName,
-            String methodName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the method for getting a foreign condition query.");
-        br.addItem("Table");
-        br.addElement(asTableDbName());
-        br.addItem("foreignPropertyName");
-        br.addElement(foreignPropertyName);
-        br.addItem("Method");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg);
-    }
-
-    protected void throwConditionInvokingForeignQueryReflectionFailureException(ConditionQuery cq, String foreignPropertyName,
-            String methodName, ReflectionFailureException cause) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to invoke the method for setting a condition(query).");
-        br.addItem("Table");
-        br.addElement(asTableDbName());
-        br.addItem("foreignPropertyName");
-        br.addElement(foreignPropertyName);
-        br.addItem("Method");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg, cause);
+        return xcreateInvokingQueryAgent().invokeForeignCQ(foreignPropertyName);
     }
 
     /** {@inheritDoc} */
     public boolean invokeHasForeignCQ(String foreignPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final List<String> traceList = Srl.splitList(foreignPropertyName, ".");
-        ConditionQuery foreignCQ = this;
-        final int splitLength = traceList.size();
-        int index = 0;
-        for (String traceName : traceList) {
-            if (!doInvokeHasForeignCQ(foreignCQ, traceName)) {
-                return false;
-            }
-            if ((index + 1) < splitLength) { // last loop
-                foreignCQ = foreignCQ.invokeForeignCQ(traceName);
-            }
-            ++index;
-        }
-        return true;
+        return xcreateInvokingQueryAgent().invokeHasForeignCQ(foreignPropertyName);
     }
 
-    protected boolean doInvokeHasForeignCQ(ConditionQuery cq, String foreignPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
-        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
-        if (method == null) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Not found the method for determining a foreign condition query.");
-            br.addItem("Table");
-            br.addElement(cq.asTableDbName());
-            br.addItem("foreignPropertyName");
-            br.addElement(foreignPropertyName);
-            br.addItem("methodName");
-            br.addElement(methodName);
-            br.addItem("ConditionQuery");
-            br.addElement(DfTypeUtil.toClassTitle(cq));
-            final String msg = br.buildExceptionMessage();
-            throw new ConditionInvokingFailureException(msg);
-        }
-        try {
-            return (Boolean) xhelpInvokingCQMethod(cq, method, (Object[]) null);
-        } catch (ReflectionFailureException e) {
-            String msg = "Failed to invoke the method for determining a condition(query):";
-            msg = msg + " foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " methodName=" + methodName + " table=" + asTableDbName();
-            throw new ConditionInvokingFailureException(msg, e);
-        }
-    }
-
-    protected PropertyNameCQContainer xhelpExtractingPropertyNameCQContainer(String name) {
-        final String[] strings = name.split("\\.");
-        final int length = strings.length;
-        String propertyName = null;
-        ConditionQuery cq = this;
-        int index = 0;
-        for (String element : strings) {
-            if (length == (index + 1)) { // at last loop!
-                propertyName = element;
-                break;
-            }
-            cq = cq.invokeForeignCQ(element);
-            ++index;
-        }
-        return new PropertyNameCQContainer(propertyName, cq);
-    }
-
-    protected static class PropertyNameCQContainer {
-        protected String _flexibleName;
-        protected ConditionQuery _cq;
-
-        public PropertyNameCQContainer(String flexibleName, ConditionQuery cq) {
-            this._flexibleName = flexibleName;
-            this._cq = cq;
-        }
-
-        public String getFlexibleName() {
-            return _flexibleName;
-        }
-
-        public ConditionQuery getConditionQuery() {
-            return _cq;
-        }
-    }
-
-    protected Method xhelpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes) {
-        final Class<? extends ConditionQuery> cqType = cq.getClass();
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(cqType);
-        final Method found = beanDesc.getMethodNoException(methodName, argTypes);
-        if (found != null) {
-            return found;
-        }
-        // non-cache #for_now e.g. native method of classification or protected option method
-        // (but cache of Class.class can be available)
-        return DfReflectionUtil.getWholeMethod(cqType, methodName, argTypes);
-    }
-
-    protected Object xhelpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
-        return DfReflectionUtil.invokeForcedly(method, cq, args);
+    // -----------------------------------------------------
+    //                                          Assist Logic
+    //                                          ------------
+    protected InvokingQueryAgent xcreateInvokingQueryAgent() {
+        return new InvokingQueryAgent(this, xgetDBMetaProvider());
     }
 
     // ===================================================================================
@@ -2632,12 +2250,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     ===============
     // handleShortChar()
     protected String hSC(String columnName, String value, Integer size, String modeCode) {
-        final ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);
-        if (mode == null) {
-            String msg = "The mode was not found by the code: ";
-            msg = msg + " columnName=" + columnName + " modeCode=" + modeCode;
-            throw new IllegalStateException(msg);
-        }
+        final ShortCharHandlingMode mode = ShortCharHandlingMode.of(modeCode).orElseTranslatingThrow(cause -> {
+            String msg = "The mode was not found by the code: columnName=" + columnName + " modeCode=" + modeCode;
+            throw new IllegalStateException(msg, cause); // basically no way, as specified by generated code
+        });
         return FunCustodial.handleShortChar(columnName, value, size, mode);
     }
 

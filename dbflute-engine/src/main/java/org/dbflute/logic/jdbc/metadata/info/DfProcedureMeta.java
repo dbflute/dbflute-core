@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,27 @@ public class DfProcedureMeta {
     protected String _procedureSqlName; // basically for procedure synonym
     protected String _procedureComment;
     protected String _procedurePackage; // basically for dropping procedure
+    protected String _procedureSpecificName; // not required (depending on DBMS?)
+
+    // -----------------------------------------------------
+    //                                          Logical Role
+    //                                          ------------
     protected boolean _procedureSynonym;
     protected boolean _includedProcedureToDBLink;
 
+    // -----------------------------------------------------
+    //                                              Argument
+    //                                              --------
     protected final List<DfProcedureColumnMeta> _procedureColumnList = DfCollectionUtil.newArrayList(); // procedure parameters
+
+    // -----------------------------------------------------
+    //                                       NotParam Result
+    //                                       ---------------
     protected final List<DfProcedureNotParamResultMeta> _notParamResultList = DfCollectionUtil.newArrayList(); // by execution meta
+
+    // -----------------------------------------------------
+    //                                           Source Code
+    //                                           -----------
     protected DfProcedureSourceInfo _procedureSourceInfo; // assist info (basically for schema diff)
 
     // ===================================================================================
@@ -224,6 +240,7 @@ public class DfProcedureMeta {
     //                                                                      ==============
     public enum DfProcedureType {
         procedureResultUnknown("ResultUnknown"), procedureNoResult("NoResult"), procedureReturnsResult("ReturnsResult");
+
         private String _alias;
 
         private DfProcedureType(String alias) {
@@ -243,7 +260,7 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureCatalog(String procedureCatalog) {
-        this._procedureCatalog = procedureCatalog;
+        _procedureCatalog = procedureCatalog;
     }
 
     public UnifiedSchema getProcedureSchema() {
@@ -251,7 +268,7 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureSchema(UnifiedSchema procedureSchema) {
-        this._procedureSchema = procedureSchema;
+        _procedureSchema = procedureSchema;
     }
 
     public String getProcedureName() {
@@ -259,7 +276,7 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureName(String procedureName) {
-        this._procedureName = procedureName;
+        _procedureName = procedureName;
     }
 
     public DfProcedureType getProcedureType() {
@@ -267,7 +284,7 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureType(DfProcedureType procedureType) {
-        this._procedureType = procedureType;
+        _procedureType = procedureType;
     }
 
     public String getProcedureFullQualifiedName() {
@@ -275,7 +292,7 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureFullQualifiedName(String procedureFullQualifiedName) {
-        this._procedureFullQualifiedName = procedureFullQualifiedName;
+        _procedureFullQualifiedName = procedureFullQualifiedName;
     }
 
     public String getProcedureSchemaQualifiedName() {
@@ -283,11 +300,11 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureSchemaQualifiedName(String procedureSchemaQualifiedName) {
-        this._procedureSchemaQualifiedName = procedureSchemaQualifiedName;
+        _procedureSchemaQualifiedName = procedureSchemaQualifiedName;
     }
 
     public void setProcedureSqlName(String procedureSqlName) { // basically for procedure synonym
-        this._procedureSqlName = procedureSqlName;
+        _procedureSqlName = procedureSqlName;
     }
 
     public String getProcedureComment() {
@@ -295,7 +312,7 @@ public class DfProcedureMeta {
     }
 
     public void setProcedureComment(String procedureComment) {
-        this._procedureComment = procedureComment;
+        _procedureComment = procedureComment;
     }
 
     public String getProcedurePackage() {
@@ -303,15 +320,26 @@ public class DfProcedureMeta {
     }
 
     public void setProcedurePackage(String procedurePackage) {
-        this._procedurePackage = procedurePackage;
+        _procedurePackage = procedurePackage;
     }
 
+    public String getProcedureSpecificName() {
+        return _procedureSpecificName;
+    }
+
+    public void setProcedureSpecificName(String procedureSpecificName) {
+        _procedureSpecificName = procedureSpecificName;
+    }
+
+    // -----------------------------------------------------
+    //                                          Logical Role
+    //                                          ------------
     public boolean isProcedureSynonym() {
         return _procedureSynonym;
     }
 
     public void setProcedureSynonym(boolean procedureSynonym) {
-        this._procedureSynonym = procedureSynonym;
+        _procedureSynonym = procedureSynonym;
     }
 
     public boolean isIncludedProcedureToDBLink() {
@@ -319,9 +347,12 @@ public class DfProcedureMeta {
     }
 
     public void setIncludedProcedureToDBLink(boolean includedProcedureToDBLink) {
-        this._includedProcedureToDBLink = includedProcedureToDBLink;
+        _includedProcedureToDBLink = includedProcedureToDBLink;
     }
 
+    // -----------------------------------------------------
+    //                                              Argument
+    //                                              --------
     public List<DfProcedureColumnMeta> getProcedureColumnList() {
         return _procedureColumnList;
     }
@@ -330,19 +361,25 @@ public class DfProcedureMeta {
         _procedureColumnList.add(procedureColumn);
     }
 
+    // -----------------------------------------------------
+    //                                       NotParam Result
+    //                                       ---------------
     public List<DfProcedureNotParamResultMeta> getNotParamResultList() {
         return _notParamResultList;
     }
 
     public void addNotParamResult(DfProcedureNotParamResultMeta notParamResult) {
-        this._notParamResultList.add(notParamResult);
+        _notParamResultList.add(notParamResult);
     }
 
+    // -----------------------------------------------------
+    //                                           Source Code
+    //                                           -----------
     public DfProcedureSourceInfo getProcedureSourceInfo() {
         return _procedureSourceInfo;
     }
 
     public void setProcedureSourceInfo(DfProcedureSourceInfo procedureSourceInfo) {
-        this._procedureSourceInfo = procedureSourceInfo;
+        _procedureSourceInfo = procedureSourceInfo;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,16 +67,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected List<String> _dropProcedureExceptList;
     protected final StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
 
-    // /= = = = = = = = = = = = =
-    // Detail execution handling!
-    // = = = = = = = = = =/
+    // -----------------------------------------------------
+    //                             Detail Execution Handling
+    //                             -------------------------
     protected boolean _suppressTruncateTable;
     protected boolean _suppressDropForeignKey;
     protected boolean _suppressDropTable;
     protected boolean _suppressDropSequence;
     protected boolean _suppressDropProcedure;
     protected boolean _suppressDropDBLink;
+    protected boolean _useDropTableCascadeAsPossible;
     protected boolean _suppressLoggingSql;
+
+    // -----------------------------------------------------
+    //                                    Connection Failure
+    //                                    ------------------
     protected boolean _suppressConnectionFailure; // basically for additional drop
 
     // ===================================================================================
@@ -179,7 +184,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         if (_initializeFirstSqlList == null || _initializeFirstSqlList.isEmpty()) {
             return;
         }
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         for (String firstSql : _initializeFirstSqlList) {
             logReplaceSql(firstSql);
             jdbcFacade.execute(firstSql);
@@ -367,15 +372,25 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMeta tableMeta) {
-        final String tableName = buildDropTableSqlName(tableMeta);
+        final String tableSqlName = buildTableSqlNameOnDropSql(tableMeta);
+        final StringBuilder currentSb = new StringBuilder();
         if (tableMeta.isTableTypeView()) {
-            sb.append("drop view ").append(tableName);
+            buildDropViewSql(currentSb, tableSqlName);
         } else {
-            sb.append("drop table ").append(tableName);
+            buildDropTableSql(currentSb, tableSqlName);
         }
+        sb.append(currentSb);
     }
 
-    protected String buildDropTableSqlName(DfTableMeta tableMeta) {
+    protected void buildDropViewSql(StringBuilder currentSb, String tableSqlName) {
+        currentSb.append("drop view ").append(tableSqlName);
+    }
+
+    protected void buildDropTableSql(StringBuilder currentSb, String tableSqlName) {
+        currentSb.append("drop table ").append(tableSqlName);
+    }
+
+    protected String buildTableSqlNameOnDropSql(DfTableMeta tableMeta) {
         return tableMeta.getTableSqlName();
     }
 
@@ -450,11 +465,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected class DfDropProcedureByJdbcDefaultCallback implements DfDropProcedureByJdbcCallback {
         public String buildDropProcedureSql(DfProcedureMeta procedureMeta) {
-            return "drop procedure " + buildProcedureSqlName(procedureMeta);
+            return "drop procedure " + buildDropProcedureSqlName(procedureMeta);
         }
 
         public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
-            return "drop function " + buildProcedureSqlName(procedureMeta);
+            return "drop function " + buildDropProcedureSqlName(procedureMeta);
         }
 
         public String buildDropPackageSql(DfProcedureMeta procedureMeta) {
@@ -462,10 +477,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
+    protected String buildDropProcedureSqlName(DfProcedureMeta procedureMeta) {
         // procedure has complex rule to call
         // so it uses SQL name despite whether it uses an own connection
-        return metaInfo.buildProcedureSqlName();
+        return procedureMeta.buildProcedureSqlName();
     }
 
     public static interface DfDropProcedureByJdbcCallback {
@@ -579,8 +594,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                         JDBC Helper
+    //                                                                         ===========
+    protected DfJdbcFacade createJdbcFacade() {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // cannot use same connection for meta data (even if logically) by jflute (2023/10/18)
+        // for example, additionalDrop may use native connection
+        // so the connection for meta data will be closed if same connection
+        // (meta data handling is not related to transaction so no problem)
+        // _/_/_/_/_/_/_/_/_/_/
+        return new DfJdbcFacade(_dataSource);
+    }
+
     protected void closeResource(ResultSet rs, Statement st) {
         closeResultSet(rs);
         closeStatement(st);
@@ -653,10 +678,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _dropProcedureExceptList = dropProcedureExceptList;
     }
 
-    // /= = = = = = = = = = = = =
-    // Detail execution handling!
-    // = = = = = = = = = =/
-
+    // -----------------------------------------------------
+    //                             Detail Execution Handling
+    //                             -------------------------
     public boolean isSuppressTruncateTable() {
         return _suppressTruncateTable;
     }
@@ -705,6 +729,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _suppressDropDBLink = suppressDropDBLink;
     }
 
+    public boolean isUseDropTableCascadeAsPossible() {
+        return _useDropTableCascadeAsPossible;
+    }
+
+    public void setUseDropTableCascadeAsPossible(boolean useDropTableCascadeAsPossible) {
+        _useDropTableCascadeAsPossible = useDropTableCascadeAsPossible;
+    }
+
     public boolean isSuppressLoggingSql() {
         return _suppressLoggingSql;
     }
@@ -713,6 +745,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _suppressLoggingSql = suppressLoggingSql;
     }
 
+    // -----------------------------------------------------
+    //                                    Connection Failure
+    //                                    ------------------
     public boolean isSuppressConnectionFailure() {
         return _suppressConnectionFailure;
     }

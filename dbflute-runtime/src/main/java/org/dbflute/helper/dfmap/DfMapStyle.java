@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -922,7 +922,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     //                                     Map/List Instance
     //                                     -----------------
     /**
-     * New string-object map.
+     * New string-object map for map:{} of this style.
      * @return The new-created map. (NotNull)
      */
     public Map<String, Object> newStringObjectMap() { // public for client
@@ -930,7 +930,7 @@ public class DfMapStyle { // migrated MapListString, basically keeping compatibl
     }
 
     /**
-     * New object-type list.
+     * New object-type list for list:{} of this style.
      * @return The new-created list. (NotNull)
      */
     public List<Object> newObjectList() { // public for client

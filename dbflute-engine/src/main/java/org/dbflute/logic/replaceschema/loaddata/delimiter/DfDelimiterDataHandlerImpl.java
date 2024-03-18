@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -32,6 +33,7 @@ import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfConvertValueProp
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
 import org.dbflute.logic.replaceschema.loaddata.base.interceptor.DfDataWritingInterceptor;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataEncodingDirectoryExtractor;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataOutputResultMarker;
 import org.dbflute.system.DBFluteSystem;
 import org.slf4j.Logger;
@@ -82,14 +84,14 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     //                                                                                ====
     public DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataResource resource, DfLoadedDataInfo loadedDataInfo) {
         final DfDelimiterDataResultInfo resultInfo = new DfDelimiterDataResultInfo();
-        final String basePath = resource.getBasePath();
+        final String basePath = resource.getBasePath(); // e.g. .../ut/reversetsv, .../ut/tsv
         final File baseDir = new File(basePath);
-        final String[] dataDirElements = baseDir.list((dir, name) -> !name.startsWith("."));
-        if (dataDirElements == null) {
+        final List<String> encodingDirectoryList = extractEncodingDirectoryList(baseDir); // e.g. UTF-8, Shift_JIS
+        if (encodingDirectoryList.isEmpty()) {
             return resultInfo;
         }
         try {
-            for (String encoding : dataDirElements) {
+            for (String encoding : encodingDirectoryList) {
                 if (isUnsupportedEncodingDirectory(encoding)) {
                     _log.warn("The encoding(directory name) is unsupported: encoding=" + encoding);
                     continue;
@@ -137,6 +139,10 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
             throw new DfDelimiterDataRegistrationFailureException(msg, e);
         }
         return resultInfo;
+    }
+
+    protected List<String> extractEncodingDirectoryList(File baseDir) { // e.g. .../ut/reversetsv, .../ut/tsv
+        return new DfDelimiterDataEncodingDirectoryExtractor(baseDir).extractEncodingDirectoryList();
     }
 
     protected boolean isUnsupportedEncodingDirectory(String encoding) {

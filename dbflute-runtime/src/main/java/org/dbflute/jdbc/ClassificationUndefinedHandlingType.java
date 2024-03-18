@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.dbflute.jdbc;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dbflute.optional.OptionalThing;
 
 /**
  * The handling type of undefined classification code. <br>
@@ -53,14 +55,27 @@ public enum ClassificationUndefinedHandlingType {
         _continued = continued;
     }
 
-    public static ClassificationUndefinedHandlingType codeOf(Object code) {
+    public static OptionalThing<ClassificationUndefinedHandlingType> of(Object code) {
         if (code == null) {
-            return null;
+            return OptionalThing.ofNullable(null, () -> {
+                throw new IllegalArgumentException("The argument 'code' should not be null.");
+            });
         }
         if (code instanceof ClassificationUndefinedHandlingType) {
-            return (ClassificationUndefinedHandlingType) code;
+            return OptionalThing.of((ClassificationUndefinedHandlingType) code);
         }
-        return _codeValueMap.get(code.toString().toLowerCase());
+        if (code instanceof OptionalThing<?>) {
+            return of(((OptionalThing<?>) code).orElse(null));
+        }
+        final ClassificationUndefinedHandlingType type = _codeValueMap.get(code.toString().toLowerCase());
+        return OptionalThing.ofNullable(type, () -> {
+            throw new IllegalStateException("Not found the type by the code: " + code);
+        });
+    }
+
+    @Deprecated
+    public static ClassificationUndefinedHandlingType codeOf(Object code) {
+        return of(code).orElse(null);
     }
 
     public String code() {

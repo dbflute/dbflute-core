@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.util.DfTypeUtil;
@@ -111,106 +113,6 @@ public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProp
     }
 
     // ===================================================================================
-    //                                                                    Filter Component
-    //                                                                    ================
-    public String filterRuntimeComponentPrefix(String componentName) {
-        if (getBasicProperties().isTargetContainerSpring()) {
-            final String prefix = getDBFluteBeansRuntimeComponentPrefix();
-            if (prefix == null || prefix.trim().length() == 0) {
-                return componentName;
-            }
-            final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
-            return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
-        } else {
-            return componentName;
-        }
-    }
-
-    // ===================================================================================
-    //                                                                       Dicon(Seasar)
-    //                                                                       =============
-    public String getDBFluteDiconNamespace() { // Java Only
-        return getProperty("dbfluteDiconNamespace", getDefaultDBFluteDicon().getDBFluteDiconNamespace());
-    }
-
-    public List<String> getDBFluteDiconPackageNameList() { // Java Only
-        final String prop = getProperty("dbfluteDiconPackageName", null);
-        if (prop == null) {
-            return new ArrayList<String>();
-        }
-        final String[] array = prop.split(";");
-        final List<String> ls = new ArrayList<String>();
-        for (String string : array) {
-            ls.add(string.trim());
-        }
-        return ls;
-    }
-
-    public String getDBFluteDiconFileName() { // Java Only
-        return getProperty("dbfluteDiconFileName", getDefaultDBFluteDicon().getDBFluteDiconFileName());
-    }
-
-    public String getDBFluteCreatorDiconFileName() { // It's closet! Java Only
-        return getProperty("dbfluteCreatorDiconFileName", "dbflute-creator.dicon");
-    }
-
-    public String getDBFluteCustomizerDiconFileName() { // It's closet! Java Only
-        return getProperty("dbfluteCustomizerDiconFileName", "dbflute-customizer.dicon");
-    }
-
-    public String getJ2eeDiconResourceName() { // Java Only
-        return getProperty("j2eeDiconResourceName", getDefaultDBFluteDicon().getJ2eeDiconResourceName());
-    }
-
-    protected DfLanguageDependency getLanguageDependencyInfo() {
-        return getBasicProperties().getLanguageDependency();
-    }
-
-    protected DfLanguageFramework getDefaultDBFluteDicon() {
-        return getLanguageDependencyInfo().getLanguageFramework();
-    }
-
-    public static final String KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap = "dbfluteDiconBeforeJ2eeIncludeDefinitionMap";
-    protected Map<String, Object> _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
-
-    public Map<String, Object> getDBFluteDiconBeforeJ2eeIncludeDefinitionMap() {
-        if (_dbfluteDiconBeforeJ2eeIncludeDefinitionMap != null) {
-            return _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
-        }
-        String key = KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
-        final Map<String, Object> map = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
-        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap = newLinkedHashMap();
-        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap.putAll(map);
-        return _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
-    }
-
-    public List<String> getDBFluteDiconBeforeJ2eeIncludePathList() {
-        return new ArrayList<String>(getDBFluteDiconBeforeJ2eeIncludeDefinitionMap().keySet());
-    }
-
-    public static final String KEY_dbfluteDiconOtherIncludeDefinitionMap = "dbfluteDiconOtherIncludeDefinitionMap";
-    protected Map<String, Object> _dbfluteDiconOtherIncludeDefinitionMap;
-
-    public Map<String, Object> getDBFluteDiconOtherIncludeDefinitionMap() {
-        if (_dbfluteDiconOtherIncludeDefinitionMap != null) {
-            return _dbfluteDiconOtherIncludeDefinitionMap;
-        }
-        String key = KEY_dbfluteDiconOtherIncludeDefinitionMap;
-        final Map<String, Object> map = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
-        _dbfluteDiconOtherIncludeDefinitionMap = newLinkedHashMap();
-        _dbfluteDiconOtherIncludeDefinitionMap.putAll(map);
-        return _dbfluteDiconOtherIncludeDefinitionMap;
-    }
-
-    public List<String> getDBFluteDiconOtherIncludePathList() {
-        return new ArrayList<String>(getDBFluteDiconOtherIncludeDefinitionMap().keySet());
-    }
-
-    public boolean isSuppressDiconBehaviorDefinition() { // closet, Java Only
-        return isProperty("isSuppressDiconBehaviorDefinition", false); // basically for HotDeploy
-    }
-
-    // ===================================================================================
     //                                                           DBFluteBeans(Spring/Lucy)
     //                                                           =========================
     public List<String> getDBFluteBeansPackageNameList() { // Java Only
@@ -275,10 +177,109 @@ public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProp
     }
 
     // ===================================================================================
+    //                                                            DBFluteModule(Guice/CDI)
+    //                                                            ========================
+    public boolean isDBFluteModuleGuiceRuntimeComponentByName() { // Java Only
+        return isProperty("isDBFluteModuleGuiceRuntimeComponentByName", false); // basically for multiple DB
+    }
+
+    // ===================================================================================
+    //                                                                       Dicon(Seasar)
+    //                                                                       =============
+    public String getDBFluteDiconNamespace() { // Java Only
+        return getProperty("dbfluteDiconNamespace", getLanguageFramework().getDBFluteDiconNamespace());
+    }
+
+    public List<String> getDBFluteDiconPackageNameList() { // Java Only
+        final String prop = getProperty("dbfluteDiconPackageName", null);
+        if (prop == null) {
+            return new ArrayList<String>();
+        }
+        final String[] array = prop.split(";");
+        final List<String> ls = new ArrayList<String>();
+        for (String string : array) {
+            ls.add(string.trim());
+        }
+        return ls;
+    }
+
+    public String getDBFluteDiconFileName() { // Java Only
+        return getProperty("dbfluteDiconFileName", getLanguageFramework().getDBFluteDiconFileName());
+    }
+
+    public String getDBFluteCreatorDiconFileName() { // It's closet! Java Only
+        return getProperty("dbfluteCreatorDiconFileName", "dbflute-creator.dicon");
+    }
+
+    public String getDBFluteCustomizerDiconFileName() { // It's closet! Java Only
+        return getProperty("dbfluteCustomizerDiconFileName", "dbflute-customizer.dicon");
+    }
+
+    public String getJ2eeDiconResourceName() { // Java Only
+        return getProperty("j2eeDiconResourceName", getLanguageFramework().getJ2eeDiconResourceName());
+    }
+
+    protected DfLanguageDependency getLanguageDependencyInfo() {
+        return getBasicProperties().getLanguageDependency();
+    }
+
+    public static final String KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap = "dbfluteDiconBeforeJ2eeIncludeDefinitionMap";
+    protected Map<String, Object> _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
+
+    public Map<String, Object> getDBFluteDiconBeforeJ2eeIncludeDefinitionMap() {
+        if (_dbfluteDiconBeforeJ2eeIncludeDefinitionMap != null) {
+            return _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
+        }
+        String key = KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
+        final Map<String, Object> map = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
+        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap = newLinkedHashMap();
+        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap.putAll(map);
+        return _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
+    }
+
+    public List<String> getDBFluteDiconBeforeJ2eeIncludePathList() {
+        return new ArrayList<String>(getDBFluteDiconBeforeJ2eeIncludeDefinitionMap().keySet());
+    }
+
+    public static final String KEY_dbfluteDiconOtherIncludeDefinitionMap = "dbfluteDiconOtherIncludeDefinitionMap";
+    protected Map<String, Object> _dbfluteDiconOtherIncludeDefinitionMap;
+
+    public Map<String, Object> getDBFluteDiconOtherIncludeDefinitionMap() {
+        if (_dbfluteDiconOtherIncludeDefinitionMap != null) {
+            return _dbfluteDiconOtherIncludeDefinitionMap;
+        }
+        String key = KEY_dbfluteDiconOtherIncludeDefinitionMap;
+        final Map<String, Object> map = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
+        _dbfluteDiconOtherIncludeDefinitionMap = newLinkedHashMap();
+        _dbfluteDiconOtherIncludeDefinitionMap.putAll(map);
+        return _dbfluteDiconOtherIncludeDefinitionMap;
+    }
+
+    public List<String> getDBFluteDiconOtherIncludePathList() {
+        return new ArrayList<String>(getDBFluteDiconOtherIncludeDefinitionMap().keySet());
+    }
+
+    public boolean isSuppressDiconBehaviorDefinition() { // closet, Java Only
+        return isProperty("isSuppressDiconBehaviorDefinition", false); // basically for HotDeploy
+    }
+
+    // ===================================================================================
+    //                                                             Quill DataSource(Quill)
+    //                                                             =======================
+    public boolean isQuillDataSourceNameValid() {
+        String name = getQuillDataSourceName();
+        return name != null && name.trim().length() > 0 && !name.trim().equalsIgnoreCase("null");
+    }
+
+    public String getQuillDataSourceName() { // CSharp Only
+        return getProperty("quillDataSourceName", null);
+    }
+
+    // ===================================================================================
     //                                                                            Lasta Di
     //                                                                            ========
     public String getDBFluteDiXmlNamespace() { // Java Only
-        return getProperty("dbfluteDiXmlNamespace", getDefaultDBFluteDicon().getDBFluteDiXmlNamespace());
+        return getProperty("dbfluteDiXmlNamespace", getLanguageFramework().getDBFluteDiXmlNamespace());
     }
 
     public List<String> getDBFluteDiXmlPackageNameList() { // Java Only
@@ -295,22 +296,89 @@ public final class DfDependencyInjectionProperties extends DfAbstractDBFluteProp
     }
 
     public String getDBFluteDiXmlFileName() { // Java Only
-        return getProperty("dbfluteDiXmlFileName", getDefaultDBFluteDicon().getDBFluteDiXmlFileName());
+        return getProperty("dbfluteDiXmlFileName", getLanguageFramework().getDBFluteDiXmlFileName());
     }
 
     public String getRdbDiXmlResourceName() { // Java Only
-        return getProperty("rdbDiXmlResourceName", getDefaultDBFluteDicon().getRdbDiXmlResourceName());
+        return getProperty("rdbDiXmlResourceName", getLanguageFramework().getRdbDiXmlResourceName());
     }
 
     // ===================================================================================
-    //                                                             Quill DataSource(Quill)
-    //                                                             =======================
-    public boolean isQuillDataSourceNameValid() {
-        String name = getQuillDataSourceName();
-        return name != null && name.trim().length() > 0 && !name.trim().equalsIgnoreCase("null");
+    //                                                                      Component Name
+    //                                                                      ==============
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    // These methods for runtime components are used when it needs to identity their components.
+    // For example when the DI container is Seasar, These methods are not used
+    // because S2Container has name-space in the DI architecture.
+    // = = = = = = = = = =/
+    public String getDBFluteInitializerComponentName() {
+        return filterRuntimeComponentPrefix("introduction");
     }
 
-    public String getQuillDataSourceName() { // CSharp Only
-        return getProperty("quillDataSourceName", null);
+    public String getInvokerAssistantComponentName() {
+        return filterRuntimeComponentPrefix("invokerAssistant");
+    }
+
+    public String getCommonColumnAutoSetupperComponentName() {
+        return filterRuntimeComponentPrefix("commonColumnAutoSetupper");
+    }
+
+    public String getBehaviorSelectorComponentName() {
+        return filterRuntimeComponentPrefix("behaviorSelector");
+    }
+
+    public String getBehaviorCommandInvokerComponentName() {
+        return filterRuntimeComponentPrefix("behaviorCommandInvoker");
+    }
+
+    protected String filterRuntimeComponentPrefix(String componentName) {
+        final DfBasicProperties basicProp = getBasicProperties();
+        String filtered = resolveDIContainerRuntimeComponentNameSpec(componentName);
+        filtered = basicProp.filterComponentNameWithAllcommonPrefix(filtered);
+        filtered = basicProp.filterComponentNameWithProjectPrefix(filtered);
+        return filtered;
+    }
+
+    protected String resolveDIContainerRuntimeComponentNameSpec(String componentName) {
+        if (getBasicProperties().isTargetContainerSpring()) {
+            final String prefix = getDBFluteBeansRuntimeComponentPrefix();
+            if (prefix == null || prefix.trim().length() == 0) {
+                return componentName; // basically here
+            }
+            final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+            return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
+        } else if (getBasicProperties().isTargetContainerGuice()) {
+            if (isDBFluteModuleGuiceRuntimeComponentByName()) {
+                final DfBasicProperties basicProp = getBasicProperties();
+                if (basicProp.getProjectPrefix().isEmpty() && basicProp.getAllcommonPrefix().isEmpty()) {
+                    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                    br.addNotice("Guice byName requires projectPrefix or allcommonPrefix.");
+                    br.addItem("Advice");
+                    br.addElement("If isDBFluteModuleGuiceRuntimeComponentByName=true,");
+                    br.addElement("then use projectPrefix or allcommonPrefix.");
+                    br.addElement("");
+                    br.addElement("isDBFluteModuleGuiceRuntimeComponentByName is on dependencyInjectionMap.dfprop.");
+                    br.addElement("projectPrefix, allcommonPrefix are on basicInfoMap.dfprop.");
+                    br.addItem("componentName (for debug)");
+                    br.addElement(componentName);
+                    final String msg = br.buildExceptionMessage();
+                    throw new DfIllegalPropertySettingException(msg);
+                }
+            }
+            // https://github.com/dbflute/dbflute-core/issues/144
+            // component name is only supplement identity of type on Guice
+            // so component name needs only prefix
+            //  e.g. Named("resola") BehaviorSelector resolaBehaviorSelector
+            return "";
+        } else {
+            return componentName;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected DfLanguageFramework getLanguageFramework() {
+        return getLanguageDependencyInfo().getLanguageFramework();
     }
 }

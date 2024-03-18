@@ -1,0 +1,104 @@
+map:{
+    ; formatVersion = 1.1
+    ; pickupDatetime = 2022-07-03T15:58:00.809
+    ; decoMap = map:{
+        ; tableList = list:{
+            ; map:{
+                ; tableName = MEMBER_SECURITY
+                ; mappingList = list:{}
+                ; propertyList = list:{
+                    ; map:{
+                        ; decomment = 会員とは one-to-one で、会員一人につき必ず一つのセキュリティ情報がある
+sea
+                        ; databaseComment = 会員とは&nbsp\;one-to-one&nbsp\;で、会員一人につき必ず一つのセキュリティ情報がある
+                        ; commentVersion = 0
+                        ; authorList = list:{
+                            ; jflute
+                        }
+                        ; pieceCode = e5ad7706
+                        ; pieceOwner = jflute
+                        ; pieceGitBranch = master
+                        ; pieceDatetime = 2018-06-30T11:17:00.997
+                        ; previousPieceList = list:{}
+                    }
+                }
+                ; columnList = list:{}
+            }
+            ; map:{
+                ; tableName = MEMBER_LOGIN
+                ; mappingList = list:{}
+                ; propertyList = list:{
+                    ; map:{
+                        ; decomment = ログインするたびに登録されるログイン履歴。
+登録されたら更新されるも削除されることもない。さらには、登録する人もプログラムもはっきりしているので、(紙面の都合上もあって)ここでは共通カラムは省略している。
+sea/land
+                        ; databaseComment = ログインするたびに登録されるログイン履歴。
+登録されたら更新されるも削除されることもない。さらには、登録する人もプログラムもはっきりしているので、(紙面の都合上もあって)ここでは共通カラムは省略している。
+                        ; commentVersion = 0
+                        ; authorList = list:{
+                            ; jflute
+                        }
+                        ; pieceCode = c61fb9e1
+                        ; pieceOwner = jflute
+                        ; pieceGitBranch = master
+                        ; pieceDatetime = 2018-06-30T11:16:56.416
+                        ; previousPieceList = list:{
+                            ; c12ec679
+                        }
+                    }
+                }
+                ; columnList = list:{}
+            }
+            ; map:{
+                ; tableName = MEMBER_FOLLOWING
+                ; mappingList = list:{}
+                ; propertyList = list:{
+                    ; map:{
+                        ; decomment = とある会員が他の会員をフォローできる。すると、フォローした会員の購入履歴が閲覧できる。
+sea
+                        ; databaseComment = とある会員が他の会員をフォローできる。すると、フォローした会員の購入履歴が閲覧できる。
+                        ; commentVersion = 0
+                        ; authorList = list:{
+                            ; jflute
+                        }
+                        ; pieceCode = be4676cf
+                        ; pieceOwner = jflute
+                        ; pieceGitBranch = master
+                        ; pieceDatetime = 2018-06-30T10:39:25.377
+                        ; previousPieceList = list:{}
+                    }
+                }
+                ; columnList = list:{}
+            }
+            ; map:{
+                ; tableName = MEMBER
+                ; mappingList = list:{}
+                ; propertyList = list:{
+                    ; map:{
+                        ; decomment = 会員のプロフィールやアカウントなどの基本情報を保持する。
+基本的に物理削除はなく、退会したらステータスが退会会員になる。
+ライフサイクルやカテゴリの違う会員情報は、one-to-oneなどの関連テーブルにて。
+
+sea/land/piari/bonvo/sea
+                        ; databaseComment = 会員のプロフィールやアカウントなどの基本情報を保持する。
+基本的に物理削除はなく、退会したらステータスが退会会員になる。
+ライフサイクルやカテゴリの違う会員情報は、one-to-oneなどの関連テーブルにて。
+                        ; commentVersion = 0
+                        ; authorList = list:{
+                            ; jflute
+                            ; coflute
+                        }
+                        ; pieceCode = c0c6b401
+                        ; pieceOwner = coflute
+                        ; pieceGitBranch = master
+                        ; pieceDatetime = 2018-10-25T12:27:47.881
+                        ; previousPieceList = list:{
+                            ; fae9411e
+                        }
+                    }
+                }
+                ; columnList = list:{}
+            }
+        }
+    }
+}

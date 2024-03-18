@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.dbflute.bhv.writable.WritableOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.dbflute.cbean.paging.PagingBean;
+import org.dbflute.exception.BatchUpdateUniqueByUnsupportedException;
 import org.dbflute.exception.DangerousResultSizeException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
@@ -283,12 +284,24 @@ public class BehaviorExceptionThrower implements Serializable {
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
         br.addElement("  (o):");
         br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
-        br.addElement("    entity.setFooId(...); // *Point");
+        br.addElement("    entity.setFooId(...); // Good");
         br.addElement("    entity.setFooName(...);");
         br.addElement("    entity.setFooDate(...);");
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("");
         br.addElement("Or if your process is insert(), you might expect identity.");
         br.addElement("Confirm the primary-key's identity setting.");
+        if (!entity.asDBMeta().getUniqueInfoList().isEmpty()) {
+            br.addElement("");
+            br.addElement("Or if you update it by unique column (not PK),");
+            br.addElement("use entity.uniqueBy(...).");
+            br.addElement("For example:");
+            br.addElement("  (o):");
+            br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
+            br.addElement("    entity.uniqueBy(...); // Good");
+            br.addElement("    entity.setFooDate(...);");
+            br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        }
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityPrimaryKeyNotFoundException(msg);
@@ -301,21 +314,28 @@ public class BehaviorExceptionThrower implements Serializable {
         br.addNotice("The unique-key value in the entity was not found.");
         br.addItem("Advice");
         br.addElement("An entity should have its unique-key value");
-        br.addElement("when e.g. update(), delete() if you call uniqueByXxx().");
+        br.addElement("when e.g. update(), delete() with uniqueBy() call.");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
         br.addElement("    entity.setFooName(...);");
         br.addElement("    entity.setFooDate(...);");
-        br.addElement("    entity.uniqueByFooAccount(...);");
+        br.addElement("    entity.uniqueBy(null); // *Bad");
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
         br.addElement("  (o):");
         br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
-        br.addElement("    entity.setFooAccount(...); // *Point");
         br.addElement("    entity.setFooName(...);");
         br.addElement("    entity.setFooDate(...);");
-        br.addElement("    entity.uniqueByFooAccount(...);");
+        br.addElement("    entity.uniqueBy(fooAccount); // Good");
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("  (o):");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    entity.setFooAccount(fooAccount); // Good");
+        br.addElement("    " + behaviorName + ".varyingUpdateNonstrict(entity, op -> {");
+        br.addElement("         op.uniqueBy(" + classTitle + "Dbm.getInstance().uniqueOf());");
+        br.addElement("    });");
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityUniqueKeyNotFoundException(msg);
@@ -339,6 +359,9 @@ public class BehaviorExceptionThrower implements Serializable {
         throw new EntityDuplicatedException(msg); // basically no way if you use PK constraint
     }
 
+    // -----------------------------------------------------
+    //                                       Optimistic Lock
+    //                                       ---------------
     public void throwVersionNoValueNullException(Entity entity) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Not found the value of 'version no' on the entity!");
@@ -399,6 +422,52 @@ public class BehaviorExceptionThrower implements Serializable {
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                          Batch Update
+    //                                          ------------
+    public <ENTITY extends Entity> void throwBatchUpdateUniqueByUnsupportedException(List<ENTITY> entityList,
+            WritableOption<? extends ConditionBean> option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The uniqueBy() of batch-update/delete is unsupported.");
+        br.addItem("Advice");
+        br.addElement("The uniqueBy() is only for entity-update.");
+        br.addElement("So use primary key instead of unique column.");
+        br.addElement("Or use entity-update.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    for (...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.uniqueBy(memberAccount); // *Bad");
+        br.addElement("        ...");
+        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList);");
+        br.addElement("  (o):");
+        br.addElement("    for (...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.setMemberId(memberId); // Good: using PK");
+        br.addElement("        member.setMemberAccount(memberAccount);");
+        br.addElement("        ...");
+        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList);");
+        br.addElement("  (o):");
+        br.addElement("    for (...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.uniqueBy(memberAccount);");
+        br.addElement("        ...");
+        br.addElement("        memberBhv.update(member); // Good: entity-update");
+        br.addElement("    }");
+        br.addItem("Entity List");
+        for (ENTITY entity : entityList) {
+            br.addElement(entity.toStringWithRelation());
+        }
+        setupOptionElement(br, option);
+        final String msg = br.buildExceptionMessage();
+        throw new BatchUpdateUniqueByUnsupportedException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                          Query Update
+    //                                          ------------
     public <ENTITY extends Entity> void throwNonQueryUpdateNotAllowedException(ENTITY entity, ConditionBean cb,
             UpdateOption<? extends ConditionBean> option) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -448,6 +517,9 @@ public class BehaviorExceptionThrower implements Serializable {
         throw new NonQueryDeleteNotAllowedException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                           Setup Logic
+    //                                           -----------
     protected void setupEntityElement(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Entity");
         try {

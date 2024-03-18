@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.dbflute.properties;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -121,6 +120,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     //                                                                 ===================
     public boolean isAvailableDatabaseDependency() {
         return isProperty("isAvailableDatabaseDependency", false);
+    }
+
+    public boolean isUseFullTextSearchPGroongaBasic() { // closet, since 1.2.7
+        return isProperty("isUseFullTextSearchPGroongaBasic", false);
     }
 
     // ===================================================================================
@@ -429,6 +432,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return Integer.valueOf(getProperty("keyableUniqueColumnLimit", defaultValue)); // if minus, no limit
     }
 
+    // -----------------------------------------------------
+    //                                               JavaDoc
+    //                                               -------
+    public boolean isGenerateTableDetailJavaDoc() { // closet, since 1.2.7
+        // there are "get/set template" users so add option here (2023/03/17)
+        // thanks pair programing, yukiyoko san! (good naming for this property)
+        return isProperty("isGenerateTableDetailJavaDoc", false);
+    }
+
     // ===================================================================================
     //                                                                       ConditionBean
     //                                                                       =============
@@ -452,6 +464,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     public boolean isNullOrEmptyQueryAllowed() { // closet
+        // invalid-query means abstract concept, so rename it
         final boolean defaultValue = isProperty("isInvalidQueryChecked", !isCompatibleBeforeJava8());
         return isProperty("isNullOrEmptyQueryAllowed", !defaultValue);
     }
@@ -468,8 +481,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isOverridingQueryAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isInvalidQueryAllowedWarning() { // closet
+        return isProperty("isInvalidQueryAllowedWarning", false);
+    }
+
     public boolean isNonSpecifiedColumnAccessAllowed() { // closet
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
+    }
+
+    public boolean isNonSpecifiedColumnAccessWarningOnly() { // closet, since 1.2.7
+        return isProperty("isNonSpecifiedColumnAccessWarningOnly", false);
     }
 
     public boolean isDatetimePrecisionTruncationOfCondition() { // closet
@@ -571,10 +592,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
             }
         }
         final String code = doGetClassificationUndefinedHandlingType(defaultValue);
-        final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
-        if (handlingType == null) {
-            throwUnknownClassificationUndefinedHandlingTypeException(code, KEY_littleAdjustmentMap + ".dfprop");
-        }
+        final ClassificationUndefinedHandlingType handlingType =
+                ClassificationUndefinedHandlingType.of(code).orElseTranslatingThrow(cause -> {
+                    throwUnknownClassificationUndefinedHandlingTypeException(code, KEY_littleAdjustmentMap + ".dfprop", cause);
+                    return null; // unreachable
+                });
         return handlingType;
     }
 
@@ -582,7 +604,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return getProperty("classificationUndefinedHandlingType", defaultValue);
     }
 
-    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code, String dfpropFile) {
+    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code, String dfpropFile, Throwable cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown handling type of classification undefined code.");
         br.addItem("Advice");
@@ -604,26 +626,29 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         br.addItem("dfprop File");
         br.addElement(dfpropFile);
         final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
+        throw new DfIllegalPropertySettingException(msg, cause);
     }
 
     public boolean isPlainCheckClassificationCode() { // for e.g. classificationResource
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         final ClassificationUndefinedHandlingType undefinedHandlingType = prop.getClassificationUndefinedHandlingType();
         if (prop.hasClassificationUndefinedHandlingTypeProperty() && undefinedHandlingType.isChecked()) {
-            return true;
+            return true; // explicitly check setting in dfprop
         }
         if (prop.isSuppressDefaultCheckClassificationCode()) {
-            return false;
+            return false; // compatible option
         }
-        return undefinedHandlingType.isChecked();
+        return undefinedHandlingType.isChecked(); // as default of dfprop (logging after java8)
     }
 
     public boolean isSuppressDefaultCheckClassificationCode() { // closet
+        // for new classification code check (existing code or not)
+        // the check is on entity if undefinedHandlingType is LOGGING or EXCEPTION
+        // but you can suppress the check if implicit setting (means default) in dfprop
         return isProperty("isSuppressDefaultCheckClassificationCode", isCompatibleBeforeJava8());
     }
 
-    // old style
+    // old style, checking on dbmeta
     protected static final String KEY_isCheckSelectedClassification = "isCheckSelectedClassification";
 
     public boolean hasCheckSelectedClassificationProperty() {
@@ -659,11 +684,32 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     // -----------------------------------------------------
-    //                                          Small Option
-    //                                          ------------
-    public boolean isCDefToStringReturnsName() { // closet
-        return isProperty("isCDefToStringReturnsName", false);
+    //                                           CDef Option
+    //                                           -----------
+    public boolean isMakeCDefOldStyleCodeOfMethod() { // closet
+        // default true until removing old style dependencies
+        return isProperty("isMakeCDefOldStyleCodeOfMethod", true);
     }
+
+    public boolean isMakeCDefOldStyleNameOfMethod() { // closet
+        // default true until deprecated version
+        return isProperty("isMakeCDefOldStyleNameOfMethod", true);
+    }
+
+    public boolean isMakeCDefOldStyleListOfMethod() { // closet
+        // default true until deprecated version
+        return isProperty("isMakeCDefOldStyleListOfMethod", true);
+    }
+
+    public boolean isMakeCDefOldStyleGroupOfMethod() { // closet
+        // default true until deprecated version
+        return isProperty("isMakeCDefOldStyleGroupOfMethod", true);
+    }
+
+    // already unused
+    //public boolean isCDefToStringReturnsName() { // closet
+    //    return isProperty("isCDefToStringReturnsName", false);
+    //}
 
     // unsupported since 1.1
     //public boolean isMakeEntityOldStyleClassify() { // closet
@@ -693,9 +739,20 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
+    // ===================================================================================
+    //                                                                          CB Purpose
+    //                                                                          ==========
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() { // closet since 1.2.7
+        return isProperty("isOrScopeQueryPurposeCheckWarningOnly", false);
+    }
+
     public boolean isThatsBadTimingDetect() { // closet
         final boolean defaultValue = !isCompatibleBeforeJava8();
         return isProperty("isThatsBadTimingDetect", defaultValue);
+    }
+
+    public boolean isThatsBadTimingWarningOnly() { // closet since 1.2.7
+        return isProperty("isThatsBadTimingWarningOnly", false); // precondition: detect=true
     }
 
     // ===================================================================================
@@ -826,6 +883,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     // ===================================================================================
     //                                                                          Quote Name
     //                                                                          ==========
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // #for_now jflute too difficult to quote catalog and schema names so unsupported for now (2023/10/30)
+    // _/_/_/_/_/_/_/_/_/_/
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
@@ -1277,8 +1337,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     //                                                                        Query Update
     //                                                                        ============
     public boolean isQueryUpdateCountPreCheck() { // closet
+        // to avoid Otegaru Deadlock of MySQL RepeatableRead
         final boolean defaultValue = isProperty("isCheckCountBeforeQueryUpdate", false); // for compatible
         return isProperty("isQueryUpdateCountPreCheck", defaultValue);
+    }
+
+    // ===================================================================================
+    //                                                                    Insert or Update
+    //                                                                    ================
+    public boolean isInsertOrUpdateCountPreCheck() { // closet
+        // to avoid Otegaru Deadlock of MySQL RepeatableRead
+        return isProperty("isInsertOrUpdateCountPreCheck", false);
     }
 
     // ===================================================================================
@@ -1296,6 +1365,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isReadOnlySchema", false);
     }
 
+    // e.g. littleAdjustmentMap.dfprop
+    //  ; readOnlyTableNameList = list:{
+    //      ; prefix:PURCHASE
+    //  
+    //      ; !PURCHASE_PAYMENT
+    //  }
+    // => PURCHASE is readable, PURCHASE_PAYMENT is writable
     protected List<String> _readOnlyTableNameList;
     protected Set<String> _exceptReadOnlyTableNameSet;
 
@@ -1307,7 +1383,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         final Object obj = getLittleAdjustmentMap().get(key);
         final List<String> plainList = obj != null ? castToList(obj, key) : new ArrayList<String>();
         _readOnlyTableNameList = new ArrayList<String>();
-        _exceptReadOnlyTableNameSet = new LinkedHashSet<String>();
+        _exceptReadOnlyTableNameSet = StringSet.createAsFlexible(); // fit with name-hint logic
         for (String element : plainList) {
             if (element.startsWith("!")) {
                 _exceptReadOnlyTableNameSet.add(Srl.ltrim(element, "!"));
@@ -1622,6 +1698,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
 
+    // -----------------------------------------------------
+    //                              System Random Management
+    //                              ------------------------
+    public boolean isFilterSystemRandomDefaultValue() { // closet, for H2 database first
+        return isProperty("isFilterSystemRandomDefaultValue", false);
+    }
+
+    public boolean isSuppressSystemRandomSequence() { // closet, for H2 database first
+        return isProperty("isSuppressSystemRandomSequence", false);
+    }
+
     // ===================================================================================
     //                                                                               S2Dao
     //                                                                               =====
@@ -1638,10 +1725,31 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     }
 
     // ===================================================================================
+    //                                                                             FreeGen
+    //                                                                             =======
+    public boolean isFreeGenJavaScriptEngineNashorn() { // closet, for emergency debug
+        return isProperty("isFreeGenJavaScriptEngineNashorn", false);
+    }
+
+    // ===================================================================================
     //                                                                          LastaFlute
     //                                                                          ==========
-    public boolean isLastaMigrationAlsoGenearteDiXml() {
+    public boolean isLastaMigrationAlsoGenearteDiXml() { // closet
+        // generate Di xml even if other DI container to gradually migrate to LastaFlute
         return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
+    }
+
+    // ===================================================================================
+    //                                                                     Jakarta Package
+    //                                                                     ===============
+    public String getCurrentJakartaPackage() {
+        return isMigrateOldJavaxToJakarta() ? /*new*/"jakarta" : /*old*/"javax";
+    }
+
+    protected boolean isMigrateOldJavaxToJakarta() { // closet
+        // many javax packages are moved to jakarta packages from since Tomcat10
+        // this property is for compatible velocity templates
+        return isProperty("isMigrateOldJavaxToJakarta", false); // will be true for the future
     }
 
     // ===================================================================================
@@ -1681,6 +1789,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
 
     public boolean isCompatibleNativeInScopePublicForcedly() { // closet
         return isProperty("isCompatibleNativeInScopePublicForcedly", false);
+    }
+
+    public boolean isCompatibleMonolithicDiffMapHistory() { // closet, for emergency so will be deleted future
+        return isProperty("isCompatibleMonolithicDiffMapHistory", false);
     }
 
     // -----------------------------------------------------

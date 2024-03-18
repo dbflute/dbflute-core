@@ -12,8 +12,8 @@ import ${request.package}.cbean.cq.bs.Bs${table.camelizedName}CQ;
 import ${request.package}.cbean.ca.${table.camelizedName}CA;
 import ${request.package}.cbean.ca.bs.Bs${table.camelizedName}CA;
 import org.dbflute.cbean.ConditionQuery;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.opensearch.action.search.SearchRequestBuilder;
+import org.opensearch.index.query.QueryBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -151,7 +151,7 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
     }
 
     public static class HpSpecification {
-        private List<String> columnList = new ArrayList<>();
+        protected List<String> columnList = new ArrayList<>();
 
         private void doColumn(String name) {
             columnList.add(name);

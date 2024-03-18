@@ -1,0 +1,19 @@
+map:{
+    ; formatVersion = 1.1
+    ; tableName = SERVICE_RANK
+    ; columnName = TEST_RENAMED_DECOMMENT
+    ; targetType = COLUMN
+    ; decomment = わーおわわーお
+    ; databaseComment = 
+    ; commentVersion = 0
+    ; authorList = list:{
+        ; jflute
+    }
+    ; pieceCode = ac5d848e
+    ; pieceDatetime = 2022-07-05T16:33:27.488
+    ; pieceOwner = jflute
+    ; pieceGitBranch = master
+    ; previousPieceList = list:{
+        ; 4696f0eb
+    }
+}

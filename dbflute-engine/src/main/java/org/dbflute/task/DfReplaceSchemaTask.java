@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,9 +76,9 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
     protected DfAlterCheckFinalInfo _alterCheckFinalInfo;
-    protected String _areYouReadyAnswer; // from environment variable
+    protected String _areYouReadyAnswer; // from environment variable, null allowed
     protected boolean _cancelled;
-    protected String _varyingArg;
+    protected String _varyingArg; // e.g. alter-check, save-previous, null allowed
     protected final DfDocumentSelector _documentSelector = new DfDocumentSelector(); // e.g. AlterCheck, SchemaPolicy
 
     // ===================================================================================
@@ -638,11 +638,11 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setAreYouReadyAnswer(String areYouReadyAnswer) {
+    public void setAreYouReadyAnswer(String areYouReadyAnswer) { // y/n
         _areYouReadyAnswer = areYouReadyAnswer;
     }
 
-    public void setVaryingArg(String varyingArg) {
+    public void setVaryingArg(String varyingArg) { // e.g. alter-check, save-previous
         if (Srl.is_Null_or_TrimmedEmpty(varyingArg)) {
             return;
         }

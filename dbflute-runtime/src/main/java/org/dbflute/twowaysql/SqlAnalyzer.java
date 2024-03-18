@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,11 +447,9 @@ public class SqlAnalyzer {
             String msg = "Unknown loop variable comment: " + comment;
             throw new IllegalStateException(msg);
         }
-        final LoopVariableType type = LoopVariableType.codeOf(code);
-        if (type == null) { // no way
-            String msg = "Unknown loop variable comment: " + comment;
-            throw new IllegalStateException(msg);
-        }
+        final LoopVariableType type = LoopVariableType.of(code).orElseTranslatingThrow(cause -> {
+            throw new IllegalStateException("Unknown loop variable comment: " + comment, cause); // no way
+        });
         final String condition = comment.substring(type.name().length()).trim();
         final LoopAbstractNode loopFirstNode = createLoopFirstNode(condition, type);
         peek().addChild(loopFirstNode);

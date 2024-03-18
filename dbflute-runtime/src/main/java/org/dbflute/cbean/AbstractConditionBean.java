@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.dbflute.cbean;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +47,7 @@ import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.garnish.SpecifyColumnRequiredChecker;
 import org.dbflute.cbean.garnish.SpecifyColumnRequiredExceptDeterminer;
+import org.dbflute.cbean.garnish.invoking.InvokingCBeanAgent;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
@@ -59,38 +59,31 @@ import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
-import org.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.dbflute.cbean.sqlclause.query.ColumnQueryClauseCreator;
 import org.dbflute.cbean.sqlclause.query.QueryClause;
 import org.dbflute.cbean.sqlclause.query.QueryClauseFilter;
-import org.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
-import org.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
+import org.dbflute.cbean.sqlclause.select.DreamSetupSelectSynchronizer;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
-import org.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
-import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
-import org.dbflute.helper.beans.DfBeanDesc;
-import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
-import org.dbflute.util.DfReflectionUtil;
-import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
- * The condition-bean as abstract.
+ * The condition-bean as abstract for generated classes. <br>
+ * This defines both CB architecture methods and facade methods for generated classes.
  * @author jflute
  */
 public abstract class AbstractConditionBean implements ConditionBean {
@@ -101,7 +94,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                             SqlClause
     //                                             ---------
-    /** SQL clause instance. */
+    /** The SQL clause that saves condition-bean SQL parts. (NotNull) */
     protected final SqlClause _sqlClause;
     {
         _sqlClause = createSqlClause();
@@ -203,8 +196,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     /**
-     * Create SQL clause. {for condition-bean}
-     * @return SQL clause. (NotNull)
+     * @return The created SQL clause, which saves SQL parts of condition-bean. (NotNull)
      */
     protected abstract SqlClause createSqlClause();
 
@@ -217,8 +209,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     /**
-     * Get the provider of DB meta.
-     * @return The provider of DB meta. (NotNull)
+     * @return The provider of DB meta, which you can get DB meta by e.g. table name. (NotNull)
      */
     protected abstract DBMetaProvider getDBMetaProvider();
 
@@ -245,15 +236,35 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected void assertSetupSelectPurpose(String foreignPropertyName) { // called by setupSelect_...() of sub-class
         if (_purpose.isNoSetupSelect()) {
             final String titleName = DfTypeUtil.toClassTitle(this);
-            throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
+            if (HpCBPurpose.OR_SCOPE_QUERY.equals(_purpose) && getSqlClause().isOrScopeQueryPurposeCheckWarningOnly()) {
+                showSetupSelectIllegalPurposeWarning(titleName, foreignPropertyName);
+            } else {
+                throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
+            }
         }
-        if (isLocked()) {
-            createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
+        if (isLocked()) { // detected
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                showSetupSelectThatsBadTimingWarning(foreignPropertyName);
+            } else { // basically here
+                throwSetupSelectThatsBadTimingException(foreignPropertyName);
+            }
         }
+    }
+
+    protected void showSetupSelectIllegalPurposeWarning(String className, String foreignPropertyName) {
+        createCBExThrower().showSetupSelectIllegalPurposeWarning(_purpose, this, foreignPropertyName);
     }
 
     protected void throwSetupSelectIllegalPurposeException(String className, String foreignPropertyName) {
         createCBExThrower().throwSetupSelectIllegalPurposeException(_purpose, this, foreignPropertyName);
+    }
+
+    protected void showSetupSelectThatsBadTimingWarning(String foreignPropertyName) {
+        createCBExThrower().showSetupSelectThatsBadTimingWarning(this, foreignPropertyName);
+    }
+
+    protected void throwSetupSelectThatsBadTimingException(String foreignPropertyName) {
+        createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
     }
 
     // unused because it has been allowed
@@ -277,15 +288,35 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected void assertSpecifyPurpose() { // called by specify() of sub-class
         if (_purpose.isNoSpecify()) {
-            throwSpecifyIllegalPurposeException();
+            if (HpCBPurpose.OR_SCOPE_QUERY.equals(_purpose) && getSqlClause().isOrScopeQueryPurposeCheckWarningOnly()) {
+                showSpecifyIllegalPurposeWarning();
+            } else {
+                throwSpecifyIllegalPurposeException();
+            }
         }
         if (isLocked() && !xisDreamCruiseShip()) { // DreamCruise might call specify() and query()
-            createCBExThrower().throwSpecifyThatsBadTimingException(this);
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                showSpecifyThatsBadTimingWarning();
+            } else { // basically here
+                throwSpecifyThatsBadTimingException();
+            }
         }
+    }
+
+    protected void showSpecifyIllegalPurposeWarning() {
+        createCBExThrower().showSpecifyIllegalPurposeWarning(_purpose, this);
     }
 
     protected void throwSpecifyIllegalPurposeException() {
         createCBExThrower().throwSpecifyIllegalPurposeException(_purpose, this);
+    }
+
+    protected void showSpecifyThatsBadTimingWarning() {
+        createCBExThrower().showSpecifyThatsBadTimingWarning(this);
+    }
+
+    protected void throwSpecifyThatsBadTimingException() {
+        createCBExThrower().throwSpecifyThatsBadTimingException(this);
     }
 
     @Deprecated
@@ -300,13 +331,25 @@ public abstract class AbstractConditionBean implements ConditionBean {
         if (_purpose.isNoQuery()) {
             throwQueryIllegalPurposeException();
         }
-        if (isLocked()) {
-            createCBExThrower().throwQueryThatsBadTimingException(this);
+        if (isLocked()) { // detected
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                showQueryThatsBadTimingWarning();
+            } else { // basically here
+                throwQueryThatsBadTimingException();
+            }
         }
     }
 
     protected void throwQueryIllegalPurposeException() {
         createCBExThrower().throwQueryIllegalPurposeException(_purpose, this);
+    }
+
+    protected void showQueryThatsBadTimingWarning() {
+        createCBExThrower().showQueryThatsBadTimingWarning(this);
+    }
+
+    protected void throwQueryThatsBadTimingException() {
+        createCBExThrower().throwQueryThatsBadTimingException(this);
     }
 
     // -----------------------------------------------------
@@ -407,113 +450,22 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                    Create ColQyClause
     //                                    ------------------
-    protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
-            final String rightColumn, final HpCalcSpecification<CB> rightCalcSp) {
-        return new QueryClause() {
-            @Override
-            public String toString() {
-                final String leftExp = resolveColumnExp(rightCalcSp.getLeftCalcSp(), leftColumn);
-                final String rightExp = resolveColumnExp(rightCalcSp, rightColumn);
-                return xbuildColQyClause(leftExp, operand, rightExp);
-            }
-
-            protected String resolveColumnExp(HpCalcSpecification<CB> calcSp, String columnExp) {
-                final String resolvedExp;
-                if (calcSp != null) {
-                    final String statement = calcSp.buildStatementToSpecifidName(columnExp);
-                    if (statement != null) { // exists calculation
-                        assertCalculationColumnType(calcSp);
-                        resolvedExp = statement; // cipher already resolved
-                    } else {
-                        final ColumnInfo columnInfo = calcSp.getSpecifiedColumnInfo();
-                        if (columnInfo != null) { // means plain column
-                            resolvedExp = decryptIfNeeds(columnInfo, columnExp);
-                        } else { // deriving sub-query
-                            resolvedExp = columnExp;
-                        }
-                    }
-                } else {
-                    resolvedExp = columnExp;
-                }
-                return resolvedExp;
-            }
-
-            protected void assertCalculationColumnType(HpCalcSpecification<CB> calcSp) {
-                if (calcSp.hasConvert()) {
-                    return; // because it may be Date type
-                }
-                final ColumnInfo columnInfo = calcSp.getResolvedSpecifiedColumnInfo();
-                if (columnInfo != null) { // basically true but checked just in case
-                    if (!columnInfo.isObjectNativeTypeNumber()) {
-                        // *simple message because other types may be supported at the future
-                        String msg = "Not number column specified: " + columnInfo;
-                        throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
-                    }
-                }
-            }
-        };
-    }
-
-    protected String xbuildColQyClause(String leftExp, String operand, String rightExp) { // can be overridden just in case
-        final StringBuilder sb = new StringBuilder();
-        if (hasSubQueryEndOnLastLine(leftExp)) {
-            if (hasSubQueryEndOnLastLine(rightExp)) { // (sub-query = sub-query)
-                // add line separator before right expression
-                // because of independent format for right query
-                sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " "));
-                sb.append(ln()).append("       ").append(rightExp);
-            } else { // (sub-query = column)
-                sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
-            }
-        } else { // (column = sub-query) or (column = column) 
-            sb.append(leftExp).append(" ").append(operand).append(" ").append(rightExp);
-        }
-        return sb.toString();
-    }
-
-    protected boolean hasSubQueryEndOnLastLine(String columnExp) {
-        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(columnExp);
-    }
-
-    protected String reflectToSubQueryEndOnLastLine(String columnExp, String inserted) {
-        return SubQueryIndentProcessor.moveSubQueryEndToRear(columnExp + inserted);
-    }
-
-    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause, final HpCalcSpecification<CB> leftCalcSp,
-            final HpCalcSpecification<CB> rightCalcSp) {
-        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-        // may null-revived -> no way to be inner-join
-        // (DerivedReferrer or conversion's coalesce)
-        // 
-        // for example, the following SQL is no way to be inner
-        // (suppose if PURCHASE refers WITHDRAWAL)
-        // 
-        // select mb.MEMBER_ID, mb.MEMBER_NAME
-        //      , mb.MEMBER_STATUS_CODE, wd.MEMBER_ID as WD_MEMBER_ID
-        //   from MEMBER mb
-        //     left outer join MEMBER_SERVICE ser on mb.MEMBER_ID = ser.MEMBER_ID
-        //     left outer join MEMBER_WITHDRAWAL wd on mb.MEMBER_ID = wd.MEMBER_ID
-        //  where (select coalesce(max(pc.PURCHASE_PRICE), 0)
-        //           from PURCHASE pc
-        //          where pc.MEMBER_ID = wd.MEMBER_ID -- may null
-        //        ) < ser.SERVICE_POINT_COUNT
-        //  order by mb.MEMBER_ID
-        // 
-        // it has a possible to be inner-join in various case
-        // but it is hard to analyze in detail so simplify it
-        // = = = = = = = = = =/
-        final QueryUsedAliasInfo leftInfo = xcreateColQyAliasInfo(leftCalcSp);
-        final QueryUsedAliasInfo rightInfo = xcreateColQyAliasInfo(rightCalcSp);
-        getSqlClause().registerWhereClause(queryClause, leftInfo, rightInfo);
-    }
-
-    protected <CB extends ConditionBean> QueryUsedAliasInfo xcreateColQyAliasInfo(final HpCalcSpecification<CB> calcSp) {
-        final String usedAliasName = calcSp.getResolvedSpecifiedTableAliasName();
-        return new QueryUsedAliasInfo(usedAliasName, new InnerJoinNoWaySpeaker() {
-            public boolean isNoWayInner() {
-                return calcSp.mayNullRevived();
-            }
+    protected <CB extends ConditionBean> QueryClause xcreateColQyClause(String leftColumn, String operand, String rightColumn,
+            HpCalcSpecification<CB> rightCalcSp) {
+        final ColumnQueryClauseCreator creator = xcreateColumnQueryClauseCreator();
+        return creator.createColumnQueryClause(leftColumn, operand, rightColumn, rightCalcSp, (columnInfo, valueExp) -> {
+            return decryptIfNeeds(columnInfo, valueExp);
         });
+    }
+
+    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause, HpCalcSpecification<CB> leftCalcSp,
+            HpCalcSpecification<CB> rightCalcSp) {
+        final ColumnQueryClauseCreator creator = xcreateColumnQueryClauseCreator();
+        creator.registerColumnQueryClause(getSqlClause(), queryClause, leftCalcSp, rightCalcSp);
+    }
+
+    protected ColumnQueryClauseCreator xcreateColumnQueryClauseCreator() {
+        return new ColumnQueryClauseCreator();
     }
 
     // [DBFlute-0.9.9.4C]
@@ -627,29 +579,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void xdoSetupSelectDreamCruiseJourneyLogBook() {
-        // small waste exists but simple logic is best here
-        final ConditionBean departurePort = xgetDreamCruiseDeparturePort();
-        for (String relationPath : _dreamCruiseJourneyLogBook) {
-            final List<String> relNoExpList = Srl.splitList(relationPath, "_"); // e.g. _2_5
-            final StringBuilder sb = new StringBuilder();
-            DBMeta currentMeta = asDBMeta();
-            int index = 0;
-            for (String relNoExp : relNoExpList) {
-                if ("".equals(relNoExp)) {
-                    continue;
-                }
-                final Integer relationNo = Integer.valueOf(relNoExp);
-                final ForeignInfo foreignInfo = currentMeta.findForeignInfo(relationNo);
-                final String foreignPropertyName = foreignInfo.getForeignPropertyName();
-                if (index > 0) {
-                    sb.append(".");
-                }
-                sb.append(foreignPropertyName);
-                currentMeta = foreignInfo.getForeignDBMeta();
-                ++index;
-            }
-            departurePort.invokeSetupSelect(sb.toString());
-        }
+        final DreamSetupSelectSynchronizer synchronizer = createDreamSetupSelectSynchronizer();
+        synchronizer.setupSelectDreamCruiseJourneyLogBook(asDBMeta(), xgetDreamCruiseDeparturePort(), _dreamCruiseJourneyLogBook);
+    }
+
+    protected DreamSetupSelectSynchronizer createDreamSetupSelectSynchronizer() {
+        return new DreamSetupSelectSynchronizer();
     }
 
     protected void xassertDreamCruiseShip() {
@@ -1514,82 +1449,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                 ===================
     /** {@inheritDoc} */
     public void invokeSetupSelect(String foreignPropertyNamePath) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyNamePath", foreignPropertyNamePath);
-        final String delimiter = ".";
-        Object currentObj = this;
-        String remainder = foreignPropertyNamePath;
-        int count = 0;
-        boolean last = false;
-        while (true) {
-            final int deimiterIndex = remainder.indexOf(delimiter);
-            final String propertyName;
-            if (deimiterIndex < 0) {
-                propertyName = remainder;
-                last = true;
-            } else {
-                propertyName = remainder.substring(0, deimiterIndex);
-                remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
-            }
-            final Class<?> targetType = currentObj.getClass();
-            final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = xhelpGettingCBChainMethod(targetType, methodName, (Class<?>[]) null);
-            if (method == null) {
-                String msg = "Not found the method for setupSelect:";
-                msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
-                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg);
-            }
-            try {
-                currentObj = DfReflectionUtil.invoke(method, currentObj, (Object[]) null);
-            } catch (ReflectionFailureException e) {
-                String msg = "Failed to invoke the method:";
-                msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
-                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg, e);
-            }
-            ++count;
-            if (last) {
-                break;
-            }
-        }
+        createInvokingCBeanAgent().invokeSetupSelect(foreignPropertyNamePath);
     }
 
     /** {@inheritDoc} */
     public SpecifiedColumn invokeSpecifyColumn(String columnPropertyPath) {
-        final String delimiter = ".";
-        Object currentObj = localSp();
-        String remainder = columnPropertyPath;
-        boolean last = false;
-        while (true) {
-            final int deimiterIndex = remainder.indexOf(delimiter);
-            final String propertyName;
-            if (deimiterIndex < 0) {
-                propertyName = remainder; // hard to get relation DB meta so plain name
-                last = true;
-            } else {
-                propertyName = remainder.substring(0, deimiterIndex);
-                remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
-            }
-            final Class<?> targetType = currentObj.getClass();
-            final String methodName = (last ? "column" : "specify") + initCap(propertyName);
-            final Method method = xhelpGettingCBChainMethod(targetType, methodName, (Class<?>[]) null);
-            if (method == null) {
-                String msg = "Not found the method for SpecifyColumn:";
-                msg = msg + " columnPropertyPath=" + columnPropertyPath + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg);
-            }
-            try {
-                currentObj = DfReflectionUtil.invoke(method, currentObj, (Object[]) null);
-            } catch (ReflectionFailureException e) {
-                String msg = "Failed to invoke the method:";
-                msg = msg + " columnPropertyPath=" + columnPropertyPath + " targetType=" + targetType + " methodName=" + methodName;
-                throw new ConditionInvokingFailureException(msg, e);
-            }
-            if (last) {
-                break;
-            }
-        }
-        return (SpecifiedColumn) currentObj;
+        return createInvokingCBeanAgent().invokeSpecifyColumn(localSp(), columnPropertyPath);
+    }
+
+    protected InvokingCBeanAgent createInvokingCBeanAgent() {
+        return new InvokingCBeanAgent(this);
     }
 
     /** {@inheritDoc} */
@@ -1600,15 +1469,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** {@inheritDoc} */
     public void invokeOrScopeQueryAndPart(AndQuery<ConditionBean> andQuery) {
         xorSQAP(this, andQuery);
-    }
-
-    protected Method xhelpGettingCBChainMethod(Class<?> type, String methodName, Class<?>[] argTypes) {
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(type);
-        return beanDesc.getMethodNoException(methodName, argTypes);
-    }
-
-    protected Object xhelpInvokingCBChainMethod(Class<?> type, Method method, Object[] args) {
-        return DfReflectionUtil.invokeForcedly(method, type, args);
     }
 
     // ===================================================================================
@@ -1996,8 +1856,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void assertOptionThatBadTiming(String optionName) {
-        if (isLocked()) {
-            createCBExThrower().throwOptionThatsBadTimingException(this, optionName);
+        if (isLocked()) { // detected
+            if (getSqlClause().isThatsBadTimingWarningOnly()) { // in migration
+                createCBExThrower().showOptionThatsBadTimingWarning(this, optionName);
+            } else { // basically here
+                createCBExThrower().throwOptionThatsBadTimingException(this, optionName);
+            }
         }
     }
 

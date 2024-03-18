@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -62,9 +62,10 @@ import ${myDBMetaPackageName}.*;
 import ${glPackageCB}.*;
 
 /**
- * The behavior of ${table.basicInfoDispString}. <br>
+ * The behavior of ${table.basicInfoDispString}.
+#if ($table.isGenerateTableDetailJavaDoc())
  * <pre>
- * [primary key]
+ * [primary-key]
  *     ${table.primaryKeyNameCommaString}
  *
  * [column]
@@ -90,7 +91,18 @@ import ${glPackageCB}.*;
  *
  * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
+ *
+ * [get/set template]
+ * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#foreach ($col in $table.columns)
+ * ${col.javaNative} ${col.uncapitalisedJavaName} = entity.get${col.javaName}();
+#end
+#foreach ($col in $table.columns)
+ * entity.set${col.javaName}(${col.uncapitalisedJavaName});
+#end
+ * = = = = = = = = = =/
  * </pre>
+#end
  * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {
@@ -1030,6 +1042,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         doInsertOrUpdateNonstrict(${myEntityVariableName}, null, null);
     }
 #end
+#if ($database.isInsertOrUpdateCountPreCheck())
+
+    @Override
+    protected boolean isInsertOrUpdateCountPreCheck() { return true; }
+#end
 
     /**
 #if ($table.hasOptimisticLock())
@@ -1428,7 +1445,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     /**
      * Delete the several entities by query. (NonExclusiveControl)
      * <pre>
-     * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">queryDelete</span>(${myEntityVariableName}, <span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">queryDelete</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">cb</span>.query().setFoo...
      * });
      * </pre>
@@ -1817,6 +1834,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
 #if ($database.isZeroUpdateCheckExistenceForPassing())
 
+    // ===================================================================================
+    //                                                                 Delegate to Command
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                         Entity Update
+    //                                         -------------
     @Override
     protected int delegateUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
         // ignore optimistic lock failure because optimistic lock column is
@@ -1996,20 +2019,23 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     //                                                                            Accessor
     //                                                                            ========
     @Override
-    @javax.annotation.Resource(name="${database.behaviorCommandInvokerComponentName}")
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("${database.behaviorCommandInvokerComponentName}")
     public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
         super.setBehaviorCommandInvoker(behaviorCommandInvoker);
     }
 
     @Override
-    @javax.annotation.Resource(name="${database.behaviorSelectorComponentName}")
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("${database.behaviorSelectorComponentName}")
     public void setBehaviorSelector(BehaviorSelector behaviorSelector) {
         super.setBehaviorSelector(behaviorSelector);
     }
 #if ($table.isWritable())
 
     @Override
-    @javax.annotation.Resource(name="${database.commonColumnAutoSetupperComponentName}")
+    @org.springframework.beans.factory.annotation.Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("${database.commonColumnAutoSetupperComponentName}")
     public void setCommonColumnAutoSetupper(CommonColumnAutoSetupper commonColumnAutoSetupper) {
         super.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -428,15 +428,15 @@ public class ResourceContext {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ResourceContext _parentContext; // not null only when recursive invoking
-    protected BehaviorCommand<?> _behaviorCommand;
-    protected DBDef _currentDBDef;
-    protected DBMetaProvider _dbmetaProvider;
-    protected SqlClauseCreator _sqlClauseCreator;
-    protected SqlAnalyzerFactory _sqlAnalyzerFactory;
-    protected SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
-    protected GearedCipherManager _gearedCipherManager;
-    protected ResourceParameter _resourceParameter;
+    protected ResourceContext _parentContext; // not null (only when recursive invoking)
+    protected BehaviorCommand<?> _behaviorCommand; // not null (after setup)
+    protected DBDef _currentDBDef; // not null (after setup)
+    protected DBMetaProvider _dbmetaProvider; // not null (after setup)
+    protected SqlClauseCreator _sqlClauseCreator; // not null (after setup)
+    protected SqlAnalyzerFactory _sqlAnalyzerFactory; // not null (after setup)
+    protected SQLExceptionHandlerFactory _sqlExceptionHandlerFactory; // not null (after setup)
+    protected GearedCipherManager _gearedCipherManager; // null allowed (optional)
+    protected ResourceParameter _resourceParameter; // not null (after setup)
 
     // ===================================================================================
     //                                                                      Basic Override

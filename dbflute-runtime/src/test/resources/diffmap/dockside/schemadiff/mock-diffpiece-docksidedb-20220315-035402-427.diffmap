@@ -1,0 +1,25 @@
+map:{
+    ; 2022/03/15 03:54:02.427 = map:{
+        ; diffDate = 2022/03/15 03:54:02.427
+        ; tableCount = map:{
+            ; next = 12
+            ; previous = 12
+        }
+        ; tableDiff = map:{
+            ; VENDOR_CHECK = map:{
+                ; tableName = VENDOR_CHECK
+                ; diffType = CHANGE
+                ; columnDiff = map:{
+                    ; TYPE_OF_INTEGER = map:{
+                        ; columnName = TYPE_OF_INTEGER
+                        ; diffType = ADD
+                    }
+                    ; TYPE_OF_BIGINT = map:{
+                        ; columnName = TYPE_OF_BIGINT
+                        ; diffType = ADD
+                    }
+                }
+            }
+        }
+    }
+}

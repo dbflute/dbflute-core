@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.dbflute.bhv.core.melodicsql.MelodicNodeAdviceFactory;
 import org.dbflute.cbean.coption.LikeSearchOption;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
@@ -27,6 +28,7 @@ import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 import org.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.dbflute.twowaysql.factory.NodeAdviceFactory;
+import org.dbflute.twowaysql.node.ForNode.LoopVariableType;
 import org.dbflute.twowaysql.pmbean.ParameterBean;
 import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
@@ -1541,6 +1543,28 @@ public class ForNodeTest extends RuntimeTestCase {
             // OK
             log(e.getMessage());
         }
+    }
+
+    // ===================================================================================
+    //                                                                    LoopVariableType
+    //                                                                    ================
+    public void test_LoopVariableType_of() {
+        assertEquals(LoopVariableType.FIRST, LoopVariableType.of("first").get());
+        assertEquals(LoopVariableType.FIRST, LoopVariableType.of("FIRST").get());
+        assertEquals(LoopVariableType.FIRST, LoopVariableType.of(LoopVariableType.FIRST).get());
+        assertEquals(LoopVariableType.LAST, LoopVariableType.of(LoopVariableType.of("last")).get());
+        assertEquals(LoopVariableType.LAST, LoopVariableType.of(LoopVariableType.of(LoopVariableType.LAST)).get());
+        assertEquals(LoopVariableType.NEXT, LoopVariableType.of(OptionalThing.of("NEXT")).get());
+        assertException(IllegalArgumentException.class, () -> LoopVariableType.of(null).get());
+        assertException(IllegalStateException.class, () -> LoopVariableType.of("none").get());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void test_LoopVariableType_codeOf() {
+        assertEquals(LoopVariableType.FIRST, LoopVariableType.codeOf("first"));
+        assertEquals(LoopVariableType.FIRST, LoopVariableType.codeOf("FIRST"));
+        assertNull(LoopVariableType.codeOf(null));
+        assertNull(LoopVariableType.codeOf("none"));
     }
 
     // ===================================================================================

@@ -9,6 +9,8 @@
 # o schemaHtmlFileName: (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql: (NotRequired - Default false)
 # o isSuppressSchemaHtmlProcedure: (NotRequired - Default false)
+# o neighborhoodSchemaHtmlMap: (NotRequired - Default map:{})
+# o schemaDiagramMap: (NotRequired - Default map:{})
 # o historyHtmlFileName: (NotRequired - Default 'history-[project-name].html')
 # o isCheckColumnDefOrderDiff: (NotRequired - Default false)
 # o isCheckDbCommentDiff: (NotRequired - Default false)
@@ -27,6 +29,8 @@
 #     ; schemaHtmlFileName = xxx.html
 #     ; isSuppressSchemaHtmlOutsideSql = false
 #     ; isSuppressSchemaHtmlProcedure = false
+#     ; neighborhoodSchemaHtmlMap = map:{}
+#     ; schemaDiagramMap = map:{}
 #     ; historyHtmlFileName = xxx.html
 #     ; isCheckColumnDefOrderDiff = true
 #     ; isCheckDbCommentDiff = true
@@ -125,6 +129,30 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o neighborhoodSchemaHtmlMap: (NotRequired - map:{})
+    #  You can add links to other SchemaHtmls on your SchemaHtml.
+    #  The path is relative from your SchemaHtml.
+    #
+    #; neighborhoodSchemaHtmlMap = map:{
+    #    ; dockside_maihama = map:{
+    #        ; path = ../../../../sea_app/dbflute_seadb/output/doc/schema-seadb.html
+    #    }
+    #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o schemaDiagramMap: (NotRequired - map:{})
+    #  You can display your ER diagram on your SchemaHtml.
+    #  The path is relative from your SchemaHtml.
+    #
+    #; schemaDiagramMap = map:{
+    #    ; sea_erd = map:{
+    #        ; path = ../../../modeling/seadb.png ; width = 100% ; height = 100%
+    #    }
+    #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o historyHtmlFileName: (NotRequired - Default 'history-[project-name].html')
     #  The file name (not contain path) of HistoryHtml.
     #  Basically you don't need this.
@@ -191,26 +219,6 @@ map:{
     #    # (if false, it needs to dump master table records)
     #    ; isSuppressCraftDiff = true
     #}
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o multipleSchemaSyncCheckMap: (NotRequired - Default map:{})
-    #
-    # created by #dbflute_intro
-    ; multipleSchemaSyncCheckMap = map:{
-        ; previow.EXAMPLEDB = map:{
-            ; url = jdbc:...
-            ; schema = EXAMPLEDB
-            ; user = exampuser
-            ; password = exampword
-        }
-        ; staging.EXAMPLEDB2 = map:{
-            ; url = jdbc:...
-            ; schema = EXAMPLEDB
-            ; user = exampuser
-            ; password = exampword
-        }
-    }
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

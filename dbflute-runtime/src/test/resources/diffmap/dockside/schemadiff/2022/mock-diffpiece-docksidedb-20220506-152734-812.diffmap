@@ -1,0 +1,33 @@
+map:{
+    ; 2022/05/06 15:27:34.812 = map:{
+        ; diffDate = 2022/05/06 15:27:34.812
+        ; tableCount = map:{
+            ; next = 22
+            ; previous = 22
+        }
+        ; tableDiff = map:{
+            ; MEMBER = map:{
+                ; tableName = MEMBER
+                ; diffType = CHANGE
+                ; columnDiff = map:{
+                    ; MEMBER_ACCOUNT = map:{
+                        ; columnName = MEMBER_ACCOUNT
+                        ; diffType = CHANGE
+                        ; columnSizeDiff = map:{
+                            ; next = 50
+                            ; previous = 80
+                        }
+                        ; notNullDiff = map:{
+                            ; next = true
+                            ; previous = false
+                        }
+                    }
+                    ; CLUB_DB2_MEMO = map:{
+                        ; columnName = CLUB_DB2_MEMO
+                        ; diffType = DELETE
+                    }
+                }
+            }
+        }
+    }
+}

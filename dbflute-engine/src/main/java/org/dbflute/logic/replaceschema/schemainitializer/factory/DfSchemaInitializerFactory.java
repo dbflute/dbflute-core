@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ public class DfSchemaInitializerFactory {
             initializer.setUnifiedSchema(unifiedSchema);
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
             initializer.setSuppressConnectionFailure(isSuppressAdditionalDropSchemaConnectionFailure(_additionalDropMap));
-            // unsupported for additional
+            // #for_now jflute unsupported for additional from old days (2023/10/18)
             //initializer.setInitializeFirstSqlList(null);
             //initializer.setDropTableExceptList(null);
             //initializer.setDropSequenceExceptList(null);
@@ -175,12 +175,14 @@ public class DfSchemaInitializerFactory {
         }
 
         String msg = "Unknown initialize type: " + _initializeType;
-        throw new IllegalStateException(msg);
+        throw new IllegalStateException(msg); // no way
     }
 
     protected DataSource getAdditionalDataSource() {
         return new DfCushionDataSource() {
             public Connection getConnection() throws SQLException {
+                // create new connection per call here
+                // but no problem because basically additional is one shot use 
                 return _replaceSchemaProperties.createAdditionalDropConnection(_additionalDropMap);
             }
         };
@@ -193,6 +195,7 @@ public class DfSchemaInitializerFactory {
         initializer.setSuppressDropSequence(_replaceSchemaProperties.isSuppressDropSequence());
         initializer.setSuppressDropProcedure(_replaceSchemaProperties.isSuppressDropProcedure());
         initializer.setSuppressDropDBLink(_replaceSchemaProperties.isSuppressDropDBLink());
+        initializer.setUseDropTableCascadeAsPossible(_replaceSchemaProperties.isUseDropTableCascadeAsPossible());
         initializer.setSuppressLoggingSql(_replaceSchemaProperties.isSuppressLoggingReplaceSql());
     }
 

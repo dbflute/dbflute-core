@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
         final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");
@@ -73,7 +73,7 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
         return new DfDropProcedureByJdbcDefaultCallback() {
             @Override
             public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
-                return "drop alias " + buildProcedureSqlName(procedureMeta);
+                return "drop alias " + buildDropProcedureSqlName(procedureMeta);
             }
         };
     }

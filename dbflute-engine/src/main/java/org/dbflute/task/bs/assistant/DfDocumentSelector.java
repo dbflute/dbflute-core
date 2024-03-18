@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,12 +229,12 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
     }
 
     public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile());
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsMonolithic(getSchemaSyncCheckDiffMapFile());
         doLoadSchemaHistory(schemaHistory);
     }
 
     public void loadSchemaHistoryAsAlterCheck() { // for AlterCheck
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getAlterCheckDiffMapFile());
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsMonolithic(getAlterCheckDiffMapFile());
         doLoadSchemaHistory(schemaHistory);
     }
 

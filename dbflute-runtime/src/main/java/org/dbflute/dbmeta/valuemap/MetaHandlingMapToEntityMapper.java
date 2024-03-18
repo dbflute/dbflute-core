@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import java.util.UUID;
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.jdbc.Classification;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -59,8 +60,7 @@ public class MetaHandlingMapToEntityMapper {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
-    public <ENTITY extends Entity> void mappingToEntity(ENTITY entity, Map<String, ? extends Object> columnMap,
-            List<ColumnInfo> columnInfoList) {
+    public <ENTITY extends Entity> void mappingToEntity(ENTITY entity, List<ColumnInfo> columnInfoList) {
         entity.clearModifiedInfo();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnName = columnInfo.getColumnDbName();
@@ -175,9 +175,16 @@ public class MetaHandlingMapToEntityMapper {
             return null;
         }
         if (Classification.class.isAssignableFrom(javaType)) {
+            // use of() since 1.2.6, however basically no way here
+            // because columnInfo nativeType is String/Integer/... in spite of classification
             final Class<?>[] argTypes = new Class[] { Object.class };
-            final Method method = DfReflectionUtil.getPublicMethod(javaType, "codeOf", argTypes);
-            return (PROPERTY) DfReflectionUtil.invokeStatic(method, new Object[] { obj });
+            final Method method = DfReflectionUtil.getPublicMethod(javaType, "of", argTypes);
+            final Object optObj = DfReflectionUtil.invokeStatic(method, new Object[] { obj });
+            if (optObj instanceof OptionalThing<?>) { // basically here
+                return (PROPERTY) ((OptionalThing<?>) optObj).orElse(null);
+            } else { // no way, just in case
+                return (PROPERTY) optObj;
+            }
         }
         return (PROPERTY) obj;
     }

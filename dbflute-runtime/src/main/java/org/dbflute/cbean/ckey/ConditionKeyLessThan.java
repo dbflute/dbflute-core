@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,9 @@ public class ConditionKeyLessThan extends ConditionKey {
             return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
+            final boolean sameAsPrevious = cvalue.equalLessThan(value); // should be before overriding
             cvalue.overrideLessThan(value);
-            return chooseResultAlreadyExists(cvalue.equalLessThan(value));
+            return chooseResultAlreadyExists(sameAsPrevious);
         }
         return RESULT_NEW_QUERY;
     }

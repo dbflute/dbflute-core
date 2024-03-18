@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -335,7 +335,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                               -----------------------
     protected Map<String, Map<String, Object>> _neighborhoodSchemaHtmlMap;
 
-    protected Map<String, Map<String, Object>> getNeighborhoodSchemaHtmlMap() { // closet
+    protected Map<String, Map<String, Object>> getNeighborhoodSchemaHtmlMap() {
         if (_neighborhoodSchemaHtmlMap != null) {
             return _neighborhoodSchemaHtmlMap;
         }
@@ -375,7 +375,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     //                                        --------------
     protected Map<String, Map<String, Object>> _schemaDiagramMap;
 
-    protected Map<String, Map<String, Object>> getSchemaDiagramMap() { // closet
+    protected Map<String, Map<String, Object>> getSchemaDiagramMap() {
         if (_schemaDiagramMap != null) {
             return _schemaDiagramMap;
         }
@@ -451,6 +451,20 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public boolean isCheckProcedureDiff() {
         return isProperty("isCheckProcedureDiff", false, getDocumentMap());
+    }
+
+    public boolean isIgnoreViewDefaultDiff() { // since 1.2.8 (2024/02/26)
+        // view's default constraint is also very unstable and uncontrollable by developers
+        // https://github.com/dbflute/dbflute-core/issues/203
+        final boolean defaultValue = false; // compatible for now
+        return isProperty("isIgnoreViewDefaultDiff", defaultValue, getDocumentMap());
+    }
+
+    public boolean isIgnoreViewNotNullDiff() { // since 1.2.8 (2024/02/13)
+        // view's not null constraint is very unstable and uncontrollable by developers
+        // https://github.com/dbflute/dbflute-core/issues/200
+        final boolean defaultValue = false; // compatible for now
+        return isProperty("isIgnoreViewNotNullDiff", defaultValue, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -916,41 +930,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
         return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
-
-    // #making multipleSchemaSyncCheckMap
-    //    // ===================================================================================
-    //    //                                                            Multiple SchemaSyncCheck
-    //    //                                                            ========================
-    //    // ; multipleSchemaSyncCheckMap = map:{
-    //    //     ; preview.EXAMPLEDB = map:{
-    //    //         ; url = jdbc:...
-    //    //         ; schema = EXAMPLEDB
-    //    //         ; user = exampuser
-    //    //         ; password = exampword
-    //    //     }
-    //    //     ; staging.EXAMPLEDB = map:{
-    //    //         ; url = jdbc:...
-    //    //         ; schema = EXAMPLEDB
-    //    //         ; user = exampuser
-    //    //         ; password = exampword
-    //    //     }
-    //    // }
-    //    protected Map<String, Map<String, String>> _multipleSchemaSyncCheckMap;
-    //
-    //    protected Map<String, Map<String, String>> getMultipleSchemaSyncCheckMap() {
-    //        if (_multipleSchemaSyncCheckMap != null) {
-    //            return _multipleSchemaSyncCheckMap;
-    //        }
-    //        final String key = "schemaSyncCheckMap";
-    //        @SuppressWarnings("unchecked")
-    //        final Map<String, Map<String, String>> map = (Map<String, Map<String, String>>) getDocumentMap().get(key);
-    //        if (map != null) {
-    //            _multipleSchemaSyncCheckMap = map;
-    //        } else {
-    //            _multipleSchemaSyncCheckMap = DfCollectionUtil.emptyMap();
-    //        }
-    //        return _multipleSchemaSyncCheckMap;
-    //    }
 
     // ===================================================================================
     //                                                              Table Display Order By

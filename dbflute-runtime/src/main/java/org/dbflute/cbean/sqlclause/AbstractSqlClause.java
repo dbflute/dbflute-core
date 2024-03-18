@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     protected Map<String, String> _selectColumnKeyNameMap;
 
-    /** Is use select index? Default value is true. */
+    /** Is use select index? e.g. select MEMBER_NAME as c1, Default value is true. */
     protected boolean _useSelectIndex = true;
 
     /** The limit size of alias name to adjust alias length on query. */
@@ -231,13 +231,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Fetch Property
     //                                        --------------
-    /** Fetch start index. (for fetchXxx()) */
+    /** Fetch start index of scope select, different from paging offset. (for fetchXxx()) */
     protected int _fetchStartIndex = 0;
 
-    /** Fetch size. (for fetchXxx()) */
+    /** Fetch size, basically same as pageSize. (for fetchXxx()) */
     protected int _fetchSize = 0;
 
-    /** Fetch page number. (for fetchXxx()) This value should be plus. */
+    /** Fetch page number, which means current page number. (for fetchXxx()) This value should be plus. */
     protected int _fetchPageNumber = 1;
 
     /** Is fetch-narrowing effective? Default value is false but true when registered. */
@@ -270,14 +270,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it check an invalid query? (save-only attribute) */
     protected boolean _nullOrEmptyChecked;
 
-    /** The list of invalid query info. (NullAllowed: lazy-load) (save-only attribute) */
-    protected List<HpInvalidQueryInfo> _invalidQueryList;
-
     /** Does it accept an empty string for query? (save-only attribute) */
     protected boolean _emptyStringQueryAllowed;
 
     /** Does it allow overriding query? (save-only attribute) */
     protected boolean _overridingQueryAllowed;
+
+    /** Does it show warning log when invalid-query allowed? (save-only attribute) */
+    protected boolean _invalidQueryAllowedWarning;
+
+    /** The list of invalid query info. (NullAllowed: lazy-load) (save-only attribute) */
+    protected List<HpInvalidQueryInfo> _invalidQueryList;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -345,11 +348,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The purpose of condition-bean for check at condition-query. (NotNull) (save-only attribute) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
+    /** Is "orScopeQuery purpose check" warning-only? (save-only attribute) */
+    protected boolean _orScopeQueryPurposeCheckWarningOnly;
+
     /** Is the clause object locked? e.g. true if in sub-query process. (save-only attribute) */
     protected boolean _locked;
 
-    /** Does it allow "that's bad timing" check? (save-only attribute) */
+    /** Does it detect "that's bad timing"? (save-only attribute) */
     protected boolean _thatsBadTimingDetectEffective;
+
+    /** Is "that's bad timing" warning-only? (save-only attribute) */
+    protected boolean _thatsBadTimingWarningOnlyEffective;
 
     // -----------------------------------------------------
     //                                        Lazy Reflector
@@ -391,9 +400,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
+     * Basic Constructor.
      * @param tableDbName The DB name of table. (NotNull)
-     **/
+     */
     public AbstractSqlClause(String tableDbName) {
         if (tableDbName == null) {
             String msg = "The argument 'tableDbName' should not be null.";
@@ -2962,30 +2971,71 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                  Invalid Query Info
-    //                                                                  ==================
+    //                                                                       Invalid Query
+    //                                                                       =============
     // -----------------------------------------------------
     //                                     NullOrEmpty Query
     //                                     -----------------
+    /** {@inheritDoc} */
     public void checkNullOrEmptyQuery() {
         _nullOrEmptyChecked = true;
     }
 
+    /** {@inheritDoc} */
     public void ignoreNullOrEmptyQuery() {
         _nullOrEmptyChecked = false;
     }
 
+    /** {@inheritDoc} */
     public boolean isNullOrEmptyQueryChecked() {
         return _nullOrEmptyChecked;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    // -----------------------------------------------------
+    //                                          Empty String
+    //                                          ------------
+    /** {@inheritDoc} */
+    public void enableEmptyStringQuery() {
+        _emptyStringQueryAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableEmptyStringQuery() {
+        _emptyStringQueryAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isEmptyStringQueryAllowed() {
+        return _emptyStringQueryAllowed;
+    }
+
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
+    /** {@inheritDoc} */
+    public void enableOverridingQuery() {
+        _overridingQueryAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableOverridingQuery() {
+        _overridingQueryAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isOverridingQueryAllowed() {
+        return _overridingQueryAllowed;
+    }
+
+    // -----------------------------------------------------
+    //                                   InvalidQuery Saving
+    //                                   -------------------
+    /** {@inheritDoc} */
     public List<HpInvalidQueryInfo> getInvalidQueryList() {
         return new ArrayList<HpInvalidQueryInfo>(doGetInvalidQueryList());
     }
 
+    /** {@inheritDoc} */
     public void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo) {
         doGetInvalidQueryList().add(invalidQueryInfo);
     }
@@ -2998,33 +3048,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                          Empty String
-    //                                          ------------
-    public void enableEmptyStringQuery() {
-        _emptyStringQueryAllowed = true;
+    //                                  InvalidQuery Warning
+    //                                  --------------------
+    // since 1.2.7
+    /** {@inheritDoc} */
+    public void enableInvalidQueryAllowedWarning() {
+        _invalidQueryAllowedWarning = true;
     }
 
-    public void disableEmptyStringQuery() {
-        _emptyStringQueryAllowed = false;
+    /** {@inheritDoc} */
+    public void disableInvalidQueryAllowedWarning() {
+        _invalidQueryAllowedWarning = false;
     }
 
-    public boolean isEmptyStringQueryAllowed() {
-        return _emptyStringQueryAllowed;
-    }
-
-    // -----------------------------------------------------
-    //                                      Overriding Query
-    //                                      ----------------
-    public void enableOverridingQuery() {
-        _overridingQueryAllowed = true;
-    }
-
-    public void disableOverridingQuery() {
-        _overridingQueryAllowed = false;
-    }
-
-    public boolean isOverridingQueryAllowed() {
-        return _overridingQueryAllowed;
+    /** {@inheritDoc} */
+    public boolean isInvalidQueryAllowedWarning() {
+        return _invalidQueryAllowedWarning;
     }
 
     // ===================================================================================
@@ -3605,36 +3644,84 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    /** {@inheritDoc} */
     public HpCBPurpose getPurpose() {
         return _purpose;
     }
 
+    /** {@inheritDoc} */
     public void setPurpose(HpCBPurpose purpose) {
         _purpose = purpose;
     }
 
-    public boolean isLocked() {
+    // -----------------------------------------------------
+    //                                         Purpose Check
+    //                                         -------------
+    /** {@inheritDoc} */
+    public void enableOrScopeQueryPurposeCheckWarningOnly() {
+        _orScopeQueryPurposeCheckWarningOnly = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableOrScopeQueryPurposeCheckWarningOnly() {
+        _orScopeQueryPurposeCheckWarningOnly = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() {
+        return _orScopeQueryPurposeCheckWarningOnly;
+    }
+
+    // -----------------------------------------------------
+    //                                          Purpose Lock
+    //                                          ------------
+    /** {@inheritDoc} */
+    public boolean isLocked() { // geared with batd-timing-detect
+        // #for_now jflute wants to split this method but no change for calm (2023/07/18)
         return _thatsBadTimingDetectEffective && _locked;
     }
 
+    /** {@inheritDoc} */
     public void lock() {
         _locked = true;
     }
 
+    /** {@inheritDoc} */
     public void unlock() {
         _locked = false;
     }
 
-    public boolean isThatsBadTimingDetectAllowed() {
-        return _thatsBadTimingDetectEffective;
-    }
-
+    // -----------------------------------------------------
+    //                                    That's Bad Timming
+    //                                    ------------------
+    /** {@inheritDoc} */
     public void enableThatsBadTimingDetect() {
         _thatsBadTimingDetectEffective = true;
     }
 
+    /** {@inheritDoc} */
     public void disableThatsBadTimingDetect() {
         _thatsBadTimingDetectEffective = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isThatsBadTimingDetectAllowed() {
+        return _thatsBadTimingDetectEffective;
+    }
+
+    /** {@inheritDoc} */
+    public void enableThatsBadTimingWarningOnly() {
+        _thatsBadTimingWarningOnlyEffective = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableThatsBadTimingWarningOnly() {
+        _thatsBadTimingWarningOnlyEffective = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isThatsBadTimingWarningOnly() {
+        return _thatsBadTimingWarningOnlyEffective;
     }
 
     // [DBFlute-0.9.4]

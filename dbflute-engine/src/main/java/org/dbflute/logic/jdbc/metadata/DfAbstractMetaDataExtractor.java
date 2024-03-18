@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.Srl;
 
@@ -155,6 +157,17 @@ public abstract class DfAbstractMetaDataExtractor {
         return getDatabaseProperties().isRetryCaseInsensitiveIndex();
     }
 
+    // -----------------------------------------------------
+    //                                      Other Properties
+    //                                      ----------------
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
+    protected DfTypeMappingProperties getTypeMappingProperties() {
+        return getProperties().getTypeMappingProperties();
+    }
+    
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

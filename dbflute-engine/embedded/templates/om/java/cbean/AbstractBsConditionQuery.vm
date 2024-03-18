@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
     public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
-        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).orElse(null));
     }
 #end
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
@@ -578,7 +578,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
     public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
-        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).orElse(null));
     }
 #end
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
@@ -1438,7 +1438,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     @Override
-    protected org.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
+    protected org.dbflute.dbway.topic.ExtensionOperand xgetPostgreSQLMatchOperand() {
         return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
     }
 #end

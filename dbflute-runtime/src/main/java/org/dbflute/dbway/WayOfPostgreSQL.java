@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
+import org.dbflute.optional.OptionalThing;
 
 /**
  * The DB-way of PostgreSQL.
@@ -91,14 +95,35 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
     //                                                                Extension Definition
     //                                                                ====================
     public enum OperandOfLikeSearch implements ExtensionOperand {
-        BASIC("like"), CASE_INSENSITIVE("ilike"), FULL_TEXT_SEARCH("%%"), OLD_FULL_TEXT_SEARCH("@@");
+        /** normal */
+        BASIC("like")
+
+        /** like-search with ignoring case (like is case-sensitive on PostgreSQL) */
+        , CASE_INSENSITIVE("ilike")
+
+        /** MeCab+textsearch–ja */
+        , MECAB_TEXTSEARCH_JA_FULL_TEXT_SEARCH("@@") // since 1.2.7
+
+        // #for_now jflute other operands "&~", "&@~" are unsupported, consider when feedback (2023/07/20)
+        // because maybe I needs to study PGroonga more to adjust framework design for it
+        /** PGroonga as basic operand. */
+        , PGROONGA_BASIC_FULL_TEXT_SEARCH("&@") // since 1.2.7
+
+        // #hope jflute rename to concrete name or remove (2023/07/21)
+        /** new Ludia+Senna */
+        , FULL_TEXT_SEARCH("%%") // traditional but default to keep compatible
+
+        /** old Ludia+Senna */
+        ,OLD_FULL_TEXT_SEARCH("@@") // traditional and may be unused
+        ;
+
         private static final Map<String, OperandOfLikeSearch> _codeValueMap = new HashMap<String, OperandOfLikeSearch>();
         static {
             for (OperandOfLikeSearch value : values()) {
                 _codeValueMap.put(value.code().toLowerCase(), value);
             }
         }
-        private String _code;
+        private final String _code;
 
         private OperandOfLikeSearch(String code) {
             _code = code;
@@ -108,11 +133,27 @@ public class WayOfPostgreSQL implements DBWay, Serializable {
             return _code;
         }
 
-        public static OperandOfLikeSearch codeOf(Object code) {
+        public static OptionalThing<OperandOfLikeSearch> of(Object code) {
             if (code == null) {
-                return null;
+                return OptionalThing.ofNullable(null, () -> {
+                    throw new IllegalArgumentException("The argument 'code' should not be null.");
+                });
             }
-            return _codeValueMap.get(code.toString().toLowerCase());
+            if (code instanceof OperandOfLikeSearch) {
+                return OptionalThing.of((OperandOfLikeSearch) code);
+            }
+            if (code instanceof OptionalThing<?>) {
+                return of(((OptionalThing<?>) code).orElse(null));
+            }
+            final OperandOfLikeSearch operand = _codeValueMap.get(code.toString().toLowerCase());
+            return OptionalThing.ofNullable(operand, () -> {
+                throw new IllegalStateException("Not found the operand by the code: " + code);
+            });
+        }
+
+        @Deprecated
+        public static OperandOfLikeSearch codeOf(Object code) {
+            return of(code).orElse(null);
         }
 
         public String operand() {

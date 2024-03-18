@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,14 +51,14 @@ public interface Classification {
 
     /**
      * Is the classification in the group?
-     * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns false)
+     * @param groupName The string of group name, which is case-insensitive. (NullAllowed: if null, returns false)
      * @return The determination, true or false. (true: this classification is in the group)
      */
     boolean inGroup(String groupName);
 
     /**
      * Get the map of sub items that are your original attributes.
-     * @return The read-only map of sub-items. (NotNull, EmptyAllowed)
+     * @return The read-only map of sub-items, whose key is case-sensitive. (NotNull, EmptyAllowed)
      */
     Map<String, Object> subItemMap();
 

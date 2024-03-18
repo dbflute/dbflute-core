@@ -46,6 +46,8 @@ if "%FIRST_ARG%"=="0" (
   set FIRST_ARG=sql2entity
 ) else if "%FIRST_ARG%"=="25" (
   set FIRST_ARG=outside-sql-test
+) else if "%FIRST_ARG%"=="31" (
+  set FIRST_ARG=sai
 ) else if "%FIRST_ARG%"=="88" (
   set FIRST_ARG=intro
 ) else if "%FIRST_ARG%"=="94" (
@@ -150,6 +152,12 @@ if "%FIRST_ARG%"=="replace-schema" (
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-outside-sql-test.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 
+) else if "%FIRST_ARG%"=="sai" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the sai Download task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-sai-download.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
 ) else if "%FIRST_ARG%"=="intro" (
   echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
   echo ...Calling the DBFluteIntro task
@@ -163,13 +171,16 @@ if "%FIRST_ARG%"=="replace-schema" (
   call %DBFLUTE_HOME%\etc\cmd\_df-upgrade.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 
 ) else if "%FIRST_ARG%"=="help" (
-  echo  [DB Change] =^> after changing database, with replacing your database
-  echo    0 : replace-schema =^> drop tables and re-create schema (needs settings^)
-  echo    1 : renewal        =^> replace-schema and generate all (call 0-^>21-^>22-^>23-^>25-^>24^)
-  echo    7 : save-previous  =^> save previous DDLs for AlterCheck
-  echo    8 : alter-check    =^> check alter DDLs with previous and next DDLs
+  echo  [DB Task] =^> after changing database, with replacing your database
+  echo    0 : replace-schema    =^> drop tables and re-create schema (needs settings^)
+  echo    1 : renewal           =^> replace-schema and generate all (call 0-^>21-^>22-^>23-^>25-^>24^)
+  echo    4 : load-data-reverse =^> reverse data to excel for e.g. ReplaceSchema
+  echo    5 : schema-sync-check =^> check difference between two schemas
+  echo    7 : save-previous     =^> save previous DDLs for AlterCheck
+  echo    8 : alter-check       =^> check alter DDLs with previous and next DDLs
+  echo   13 : take-assert       =^> execute assertion SQL of TakeFinally
   echo:
-  echo  [Generate] =^> generate class files and documents by schema meta data
+  echo  [Generate Task] =^> generate class files and documents by schema meta data
   echo    2 : regenerate       =^> generate all (call 21-^>22-^>23-^>24-^>25^)
   echo   21 : jdbc             =^> get meta data from schema (before doc and generate^)
   echo   22 : doc              =^> generate documents e.g. SchemaHTML, HistoryHTML
@@ -177,14 +188,13 @@ if "%FIRST_ARG%"=="replace-schema" (
   echo   24 : sql2entity       =^> generate class files for OutsideSql
   echo   25 : outside-sql-test =^> check OutsideSql (execute SQLs, expect no error^)
   echo:
-  echo  [Utility] =^> various tasks
-  echo    4 : load-data-reverse =^> reverse data to excel for e.g. ReplaceSchema
-  echo    5 : schema-sync-check =^> check difference between two schemas
-  echo   11 : refresh           =^> request refresh (F5^) to IDE e.g. Eclipse
-  echo   12 : freegen           =^> generate something by free template
-  echo   13 : take-assert       =^> execute assertion SQL of TakeFinally
-  echo:
+  echo  [Utility Task]
+  echo   12 : freegen =^> generate something by free template
   echo   88 : intro   =^> boot DBFluteIntro that provides GUI control
+  echo:
+  echo  [Environment Task]
+  echo   11 : refresh =^> request refresh (F5^) to IDE e.g. Eclipse
+  echo   31 : sai     =^> download sai libraries to extlib for JavaScript
   echo   94 : upgrade =^> upgrade DBFlute module to new version (except runtime^)
   echo   97 : help    =^> show description of tasks
 

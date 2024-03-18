@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,11 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             info.setSequenceSchema(sequenceSchema);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
+
+            if (isOutOfTargetSequence(sequenceName)) {
+                continue;
+            }
+
             //final String minimumValue = recordMap.get("MINIMUM_VALUE");
             //info.setMinimumValue(minimumValue != null ? new BigDecimal(minimumValue) : null);
             //final String maximumValue = recordMap.get("MAXIMUM_VALUE");
@@ -101,5 +107,14 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         }
         // it allowed to exist unused sequences so it does not use catalog condition
         return "select * from INFORMATION_SCHEMA.SEQUENCES where SEQUENCE_SCHEMA in (" + schemaCondition + ")";
+    }
+
+    protected boolean isOutOfTargetSequence(String sequenceName) {
+        // H2 database has sequence name of random characters for identity column
+        //  e.g. PUBLIC.SYSTEM_SEQUENCE_64BC7B99_6ACA_463D_BB16_13E87C28AA63
+        // very noisy differences on git so you can remove it if you don't need sequence handling
+        // (basically unneeded because of used as default value in database) by jflute (2022/07/03)
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isSuppressSystemRandomSequence() && sequenceName.startsWith("SYSTEM_SEQUENCE_");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,26 +27,50 @@ public class BatchEntityAlreadyUpdatedException extends EntityAlreadyUpdatedExce
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Integer _batchUpdateCount;
+    // keep Integer for compatible, just in case (2023/07/09)
+    protected final Integer _batchUpdateCount; // actual updated records, keep name for compatible
+    protected final Integer _batchSize; // planed update records, no change by result, since 1.2.7
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    // rows are same as batchUpdateCount, make batch-only variables for easy-to-use
+    // (that's excuse, rows and batchUpdateCount was ambiguous...m(_ _)m)
     /**
-     * Constructor.
+     * Constructor without bean mask.
      * @param bean The instance of entity. (NotNull)
-     * @param rows The row count returned by update process. (basically zero)
-     * @param batchUpdateCount Batch update count(Total).
+     * @param rows The count of actually-updated rows, returned by update process. (basically zero when entity update)
+     * @param batchUpdateCount Actually-updated count in all rows, batch result total. (NotNull)
+     * @param batchSize Planed update records as batch, no change by result. (NotNull)
      */
-    public BatchEntityAlreadyUpdatedException(Object bean, int rows, Integer batchUpdateCount) {
-        super(bean, rows);
+    public BatchEntityAlreadyUpdatedException(Object bean, int rows, Integer batchUpdateCount, Integer batchSize) {
+        this(bean, rows, batchUpdateCount, batchSize, /*maskMan*/null);
+    }
+
+    // #needs_fix jflute rows means batchUpdateCount? (2023/07/09)
+    /**
+     * Constructor with bean mask.
+     * @param bean The instance of entity. (NotNull)
+     * @param rows The count of actually-updated rows, returned by update process. (basically zero when entity update)
+     * @param batchUpdateCount Actually-updated count in all rows, batch result total. (NotNull)
+     * @param batchSize Planed update records as batch, no change by result. (NotNull)
+     * @param maskMan The callback to mask the bean information on exception message. (NullAllowed: if null, show all)
+     */
+    public BatchEntityAlreadyUpdatedException(Object bean, int rows, Integer batchUpdateCount, Integer batchSize,
+            AlreadyUpdatedBeanMaskMan maskMan) { // DBFlute uses
+        super(bean, rows, maskMan);
         _batchUpdateCount = batchUpdateCount;
+        _batchSize = batchSize;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Integer getBatchUpdateCount() {
+    public Integer getBatchUpdateCount() { // not null
         return _batchUpdateCount;
+    }
+
+    public Integer getBatchSize() { // not null
+        return _batchSize;
     }
 }

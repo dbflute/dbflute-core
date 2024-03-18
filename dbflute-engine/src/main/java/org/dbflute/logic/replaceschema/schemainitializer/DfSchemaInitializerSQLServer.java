@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@ public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildProcedureSqlName(DfProcedureMeta procedureMeta) {
-        final String sqlName = removeSemicolonSuffixIfExists(super.buildProcedureSqlName(procedureMeta));
+    protected String buildDropProcedureSqlName(DfProcedureMeta procedureMeta) {
+        final String sqlName = removeSemicolonSuffixIfExists(super.buildDropProcedureSqlName(procedureMeta));
         if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
             return filterLocalDBDropProcedureSqlName(procedureMeta, sqlName);
         } else { // mainly here
@@ -75,7 +75,7 @@ public class DfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected String buildDropTableSqlName(DfTableMeta tableMeta) {
+    protected String buildTableSqlNameOnDropSql(DfTableMeta tableMeta) {
         final String tableSqlName = tableMeta.getTableSqlName();
         if (_databaseTypeFacadeProp.isSubTypeOnDatabaseSQLServerLocalDB()) {
             return filterLocalDBDropTableSqlName(tableMeta, tableSqlName);

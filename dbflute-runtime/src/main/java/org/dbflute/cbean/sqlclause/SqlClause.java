@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ public interface SqlClause {
     void changeAliasNameLimitSize(int aliasNameLimitSize);
 
     /**
-     * Disable select index.
+     * Disable select index. (select index is e.g. select MEMBER_NAME as c1)
      */
     void disableSelectIndex();
 
@@ -646,19 +646,19 @@ public interface SqlClause {
     //                                                                          ==========
     /**
      * Fetch first several rows only.
-     * @param fetchSize The size of fetching. (NotMinus)
+     * @param fetchSize The size of fetching. (NotMinus, NotZero)
      */
     void fetchFirst(int fetchSize);
 
     /**
-     * Fetch scope (skip first several rows, and fetch first rows).
+     * Fetch the scoped records only. (skip first several rows, and fetch first rows)
      * @param fetchStartIndex The index of fetch-start. 0 origin. (NotMinus)
      * @param fetchSize The size of fetching from start index. (NotMinus)
      */
     void fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page.
+     * Fetch the page records only.
      * <p>
      * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
@@ -669,32 +669,35 @@ public interface SqlClause {
     void fetchPage(int fetchPageNumber);
 
     /**
-     * Get fetch start index.
-     * @return Fetch start index.
+     * Get start index to fetch scoped records, different from paging offset. <br>
+     * Basically used by fetchScope().
+     * @return The start index to fetch. 0 origin (NotMinus)
      */
     int getFetchStartIndex();
 
     /**
-     * Get fetch size.
-     * @return Fetch size.
+     * Get the size to fetch page records, basically same as pageSize.
+     * @return The record size to fetch. (NotMinus)
      */
     int getFetchSize();
 
     /**
-     * Get fetch page number.
-     * @return Fetch page number.
+     * Get the page number to fetch page records, which means current page number.
+     * @return The page number to fetch. 1 origin. (NotMinus, NotZero)
      */
     int getFetchPageNumber();
 
     /**
-     * Get page start index.
-     * @return Page start index. 0 origin. (NotMinus)
+     * Get the start index of selected current page, as paging offset. <br>
+     * e.g. pageSize=4, pageNumber=3 then pageStartIndex=8
+     * @return The start index of the selected page. 0 origin. (NotMinus)
      */
     int getPageStartIndex();
 
     /**
-     * Get page end index.
-     * @return Page end index. 0 origin. (NotMinus)
+     * Get the end index of selected current page. <br>
+     * e.g. pageSize=4, pageNumber=3 then pageStartIndex=12
+     * @return The end index of the selected page. 0 origin. (NotMinus)
      */
     int getPageEndIndex();
 
@@ -1015,8 +1018,8 @@ public interface SqlClause {
     ColumnRealName getSpecifiedResolvedColumnRealNameAsOne();
 
     // ===================================================================================
-    //                                                                  Invalid Query Info
-    //                                                                  ==================
+    //                                                                       Invalid Query
+    //                                                                       =============
     // -----------------------------------------------------
     //                                     NullOrEmpty Query
     //                                     -----------------
@@ -1036,18 +1039,6 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isNullOrEmptyQueryChecked();
-
-    /**
-     * Get the list of invalid query. (basically for logging)
-     * @return The list of invalid query. (NotNull, ReadOnly)
-     */
-    List<HpInvalidQueryInfo> getInvalidQueryList();
-
-    /**
-     * Save the invalid query.
-     * @param invalidQueryInfo The information of invalid query. (NotNull)
-     */
-    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
 
     // -----------------------------------------------------
     //                                          Empty String
@@ -1086,6 +1077,44 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isOverridingQueryAllowed();
+
+    // -----------------------------------------------------
+    //                                   InvalidQuery Saving
+    //                                   -------------------
+    // actually only for nullOrEmpty query for now (2023/07/16)
+    /**
+     * Get the list of invalid query. (basically for logging)
+     * @return The list of invalid query. (NotNull, ReadOnly)
+     */
+    List<HpInvalidQueryInfo> getInvalidQueryList();
+
+    /**
+     * Save the invalid query.
+     * @param invalidQueryInfo The information of invalid query. (NotNull)
+     */
+    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
+
+    // -----------------------------------------------------
+    //                                  InvalidQuery Warning
+    //                                  --------------------
+    // since 1.2.7
+    // for various invalid-query e.g. nullOrEmpty-query, overriding-query (2023/07/16)
+    /**
+     * Enable warning log when invalid-query allowed. (default is disabled, means no logging)
+     */
+    void enableInvalidQueryAllowedWarning();
+
+    /**
+     * Disable warning log when invalid-query allowed.
+     */
+    void disableInvalidQueryAllowedWarning();
+
+    /**
+     * Does it show warning log when invalid-query allowed? <br>
+     * It contains nullOrEmpty-query, overriding-query, and so on...
+     * @return The determination, true or false.
+     */
+    boolean isInvalidQueryAllowedWarning();
 
     // [DBFlute-0.8.6]
     // ===================================================================================
@@ -1337,6 +1366,28 @@ public interface SqlClause {
      */
     void setPurpose(HpCBPurpose purpose);
 
+    // -----------------------------------------------------
+    //                                         Purpose Check
+    //                                         -------------
+    /**
+     * Enable "orScopeQuery purpose check" warning-only.
+     */
+    void enableOrScopeQueryPurposeCheckWarningOnly(); // since 1.2.7
+
+    /**
+     * Disable "orScopeQuery purpose check" warning-only. (default is disabled)
+     */
+    void disableOrScopeQueryPurposeCheckWarningOnly();
+
+    /**
+     * Is "orScopeQuery purpose check" warning-only?
+     * @return The determination, true or false.
+     */
+    boolean isOrScopeQueryPurposeCheckWarningOnly();
+
+    // -----------------------------------------------------
+    //                                          Purpose Lock
+    //                                          ------------
     /**
      * Is the clause object locked? e.g. true if in sub-query process and check allowed <br>
      * Java8 cannot use the same name as lambda argument with already existing name in the scope.
@@ -1353,7 +1404,7 @@ public interface SqlClause {
      *
      * @return The determination, true or false.
      */
-    boolean isLocked();
+    boolean isLocked(); // contains that's-bad-timing determination
 
     /**
      * Lock the clause object. <br>
@@ -1366,22 +1417,41 @@ public interface SqlClause {
      */
     void unlock();
 
+    // -----------------------------------------------------
+    //                                    That's Bad Timming
+    //                                    ------------------
     /**
-     * Enable "that's-bad-timing" detect.
+     * Enable "that's bad timing" detect.
      */
     void enableThatsBadTimingDetect();
 
     /**
-     * Disable "that's-bad-timing" detect for compatible. <br>
+     * Disable "that's bad timing" detect for compatible. <br>
      * If disabled, isLocked() always returns false.
      */
     void disableThatsBadTimingDetect();
 
     /**
-     * Does it allow "that's-bad-timing" detect?
+     * Does it detect "that's bad timing"?
      * @return The determination, true or false.
      */
-    boolean isThatsBadTimingDetectAllowed();
+    boolean isThatsBadTimingDetectAllowed(); // means "DetectEffective"
+
+    /**
+     * Enable "that's bad timing" warning-only.
+     */
+    void enableThatsBadTimingWarningOnly(); // since 1.2.7
+
+    /**
+     * Disable "that's bad timing" warning-only. (default is disabled)
+     */
+    void disableThatsBadTimingWarningOnly();
+
+    /**
+     * Is "that's bad timing" warning-only?
+     * @return The determination, true or false.
+     */
+    boolean isThatsBadTimingWarningOnly();
 
     // [DBFlute-0.9.4]
     // ===================================================================================

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.dbflute.infra.core;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.dbway.DBDef;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -52,5 +53,12 @@ public class DfDatabaseNameMappingTest extends RuntimeTestCase {
         final Map<String, Map<String, String>> databaseBaseInfo = config.analyze();
         assertNotNull(databaseBaseInfo);
         log("databaseBaseInfoTest=" + databaseBaseInfo);
+    }
+
+    public void test_findDBDef() {
+        final DfDatabaseNameMapping mapping = DfDatabaseNameMapping.getInstance();
+        assertEquals(DBDef.Oracle, mapping.findDBDef("oracle"));
+        assertEquals(DBDef.Unknown, mapping.findDBDef("none"));
+        assertEquals(DBDef.Unknown, mapping.findDBDef(null)); // treated as default
     }
 }

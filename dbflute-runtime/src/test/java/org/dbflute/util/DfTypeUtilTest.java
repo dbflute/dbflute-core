@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,15 +217,19 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toLocalDate_fromUtilDate_timeZone() {
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt2hour);
-        LocalDate localDate = toLocalDate(pureDate, gmt2hour);
-        assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt2localDate = toLocalDate(pureDate, gmt2hour);
+        assertEquals("2009-12-13", gmt2localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt0localDate = toLocalDate(pureDate, TimeZone.getTimeZone("GMT"));
+        assertEquals("2009-12-12", gmt0localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
     public void test_toLocalDate_fromUtilDate_gmt9hour() {
         TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt9hour);
-        LocalDate localDate = toLocalDate(pureDate, gmt9hour);
-        assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt9localDate = toLocalDate(pureDate, gmt9hour);
+        assertEquals("2009-12-13", gmt9localDate.format(DateTimeFormatter.ISO_DATE));
+        LocalDate gmt7localDate = toLocalDate(pureDate, TimeZone.getTimeZone("GMT+7"));
+        assertEquals("2009-12-12", gmt7localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
     public void test_toLocalDate_fromStringDate_basic() {
@@ -244,8 +248,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     public void test_toLocalDate_withTimeZone() {
-        TimeZone jstZone = TimeZone.getTimeZone("JST");
-        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+        Date gmtDate = toDate("2014/01/01", TimeZone.getTimeZone("GMT")); // 2014/01/01 00:00:00
+        assertEquals(LocalDate.of(2014, 01, 01), toLocalDate(gmtDate, TimeZone.getTimeZone("JST")));
     }
 
     public void test_toLocalDate_withTimeZoneLocale() {
@@ -404,8 +408,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     public void test_toLocalDateTime_withTimeZone() {
-        TimeZone jstZone = TimeZone.getTimeZone("JST");
-        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+        Date gmtDate = toDate("2014/01/01", TimeZone.getTimeZone("GMT")); // 2014/01/01 00:00:00
+        assertEquals(LocalDateTime.of(2014, 01, 01, 9, 0, 0), toLocalDateTime(gmtDate, TimeZone.getTimeZone("JST")));
     }
 
     public void test_toLocalDateTime_withTimeZoneLocale() {

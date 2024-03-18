@@ -82,7 +82,7 @@ you can clone the example project of DBFlute:
 
 1. git clone https://github.com/dbflute/dbflute-howto.git
 2. prepare database by *ReplaceSchema at DBFlute client directory 'dbflute_maihamadb'
-3. compile it by Java8, on e.g. Eclipse or IntelliJ or ... as Maven project
+3. compile it by Java8 (or over), on e.g. Eclipse or IntelliJ or ... as Maven project
 4. see HowToSelectTest.java  
 you can implement condition-bean as trial, and can execute it by JUnit
 
@@ -100,7 +100,7 @@ http://dbflute.seasar.org/ja/environment/setup/maven.html
 *for DBFlute Runtime
 ```xml
   <properties>
-    <dbflute.version>1.1.6</dbflute.version>
+    <dbflute.version>1.2.6</dbflute.version>
     ...
   </properties>
   ...
@@ -123,10 +123,13 @@ http://dbflute.seasar.org/ja/environment/setup/maven.html
       <version>1.1.0</version>
       <configuration>
           <clientProject>xxxdb</clientProject>
-          <packageBase>com.xxx.dbflute</packageBase>
+          <packageBase>xxx.yyy.dbflute</packageBase>
       </configuration>
   </plugin>
 ```
+
+or use DBFlute Intro:  
+https://dbflute.seasar.org/ja/manual/function/generator/intro/index.html
 
 # Information
 ## License

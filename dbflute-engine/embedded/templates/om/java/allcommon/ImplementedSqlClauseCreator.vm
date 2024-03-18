@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -159,6 +159,7 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         doSetupSqlClauseNullOrEmptyQuery(sqlClause);
         doSetupSqlClauseEmptyStringQuery(sqlClause);
         doSetupSqlClauseOverridingQuery(sqlClause);
+        doSetupSqlClauseInvalidQueryAllowedWarning(sqlClause);
         doSetupSqlClauseColumnNullObject(sqlClause);
         doSetupSqlClauseColumnNullObjectGearedToSpecify(sqlClause);
         doSetupSqlClauseTruncateConditionDatetimePrecision(sqlClause);
@@ -174,6 +175,12 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
     protected void doSetupSqlClauseThatsBadTimingDetect(SqlClause sqlClause) {
         if (isThatsBadTimingDetect()) {
             sqlClause.enableThatsBadTimingDetect();
+        }
+        if (isThatsBadTimingWarningOnly()) {
+            sqlClause.enableThatsBadTimingWarningOnly();
+        }
+        if (isOrScopeQueryPurposeCheckWarningOnly()) {
+            sqlClause.enableOrScopeQueryPurposeCheckWarningOnly();
         }
     }
 
@@ -196,6 +203,14 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
             sqlClause.enableOverridingQuery();
         } else { // default for 1.1
             sqlClause.disableOverridingQuery();
+        }
+    }
+
+    protected void doSetupSqlClauseInvalidQueryAllowedWarning(SqlClause sqlClause) { // since 1.2.7
+        if (isInvalidQueryAllowedWarning()) {
+            sqlClause.enableInvalidQueryAllowedWarning();
+        } else {
+            sqlClause.disableInvalidQueryAllowedWarning();
         }
     }
 
@@ -244,6 +259,14 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         return ${glDBFluteConfig}.getInstance().isThatsBadTimingDetect();
     }
 
+    protected boolean isThatsBadTimingWarningOnly() {
+        return ${glDBFluteConfig}.getInstance().isThatsBadTimingWarningOnly();
+    }
+
+    protected boolean isOrScopeQueryPurposeCheckWarningOnly() {
+        return ${glDBFluteConfig}.getInstance().isOrScopeQueryPurposeCheckWarningOnly();
+    }
+
     protected boolean isNullOrEmptyQueryAllowed() {
         return ${glDBFluteConfig}.getInstance().isNullOrEmptyQueryAllowed();
     }
@@ -254,6 +277,10 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected boolean isOverridingQueryAllowed() {
         return ${glDBFluteConfig}.getInstance().isOverridingQueryAllowed();
+    }
+
+    protected boolean isInvalidQueryAllowedWarning() {
+        return ${glDBFluteConfig}.getInstance().isInvalidQueryAllowedWarning();
     }
 
     protected boolean isColumnNullObjectAllowed() {

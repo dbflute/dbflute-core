@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ public class SQLExceptionResource {
 
     protected final List<String> _noticeList = new ArrayList<String>(2);
     protected final Map<String, List<Object>> _resourceMap = new LinkedHashMap<String, List<Object>>(4);
-    protected String _executedSql;
-    protected String _displaySql;
+    protected String _executedSql; // basically not null
+    protected String _displaySql; // null allowed if making failure
     protected boolean _uniqueConstraintHandling;
     protected boolean _displaySqlPartHandling;
 

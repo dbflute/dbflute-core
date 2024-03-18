@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
 import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.bhv.core.context.ResourceParameter;
+import org.dbflute.bhv.core.context.logmask.BehaviorLogMaskProvider;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.EntityAlreadyExistsException;
@@ -200,6 +202,9 @@ public class SQLExceptionHandler {
      * <p>
      * If you want to hide application data on exception message,
      * you should override and use executedSql instead of displaySql or set up nothing.
+     * (Or you can use mask interface)
+     * </p>
+     * <p>
      * But you should consider the following things:
      * </p>
      * <ul>
@@ -218,15 +223,19 @@ public class SQLExceptionHandler {
     protected void setupTargetSqlElement(ExceptionMessageBuilder br, SQLExceptionResource resource) {
         final String displaySql = resource.getDisplaySql();
         if (displaySql != null) {
-            doSetupTargetSqlElement(br, displaySql, resource.isDisplaySqlPartHandling());
+            final String messageSql; // not null
+            final SQLExceptionDisplaySqlMaskMan displaySqlMaskMan = findDisplaySqlMaskMan();
+            if (displaySqlMaskMan != null) {
+                final String masked = displaySqlMaskMan.mask(resource, displaySql); // null allowed
+                messageSql = masked != null ? masked : "null";
+            } else {
+                messageSql = displaySql;
+            }
+            doSetupTargetSqlElement(br, messageSql, resource.isDisplaySqlPartHandling());
         }
         // this is example to use executed SQL
         //final String executedSql = resource.getExecutedSql();
-        //if (executedSql != null) {
-        //    br.addItem("Executed SQL");
-        //    br.addElement(executedSql);
-        //    br.addElement("*NOT use displaySql for security");
-        //}
+        //doSetupTargetSqlElement(br, executedSql, resource.isDisplaySqlPartHandling());
     }
 
     // split for application mask requirement
@@ -241,6 +250,33 @@ public class SQLExceptionHandler {
             br.addItem("Display SQL");
             br.addElement(displaySql);
         }
+    }
+
+    protected SQLExceptionDisplaySqlMaskMan findDisplaySqlMaskMan() { // null allowed
+        SQLExceptionDisplaySqlMaskMan maskMan = null;
+        if (ResourceContext.isExistResourceContextOnThread()) { // basically true, just in case
+            final ResourceContext context = ResourceContext.getResourceContextOnThread();
+            final ResourceParameter parameter = context.getResourceParameter();
+            final BehaviorLogMaskProvider provider = parameter.getBehaviorLogMaskProvider();
+            if (provider != null) {
+                maskMan = provider.provideSQLExceptionDisplaySqlMaskMan(); // null allowed
+            }
+        }
+        return maskMan;
+    }
+
+    /**
+     * @author jflute
+     * @since 1.2.7
+     */
+    public static interface SQLExceptionDisplaySqlMaskMan {
+
+        /**
+         * @param resource The resource of SQLException handling containing e.g. executedSql, displaySql. (NotNull)
+         * @param displaySql The target SQL as displaySql. (NotNull)
+         * @return The masked string of the bean. (NullAllowed: if null, show "null")
+         */
+        String mask(SQLExceptionResource resource, String displaySql);
     }
 
     // ===================================================================================

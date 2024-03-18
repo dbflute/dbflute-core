@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,14 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgJavaScriptJsonEngine;
+import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgJavaScriptJsonEngine.ScriptEngineFound;
+import org.dbflute.logic.manage.freegen.table.json.engine.DfFrgVeloScriptEngine;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -85,6 +89,9 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                          Basic Info
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                      Traget Container
+    //                                      ----------------
     public boolean isTargetContainerSeasar() {
         return getBasicProperties().isTargetContainerSeasar();
     }
@@ -129,6 +136,16 @@ public class DfFreeGenManager {
 
     public String getLastaDocHtmlMarkFreeGenDocBody() {
         return getLastaFluteProperties().getLastaDocHtmlMarkFreeGenDocBody();
+    }
+
+    // ===================================================================================
+    //                                                                           Migration
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                       Jakarta Package
+    //                                       ---------------
+    public String getCurrentJakartaPackage() {
+        return getLittleAdjustmentProperties().getCurrentJakartaPackage();
     }
 
     // ===================================================================================
@@ -190,32 +207,35 @@ public class DfFreeGenManager {
     //                                                                       Script Helper
     //                                                                       =============
     // #hope switch to simple JSON interface for FreeGen frameworks (e.g. KVSFlute) by jflute (2020/12/31)
+    // #for_now jflute e.g. RemoteApiGen uses not only JSON but also JavaScript code so needed here (2021/08/31)
     public ScriptEngine createJavaScriptEngine() { // as public engine e.g. remote-api generate
         // should use Ant class loader to find 'sai' engine in 'extlib' directory
         // because default constructor of the manager uses only System class loader
         // (also DfFrgJavaScriptJsonEngine)
         final ScriptEngineManager manager = new ScriptEngineManager(getClass().getClassLoader());
-        ScriptEngine engine = manager.getEngineByName("sai");
-        if (engine == null) {
-            engine = manager.getEngineByName("JavaScript"); // original code until 1.2.3
-        }
+        final ScriptEngineFound engine = new DfFrgJavaScriptJsonEngine().findScriptEngine(manager);
         if (engine == null) {
             throwJsonScriptPublicEngineNotFoundException();
         }
-        return engine;
+        return new DfFrgVeloScriptEngine(engine.getFoundEngine());
     }
 
     protected void throwJsonScriptPublicEngineNotFoundException() {
+        // this message is from DfFrgJavaScriptJsonEngine
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the public engine of JSON script for FreeGen template.");
+        br.addNotice("Not found the public engine of JavaScript for FreeGen template.");
         br.addItem("Advice");
-        br.addElement("Nashorn (JavaScript engine) is removed since Java15.");
+        br.addElement("Your FreeGen request needs JavaScript engine.");
+        br.addElement("But Nashorn (JavaScript engine) is removed since Java15.");
         br.addElement("");
-        br.addElement("You can use 'sai' instead of Nashorn.");
-        br.addElement(" https://github.com/codelibs/sai");
+        br.addElement("So prepare 'sai' libraries in your 'extlib' directory.");
         br.addElement("");
-        br.addElement("Put the jar files (including dependencies)");
-        br.addElement("on 'extlib' directory of your DBFlute client.");
+        br.addElement("You can download automatically by DBFlute 'sai' task like this:");
+        br.addElement(" 1. execute manage.sh|bat");
+        br.addElement(" 2. select 31 (sai task)");
+        br.addElement("   => downloading sai libraries to 'extlib'");
+        br.addElement(" 3. retry your FreeGen task");
+        br.addElement("   => you can use JavaScript expression in FreeGen");
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
     }
@@ -233,6 +253,10 @@ public class DfFreeGenManager {
 
     protected DfAllClassCopyrightProperties getAllClassCopyrightProperties() {
         return getProperties().getAllClassCopyrightProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     protected DfLastaFluteProperties getLastaFluteProperties() {

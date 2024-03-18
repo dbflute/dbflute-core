@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.dbflute.cbean.exception;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +28,9 @@ import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.cbean.garnish.logger.InvalidQueryAllowedWLog;
+import org.dbflute.cbean.garnish.logger.OrScopeQueryPurposeWLog;
+import org.dbflute.cbean.garnish.logger.ThatsBadTimingWLog;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
@@ -72,10 +76,13 @@ import org.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.dbflute.exception.SpecifyThatsBadTimingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
+ * Having throwing-exception methods for condition-bean. <br>
+ * Also it contains warning methods.
  * @author jflute
  */
 public class ConditionBeanExceptionThrower implements Serializable {
@@ -86,11 +93,27 @@ public class ConditionBeanExceptionThrower implements Serializable {
     //                                                                       Set up Select
     //                                                                       =============
     public void throwSetupSelectIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String foreignPropertyName) {
+        throw createSetupSelectIllegalPurpose(purpose, baseCB, foreignPropertyName);
+    }
+
+    public void showSetupSelectIllegalPurposeWarning(HpCBPurpose purpose, ConditionBean baseCB, String foreignPropertyName) {
+        final SetupSelectIllegalPurposeException ex = createSetupSelectIllegalPurpose(purpose, baseCB, foreignPropertyName);
+        OrScopeQueryPurposeWLog.log(buildWarningOnlyRootMessage(), ex);
+    }
+
+    protected SetupSelectIllegalPurposeException createSetupSelectIllegalPurpose(HpCBPurpose purpose, ConditionBean baseCB,
+            String foreignPropertyName) {
+        final String msg = buildSetupSelectIllegalPurposeMessage(purpose, baseCB, foreignPropertyName);
+        return new SetupSelectIllegalPurposeException(msg);
+    }
+
+    protected String buildSetupSelectIllegalPurposeMessage(HpCBPurpose purpose, ConditionBean baseCB, String foreignPropertyName) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Bad location to call SetupSelect.");
         br.addItem("Advice");
         br.addElement("The condition-bean is not allowed to set up select.");
         br.addElement("Because this is for " + purpose + ".");
+        setupCBPurposeCheckHashtag(br);
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
         br.addElement("    cb.query().existsPurchase(purchaseCB -> {");
@@ -107,15 +130,33 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("(" + purpose + ")");
         br.addItem("Setup Relation");
         br.addElement(foreignPropertyName);
-        final String msg = br.buildExceptionMessage();
-        throw new SetupSelectIllegalPurposeException(msg);
+        return br.buildExceptionMessage();
+    }
+
+    // -----------------------------------------------------
+    //                                            Bad Timing
+    //                                            ----------
+    public void showSetupSelectThatsBadTimingWarning(ConditionBean lockedCB, String foreignPropertyName) {
+        final SetupSelectThatsBadTimingException ex = createSetupSelectThatsBadTimingException(lockedCB, foreignPropertyName);
+        ThatsBadTimingWLog.log(buildWarningOnlyRootMessage(), ex);
     }
 
     public void throwSetupSelectThatsBadTimingException(ConditionBean lockedCB, String foreignPropertyName) {
+        throw createSetupSelectThatsBadTimingException(lockedCB, foreignPropertyName);
+    }
+
+    protected SetupSelectThatsBadTimingException createSetupSelectThatsBadTimingException(ConditionBean lockedCB,
+            String foreignPropertyName) {
+        final String msg = buildSetupSelectThatsBadTimingMessage(lockedCB, foreignPropertyName);
+        return new SetupSelectThatsBadTimingException(msg);
+    }
+
+    protected String buildSetupSelectThatsBadTimingMessage(ConditionBean lockedCB, String foreignPropertyName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("That's bad timing for SetupSelect.");
         br.addItem("Advice");
         br.addElement("The condition-bean was locked in the timing.");
+        setupThatsBadTimingHashtag(br);
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    ListResultBean<Member> memberList = memberBhv.selectList(cb -> {");
@@ -136,10 +177,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("(" + lockedCB.getPurpose() + ")");
         br.addItem("Your SetupSelect");
         br.addElement(cbType.getSimpleName() + "#setupSelect_" + initCap(foreignPropertyName) + "()");
-        final String msg = br.buildExceptionMessage();
-        throw new SetupSelectThatsBadTimingException(msg);
+        return br.buildExceptionMessage();
     }
 
+    // -----------------------------------------------------
+    //                                           After Union
+    //                                           -----------
     // unused because it has been allowed
     //public void throwSetupSelectAfterUnionException(ConditionBean baseCB, String foreignPropertyName) {
     //    final ExceptionMessageBuilder br = createExceptionMessageBuilder();
@@ -176,12 +219,30 @@ public class ConditionBeanExceptionThrower implements Serializable {
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
+    // -----------------------------------------------------
+    //                                               Purpose
+    //                                               -------
     public void throwSpecifyIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
+        throw createSpecifyIllegalPurposeException(purpose, baseCB);
+    }
+
+    public void showSpecifyIllegalPurposeWarning(HpCBPurpose purpose, ConditionBean baseCB) {
+        final SpecifyIllegalPurposeException ex = createSpecifyIllegalPurposeException(purpose, baseCB);
+        OrScopeQueryPurposeWLog.log(buildWarningOnlyRootMessage(), ex);
+    }
+
+    protected SpecifyIllegalPurposeException createSpecifyIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
+        final String msg = buildSpecifyIllegalPurposeMessage(purpose, baseCB);
+        return new SpecifyIllegalPurposeException(msg);
+    }
+
+    protected String buildSpecifyIllegalPurposeMessage(HpCBPurpose purpose, ConditionBean baseCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call specify().");
         br.addItem("Advice");
         br.addElement("The condition-bean is not allowed to specify() there.");
         br.addElement("Because this is for " + purpose + ".");
+        setupCBPurposeCheckHashtag(br);
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
         br.addElement("    cb.query().existsPurchaseList(purchaseCB -> {");
@@ -199,15 +260,32 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
-        final String msg = br.buildExceptionMessage();
-        throw new SpecifyIllegalPurposeException(msg);
+        return br.buildExceptionMessage();
     }
 
+    // -----------------------------------------------------
+    //                                            Bad Timing
+    //                                            ----------
     public void throwSpecifyThatsBadTimingException(ConditionBean lockedCB) {
+        throw createSpecifyThatsBadTimingException(lockedCB);
+    }
+
+    public void showSpecifyThatsBadTimingWarning(ConditionBean lockedCB) {
+        final SpecifyThatsBadTimingException ex = createSpecifyThatsBadTimingException(lockedCB);
+        ThatsBadTimingWLog.log(buildWarningOnlyRootMessage(), ex);
+    }
+
+    protected SpecifyThatsBadTimingException createSpecifyThatsBadTimingException(ConditionBean lockedCB) {
+        final String msg = buildSpecifyThatsBadTimingMessage(lockedCB);
+        return new SpecifyThatsBadTimingException(msg);
+    }
+
+    protected String buildSpecifyThatsBadTimingMessage(ConditionBean lockedCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("That's bad timing for Specify.");
         br.addItem("Advice");
         br.addElement("The condition-bean was locked in the timing.");
+        setupThatsBadTimingHashtag(br);
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    cb.specify().derivedPurchase().max(purchaseCB -> {");
@@ -222,10 +300,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(lockedCB.getClass().getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
-        final String msg = br.buildExceptionMessage();
-        throw new SpecifyThatsBadTimingException(msg);
+        return br.buildExceptionMessage();
     }
 
+    // -----------------------------------------------------
+    //                                    Two-or-More Column
+    //                                    ------------------
     public void throwSpecifyColumnTwoOrMoreColumnException(HpCBPurpose purpose, ConditionBean baseCB, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("You specified two or more columns!");
@@ -256,6 +336,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyColumnTwoOrMoreColumnException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                       not SetupSelect
+    //                                       ---------------
     public void throwSpecifyColumnNotSetupSelectColumnException(ConditionBean baseCB, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Lonely specify().column... was called. (without SetupSelect)");
@@ -280,6 +363,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                  with DerivedReferrer
+    //                                  --------------------
     public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB, String columnName,
             String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -312,6 +398,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyColumnWithDerivedReferrerException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                     Already Specified
+    //                                     -----------------
     public void throwSpecifyColumnAlreadySpecifiedEveryColumnException(String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyColumn is specified after SpecifyEveryColumn.");
@@ -424,6 +513,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                          Relationship
+    //                                          ------------
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call specify() for relation.");
@@ -456,6 +548,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyRelationIllegalPurposeException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                      Derived Referrer
+    //                                      ----------------
     public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call (Specify)DerivedReferrer.");
@@ -792,6 +887,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
+    // -----------------------------------------------------
+    //                                       Illegal Purpose
+    //                                       ---------------
     public void throwQueryIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call query().");
@@ -827,11 +925,29 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new QueryIllegalPurposeException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                            Bad Timing
+    //                                            ----------
     public void throwQueryThatsBadTimingException(ConditionBean lockedCB) {
+        throw createQueryThatsBadTimingException(lockedCB);
+    }
+
+    public void showQueryThatsBadTimingWarning(ConditionBean lockedCB) {
+        final QueryThatsBadTimingException ex = createQueryThatsBadTimingException(lockedCB);
+        ThatsBadTimingWLog.log(buildWarningOnlyRootMessage(), ex);
+    }
+
+    protected QueryThatsBadTimingException createQueryThatsBadTimingException(ConditionBean lockedCB) {
+        final String msg = buildQueryThatsBadTimingMessage(lockedCB);
+        return new QueryThatsBadTimingException(msg);
+    }
+
+    protected String buildQueryThatsBadTimingMessage(ConditionBean lockedCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("That's bad timing for Query.");
         br.addItem("Advice");
         br.addElement("The condition-bean was locked in the timing.");
+        setupThatsBadTimingHashtag(br);
         br.addElement("For example:");
         br.addElement("(x):");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
@@ -846,10 +962,12 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addItem("Locked ConditionBean");
         br.addElement(lockedCB.getClass().getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
-        final String msg = br.buildExceptionMessage();
-        throw new QueryThatsBadTimingException(msg);
+        return br.buildExceptionMessage();
     }
 
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
     public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Already registered the query. (cannot override it)");
@@ -883,6 +1001,19 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new QueryAlreadyRegisteredException(msg);
     }
 
+    public void showOverridingQueryAllowedWarning(ConditionBean baseCB, ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) { // since 1.2.7
+        // unfortunately we cannot get previous value (overridden value)
+        // beacause already overridden here so new value only for now
+        final String hashtag = "#invalid_query #overriding_query";
+        final String cbExp = DfTypeUtil.toClassTitle(baseCB) + " (for " + baseCB.getPurpose() + ")";
+        final String queryExp = "column=" + columnDbName + ", conditionKey=" + key + ", newValue=" + value;
+        InvalidQueryAllowedWLog.log("The " + hashtag + " occurred at the condition-bean: " + cbExp + ": " + queryExp);
+    }
+
+    // -----------------------------------------------------
+    //                                         Invalid Query
+    //                                         -------------
     public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Registered the invalid query. (null or empty)");
@@ -906,6 +1037,20 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new InvalidQueryRegisteredException(msg);
     }
 
+    // you can define warning methods in this class by jflute (2023/07/16)
+    public void showNullOrEmptyQueryAllowedWarning(ConditionBean baseCB, HpInvalidQueryInfo... invalidQueryInfoAry) { // since 1.2.7
+        final String hashtag = "#invalid_query #nullOrEmpty_query";
+        final String cbExp = DfTypeUtil.toClassTitle(baseCB) + " (for " + baseCB.getPurpose() + ")";
+        final List<String> queryExpList = DfCollectionUtil.newArrayList();
+        for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
+            queryExpList.add(invalidQueryInfo.buildDisplay());
+        }
+        InvalidQueryAllowedWLog.log("The " + hashtag + " occurred at the condition-bean: " + cbExp + ": query=" + queryExpList);
+    }
+
+    // -----------------------------------------------------
+    //                                            LikeSearch
+    //                                            ----------
     public void throwLikeSearchOptionNotFoundException(String colName, String value, DBMeta dbmeta) {
         final String capPropName = initCap(dbmeta.findColumnInfo(colName).getPropertyName());
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -919,12 +1064,31 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new RequiredOptionNotFoundException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                               OrderBy
+    //                                               -------
     public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName, String columnName) {
+        throw createOrderByIllegalPurposeException(purpose, baseCB, tableDbName, columnName);
+    }
+
+    public void showOrderByIllegalPurposeWarning(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName, String columnName) {
+        final OrderByIllegalPurposeException ex = createOrderByIllegalPurposeException(purpose, baseCB, tableDbName, columnName);
+        OrScopeQueryPurposeWLog.log(buildWarningOnlyRootMessage(), ex);
+    }
+
+    protected OrderByIllegalPurposeException createOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
+            String tableDbName, String columnName) {
+        final String msg = buildOrderByIllegalPurposeMessage(purpose, baseCB, tableDbName, columnName);
+        return new OrderByIllegalPurposeException(msg);
+    }
+
+    protected String buildOrderByIllegalPurposeMessage(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call order-by.");
         br.addItem("Advice");
         br.addElement("The condition-bean is not allowed to order.");
         br.addElement("Because this is for " + purpose + ".");
+        setupCBPurposeCheckHashtag(br);
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
         br.addElement("    cb.query().existsPurchase(purchaseCB -> {");
@@ -943,8 +1107,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Order-By Column");
         br.addElement(tableDbName + "." + columnName);
-        final String msg = br.buildExceptionMessage();
-        throw new OrderByIllegalPurposeException(msg);
+        return br.buildExceptionMessage();
     }
 
     // ===================================================================================
@@ -1269,10 +1432,25 @@ public class ConditionBeanExceptionThrower implements Serializable {
     //                                                                              Option
     //                                                                              ======
     public void throwOptionThatsBadTimingException(ConditionBean lockedCB, String optionName) {
+        throw createOptionThatsBadTimingException(lockedCB, optionName);
+    }
+
+    public void showOptionThatsBadTimingWarning(ConditionBean lockedCB, String optionName) {
+        final OptionThatsBadTimingException ex = createOptionThatsBadTimingException(lockedCB, optionName);
+        ThatsBadTimingWLog.log(buildWarningOnlyRootMessage(), ex);
+    }
+
+    protected OptionThatsBadTimingException createOptionThatsBadTimingException(ConditionBean lockedCB, String optionName) {
+        final String msg = buildOptionThatsBadTimingMessage(lockedCB, optionName);
+        return new OptionThatsBadTimingException(msg);
+    }
+
+    protected String buildOptionThatsBadTimingMessage(ConditionBean lockedCB, String optionName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("That's bad timing for Option.");
         br.addItem("Advice");
         br.addElement("The condition-bean was locked in the timing.");
+        setupThatsBadTimingHashtag(br);
         br.addElement("For example:");
         br.addElement("(x):");
         br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
@@ -1294,8 +1472,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("(" + lockedCB.getPurpose() + ")");
         br.addItem("Called Option");
         br.addElement(optionName);
-        final String msg = br.buildExceptionMessage();
-        throw new OptionThatsBadTimingException(msg);
+        return br.buildExceptionMessage();
     }
 
     // ===================================================================================
@@ -1326,6 +1503,21 @@ public class ConditionBeanExceptionThrower implements Serializable {
         }
         final String msg = br.buildExceptionMessage();
         throw new RequiredSpecifyColumnNotFoundException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected String buildWarningOnlyRootMessage() {
+        return "Treated as warning only. See the exception message.";
+    }
+
+    protected void setupThatsBadTimingHashtag(ExceptionMessageBuilder br) {
+        br.addElement(" #thats_badTiming");
+    }
+
+    protected void setupCBPurposeCheckHashtag(final ExceptionMessageBuilder br) {
+        br.addElement(" #cb_purpose_check");
     }
 
     // ===================================================================================

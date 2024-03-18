@@ -14,14 +14,13 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
-
-import javax.sql.DataSource;
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Factory;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import ${jakartaPackage}.inject.Inject;
+import ${jakartaPackage}.inject.Named;
+import ${jakartaPackage}.inject.Singleton;
 import javax.sql.DataSource;
 
 import org.dbflute.bhv.core.BehaviorCommandInvoker;

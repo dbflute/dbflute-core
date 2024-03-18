@@ -1,8 +1,9 @@
 ${manager.allClassCopyright}package ${request.package}.allcommon;
 
+import org.apache.lucene.search.TotalHits;
 import org.dbflute.cbean.result.PagingResultBean;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.search.aggregations.Aggregations;
+import org.opensearch.action.search.SearchRequestBuilder;
+import org.opensearch.search.aggregations.Aggregations;
 
 /**
  * @param <ENTITY> The type of entity.
@@ -16,6 +17,7 @@ public class EsPagingResultBean<ENTITY> extends PagingResultBean<ENTITY> {
     private int totalShards;
     private int successfulShards;
     private int failedShards;
+    private TotalHits totalHits;
     private Aggregations aggregations;
 
     private SearchRequestBuilder builder;
@@ -68,5 +70,12 @@ public class EsPagingResultBean<ENTITY> extends PagingResultBean<ENTITY> {
         this.aggregations = aggregations;
     }
 
+    public TotalHits getTotalHits() {
+        return totalHits;
+    }
+
+    public void setTotalHits(TotalHits totalHits) {
+        this.totalHits = totalHits;
+    }
 }
 

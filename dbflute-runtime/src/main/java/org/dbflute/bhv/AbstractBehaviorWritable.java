@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.QueryInsertSetupper;
 import org.dbflute.bhv.writable.UpdateOption;
+import org.dbflute.bhv.writable.WritableOption;
 import org.dbflute.bhv.writable.WritableOptionCall;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.scoping.SpecifyQuery;
@@ -122,6 +123,10 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         final InsertOption<CB> op = newInsertOption();
         opCall.callback(op);
         return op;
+    }
+
+    protected InsertOption<CB> createPlainInsertOption() { // for e.g. default use
+        return newInsertOption();
     }
 
     protected InsertOption<CB> newInsertOption() {
@@ -245,6 +250,10 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return op;
     }
 
+    protected UpdateOption<CB> createPlainUpdateOption() { // for e.g. default use
+        return newUpdateOption();
+    }
+
     protected UpdateOption<CB> newUpdateOption() {
         return new UpdateOption<CB>();
     }
@@ -307,24 +316,47 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                      ----------------
     protected void doInsertOrUpdate(ENTITY entity, InsertOption<CB> insertOption, UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
+        insertOption = filterInsertOrUpdateInsertOption(insertOption);
+        updateOption = filterInsertOrUpdateUpdateOption(updateOption);
         helpInsertOrUpdateInternally(entity, insertOption, updateOption);
     }
 
     protected void doInsertOrUpdateNonstrict(ENTITY entity, InsertOption<CB> insertOption, UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
+        insertOption = filterInsertOrUpdateInsertOption(insertOption);
+        updateOption = filterInsertOrUpdateUpdateOption(updateOption);
         helpInsertOrUpdateNonstrictInternally(entity, insertOption, updateOption);
     }
 
-    protected <RESULT extends ENTITY> void helpInsertOrUpdateInternally(RESULT entity, InsertOption<CB> insOption,
-            UpdateOption<CB> updOption) {
+    // #for_now jflute option may be null so use filtering way here, want to unify (2021/11/20)
+    protected InsertOption<CB> filterInsertOrUpdateInsertOption(InsertOption<CB> insertOption) {
+        return insertOption;
+    }
+
+    protected UpdateOption<CB> filterInsertOrUpdateUpdateOption(UpdateOption<CB> updateOption) {
+        if (isInsertOrUpdateCountPreCheck()) {
+            if (updateOption == null) { // the argument is null allowed
+                updateOption = newUpdateOption();
+            }
+            updateOption.precheckInsertOrUpdateCount();
+        }
+        return updateOption;
+    }
+
+    protected boolean isInsertOrUpdateCountPreCheck() {
+        return false; // might be overridden by generator option
+    }
+
+    protected <RESULT extends ENTITY> void helpInsertOrUpdateInternally(RESULT entity, InsertOption<CB> insertOption,
+            UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
-        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
-            doCreate(entity, insOption);
+        if (helpDetermineInsertOrUpdateDirectInsert(entity, insertOption, updateOption)) {
+            doCreate(entity, insertOption);
             return;
         }
         RuntimeException updateException = null;
         try {
-            doModify(entity, updOption);
+            doModify(entity, updateOption);
         } catch (EntityAlreadyUpdatedException e) { // already updated (or means not found)
             updateException = e;
         } catch (EntityAlreadyDeletedException e) { // means not found
@@ -348,32 +380,50 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             cb.acceptPrimaryKeyMap(asDBMeta().extractPrimaryKeyMap(entity));
         }
         if (readCount(cb) == 0) { // anyway if not found, insert
-            doCreate(entity, insOption);
+            doCreate(entity, insertOption);
         } else {
             throw updateException;
         }
     }
 
-    protected <RESULT extends ENTITY> void helpInsertOrUpdateNonstrictInternally(RESULT entity,
-            InsertOption<? extends ConditionBean> insOption, UpdateOption<? extends ConditionBean> updOption) {
+    protected <RESULT extends ENTITY> void helpInsertOrUpdateNonstrictInternally(RESULT entity, InsertOption<CB> insertOption,
+            UpdateOption<CB> updateOption) {
         assertEntityNotNull(entity);
-        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
-            doCreate(entity, insOption);
+        if (helpDetermineInsertOrUpdateDirectInsert(entity, insertOption, updateOption)) {
+            doCreate(entity, insertOption);
         } else {
             try {
-                doModifyNonstrict(entity, updOption);
+                doModifyNonstrict(entity, updateOption);
             } catch (EntityAlreadyDeletedException ignored) { // means not found
-                doCreate(entity, insOption);
+                doCreate(entity, insertOption);
             }
         }
     }
 
-    protected boolean helpDetermineInsertOrUpdateDirectInsert(Entity entity) {
+    protected boolean helpDetermineInsertOrUpdateDirectInsert(Entity entity, InsertOption<CB> insertOption, UpdateOption<CB> updateOption) {
         final Set<String> uniqueDrivenProperties = entity.myuniqueDrivenProperties();
-        if (uniqueDrivenProperties != null && !uniqueDrivenProperties.isEmpty()) {
-            return false;
+        if (uniqueDrivenProperties.isEmpty() && !entity.hasPrimaryKeyValue()) {
+            return true; // cannot update, may be identity PK so insert only
         }
-        return !entity.hasPrimaryKeyValue();
+        // no identity here
+        if (updateOption != null && updateOption.isInsertOrUpdateCountPreCheck()) {
+            // basically to avoid Otegaru Deadlock of MySQL RepeatableRead.
+            final boolean hasPK = entity.hasPrimaryKeyValue();
+            if (hasPK || !uniqueDrivenProperties.isEmpty()) { // basically true here but independent
+                final CB cb = newConditionBean();
+                if (hasPK) {
+                    cb.acceptPrimaryKeyMap(asDBMeta().extractPrimaryKeyMap(entity));
+                } else {
+                    for (String uq : uniqueDrivenProperties) {
+                        cb.localCQ().invokeQueryEqual(uq, asDBMeta().findColumnInfo(uq).read(entity));
+                    }
+                }
+                if (readCount(cb) == 0) {
+                    return true; // the PK or unique key is not found so insert only
+                }
+            }
+        }
+        return false; // update statement first 
     }
 
     // -----------------------------------------------------
@@ -532,10 +582,6 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return delegateBatchInsert(entityList, rlop);
     }
 
-    protected InsertOption<CB> createPlainInsertOption() {
-        return newInsertOption();
-    }
-
     protected <ELEMENT extends ENTITY> void prepareBatchInsertOption(List<ELEMENT> entityList, InsertOption<CB> option) { // might be overridden to set option
         if (isBatchInsertColumnModifiedPropertiesFragmentedDisallowed()) {
             option.xdisallowInsertColumnModifiedPropertiesFragmented(); // default is allowed so use 'disallow' as option
@@ -574,30 +620,16 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                          ------------
     protected int[] doBatchUpdate(List<ENTITY> entityList, UpdateOption<CB> option) {
         assertEntityListNotNull(entityList);
-        final UpdateOption<CB> rlop;
-        if (option != null) {
-            rlop = option;
-        } else {
-            rlop = createPlainUpdateOption();
-        }
+        final UpdateOption<CB> rlop = option != null ? option : createPlainUpdateOption();
         prepareBatchUpdateOption(entityList, rlop); // required
         return delegateBatchUpdate(entityList, rlop);
     }
 
     protected int[] doBatchUpdateNonstrict(List<ENTITY> entityList, UpdateOption<CB> option) {
         assertEntityListNotNull(entityList);
-        final UpdateOption<CB> rlop;
-        if (option != null) {
-            rlop = option;
-        } else {
-            rlop = createPlainUpdateOption();
-        }
+        final UpdateOption<CB> rlop = option != null ? option : createPlainUpdateOption();
         prepareBatchUpdateOption(entityList, rlop);
         return delegateBatchUpdateNonstrict(entityList, rlop);
-    }
-
-    protected UpdateOption<CB> createPlainUpdateOption() {
-        return new UpdateOption<CB>();
     }
 
     protected UpdateOption<CB> createSpecifiedUpdateOption(SpecifyQuery<CB> updateColumnSpec) {
@@ -1502,27 +1534,57 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             UpdateOption<? extends ConditionBean> option, boolean nonstrict) {
         assertObjectNotNull("entityList", entityList);
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
+        boolean hasPrimaryKeyValueAtLeastOne = false;
+        boolean hasUniqueByCallAtLeastOne = false;
         for (ELEMENT entity : entityList) {
             adjustEntityBeforeUpdate(entity, optOption);
             if (!nonstrict) {
                 assertEntityHasOptimisticLockValue(entity);
             }
+            if (entity.hasPrimaryKeyValue()) {
+                hasPrimaryKeyValueAtLeastOne = true;
+            }
+            if (!entity.myuniqueDrivenProperties().isEmpty()) { // uniqueBy() called
+                hasUniqueByCallAtLeastOne = true;
+            }
         }
+        assertEntityListBeforeBatchUniqueBy(entityList, option, hasPrimaryKeyValueAtLeastOne, hasUniqueByCallAtLeastOne);
     }
 
     protected <ELEMENT extends Entity> List<ELEMENT> adjustEntityListBeforeBatchDelete(List<ELEMENT> entityList,
             DeleteOption<? extends ConditionBean> option, boolean nonstrict) {
+        // #for_now jflute no recycle with update for careful release (2022/07/23)
         assertObjectNotNull("entityList", entityList);
         final OptionalThing<DeleteOption<? extends ConditionBean>> optOption = createOptionalDeleteOption(option);
+        boolean hasPrimaryKeyValueAtLeastOne = false;
+        boolean hasUniqueByCallAtLeastOne = false;
         final List<ELEMENT> filteredList = new ArrayList<ELEMENT>(entityList.size());
         for (ELEMENT entity : entityList) {
             adjustEntityBeforeDelete(entity, optOption);
             if (!nonstrict) {
                 assertEntityHasOptimisticLockValue(entity);
             }
+            if (entity.hasPrimaryKeyValue()) {
+                hasPrimaryKeyValueAtLeastOne = true;
+            }
+            if (!entity.myuniqueDrivenProperties().isEmpty()) { // uniqueBy() called
+                hasUniqueByCallAtLeastOne = true;
+            }
             filteredList.add(entity);
         }
-        return filteredList;
+        assertEntityListBeforeBatchUniqueBy(entityList, option, hasPrimaryKeyValueAtLeastOne, hasUniqueByCallAtLeastOne);
+        return filteredList; // #for_now existing filtering process looks unneeded by jflute (2022/07/23)
+    }
+
+    protected <ELEMENT extends Entity> void assertEntityListBeforeBatchUniqueBy(List<ELEMENT> entityList,
+            WritableOption<? extends ConditionBean> option, boolean hasPrimaryKeyValueAtLeastOne, boolean hasUniqueByCallAtLeastOne) {
+        // no check if all entities have PKs for compatible
+        // and also if part of entities have PK for careful release
+        if (!hasPrimaryKeyValueAtLeastOne // all records are "PK = null" (nonsense SQL)
+                && hasUniqueByCallAtLeastOne // unsupported uniqueBy() of BatchUpdate
+                && !asDBMeta().getUniqueInfoList().isEmpty()) { // maybe unneeded but just in case
+            createBhvExThrower().throwBatchUpdateUniqueByUnsupportedException(entityList, option);
+        }
     }
 
     // ===================================================================================

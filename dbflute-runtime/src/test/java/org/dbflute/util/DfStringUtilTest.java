@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,9 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("foo", trim("\n \n foo "));
         assertEquals("foo", trim(" \r\n foo "));
         assertEquals("foo", trim(" \r\n \r\n foo "));
+        assertEquals("", trim(""));
+        assertEquals("", trim(" "));
+        assertException(IllegalArgumentException.class, () -> trim(null));
     }
 
     public void test_trim_originalTrimTarget() {
@@ -128,6 +131,11 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("f\"o\"o", trim("\"f\"o\"o\"", "\""));
         assertEquals("fo\"\"o", trim("\"fo\"\"o\"", "\""));
         assertEquals("Long", trim(">>Long>>", ">"));
+        assertEquals("sea", trim("sea ", " "));
+        assertEquals("", trim("", " "));
+        assertEquals("sea", trim(" sea ", null)); // me too
+        assertEquals("sea", trim(" sea ", "")); // same as String@trim()
+        assertException(IllegalArgumentException.class, () -> trim(null, " "));
     }
 
     public void test_ltrim_default() {
@@ -352,7 +360,7 @@ public class DfStringUtilTest extends RuntimeTestCase {
     //                                                                               =====
     public void test_splitList_basic() {
         String ln = "\n";
-        List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
+        List<String> splitList = DfStringUtil.splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
@@ -363,9 +371,9 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(Arrays.asList("aaa"), splitList("aaa", "/"));
     }
 
-    public void test_splitList_empty() {
+    public void test_splitList_emptyStr() {
         String ln = "\n";
-        List<String> splitList = splitList("", ln);
+        List<String> splitList = DfStringUtil.splitList("", ln);
         assertHasOnlyOneElement(splitList);
         assertEquals("", splitList.get(0));
     }
@@ -378,9 +386,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(" ccc", splitList.get(2));
     }
 
+    public void test_splitList_illegal() {
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitList("s e a", null));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitList("s e a", ""));
+        assertEquals(Arrays.asList("s", "e", "a"), splitList("s e a", " "));
+    }
+
     public void test_splitListTrimmed_trim() {
         String ln = "\n";
-        List<String> splitList = splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
+        List<String> splitList = DfStringUtil.splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
@@ -388,9 +402,25 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(Arrays.asList("aaa", "bbb", "ccc"), splitListTrimmed(" aaa/ bbb/ ccc ", "/"));
     }
 
+    public void test_splitListTrimmed_illegal() {
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitListTrimmed("s e a", null));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.splitListTrimmed("s e a", ""));
+        assertEquals(Arrays.asList("s", "e", "a"), splitListTrimmed("s e a", " "));
+        assertEquals(Arrays.asList("s", "e", "a"), splitListTrimmed("s \ne \ta\n", " "));
+    }
+
     // ===================================================================================
     //                                                                             Replace
     //                                                                             =======
+    public void test_replace_basic() {
+        assertEquals("obar", DfStringUtil.replace("foobar", "foo", "o"));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace(null, "foo", "bar"));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace("foobar", null, "o"));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace("foobar", "foo", null));
+        assertException(IllegalArgumentException.class, () -> DfStringUtil.replace("foobar", "", "o"));
+        assertEquals("fbar", DfStringUtil.replace("foobar", "o", ""));
+    }
+
     public void test_replaceScopeContent_basic() {
         // ## Arrange ##
         String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
@@ -400,6 +430,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
 
         // ## Assert ##
         assertEquals("/*jflute*/foo/*bar*/bar/*jflutebarbaz*/", actual);
+    }
+
+    public void test_replaceScopeContent_empty() {
+        // ## Arrange ##
+        String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
+
+        // ## Act ##
+        // ## Assert ##
+        assertException(IllegalArgumentException.class, () -> replaceScopeContent(str, "", "jflute", "/*", "*/"));
     }
 
     public void test_replaceInterspaceContent_basic() {
@@ -943,6 +982,9 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(2, count("foo.bar.baz", "."));
         assertEquals(4, count(".foo.bar.baz.", "."));
         assertEquals(1, count("fooo.bar", "oo"));
+        assertEquals(2, count("fooo .ba r", " "));
+        assertException(IllegalArgumentException.class, () -> count("fooo.bar", null));
+        assertException(IllegalArgumentException.class, () -> count("fooo.bar", ""));
     }
 
     public void test_countIgnoreCase_basic() {
@@ -1020,6 +1062,10 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("foo,,qux", connectByDelimiter(newArrayList("foo", "", "qux"), ","));
         assertEquals("foo,null,qux", connectByDelimiter(newArrayList("foo", null, "qux"), ","));
         assertEquals("", connectByDelimiter(new ArrayList<String>(), ","));
+
+        // should be illegal argument but keep compatible so treat it as "null"
+        assertEquals("foonullbar", connectByDelimiter(newArrayList("foo", "bar"), null));
+        assertEquals("foo,null,bar", connectByDelimiter(newArrayList("foo", null, "bar"), ","));
     }
 
     public void test_connectByDelimiterQuoted_basic() {
@@ -1030,6 +1076,14 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("'foo','','qux'", connectByDelimiterQuoted(newArrayList("foo", "", "qux"), ",", "'"));
         assertEquals("'foo','null','qux'", connectByDelimiterQuoted(newArrayList("foo", null, "qux"), ",", "'"));
         assertEquals("", connectByDelimiterQuoted(new ArrayList<String>(), ",", "'"));
+
+        // should be illegal argument but keep compatible so treat it as "null"
+        assertEquals("'foo'null'bar'", connectByDelimiterQuoted(newArrayList("foo", "bar"), null, "'"));
+        assertEquals("'foo','null','bar'", connectByDelimiterQuoted(newArrayList("foo", null, "bar"), ",", "'"));
+
+        // if null/empty quoation
+        assertException(IllegalArgumentException.class, () -> connectByDelimiterQuoted(newArrayList("foo", "bar"), ",", null));
+        assertEquals("foo,bar", connectByDelimiterQuoted(newArrayList("foo", "bar"), ",", ""));
     }
 
     public void test_connectPrefix_basic() {
@@ -1556,6 +1610,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FooName", camelize("foo__name"));
         assertEquals("FooName", camelize("FOO _ NAME"));
         assertEquals("FooNa me", camelize("FOO _ NA ME"));
+
+        // #for_now jflute camel conversion for front and rear delimiters, unexpected pattern, cannot decamelize after (2022/05/02)
+        assertEquals("FooName", camelize("_FOO_NAME_"));
+        assertEquals("FooName", camelize("_FOO_NAME"));
+        assertEquals("FooName", camelize("FOO_NAME_"));
+
+        // illegal
+        assertException(IllegalArgumentException.class, () -> camelize(null));
+        assertEquals("", camelize(""));
     }
 
     public void test_camelize_delimiters() {
@@ -1603,6 +1666,15 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO_NAME", decamelize("foo_name"));
         assertEquals("FOO_NAME_BAR", decamelize("FOO_NameBar"));
         assertEquals("FOO_NAME_BAR", decamelize("foo_NameBar"));
+
+        // #for_now jflute camel conversion for front and rear delimiters, unexpected pattern, cannot camelize after (2022/05/02)
+        assertEquals("FOO_NAME_", decamelize("_FooName_"));
+        assertEquals("FOO_NAME", decamelize("_FooName"));
+        assertEquals("FOO_NAME_", decamelize("FooName_"));
+
+        // illegal
+        assertException(IllegalArgumentException.class, () -> decamelize(null));
+        assertEquals("", decamelize(""));
     }
 
     public void test_decamelize_delimiter() {
@@ -1611,6 +1683,10 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals("FOO@BAR@NAME", decamelize("fooBarName", "@"));
         assertEquals("F", decamelize("f", "_"));
         assertEquals("F*O*O_*NAME*BAR", decamelize("FOO_NameBar", "*")); // before FOO_*NAME*BAR
+        assertEquals("FOO BAR NAME", decamelize("foo Bar Name", " "));
+
+        assertException(IllegalArgumentException.class, () -> decamelize("sea", null));
+        assertException(IllegalArgumentException.class, () -> decamelize("sea", ""));
     }
 
     // ===================================================================================
@@ -1630,6 +1706,14 @@ public class DfStringUtilTest extends RuntimeTestCase {
 
         // ## Assert ##
         assertEquals("aaaa\nbbbb\n--\ncccc", actual);
+    }
+
+    public void test_removeEmptyLine_illegal() {
+        assertException(IllegalArgumentException.class, () -> removeEmptyLine(null));
+        assertEquals("", removeEmptyLine(""));
+        assertEquals(" ", removeEmptyLine(" "));
+        assertEquals("", removeEmptyLine(" \n  \n"));
+        assertEquals(" se\na", removeEmptyLine(" se\n  \na"));
     }
 
     public void test_removeBlockComment_basic() {
@@ -1652,6 +1736,12 @@ public class DfStringUtilTest extends RuntimeTestCase {
 
         // ## Assert ##
         assertEquals("barbaz", actual);
+    }
+
+    public void test_removeBlockComment_illegal() {
+        assertException(IllegalArgumentException.class, () -> removeEmptyLine(null));
+        assertEquals("", removeEmptyLine(""));
+        assertEquals(" ", removeEmptyLine(" "));
     }
 
     public void test_removeLineComment_basic() throws Exception {

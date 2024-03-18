@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ public class DfClsTopLiteralArranger {
     //                                        Process Method
     //                                        --------------
     public void arrangeClassificationTopFromLiteral(DfClassificationTop classificationTop, Map<?, ?> elementMap) {
+        // #thinking jflute while analyzing literal, we don't know table or implict classification (2023/08/17)
+        // so you cannot determine e.g. isCheckImplicitSet correctly (but small problem so keep it for now)
         classificationTop.acceptBasicItem(elementMap);
         classificationTop.setCheckClassificationCode(isElementMapCheckClassificationCode(elementMap));
         classificationTop.setUndefinedHandlingType(getElementMapUndefinedHandlingType(elementMap));
@@ -76,6 +78,7 @@ public class DfClsTopLiteralArranger {
             return checked; // e.g. explicitly undefinedHandlingType=[something]
         }
         if (hasElementMapCheckImplicitSetProperty(elementMap) && !isElementMapCheckImplicitSet(elementMap)) {
+            // #for_now jflute isCheckImplicitSet, no determination whether table classification or not (2023/08/17)
             return false; // explicitly isCheckImplicitSet=false
         }
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
@@ -100,6 +103,8 @@ public class DfClsTopLiteralArranger {
     @SuppressWarnings("unchecked")
     protected ClassificationUndefinedHandlingType getElementMapUndefinedHandlingType(Map<?, ?> elementMap) {
         if (isElementMapCheckImplicitSet(elementMap)) {
+            // #for_now jflute isCheckImplicitSet, no determination whether table classification or not (2023/08/17)
+            // so here even if isCheckImplicitSet=true in table classification
             return ClassificationUndefinedHandlingType.EXCEPTION;
         }
         final String key = DfClassificationTop.KEY_UNDEFINED_HANDLING_TYPE;
@@ -107,14 +112,15 @@ public class DfClsTopLiteralArranger {
         final ClassificationUndefinedHandlingType defaultType = prop.getClassificationUndefinedHandlingType();
         final String defaultValue = defaultType.code();
         final String code = getProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
-        final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
-        if (handlingType == null) {
-            throwUnknownClassificationUndefinedCodeHandlingTypeException(code);
-        }
+        final ClassificationUndefinedHandlingType handlingType =
+                ClassificationUndefinedHandlingType.of(code).orElseTranslatingThrow(cause -> {
+                    throwUnknownClassificationUndefinedCodeHandlingTypeException(code, cause);
+                    return null; // unreachable
+                });
         return handlingType;
     }
 
-    protected void throwUnknownClassificationUndefinedCodeHandlingTypeException(String code) {
+    protected void throwUnknownClassificationUndefinedCodeHandlingTypeException(String code, Throwable cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown handling type of classification undefined code.");
         br.addItem("Advice");
@@ -136,7 +142,7 @@ public class DfClsTopLiteralArranger {
         br.addItem("Specified Unknown Type");
         br.addElement(code);
         final String msg = br.buildExceptionMessage();
-        throw new DfIllegalPropertySettingException(msg);
+        throw new DfIllegalPropertySettingException(msg, cause);
     }
 
     // user closet, old style
@@ -149,6 +155,7 @@ public class DfClsTopLiteralArranger {
     @SuppressWarnings("unchecked")
     protected boolean isElementMapCheckImplicitSet(Map<?, ?> elementMap) { // has been existed since old
         // table classification determination is set at DfClassificationTop
+        // #hope jflute isCheckImplicitSet, should determine table classification here (2023/08/17)
         final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
         return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
     }

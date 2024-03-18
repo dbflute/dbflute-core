@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,19 @@ public class DfClsTopSisterCodeHandler {
     //                                                                    ================
     public boolean hasSisterCode() {
         for (DfClassificationElement element : _elementList) {
-            final String[] sisters = element.getSisters();
-            if (sisters != null && sisters.length > 0) {
+            if (element.hasSiserCode()) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasSisterEmpty() {
+        if (hasSisterCode()) {
+            for (DfClassificationElement element : _elementList) {
+                if (!element.hasSiserCode()) {
+                    return true;
+                }
             }
         }
         return false;

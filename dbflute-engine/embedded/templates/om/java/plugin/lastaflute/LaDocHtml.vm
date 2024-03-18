@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -261,6 +261,8 @@ to ${app.appName}
 #if ($optionMap.namedclsList.size() > 0)
     | <a href="#lastadoc_namedcls">to namedcls</a>
 #end
+## for injecting your own document link (replace it at your process)
+## for example, RemoteApiGen actually uses this mark
 $manager.getLastaDocHtmlMarkFreeGenDocNaviLink()
 </p>
 </div>
@@ -279,6 +281,8 @@ $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "app
 $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $namedclsMap)
 #end
 #end
+## for injecting your own document body (replace it at your process)
+## for example, RemoteApiGen actually uses this mark
 $manager.getLastaDocHtmlMarkFreeGenDocBody()
 </body>
 </html>

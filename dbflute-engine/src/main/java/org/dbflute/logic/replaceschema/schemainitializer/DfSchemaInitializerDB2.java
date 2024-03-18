@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
         }
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select SEQNAME as ").append(sequenceColumnName).append(" from SYSCAT.SEQUENCES");

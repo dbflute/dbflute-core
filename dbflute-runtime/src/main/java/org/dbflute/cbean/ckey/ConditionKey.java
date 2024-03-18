@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ import org.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
-import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
@@ -127,10 +127,10 @@ public abstract class ConditionKey implements Serializable {
     //                                                                           Attribute
     //                                                                           =========
     // not final because of no time of refactoring...
-    /** The key name of the condition. (NotNull: initialized in constructor of sub-class) */
+    /** The key name of the condition. e.g. equal, greaterThan, isNull (NotNull: initialized in constructor of sub-class) */
     protected String _conditionKey;
 
-    /** The string of operand, used in SQL. (NotNull: initialized in constructor of sub-class) */
+    /** The string of operand, used in SQL. e.g. "=", "&gt;", "is null" (NotNull: initialized in constructor of sub-class) */
     protected String _operand;
 
     // ===================================================================================
@@ -160,8 +160,8 @@ public abstract class ConditionKey implements Serializable {
     // -----------------------------------------------------
     //                                         Choose Result
     //                                         -------------
-    protected ConditionKeyPrepareResult chooseResultAlreadyExists(boolean equalValue) {
-        return equalValue ? RESULT_DUPLICATE_QUERY : RESULT_OVERRIDING_QUERY;
+    protected ConditionKeyPrepareResult chooseResultAlreadyExists(boolean sameAsPrevious) {
+        return sameAsPrevious ? RESULT_DUPLICATE_QUERY : RESULT_OVERRIDING_QUERY;
     }
 
     protected ConditionKeyPrepareResult chooseResultNonValue(ConditionValue cvalue) {
@@ -558,16 +558,14 @@ public abstract class ConditionKey implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get condition-key.
-     * @return Condition-key.
+     * @return The key name of the condition. e.g. equal, greaterThan, isNull (NotNull)
      */
     public String getConditionKey() {
         return _conditionKey;
     }
 
     /**
-     * Get operand.
-     * @return Operand.
+     * @return The string of operand, used in SQL. e.g. "=", "&gt;", "is null". (NotNull)
      */
     public String getOperand() {
         return _operand;

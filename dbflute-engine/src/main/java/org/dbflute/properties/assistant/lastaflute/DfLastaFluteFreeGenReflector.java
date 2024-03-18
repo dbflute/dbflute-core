@@ -1,6 +1,6 @@
 /*
 
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -579,6 +579,9 @@ public final class DfLastaFluteFreeGenReflector {
             namedclsMap.put(clsTheme + "ResourceFile", filterOverridden(clsResourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
             namedclsMap.put(clsTheme + "Package", buildCDefPackage("namedcls", appName, lastafluteMap, clsTheme));
 
+            // redundant comment is checked when classification generate so unneeded here
+            namedclsMap.put("isSuppressRedundantCommentStop", true); // inner use so direct literal
+
             namedclsList.add(namedclsMap);
         }
     }
@@ -617,6 +620,7 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -651,6 +655,7 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap);
     }
 
     // -----------------------------------------------------
@@ -712,6 +717,8 @@ public final class DfLastaFluteFreeGenReflector {
         optionMap.put("cdefClassName", cdefClassName); // me too
         doSetupSuppressDBClsCollaboration(lastafluteMap, appName, clsTheme, optionMap);
         doSetupSuppressRedundantCommentStop(lastafluteMap, appName, clsTheme, optionMap);
+        doSetupCDefOldStyleOption(lastafluteMap, appName, "namedcls", optionMap); // namedcls-common settings
+        doSetupCDefOldStyleOption(lastafluteMap, appName, clsTheme, optionMap); // per theme e.g. vinci_cls
     }
 
     // -----------------------------------------------------
@@ -744,6 +751,18 @@ public final class DfLastaFluteFreeGenReflector {
         final String key = "isSuppressRedundantCommentStop";
         final boolean overriddenValue = false; // used in template so you can use boolean directly
         optionMap.put(key, filterOverridden(overriddenValue, lastafluteMap, appName, clsTheme, key));
+    }
+
+    // -----------------------------------------------------
+    //                                  CDef OldStyle Option
+    //                                  --------------------
+    protected void doSetupCDefOldStyleOption(Map<String, Object> lastafluteMap, String appName, String clsTheme,
+            Map<String, Object> optionMap) {
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeSimpleDeterminationMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleCodeOfMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleNameOfMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleListOfMethod", optionMap);
+        overrideBooleanOptionIfExists(lastafluteMap, appName, clsTheme, "isMakeCDefOldStyleGroupOfMethod", optionMap);
     }
 
     // -----------------------------------------------------
@@ -815,19 +834,44 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                          Overridden
     //                                                                          ==========
-    protected <VALUE> VALUE filterOverridden(VALUE overriddenValue, Map<String, Object> lastafluteMap, String appName, String title,
+    protected <VALUE> VALUE filterOverridden(VALUE standardValue, Map<String, Object> lastafluteMap, String appName, String title,
             String key) {
         // e.g. lastafluteMap.dfprop
         //  ; overrideMap = map:{
         //      ; hangar.freeGen.appcls.isSuppressRedundantCommentStop = true
         //  }
+        final VALUE overridingValue = extractOverridingValue(lastafluteMap, appName, title, key);
+        if (overridingValue != null) {
+            if (standardValue instanceof Boolean) {
+                // convert to e.g. "true" to true for template use
+                final Boolean nativeBoolean = "true".equalsIgnoreCase(overridingValue.toString());
+                @SuppressWarnings("unchecked")
+                final VALUE typeMatched = (VALUE) nativeBoolean;
+                return typeMatched;
+            } else {
+                return overridingValue;
+            }
+        } else {
+            return standardValue;
+        }
+    }
+
+    protected void overrideBooleanOptionIfExists(Map<String, Object> lastafluteMap, String appName, String clsTheme, String key,
+            Map<String, Object> optionMap) {
+        final Object overridingValue = extractOverridingValue(lastafluteMap, appName, clsTheme, key);
+        if (overridingValue != null) {
+            optionMap.put(key, "true".equalsIgnoreCase(overridingValue.toString()));
+        }
+    }
+
+    protected <VALUE> VALUE extractOverridingValue(Map<String, Object> lastafluteMap, String appName, String title, String key) {
         @SuppressWarnings("unchecked")
         final Map<String, VALUE> overrideMap = (Map<String, VALUE>) lastafluteMap.get("overrideMap");
         if (overrideMap == null) {
-            return overriddenValue;
+            return null;
         }
         final String fullKey = appName + ".freeGen." + title + "." + key;
-        return (VALUE) overrideMap.getOrDefault(fullKey, overriddenValue);
+        return (VALUE) overrideMap.get(fullKey);
     }
 
     // ===================================================================================

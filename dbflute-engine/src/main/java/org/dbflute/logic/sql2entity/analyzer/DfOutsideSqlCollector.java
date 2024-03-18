@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class DfOutsideSqlCollector {
                     String msg = "Failed to collect SQL files at the directory: " + sqlDirectory;
                     throw new IllegalStateException(msg, e);
                 }
-                handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, false);
+                handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, /*suppressCheck*/true);
             } else {
                 final boolean suppressCheck = _suppressDirectoryCheck || sqlLocation.isSuppressDirectoryCheck();
                 final boolean foundSecondaryDirectory = handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, suppressCheck);
@@ -92,7 +92,8 @@ public class DfOutsideSqlCollector {
         return new File(sqlDirPath).exists();
     }
 
-    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation) throws FileNotFoundException {
+    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation)
+            throws FileNotFoundException {
         final List<File> sqlFileList = createSqlFileGetter().getSqlFileList(realSqlDirectory);
         final List<DfOutsideSqlFile> outsideSqlList = new ArrayList<DfOutsideSqlFile>();
         for (File sqlFile : sqlFileList) {
@@ -115,7 +116,7 @@ public class DfOutsideSqlCollector {
     }
 
     protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation, String sqlDirectory,
-            boolean checkNotFound) {
+            boolean suppressCheck) {
         final DfBasicProperties basicProp = getBasicProperties();
         final DfLanguageDependency lang = basicProp.getLanguageDependency();
         final String secondaryDirectory = lang.convertToSecondaryOutsideSqlDirectory(sqlDirectory);
@@ -124,11 +125,11 @@ public class DfOutsideSqlCollector {
             try {
                 outsideSqlPack.addAll(collectSqlFile(secondaryDirectory, sqlLocation));
             } catch (FileNotFoundException e) {
-                if (checkNotFound) {
+                if (suppressCheck) {
+                    _log.info("Not found sql directory on resources: " + secondaryDirectory);
+                } else {
                     String msg = "The sqlDirectory does not exist: " + secondaryDirectory;
                     throw new IllegalStateException(msg);
-                } else {
-                    _log.info("Not found sql directory on resources: " + secondaryDirectory);
                 }
             }
             foundSecondaryDirectory = true;

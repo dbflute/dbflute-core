@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -1532,7 +1532,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     }
 
     @Override
-    protected def xgetPostgreSQLMatchOperand(): org.dbflute.dbway.ExtensionOperand = {
+    protected def xgetPostgreSQLMatchOperand(): org.dbflute.dbway.topic.ExtensionOperand = {
         return ${glDBFluteConfig}.getFullTextSearchOperand();
     }
 #end
@@ -1662,6 +1662,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     // ===================================================================================
     //                                                                        Invoke Query
     //                                                                        ============
+## this methods are moved to individual class since 1.2.7 so needs to fix here by jflute (2023/07/21)
     override protected def xfilterInvokeQueryParameterType(colName: String, ckey: String, parameterType: Class[_]): Class[_] =
     { if (classOf[Collection[_]].isAssignableFrom(parameterType)) { classOf[List[_]] } else { parameterType } }
 

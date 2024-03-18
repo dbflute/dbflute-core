@@ -41,7 +41,7 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetLanguage: (Required)
-    #  The target language.
+    #  The target language for generated classes.
     #  Your possible choices are:
     #
     #       java, csharp, scala
@@ -51,10 +51,10 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetContainer: (Required)
-    #  The target DI container.
+    #  The target DI container for DBFlute components.
     #  Your possible choices are:
     #
-    #       spring, guice, seasar, cdi, lasta_di
+    #       spring, guice, cdi, seasar, lasta_di
     #
     ; targetContainer = @targetContainer@
     # - - - - - - - - - -/
@@ -186,7 +186,7 @@ map:{
     #  The line separator setting for source code of generated classes.
     #   LF   -> converted to LF
     #   CRLF -> converted to CRLF
-    #   (no setting) -> no convert (template default is CRLF)
+    #   (no setting) -> no convert (template files are basically LF)
     #
     #; sourceCodeLineSeparator = LF
     # - - - - - - - - - -/

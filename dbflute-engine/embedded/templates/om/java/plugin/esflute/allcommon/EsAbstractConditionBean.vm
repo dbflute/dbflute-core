@@ -23,8 +23,8 @@ import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.common.unit.TimeValue;
+import org.opensearch.action.search.SearchRequestBuilder;
+import org.opensearch.common.unit.TimeValue;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -641,6 +641,8 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
 
         private Boolean version;
 
+        private Boolean seqNoAndPrimaryTerm = Boolean.TRUE;
+
         private int terminateAfter = 0;
 
         public void build(SearchRequestBuilder builder) {
@@ -664,6 +666,9 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
             }
             if (version != null) {
                 builder.setVersion(version);
+            }
+            if (seqNoAndPrimaryTerm != null) {
+                builder.seqNoAndPrimaryTerm(seqNoAndPrimaryTerm);
             }
             if (terminateAfter > 0) {
                 builder.setTerminateAfter(terminateAfter);

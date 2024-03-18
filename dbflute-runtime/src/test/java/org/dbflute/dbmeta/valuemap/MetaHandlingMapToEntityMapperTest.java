@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
@@ -60,6 +61,7 @@ public class MetaHandlingMapToEntityMapperTest extends RuntimeTestCase {
 
     protected static enum MockClassification implements Classification {
         FOO, BAR;
+
         public String alias() {
             return null;
         }
@@ -72,8 +74,15 @@ public class MetaHandlingMapToEntityMapperTest extends RuntimeTestCase {
             return DfCollectionUtil.emptySet();
         }
 
-        public static MockClassification codeOf(Object obj) {
-            return obj instanceof String && obj.equals("bar") ? BAR : null;
+        public static OptionalThing<MockClassification> of(Object code) {
+            MockClassification result = code instanceof String && code.equals("bar") ? BAR : null;
+            return OptionalThing.ofNullable(result, () -> {
+                throw new IllegalStateException("Not found the mock cls by the code: " + code);
+            });
+        }
+
+        public static MockClassification codeOf(Object code) {
+            return of(code).orElse(null);
         }
 
         public boolean inGroup(String groupName) {

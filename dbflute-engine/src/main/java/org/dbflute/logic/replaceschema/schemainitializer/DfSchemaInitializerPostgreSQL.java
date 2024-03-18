@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     @Override
     protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList, List<DfTableMeta> otherList) {
         // order for inherit tables
-        final List<Map<String, String>> resultList = selectInheritList(conn);
+        final List<Map<String, String>> resultList = selectInheritList();
         final Set<String> childSet = StringSet.createAsCaseInsensitive();
         for (Map<String, String> elementMap : resultList) {
             childSet.add(elementMap.get("child_name"));
@@ -99,7 +99,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         return sortedList;
     }
 
-    protected List<Map<String, String>> selectInheritList(Connection conn) {
+    protected List<Map<String, String>> selectInheritList() {
         final StringBuilder sb = new StringBuilder();
         sb.append("select rits.inhrelid, child_cls.relname as child_name");
         sb.append(", rits.inhparent, parent_cls.relname as parent_name, inhseqno");
@@ -108,12 +108,30 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         sb.append(" left outer join pg_class parent_cls on rits.inhparent = parent_cls.oid");
         final String sql = sb.toString();
         final List<String> colList = Arrays.asList("inhrelid", "child_name", "inhparent", "parent_name", "inhseqno");
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         try {
             return jdbcFacade.selectStringList(sql, colList);
         } catch (RuntimeException continued) {
             _log.info("*Failed to select pg_inherits for priority of dropping table: " + continued.getMessage());
             return DfCollectionUtil.emptyList();
+        }
+    }
+
+    @Override
+    protected void buildDropViewSql(StringBuilder currentSb, String tableSqlName) {
+        // it needs cascade to resolve PostgreSQL view dependencies
+        // https://github.com/dbflute/dbflute-core/issues/196
+        // and it needs if-exsits to skip view already-dropped by cascade option
+        currentSb.append("drop view if exists ").append(tableSqlName).append(" cascade");
+    }
+
+    @Override
+    protected void buildDropTableSql(StringBuilder currentSb, String tableSqlName) {
+        super.buildDropTableSql(currentSb, tableSqlName);
+        if (_useDropTableCascadeAsPossible) {
+            // to resolve interdependence of schemas on PostgreSQL
+            // https://github.com/dbflute/dbflute-core/issues/201
+            currentSb.append(" cascade"); // since 1.2.8
         }
     }
 
@@ -125,7 +143,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
-        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        final DfJdbcFacade jdbcFacade = createJdbcFacade();
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");
@@ -155,9 +173,9 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
-        final String expression = "(" + buildProcedureArgExpression(metaInfo) + ")";
-        return super.buildProcedureSqlName(metaInfo) + expression;
+    protected String buildDropProcedureSqlName(DfProcedureMeta procedureMeta) {
+        final String expression = "(" + buildDropProcedureArgExpression(procedureMeta) + ")";
+        return super.buildDropProcedureSqlName(procedureMeta) + expression;
     }
 
     @Override
@@ -165,20 +183,20 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         return true; // because PostgreSQL supports function only
     }
 
-    protected String buildProcedureArgExpression(DfProcedureMeta metaInfo) {
-        final List<DfProcedureColumnMeta> metaInfoList = metaInfo.getProcedureColumnList();
+    protected String buildDropProcedureArgExpression(DfProcedureMeta procedureMeta) {
+        final List<DfProcedureColumnMeta> metaList = procedureMeta.getProcedureColumnList();
         final StringBuilder sb = new StringBuilder();
-        for (DfProcedureColumnMeta columnMetaInfo : metaInfoList) {
-            final String dbTypeName = columnMetaInfo.getDbTypeName();
-            final String columnName = columnMetaInfo.getColumnName();
-            final DfProcedureColumnType columnType = columnMetaInfo.getProcedureColumnType();
+        for (DfProcedureColumnMeta columnMeta : metaList) {
+            final String dbTypeName = columnMeta.getDbTypeName();
+            final String columnName = columnMeta.getColumnName();
+            final DfProcedureColumnType columnType = columnMeta.getProcedureColumnType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
                 continue;
             }
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(columnName);
+            sb.append(filterDropProcedureArgumentName(columnName));
             if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
                 sb.append(" in ");
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
@@ -191,5 +209,17 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             sb.append(dbTypeName);
         }
         return sb.toString();
+    }
+
+    protected String filterDropProcedureArgumentName(String columnName) {
+        // cannot drop no-name function without filtering by jflute (2023/10/19)
+        // https://www.postgresql.org/docs/current/sql-dropfunction.html
+        // says argument name is not related to function's identity so we can use dummy value
+        if (columnName != null && columnName.startsWith("$")) {
+            final String dummyPrefix = "df"; // means DBFlute
+            return dummyPrefix + Srl.removePrefix(columnName, "$");
+        } else {
+            return columnName;
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,17 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfFreeGenTask.class);
-    protected static final String CONTROL_FREEGEN_VM = "ControlFreeGen.vm";
-    protected static List<IndependentProcessor> lazyCallList = new ArrayList<IndependentProcessor>();
 
+    /** The velocity template as entry for FreeGen (NotNull) */
+    protected static final String CONTROL_FREEGEN_VM = "ControlFreeGen.vm";
+
+    // -----------------------------------------------------
+    //                                             Lazy Call
+    //                                             ---------
+    /** for tricky process of FreeGen (NotNull) */
+    protected static final List<IndependentProcessor> lazyCallList = new ArrayList<IndependentProcessor>();
+
+    // executed after all processes of FreeGen
     public static void regsiterLazyCall(IndependentProcessor processor) {
         lazyCallList.add(processor);
     }
@@ -271,7 +279,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setGenTarget(String genTarget) {
+    public void setGenTarget(String genTarget) { // FreeGen request to be executed
         if (Srl.is_Null_or_TrimmedEmpty(genTarget)) {
             return;
         }

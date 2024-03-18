@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,13 @@ import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.coption.parts.SplitOptionParts;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
-import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
- * The class of simple-string-option.
+ * The option of simple string, e.g. LikeSearch.
  * @author jflute
  */
 public class SimpleStringOption implements ConditionOption {
@@ -35,7 +35,7 @@ public class SimpleStringOption implements ConditionOption {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected SplitOptionParts _splitOptionParts;
+    protected SplitOptionParts _splitOptionParts; // null allowed
 
     // ===================================================================================
     //                                                                               Split
@@ -95,19 +95,18 @@ public class SimpleStringOption implements ConditionOption {
     }
 
     // ===================================================================================
-    //                                                                          Real Value
-    //                                                                          ==========
-    public String generateRealValue(String value) {
-        return value;
-    }
-
-    // ===================================================================================
     //                                                            Interface Implementation
     //                                                            ========================
+    // -----------------------------------------------------
+    //                                           Rear Option
+    //                                           -----------
     public String getRearOption() {
-        return "";
+        return ""; // as default (not null)
     }
 
+    // -----------------------------------------------------
+    //                                       Compound Column
+    //                                       ---------------
     public boolean hasCompoundColumn() {
         return false;
     }
@@ -124,6 +123,9 @@ public class SimpleStringOption implements ConditionOption {
         return null;
     }
 
+    // -----------------------------------------------------
+    //                                     Clause Adjustment
+    //                                     -----------------
     public ExtensionOperand getExtensionOperand() {
         return null;
     }
@@ -137,10 +139,10 @@ public class SimpleStringOption implements ConditionOption {
     }
 
     // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String replace(String text, String fromText, String toText) {
-        return Srl.replace(text, fromText, toText);
+    //                                                                          Real Value
+    //                                                                          ==========
+    public String generateRealValue(String value) {
+        return value; // as default (no filter)
     }
 
     // ===================================================================================
@@ -156,5 +158,12 @@ public class SimpleStringOption implements ConditionOption {
 
     protected SimpleStringOption newDeepCopyInstance() {
         return new SimpleStringOption();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replace(String text, String fromText, String toText) {
+        return Srl.replace(text, fromText, toText);
     }
 }

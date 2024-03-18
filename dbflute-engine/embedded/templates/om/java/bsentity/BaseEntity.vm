@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -70,11 +70,17 @@ import ${table.relationalNullObjectProviderPackage}.*;
 #set ($myEntityInterfaceDef = "${myEntityInterfaceDef}, ColumnNullObjectable")
 #end
 
+#set ($commentForJavaDocValid = $table.isCommentForJavaDocValid())
+#set ($javadocFirstLineRear = "")
+#if ($commentForJavaDocValid)
+#set ($javadocFirstLineRear = " <br>")
+#end
 /**
- * The entity of ${table.basicInfoDispString}. <br>
-#if ($table.isCommentForJavaDocValid())
+ * The entity of ${table.basicInfoDispString}.${javadocFirstLineRear}
+#if ($commentForJavaDocValid)
  * ${table.commentForJavaDoc}
 #end
+#if ($table.isGenerateTableDetailJavaDoc())
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -113,6 +119,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
 #end
  * = = = = = = = = = =/
  * </pre>
+#end
  * @author ${database.classAuthor}
  */
 public abstract class $myClassName extends AbstractEntity implements ${myEntityInterfaceDef} {
@@ -197,7 +204,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
-        return ${glCDef}.${col.classificationName}.codeOf(get${col.javaName}());
+        return ${glCDef}.${col.classificationName}.of(get${col.javaName}()).orElse(null);
     }
 
     /**
@@ -228,7 +235,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
      * @param determination The determination, true or false. (NullAllowed: if null, null value is set to the column)
      */
     public void set${col.javaName}AsBoolean(Boolean determination) {
-        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.of(determination).orElse(null));
     }
 #end
 

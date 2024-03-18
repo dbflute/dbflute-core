@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +58,7 @@ public class DfFrgJavaScriptJsonEngine {
         // because default constructor of the manager uses only System class loader
         // (also DfFreeGenManager)
         final ScriptEngineManager manager = new ScriptEngineManager(getClass().getClassLoader());
-        final ScriptEngine engine = findScriptEngine(manager, requestName, resourceFile);
+        final ScriptEngine engine = prepareScriptEngine(manager, requestName, resourceFile);
         try {
             // move to caller to share between engines
             //final String realExp;
@@ -67,39 +69,58 @@ public class DfFrgJavaScriptJsonEngine {
             //}
             engine.eval("var result = " + json);
         } catch (ScriptException e) {
-            throwJsonParseFailureException(requestName, resourceFile, e);
+            throwJsonParseFailureException(requestName, resourceFile, engine, e);
         }
         @SuppressWarnings("unchecked")
         final RESULT result = (RESULT) engine.get("result");
         return filterJavaScriptObject(result);
     }
 
-    protected ScriptEngine findScriptEngine(ScriptEngineManager manager, String requestName, String resourceFile) {
+    // -----------------------------------------------------
+    //                                         Script Engine
+    //                                         -------------
+    protected ScriptEngine prepareScriptEngine(ScriptEngineManager manager, String requestName, String resourceFile) {
         if (!_foundLoggingDone) {
             _log.info("...Finding the script engine for FreeGen");
         }
-        final String saiKeyword = "sai";
-        ScriptEngine engine = manager.getEngineByName(saiKeyword);
-        if (engine != null) {
-            if (!_foundLoggingDone) {
-                _log.info(" -> found the script engine as '{}'", saiKeyword);
-                _foundLoggingDone = true;
-            }
-        } else {
-            final String nashornKeyword = "javascript";
-            engine = manager.getEngineByName(nashornKeyword);
-            if (engine != null) {
-                if (!_foundLoggingDone) {
-                    _log.info(" -> found the script engine as '{}'", nashornKeyword);
-                    _foundLoggingDone = true;
-                }
-            } else {
-                throwJsonScriptEngineNotFoundException(requestName, resourceFile);
-            }
+        // same as Lasta Di logic (2021/08/31)
+        final ScriptEngineFound engine = findScriptEngine(manager);
+        if (engine == null) {
+            throwJsonScriptEngineNotFoundException(requestName, resourceFile);
         }
-        return engine;
+        if (!_foundLoggingDone) {
+            _log.info(" -> found the script engine as '{}'", engine.getEngineName());
+            _foundLoggingDone = true;
+        }
+        return engine.getFoundEngine();
     }
 
+    protected void throwJsonScriptEngineNotFoundException(String requestName, String resourceFile) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the JSON engine for FreeGen.");
+        br.addItem("Advice");
+        br.addElement("Your FreeGen request needs JavaScript engine.");
+        br.addElement("But Nashorn (JavaScript engine) is removed since Java15.");
+        br.addElement("");
+        br.addElement("So prepare 'sai' libraries in your 'extlib' directory.");
+        br.addElement("");
+        br.addElement("You can download automatically by DBFlute 'sai' task like this:");
+        br.addElement(" 1. execute manage.sh|bat");
+        br.addElement(" 2. select 31 (sai task)");
+        br.addElement("   => downloading sai libraries to 'extlib'");
+        br.addElement(" 3. retry your FreeGen task");
+        br.addElement("   => you can use JavaScript expression in FreeGen");
+        br.addItem("FreeGen Request");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resourceFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                             Filtering
+    //                                             ---------
     @SuppressWarnings("unchecked")
     protected <RESULT> RESULT filterJavaScriptObject(RESULT result) {
         if (result instanceof List<?>) {
@@ -140,36 +161,82 @@ public class DfFrgJavaScriptJsonEngine {
         return new ArrayList<Object>(map.values());
     }
 
-    protected void throwJsonScriptEngineNotFoundException(String requestName, String resourceFile) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the JSON script engine for FreeGen.");
-        br.addItem("Advice");
-        br.addElement("Nashorn (JavaScript engine) is removed since Java15.");
-        br.addElement("");
-        br.addElement("You can use 'sai' instead of Nashorn.");
-        br.addElement(" https://github.com/codelibs/sai");
-        br.addElement("");
-        br.addElement("Or Google Gson.");
-        br.addElement(" https://github.com/google/gson");
-        br.addElement("");
-        br.addElement("Put the jar files (including dependencies)");
-        br.addElement("on 'extlib' directory of your DBFlute client.");
-        br.addItem("FreeGen Request");
-        br.addElement(requestName);
-        br.addItem("JSON File");
-        br.addElement(resourceFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
-    }
-
-    protected void throwJsonParseFailureException(String requestName, String resourceFile, Exception cause) {
+    // -----------------------------------------------------
+    //                                         Parse Failure
+    //                                         -------------
+    protected void throwJsonParseFailureException(String requestName, String resourceFile, ScriptEngine engine, Exception cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the JSON file for FreeGen.");
         br.addItem("FreeGen Request");
         br.addElement(requestName);
         br.addItem("JSON File");
         br.addElement(resourceFile);
+        br.addItem("JSON Engine");
+        br.addElement(engine);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg, cause);
+    }
+
+    // ===================================================================================
+    //                                                                  Find Script Engine
+    //                                                                  ==================
+    // called by e.g. DfFreeGenManager
+    public ScriptEngineFound findScriptEngine(ScriptEngineManager manager) { // null allowed
+        if (getLittleAdjustmentProperties().isFreeGenJavaScriptEngineNashorn()) {
+            return getEngineByName(manager, "nashorn"); // for emergency debug
+        }
+        // name "javascript" may be conflicted if two engines exist in same JavaVM by jflute (2021/09/01)
+        // rhino might be best at the future but sai has the best compatibility so first is sai
+        ScriptEngineFound engine = getEngineByName(manager, "sai"); // forked from nashorn, since Java11
+        if (engine == null) {
+            engine = getEngineByName(manager, "rhino"); // also can use Java8
+        }
+        if (engine == null) {
+            engine = getEngineByName(manager, "nashorn"); // embedded until Java14
+        }
+        if (engine == null) {
+            engine = getEngineByName(manager, "javascript"); // may be conflicted so last
+        }
+        return engine;
+    }
+
+    protected ScriptEngineFound getEngineByName(ScriptEngineManager manager, String engineName) {
+        final ScriptEngine engine = manager.getEngineByName(engineName);
+        return engine != null ? new ScriptEngineFound(engineName, engine) : null;
+    }
+
+    public static class ScriptEngineFound { // to keep engine name for e.g. logging
+
+        protected final String engineName; // not null
+        protected final ScriptEngine foundEngine; // not null
+
+        public ScriptEngineFound(String engineName, ScriptEngine foundEngine) {
+            this.engineName = engineName;
+            this.foundEngine = foundEngine;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + engineName + ", " + foundEngine + "}";
+        }
+
+        public String getEngineName() {
+            return engineName;
+        }
+
+        public ScriptEngine getFoundEngine() {
+            return foundEngine;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 }

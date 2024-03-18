@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,7 +225,7 @@ public class Srl {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
-        if (trimStr == null) {
+        if (trimStr == null || trimStr.length() == 0) { // also "" to avoid infinity loop
             final String notTrimmedString = "a";
             final String trimmed = (str + notTrimmedString).trim();
             return trimmed.substring(0, trimmed.length() - notTrimmedString.length());
@@ -243,7 +243,7 @@ public class Srl {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
-        if (trimStr == null) {
+        if (trimStr == null || trimStr.length() == 0) { // also "" to avoid infinity loop
             final String notTrimmedString = "a";
             return (notTrimmedString + str).trim().substring(notTrimmedString.length());
         }
@@ -262,6 +262,7 @@ public class Srl {
     public static String replace(String str, String fromStr, String toStr) {
         assertStringNotNull(str);
         assertFromStringNotNull(fromStr);
+        assertStringNotNullAndNotEmpty("fromStr", fromStr); // to avoid infinity loop
         assertToStringNotNull(toStr);
         StringBuilder sb = null; // lazy load
         int pos = 0;
@@ -351,6 +352,7 @@ public class Srl {
     protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
         assertStringNotNull(str);
         assertDelimiterNotNull(delimiter);
+        assertStringNotNullAndNotEmpty("delimiter", delimiter); // to avoid infinity loop
         final List<String> list = new ArrayList<String>();
         int elementIndex = 0;
         int delimiterIndex = str.indexOf(delimiter);
@@ -1242,6 +1244,7 @@ public class Srl {
     protected static int doCount(String str, String element, boolean ignoreCase) {
         assertStringNotNull(str);
         assertElementNotNull(element);
+        assertStringNotNullAndNotEmpty("element", element); // to avoid infinity loop
         final String filteredStr = ignoreCase ? str.toLowerCase() : str;
         final String filteredElement = ignoreCase ? element.toLowerCase() : element;
         int count = 0;
@@ -2330,6 +2333,7 @@ public class Srl {
     protected static String doDecamelize(String camelName, String delimiter) {
         assertCamelNameNotNull(camelName);
         assertDelimiterNotNull(delimiter);
+        assertStringNotNullAndNotEmpty("delimiter", delimiter); // to avoid infinity loop
         final StringBuilder sb = new StringBuilder();
         final List<String> splitList = splitList(camelName, delimiter); // one element if no delimiter
         for (String element : splitList) { // to separate e.g. FOO_NameBar (to FOO_NAME_BAR)
@@ -2382,6 +2386,12 @@ public class Srl {
      */
     public static String removeEmptyLine(String str) {
         assertStringNotNull(str);
+        if (str.isEmpty()) { // to avoid out-of-bounds
+            return str;
+        }
+        if (!str.contains("\n")) { // no line so unneeded
+            return str;
+        }
         final StringBuilder sb = new StringBuilder();
         final List<String> lineList = splitList(str, "\n");
         for (String line : lineList) {
@@ -2391,7 +2401,10 @@ public class Srl {
             sb.append(removeCR(line)).append("\n");
         }
         final String filtered = sb.toString();
-        return filtered.substring(0, filtered.length() - "\n".length());
+        if (filtered.isEmpty()) { // e.g. " \n \n ", to avoid out-of-bounds 
+            return filtered;
+        }
+        return filtered.substring(0, filtered.length() - "\n".length()); // remove rear LF
     }
 
     /**
@@ -2698,6 +2711,20 @@ public class Srl {
         }
         if (value == null) {
             String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the entity is not null and not empty.
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     */
+    protected static void assertStringNotNullAndNotEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (value.length() == 0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
     }

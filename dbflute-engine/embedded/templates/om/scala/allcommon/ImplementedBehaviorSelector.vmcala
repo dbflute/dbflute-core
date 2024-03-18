@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
+#set ($jakartaPackage = $database.currentJakartaPackage)
 
 import scala.collection.JavaConverters._
 
@@ -49,9 +50,9 @@ import com.google.inject.Injector;
 import org.slim3.container.S3Container;
 #end
 #if ($database.isTargetContainerCDI())
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
+import ${jakartaPackage}.enterprise.context.spi.CreationalContext;
+import ${jakartaPackage}.enterprise.inject.spi.Bean;
+import ${jakartaPackage}.enterprise.inject.spi.BeanManager;
 #end
 
 /**

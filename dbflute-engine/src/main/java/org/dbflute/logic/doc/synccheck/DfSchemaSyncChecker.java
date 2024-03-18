@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,13 +179,13 @@ public class DfSchemaSyncChecker {
     //                                                                          ==========
     protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) { // as previous
         final UnifiedSchema targetSchema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
-        _log.info("schema: " + targetSchema);
+        _log.info("SchemaSyncCheck target schema: " + targetSchema);
         final String historyFile = /*historyFile*/null; // to make only schemaXml as target (previous)
         return doCreateSerializer(new DfSchemaSource(targetDs, targetSchema), historyFile);
     }
 
     protected DfSchemaXmlSerializer createMainSerializer() { // as next
-        _log.info("schema: " + _mainSource.getSchema());
+        _log.info("SchemaSyncCheck main schema: " + _mainSource.getSchema());
         final String historyFile = getDiffMapFile(); // needs to make for comparing with target (previous)
         return doCreateSerializer(_mainSource, historyFile);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,7 +175,6 @@ import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDatabaseProperties;
-import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.base.DfTableDeterminer;
@@ -2057,8 +2056,24 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
-    public boolean isCDefToStringReturnsName() {
-        return getLittleAdjustmentProperties().isCDefToStringReturnsName();
+    public boolean isUseFullTextSearchPGroongaBasic() {
+        return getLittleAdjustmentProperties().isUseFullTextSearchPGroongaBasic();
+    }
+
+    public boolean isMakeCDefOldStyleCodeOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleCodeOfMethod();
+    }
+
+    public boolean isMakeCDefOldStyleNameOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleNameOfMethod();
+    }
+
+    public boolean isMakeCDefOldStyleListOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleListOfMethod();
+    }
+
+    public boolean isMakeCDefOldStyleGroupOfMethod() {
+        return getLittleAdjustmentProperties().isMakeCDefOldStyleGroupOfMethod();
     }
 
     public String getConditionQueryNotEqualDefinitionName() {
@@ -2077,8 +2092,16 @@ public class Database {
         return getLittleAdjustmentProperties().isInnerJoinAutoDetect();
     }
 
+    public boolean isOrScopeQueryPurposeCheckWarningOnly() {
+        return getLittleAdjustmentProperties().isOrScopeQueryPurposeCheckWarningOnly();
+    }
+
     public boolean isThatsBadTimingDetect() {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
+    }
+
+    public boolean isThatsBadTimingWarningOnly() {
+        return getLittleAdjustmentProperties().isThatsBadTimingWarningOnly();
     }
 
     public boolean isSpecifyColumnRequired() {
@@ -2101,8 +2124,16 @@ public class Database {
         return getLittleAdjustmentProperties().isOverridingQueryAllowed();
     }
 
+    public boolean isInvalidQueryAllowedWarning() {
+        return getLittleAdjustmentProperties().isInvalidQueryAllowedWarning();
+    }
+
     public boolean isNonSpecifiedColumnAccessAllowed() {
         return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessAllowed();
+    }
+
+    public boolean isNonSpecifiedColumnAccessWarningOnly() {
+        return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessWarningOnly();
     }
 
     public boolean isDatetimePrecisionTruncationOfCondition() {
@@ -2238,6 +2269,10 @@ public class Database {
         return getLittleAdjustmentProperties().isQueryUpdateCountPreCheck();
     }
 
+    public boolean isInsertOrUpdateCountPreCheck() {
+        return getLittleAdjustmentProperties().isInsertOrUpdateCountPreCheck();
+    }
+
     public boolean isZeroUpdateCheckExistenceForPassing() {
         return getLittleAdjustmentProperties().isZeroUpdateCheckExistenceForPassing();
     }
@@ -2287,13 +2322,6 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                       Lasta Migration
-    //                                       ---------------
-    public boolean isLastaMigrationAlsoGenearteDiXml() {
-        return getLittleAdjustmentProperties().isLastaMigrationAlsoGenearteDiXml();
-    }
-
-    // -----------------------------------------------------
     //                                       Optional Entity
     //                                       ---------------
     public String getBasicOptionalEntityClassName() {
@@ -2314,6 +2342,20 @@ public class Database {
 
     public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
         return getLittleAdjustmentProperties().isRelationOptionalEntityDBFluteEmbeddedClass();
+    }
+
+    // -----------------------------------------------------
+    //                                            LastaFlute
+    //                                            ----------
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return getLittleAdjustmentProperties().isLastaMigrationAlsoGenearteDiXml();
+    }
+
+    // -----------------------------------------------------
+    //                                       Jakarta Package
+    //                                       ---------------
+    public String getCurrentJakartaPackage() {
+        return getLittleAdjustmentProperties().getCurrentJakartaPackage();
     }
 
     // ===================================================================================
@@ -2685,57 +2727,41 @@ public class Database {
     //                                                  Component Name Helper for Template
     //                                                  ==================================
     // -----------------------------------------------------
-    //                                   AllCommon Component
-    //                                   -------------------
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    // These methods for all-common components are used when it needs to identity their components.
-    // For example when the DI container is Seasar, These methods are not used
-    // because S2Container has name-space in the DI architecture.
-    // = = = = = = = = = =/
-
+    //                                     Runtime Component
+    //                                     -----------------
     public String getDBFluteInitializerComponentName() {
-        return filterRuntimeComponentPrefix("introduction");
+        return getProperties().getDependencyInjectionProperties().getDBFluteInitializerComponentName();
     }
 
     public String getInvokerAssistantComponentName() {
-        return filterRuntimeComponentPrefix("invokerAssistant");
+        return getProperties().getDependencyInjectionProperties().getInvokerAssistantComponentName();
     }
 
     public String getCommonColumnAutoSetupperComponentName() {
-        return filterRuntimeComponentPrefix("commonColumnAutoSetupper");
+        return getProperties().getDependencyInjectionProperties().getCommonColumnAutoSetupperComponentName();
     }
 
     public String getBehaviorSelectorComponentName() {
-        return filterRuntimeComponentPrefix("behaviorSelector");
+        return getProperties().getDependencyInjectionProperties().getBehaviorSelectorComponentName();
     }
 
     public String getBehaviorCommandInvokerComponentName() {
-        return filterRuntimeComponentPrefix("behaviorCommandInvoker");
+        return getProperties().getDependencyInjectionProperties().getBehaviorCommandInvokerComponentName();
     }
 
-    protected String filterRuntimeComponentPrefix(String componentName) {
-        final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
-        final String filtered = prop.filterRuntimeComponentPrefix(componentName);
-        return filterComponentNameWithProjectPrefix(filterComponentNameWithAllcommonPrefix(filtered));
+    public boolean isDBFluteModuleGuiceRuntimeComponentByName() {
+        return getProperties().getDependencyInjectionProperties().isDBFluteModuleGuiceRuntimeComponentByName();
     }
 
     // -----------------------------------------------------
     //                                     Filtering Utility
     //                                     -----------------
     public String filterComponentNameWithProjectPrefix(String componentName) { // called from Table
-        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getProjectPrefix());
+        return getBasicProperties().filterComponentNameWithProjectPrefix(componentName);
     }
 
-    protected String filterComponentNameWithAllcommonPrefix(String componentName) {
-        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getAllcommonPrefix());
-    }
-
-    protected String doFilterComponentNameWithPrefix(String componentName, String prefix) {
-        if (prefix == null || prefix.trim().length() == 0) {
-            return componentName;
-        }
-        final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
-        return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
+    public String filterComponentNameWithAllcommonPrefix(String componentName) {
+        return getBasicProperties().filterComponentNameWithAllcommonPrefix(componentName);
     }
 
     // ===================================================================================

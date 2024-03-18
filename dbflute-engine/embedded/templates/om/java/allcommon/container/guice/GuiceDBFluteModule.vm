@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import javax.sql.DataSource;
 
 import com.google.inject.AbstractModule;
+#if ($database.isDBFluteModuleGuiceRuntimeComponentByName())
+import com.google.inject.name.Names;
+#end
 import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.InvokerAssistant;
@@ -50,10 +53,20 @@ public class ${glDBFluteModule} extends AbstractModule {
         behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
         ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
 
+#if ($database.isDBFluteModuleGuiceRuntimeComponentByName())
+## basically for multiple DB
+        bind(BehaviorSelector.class).annotatedWith(Names.named("${database.behaviorSelectorComponentName}")).toInstance(behaviorSelector);
+        bind(BehaviorCommandInvoker.class).annotatedWith(Names.named("${database.behaviorCommandInvokerComponentName}")).toInstance(behaviorCommandInvoker);
+        bind(InvokerAssistant.class).annotatedWith(Names.named("${database.invokerAssistantComponentName}")).toInstance(invokerAssistant);
+        bind(CommonColumnAutoSetupper.class).annotatedWith(Names.named("${database.commonColumnAutoSetupperComponentName}")).toInstance(commonColumnAutoSetupper);
+#else
+## as default, keep byType injection for compatible
+## (cannot use byType injection if byName registration on Guice)
         bind(BehaviorSelector.class).toInstance(behaviorSelector);
         bind(BehaviorCommandInvoker.class).toInstance(behaviorCommandInvoker);
         bind(InvokerAssistant.class).toInstance(invokerAssistant);
         bind(CommonColumnAutoSetupper.class).toInstance(commonColumnAutoSetupper);
+#end
 
         // The components of Behavior.
         setupBehavior(behaviorCommandInvoker, behaviorSelector, commonColumnAutoSetupper);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,12 +123,15 @@ public class DfXlsFactory {
         setupMinInflateRatioIfNeeds();
 
         try {
-            final Class<?>[] argTypes = new Class<?>[] { InputStream.class };
-            final Constructor<?> constructor = DfReflectionUtil.getConstructor(XSSF_TYPE_MAP.get(XSSF_WORKBOOK_NAME), argTypes);
+            final Workbook workbook;
             if (file.exists() && file.length() > 0) {
-                return (Workbook) DfReflectionUtil.newInstance(constructor, new Object[] { new FileInputStream(file) });
+                final Class<?>[] argTypes = new Class<?>[] { InputStream.class };
+                final Constructor<?> constructor = DfReflectionUtil.getConstructor(XSSF_TYPE_MAP.get(XSSF_WORKBOOK_NAME), argTypes);
+                workbook = (Workbook) DfReflectionUtil.newInstance(constructor, new Object[] { new FileInputStream(file) });
+            } else {
+                workbook = (Workbook) DfReflectionUtil.newInstance(XSSF_TYPE_MAP.get(SXSSF_WORKBOOK_NAME));
             }
-            return (Workbook) DfReflectionUtil.newInstance(XSSF_TYPE_MAP.get(SXSSF_WORKBOOK_NAME));
+            return workbook;
         } catch (IOException | ReflectionFailureException e) {
             throw new IllegalStateException("Failed to create workbook: " + file, e);
         }

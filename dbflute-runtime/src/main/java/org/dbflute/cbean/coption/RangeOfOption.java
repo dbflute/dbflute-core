@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.dbway.topic.ExtensionOperand;
+import org.dbflute.dbway.topic.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;

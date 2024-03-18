@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2021 the original author or authors.
+## Copyright 2014-2024 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -64,7 +64,16 @@ public class ${glDBFluteBeansJavaConfig} {
     //                                                                   =================
     @Bean(name="${database.DBFluteInitializerComponentName}")
     public ${glDBFluteInitializer} createDBFluteInitializer() { // no lazy for initialize-only component
-        return new ${database.DBFluteInitializerClass}(_dataSource);
+        hookInitialization();
+        return newDBFluteInitializer(_dataSource);
+    }
+
+    protected void hookInitialization() { // you can override for e.g. DBFluteConfig settings
+        // do nothing as default
+    }
+
+    protected ${glDBFluteInitializer} newDBFluteInitializer(DataSource dataSource) {
+        return new ${database.DBFluteInitializerClass}(dataSource);
     }
 
     @Bean(name="${database.invokerAssistantComponentName}")

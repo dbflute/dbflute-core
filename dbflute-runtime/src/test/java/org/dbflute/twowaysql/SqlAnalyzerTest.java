@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,6 +133,31 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         String sql = ctx.getSql();
         log(ln() + sql);
         assertEquals("select *\n\n\n\namba", sql);
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_analyze_FOR_loopVariable() {
+        // ## Arrange ##
+        StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(ln());
+        sb.append(ln()).append("/*FOR pmb.dstore*//*FIRST*/han/*END*/");
+        sb.append(ln()).append("/*$#current*/mystic");
+        sb.append(ln()).append("/*LAST*/gar/*END*//*END*/");
+        sb.append(ln()).append("/*FOR pmb.bonvo*/oneman/*END*/");
+        sb.append(ln()).append("/*$pmb.iks*/");
+        String twoway = sb.toString();
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        assertEquals("select *\n\nhan\nuni\n\ncity\ngar\n\namba", sql);
         assertEquals(0, ctx.getBindVariables().length);
     }
 

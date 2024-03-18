@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -83,32 +84,54 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                Analyze by ResultSet
     //                                                                ====================
-    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName) throws SQLException {
-        final String tableSqlName = tableInfo.getTableSqlName();
+    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableMeta, String primaryKeyColumnName) throws SQLException {
+        final String tableSqlName = tableMeta.getTableSqlName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableSqlName);
-        return executeAutoIncrementQuery(conn, tableInfo, primaryKeyColumnName, tableSqlName, sql);
+        return executeAutoIncrementQuery(conn, tableMeta, primaryKeyColumnName, tableSqlName, sql);
     }
 
-    protected boolean executeAutoIncrementQuery(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName, String tableSqlName,
+    protected boolean executeAutoIncrementQuery(Connection conn, DfTableMeta tableMeta, String primaryKeyColumnName, String tableSqlName,
             String sql) throws DfJDBCException {
         try {
-            return doExecuteAutoIncrementQuery(conn, tableInfo, primaryKeyColumnName, sql);
+            return doExecuteAutoIncrementQuery(conn, tableMeta, primaryKeyColumnName, sql);
         } catch (SQLException e) {
             if (isDatabasePostgreSQL()) { // the table name needs quote e.g. upper case
-                final String retrySql = buildMetaDataSql(primaryKeyColumnName, Srl.quoteDouble(tableSqlName));
+                final String retrySql = buildMetaDataSql(primaryKeyColumnName, quotePostgreSQLUpperCaseTableSqlName(tableSqlName));
                 try {
-                    return doExecuteAutoIncrementQuery(conn, tableInfo, primaryKeyColumnName, retrySql);
+                    return doExecuteAutoIncrementQuery(conn, tableMeta, primaryKeyColumnName, retrySql);
                 } catch (SQLException continued) {
                     _log.info("Failed to retry auto-increment query: sql=" + retrySql + ", msg=" + continued.getMessage());
                 }
             }
-            throwAutoIncrementDeterminationFailureException(tableInfo, primaryKeyColumnName, sql, e);
+            throwAutoIncrementDeterminationFailureException(tableMeta, primaryKeyColumnName, sql, e);
             return false; // unreachable
         }
     }
 
-    protected String buildMetaDataSql(String pkName, String tableName) {
-        return "select " + quoteColumnNameIfNeedsDirectUse(pkName) + " from " + tableName + " where 0 = 1";
+    protected String quotePostgreSQLUpperCaseTableSqlName(String tableSqlName) {
+        if (tableSqlName.contains(".")) { // e.g. TESTDB.schema1.table1
+            final StringBuilder sb = new StringBuilder();
+            final List<String> elementList = Srl.splitList(tableSqlName, ".");
+            for (String element : elementList) {
+                final String filtered;
+                if (Srl.isUpperCaseAny(element)) {
+                    filtered = Srl.quoteDouble(element);
+                } else {
+                    filtered = element;
+                }
+                if (sb.length() > 0) {
+                    sb.append(".");
+                }
+                sb.append(filtered);
+            }
+            return sb.toString();
+        } else { // traditional logic so keep it (2023/10/30)
+            return Srl.quoteDouble(tableSqlName);
+        }
+    }
+
+    protected String buildMetaDataSql(String pkName, String tableSqlName) {
+        return "select " + quoteColumnNameIfNeedsDirectUse(pkName) + " from " + tableSqlName + " where 0 = 1";
     }
 
     protected String quoteColumnNameIfNeedsDirectUse(String pkName) {

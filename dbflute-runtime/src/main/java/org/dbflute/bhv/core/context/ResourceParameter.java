@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core.context;
 
+import org.dbflute.bhv.core.context.logmask.BehaviorLogMaskProvider;
 import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 
@@ -35,16 +36,20 @@ public class ResourceParameter {
     // -----------------------------------------------------
     //                                          Mapping Date
     //                                          ------------
-    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
+    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider; // null allowed
 
     // -----------------------------------------------------
     //                                     Log Display Style
     //                                     -----------------
-    // every one null allowed
-    protected String _logDatePattern;
-    protected String _logTimestampPattern;
-    protected String _logTimePattern;
-    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
+    protected String _logDatePattern; // null allowed
+    protected String _logTimestampPattern; // null allowed
+    protected String _logTimePattern; // null allowed
+    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider; // null allowed
+
+    // -----------------------------------------------------
+    //                                     Behavior Log Mark
+    //                                     -----------------
+    protected BehaviorLogMaskProvider _behaviorLogMaskProvider; // null allowed
 
     // -----------------------------------------------------
     //                                        Internal Debug
@@ -109,6 +114,17 @@ public class ResourceParameter {
 
     public void setLogTimeZoneProvider(BoundDateDisplayTimeZoneProvider logTimeZoneProvider) {
         _logTimeZoneProvider = logTimeZoneProvider;
+    }
+
+    // -----------------------------------------------------
+    //                                     Behavior Log Mark
+    //                                     -----------------
+    public BehaviorLogMaskProvider getBehaviorLogMaskProvider() {
+        return _behaviorLogMaskProvider;
+    }
+
+    public void setBehaviorLogMaskProvider(BehaviorLogMaskProvider errorLogMaskProvider) {
+        _behaviorLogMaskProvider = errorLogMaskProvider;
     }
 
     // -----------------------------------------------------

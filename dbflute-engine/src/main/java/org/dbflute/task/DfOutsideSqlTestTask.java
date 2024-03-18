@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -410,7 +410,7 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setSpecifiedSqlFile(String specifiedSqlFile) {
+    public void setSpecifiedSqlFile(String specifiedSqlFile) { // simple file name of target SQL
         DfSpecifiedSqlFile.getInstance().setSpecifiedSqlFile(specifiedSqlFile);
     }
 }

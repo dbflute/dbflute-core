@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,16 @@ public enum DfDecoMapPieceTargetType implements Classification {
             }
 
             @Override
+            public OptionalThing<? extends Classification> of(Object code) {
+                return DfDecoMapPieceTargetType.of(code);
+            }
+
+            @Override
+            public OptionalThing<? extends Classification> byName(String name) {
+                return DfDecoMapPieceTargetType.byName(name);
+            }
+
+            @Override
             public Classification codeOf(Object code) { // null if not found
                 return DfDecoMapPieceTargetType.of(code).orElse(null);
             }
@@ -116,8 +126,14 @@ public enum DfDecoMapPieceTargetType implements Classification {
             }
 
             @Override
+            public List<Classification> listByGroup(String groupName) {
+                DfDecoMapPieceTargetType.listByGroup(groupName); // exception fixedly
+                return Collections.emptyList(); // unreachable
+            }
+
+            @Override
             public List<Classification> groupOf(String groupName) {
-                return Collections.emptyList(); // empty if not found (see javadoc)
+                return Collections.emptyList(); // no group fixedly, empty if not found (see javadoc)
             }
 
             @Override
@@ -172,12 +188,12 @@ public enum DfDecoMapPieceTargetType implements Classification {
         });
     }
 
+    // #for_now jflute LastaFlute uses this codeOf() as reflection, waiting for migration (2022/04/16)
     /**
      * <span style="color: #AD4747; font-size: 120%">Old style so use of(code).</span> <br>
      * Get the classification by the code. (CaseInsensitive)
      * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
      * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
-     * @deprecated use of()
      */
     public static DfDecoMapPieceTargetType codeOf(Object code) {
         if (code == null) {
@@ -194,6 +210,7 @@ public enum DfDecoMapPieceTargetType implements Classification {
      * Get the classification by the name (also called 'value' in ENUM world).
      * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
      * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
+     * @deprecated use byName().
      */
     public static DfDecoMapPieceTargetType nameOf(String name) {
         if (name == null) {
@@ -246,6 +263,7 @@ public enum DfDecoMapPieceTargetType implements Classification {
      * Get the list of classification elements in the specified group. (returns new copied list) <br>
      * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
      * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if the group is not found)
+     * @deprecated use listByGroup().
      */
     public static List<DfDecoMapPieceTargetType> groupOf(String groupName) {
         return new ArrayList<DfDecoMapPieceTargetType>(4);

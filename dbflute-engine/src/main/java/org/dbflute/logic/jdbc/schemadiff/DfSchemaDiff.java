@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public class DfSchemaDiff extends DfAbstractDiff {
 
     //[diff-date] = map:{
-    //    ; diffDate = 2010/12/12 12:34:56
+    //    ; diffDate = 2010/12/12 12:34:56.789
     //    ; tableCount = map:{ next = 123 ; previous = 145}
     //    ; tableDiff = map:{
     //        ; [table-name] = map:{
@@ -168,21 +168,40 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfSchemaDiff.class);
+
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
     public static final String DIFF_DATE_KEY = "diffDate";
-    public static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
-    public static final String DIFF_DATE_DATE_PART_PATTERN = "yyyy/MM/dd";
-    public static final String DIFF_DATE_TIME_PART_PATTERN = "HH:mm:ss";
-    public static final String DIFF_DATE_CODE_PATTERN = "yyyyMMddHHmmss";
     public static final String COMMENT_KEY = "comment";
     public static final String TABLE_COUNT_KEY = "tableCount";
     public static final String DIFF_AUTHOR_KEY = "diffAuthor";
     public static final String DIFF_GIT_BRANCH_KEY = "diffGitBranch";
     public static final String TABLE_DIFF_KEY = "tableDiff";
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
-    public static final String KEYWORD_DB2_SYSTEM_SEQUENCE = "SQL";
-    public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
     public static final String PROCEDURE_DIFF_KEY = "procedureDiff";
     public static final String CRAFT_DIFF_KEY = "craftDiff";
+
+    // -----------------------------------------------------
+    //                                          Date Pattern
+    //                                          ------------
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // identity has milliseconds since 1.2.6 to avoid git conflict as possible
+    // (so it needs to widely parse existing date expression)
+    // and identity pattern can be parsed by DfTypeUtil/HandyDate default
+    // _/_/_/_/_/_/_/_/_/_/
+    public static final String DIFF_DATE_IDENTITY_PATTERN = "yyyy/MM/dd HH:mm:ss.SSS"; // for e.g. diffmap
+
+    public static final String DIFF_DATE_PUBLIC_PATTERN = "yyyy/MM/dd HH:mm:ss"; // for e.g. HistoryHTML
+    public static final String DIFF_DATE_PUBLIC_DATE_PART_PATTERN = "yyyy/MM/dd"; // me too
+    public static final String DIFF_DATE_PUBLIC_TIME_PART_PATTERN = "HH:mm:ss"; // me too
+    public static final String DIFF_DATE_SIMPLE_CODE_PATTERN = "yyyyMMddHHmmss"; // for e.g. hacomment
+
+    // -----------------------------------------------------
+    //                                               Various
+    //                                               -------
+    public static final String KEYWORD_DB2_SYSTEM_SEQUENCE = "SQL";
+    public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
     public static final String PROCEDURE_SOURCE_NO_META_MARK = "-1";
 
     // ===================================================================================
@@ -212,7 +231,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                Option
     //                                                ------
     protected boolean _checkColumnDefOrder; // depends on DBFlute property
-    protected boolean _checkDbComment; // depends on DBFlute property
+    protected boolean _checkDbComment; // me too
+    protected boolean _ignoreViewDefault; // me too
+    protected boolean _ignoreViewNotNull; // me too
     protected boolean _suppressSchema; // basically for SchemaSyncCheck
 
     // -----------------------------------------------------
@@ -326,28 +347,34 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public static DfSchemaDiff createAsHistory() {
         final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsCoreToManage();
-        return newReader(reader);
+        return newByOneReader(reader);
     }
 
     public static DfSchemaDiff createAsSerializer(String schemaXml) {
         final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsFlexibleToManage(schemaXml);
-        return prepareDiffOption(newReader(reader));
+        return prepareDiffOption(newByOneReader(reader));
     }
 
     public static DfSchemaDiff createAsAlterCheck(String previousXml, String nextXml) {
         final DfSchemaXmlReader previousReader = DfSchemaXmlReader.createAsFlexibleToManage(previousXml);
         final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsFlexibleToManage(nextXml);
-        return prepareDiffOption(newReader(previousReader, nextReader));
+        return prepareDiffOption(newByNextPreviousReader(previousReader, nextReader));
     }
 
-    protected static DfSchemaDiff newReader(DfSchemaXmlReader reader) {
+    // -----------------------------------------------------
+    //                                             by Reader
+    //                                             ---------
+    protected static DfSchemaDiff newByOneReader(DfSchemaXmlReader reader) {
         return new DfSchemaDiff(reader, reader);
     }
 
-    protected static DfSchemaDiff newReader(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
+    protected static DfSchemaDiff newByNextPreviousReader(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
         return new DfSchemaDiff(previousReader, nextReader);
     }
 
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     protected static DfSchemaDiff prepareDiffOption(DfSchemaDiff schemaDiff) {
         // all diff processes are depends on the DBFlute property
         // (CraftDiff settings are set later)
@@ -357,6 +384,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
         if (prop.isCheckDbCommentDiff()) {
             schemaDiff.checkDbComment();
+        }
+        if (prop.isIgnoreViewDefaultDiff()) {
+            schemaDiff.ignoreViewDefault();
+        }
+        if (prop.isIgnoreViewNotNullDiff()) {
+            schemaDiff.ignoreViewNotNull();
         }
         return schemaDiff;
     }
@@ -803,6 +836,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processDefaultValue(Column next, Column previous, DfColumnDiff columnDiff) {
+        if (_ignoreViewDefault && next.getTable().isTypeView()) {
+            // view's default constraint is very unstable and uncontrollable by developers
+            // https://github.com/dbflute/dbflute-core/issues/203
+            return;
+        }
         diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
             public String provide(Column obj) {
                 return obj.getDefaultValue();
@@ -838,6 +876,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processNotNull(Column next, Column previous, DfColumnDiff columnDiff) {
+        if (_ignoreViewNotNull && next.getTable().isTypeView()) {
+            // view's not null constraint is very unstable and uncontrollable by developers
+            // https://github.com/dbflute/dbflute-core/issues/200
+            return;
+        }
         diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
             public Boolean provide(Column obj) {
                 return obj.isNotNull();
@@ -1463,7 +1506,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                            ========
     public Map<String, Object> createSchemaDiffMap() {
         final Map<String, Object> schemaDiffMap = DfCollectionUtil.newLinkedHashMap();
-        schemaDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN));
+        schemaDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_IDENTITY_PATTERN));
         if (_tableCountDiff.hasDiff()) {
             schemaDiffMap.put(TABLE_COUNT_KEY, _tableCountDiff.createNextPreviousDiffMap());
         }
@@ -1498,7 +1541,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             final String key = entry.getKey();
             final Object value = entry.getValue();
             if (DIFF_DATE_KEY.equals(key)) {
-                _diffDate = DfTypeUtil.toDate(value, DIFF_DATE_PATTERN);
+                _diffDate = parseDiffDate(value);
                 assertDiffDateExists(key, _diffDate, schemaDiffMap);
             } else if (COMMENT_KEY.equals(key)) {
                 _comment = (String) value; // null allowed
@@ -1520,35 +1563,34 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    protected Date parseDiffDate(Object value) {
+        // until 1.2.5: 2022/05/06 23:06:59
+        // since 1.2.6: 2022/05/06 23:06:59.369
+        // so widely parse here
+        return DfTypeUtil.toDate(value); // basically both pattern can be parsed by the utility
+    }
+
     protected void assertDiffDateExists(String key, Date diffDate, Map<String, Object> schemaDiffMap) {
         if (diffDate == null) { // basically no way
-            String msg = "The diff-date of diff-map is required:";
-            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException("The diff-date of diff-map is required: key=" + key + " diffMap=" + schemaDiffMap);
         }
     }
 
     protected void assertTableCountExists(String key, DfNextPreviousDiff nextPreviousDiff, Map<String, Object> schemaDiffMap) {
         if (nextPreviousDiff == null) { // basically no way
-            String msg = "The table count of diff-map is required:";
-            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException("The table count of diff-map is required: key=" + key + " diffMap=" + schemaDiffMap);
         }
     }
 
     protected void assertNextTableCountExists(String key, String nextTableCount, Map<String, Object> schemaDiffMap) {
         if (nextTableCount == null) { // basically no way
-            String msg = "The next table count of diff-map is required:";
-            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException("The next table count of diff-map is required: key=" + key + " diffMap=" + schemaDiffMap);
         }
     }
 
     protected void assertPreviousTableCountExists(String key, String previousTableCount, Map<String, Object> schemaDiffMap) {
         if (previousTableCount == null) { // basically no way
-            String msg = "The previous table count of diff-map is required:";
-            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException("The previous table count of diff-map is required: key=" + key + " diffMap=" + schemaDiffMap);
         }
     }
 
@@ -1600,6 +1642,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _checkDbComment = true;
     }
 
+    public void ignoreViewDefault() {
+        _ignoreViewDefault = true;
+    }
+
+    public void ignoreViewNotNull() {
+        _ignoreViewNotNull = true;
+    }
+
     public void suppressSchema() {
         _suppressSchema = true;
     }
@@ -1618,19 +1668,19 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                 Basic
     //                                                 -----
     public String getDiffDate() { // as display string (for compatible)
-        return DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN);
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_PUBLIC_PATTERN);
     }
 
     public String getDiffDateAsCode() { // for e.g. Hacomment of DBFlute Intro
-        return DfTypeUtil.toString(_diffDate, DIFF_DATE_CODE_PATTERN);
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_SIMPLE_CODE_PATTERN);
     }
 
     public String getDiffDateAsDatePart() { // for e.g. title in HistoryHTML
-        return DfTypeUtil.toString(_diffDate, DIFF_DATE_DATE_PART_PATTERN);
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_PUBLIC_DATE_PART_PATTERN);
     }
 
     public String getDiffDateAsTimePart() { // for e.g. title in HistoryHTML
-        return DfTypeUtil.toString(_diffDate, DIFF_DATE_TIME_PART_PATTERN);
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_PUBLIC_TIME_PART_PATTERN);
     }
 
     public Date getNativeDiffDate() {

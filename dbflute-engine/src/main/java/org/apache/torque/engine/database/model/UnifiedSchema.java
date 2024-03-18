@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,8 +95,15 @@ public class UnifiedSchema {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _catalog;
-    protected final String _schema;
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // basically not null if the DBMS support it
+    // e.g. 
+    //  catalog is not null but schema is null if MySQL
+    //  catalog is null but schema is not null if Oracle
+    // _/_/_/_/_/_/_/_/_/_/
+    protected final String _catalog; // null allowed (e.g. no catalog DBMS, unsupported DBMS)
+    protected final String _schema; // null allowed (e.g. no schema DBMS, unsupported DBMS)
+
     protected boolean _mainSchema;
     protected boolean _additionalSchema;
     protected boolean _unknownSchema;
@@ -211,7 +218,14 @@ public class UnifiedSchema {
     // ===================================================================================
     //                                                                   Schema Expression
     //                                                                   =================
-    public String getCatalogSchema() {
+    // -----------------------------------------------------
+    //                                        Catalog Schema
+    //                                        --------------
+    public String getCatalogSchema() { // null allowed
+        return buildCatalogSchema();
+    }
+
+    protected String buildCatalogSchema() { // null allowed
         final StringBuilder sb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalog)) {
             sb.append(_catalog);
@@ -227,7 +241,14 @@ public class UnifiedSchema {
         return sb.length() > 0 ? sb.toString() : null;
     }
 
-    public String getIdentifiedSchema() {
+    // -----------------------------------------------------
+    //                                     Identified Schema
+    //                                     -----------------
+    public String getIdentifiedSchema() { // null allowed
+        return buildIdentifiedSchema();
+    }
+
+    protected String buildIdentifiedSchema() { // null allowed
         final StringBuilder sb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalog)) {
             sb.append(_catalog);
@@ -243,41 +264,65 @@ public class UnifiedSchema {
         return sb.length() > 0 ? sb.toString() : null;
     }
 
-    public String getLoggingSchema() {
+    // -----------------------------------------------------
+    //                                        Logging Schema
+    //                                        --------------
+    public String getLoggingSchema() { // null allowed
         return getCatalogSchema();
     }
 
-    public String getPureCatalog() {
+    // -----------------------------------------------------
+    //                                             Pure Name
+    //                                             ---------
+    public String getPureCatalog() { // null allowed
         return _catalog;
     }
 
-    public String getPureSchema() {
+    public String getPureSchema() { // null allowed
+        return buildPureSchema();
+    }
+
+    protected String buildPureSchema() {
         if (isNoNameSchema()) {
             return null;
         }
         return _schema;
     }
 
-    public String getSqlPrefixSchema() {
+    // -----------------------------------------------------
+    //                                     SQL Prefix Schema
+    //                                     -----------------
+    public String getSqlPrefixSchema() { // null allowed
+        return buildSqlPrefixSchema();
+    }
+
+    protected String buildSqlPrefixSchema() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isAvailableAddingSchemaToTableSqlName()) {
             if (prop.isAvailableAddingCatalogToTableSqlName()) {
-                return getCatalogSchema();
+                return buildCatalogSchema();
             } else {
-                return getPureSchema();
+                return buildPureSchema();
             }
         }
-        return getExecutableSchema();
+        return buildExecutableSchema();
     }
 
-    public String getDrivenSchema() {
+    // -----------------------------------------------------
+    //                                         Driven Schema
+    //                                         -------------
+    public String getDrivenSchema() {// null allowed
+        return buildDrivenSchema();
+    }
+
+    protected String buildDrivenSchema() { // null allowed
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isAvailableSchemaDrivenTable()) {
             final String drivenSchema;
             if (isNoNameSchema()) { // e.g. MySQL
-                drivenSchema = getCatalogSchema();
+                drivenSchema = buildCatalogSchema();
             } else { // e.g. PostgreSQL, Oracle
-                drivenSchema = getPureSchema();
+                drivenSchema = buildPureSchema();
             }
             return drivenSchema;
         }
@@ -285,20 +330,27 @@ public class UnifiedSchema {
         return null;
     }
 
-    public String getExecutableSchema() {
+    // -----------------------------------------------------
+    //                                     Executable Schema
+    //                                     -----------------
+    public String getExecutableSchema() { // null allowed
+        return buildExecutableSchema();
+    }
+
+    protected String buildExecutableSchema() { // null allowed
         if (_mainSchema) {
             return "";
         }
         if (_additionalSchema) {
             if (_catalogAdditionalSchema) {
-                return getCatalogSchema();
+                return buildCatalogSchema();
             } else { // schema-only additional schema
-                return getPureSchema();
+                return buildPureSchema();
             }
         }
         // basically no way but, for example,
         // SchemaSyncCheck's target schema comes here to extract auto-increment info
-        return getCatalogSchema(); // as default
+        return buildCatalogSchema(); // as default
     }
 
     // ===================================================================================

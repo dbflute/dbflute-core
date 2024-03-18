@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,21 +58,38 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // SelfCalculation specification
     protected List<HpCalcSpecification<CB>> _selfSpecificationList;
     protected Map<String, HpCalcSpecification<CB>> _selfSpecificationMap;
 
+    // UpdateColumn specification
     protected SpecifyQuery<CB> _updateColumnSpecification;
     protected CB _updateColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
+
+    // UniqueBy
     protected UniqueInfo _uniqueByUniqueInfo;
+
+    // small option for UpdateColumn adjustment
     protected boolean _exceptCommonColumnForcedSpecified;
     protected boolean _updateColumnModifiedPropertiesFragmentedAllowed; // as default of batch update
     protected boolean _compatibleBatchUpdateDefaultEveryColumn;
     protected boolean _disableCommonColumnAutoSetup;
+
+    // small option for QueryUpdate condition
     protected boolean _nonQueryUpdateAllowed;
     protected boolean _queryUpdateForcedDirectAllowed;
+
+    // small option for BatchUpdate logging
     protected Integer _batchLoggingUpdateLimit;
+
+    // small option for InsertOrUpdate count pre-check
+    protected boolean _insertOrUpdateCountPreChecked;
+
+    // small option for UniqueBy PK handling
     protected boolean _reloadPrimaryKeyIfUniqueBy;
+
+    // configuration for JDBC statement e.g. queryTimeout
     protected StatementConfig _updateStatementConfig;
 
     // ===================================================================================
@@ -683,6 +700,23 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
 
     public Integer getBatchUpdateLoggingLimit() {
         return _batchLoggingUpdateLimit;
+    }
+
+    // ===================================================================================
+    //                                                       InsertOrUpdate Count PreCheck
+    //                                                       =============================
+    /**
+     * Pre-check the count before insert-or-update. <br>
+     * Basically to avoid Otegaru Deadlock of MySQL RepeatableRead.
+     * @return The option of update. (NotNull: returns this)
+     */
+    public UpdateOption<CB> precheckInsertOrUpdateCount() {
+        _insertOrUpdateCountPreChecked = true;
+        return this;
+    }
+
+    public boolean isInsertOrUpdateCountPreCheck() {
+        return _insertOrUpdateCountPreChecked;
     }
 
     // ===================================================================================

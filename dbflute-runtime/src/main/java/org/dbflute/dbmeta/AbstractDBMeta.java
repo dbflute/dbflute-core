@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (meta == null) { // no way (just in case)
             return null;
         }
-        return meta.codeOf(code);
+        return meta.of(code).orElse(null);
     }
 
     protected static Integer cti(Object value) { // convertToInteger
@@ -893,7 +893,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap, boolean pkOnly) {
         final List<ColumnInfo> columnInfoList = pkOnly ? getPrimaryInfo().getPrimaryColumnList() : getColumnInfoList();
         final MetaHandlingMapToEntityMapper mapper = createMetaHandlingMapToEntityMapper(columnMap);
-        mapper.mappingToEntity(entity, columnMap, columnInfoList);
+        mapper.mappingToEntity(entity, columnInfoList);
     }
 
     protected MetaHandlingMapToEntityMapper createMetaHandlingMapToEntityMapper(Map<String, ? extends Object> columnMap) {
@@ -979,7 +979,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         br.addItem("Table");
         br.addElement(getTableDbName());
         br.addItem(keyName);
-        br.addElement(value);
+        final Class<? extends Object> valueType = value != null ? value.getClass() : null;
+        br.addElement(value + " :: " + valueType);
         br.addItem("Existing KeySet");
         br.addElement(keySet);
         final String msg = br.buildExceptionMessage();
