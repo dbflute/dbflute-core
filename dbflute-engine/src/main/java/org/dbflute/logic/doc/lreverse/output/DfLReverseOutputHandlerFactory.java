@@ -58,6 +58,7 @@ public class DfLReverseOutputHandlerFactory {
             handler.setCellLengthLimit(cellLengthLimit);
         }
         handler.setDelimiterDataDir(getDelimiterDataDir());
+        handler.setDelimiterMinimallyQuoted(isDelimiterDataMinimallyQuoted());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
         return handler;
@@ -83,6 +84,10 @@ public class DfLReverseOutputHandlerFactory {
 
     protected Integer getXlsLimit() {
         return getDocumentProperties().getLoadDataReverseXlsLimit();
+    }
+
+    protected boolean isDelimiterDataMinimallyQuoted() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataMinimallyQuoted();
     }
 
     protected boolean isSuppressLargeDataHandling() {

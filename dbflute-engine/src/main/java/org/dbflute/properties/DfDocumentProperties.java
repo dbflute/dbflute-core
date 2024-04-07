@@ -797,6 +797,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         }
     }
 
+    public boolean isLoadDataReverseDelimiterDataMinimallyQuoted() { // since 1.2.9
+        // to fit with application policy: https://github.com/dbflute/dbflute-core/issues/205
+        return isProperty("isDelimiterDataMinimallyQuoted", false, getLoadDataReverseMap());
+    }
+
     // -----------------------------------------------------
     //                                     Table Except List
     //                                     -----------------

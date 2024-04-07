@@ -69,6 +69,7 @@ public class DfLReverseOutputHandler {
     protected boolean _suppressQuoteEmptyString; // default is in writer
     protected Integer _cellLengthLimit; // default is in writer
     protected String _delimiterDataDir; // option for large data
+    protected boolean _delimiterDataMinimallyQuoted; // option for large data
     protected final Map<String, Table> _tableNameMap = new LinkedHashMap<String, Table>();
 
     // ===================================================================================
@@ -291,7 +292,12 @@ public class DfLReverseOutputHandler {
                                 ++count;
                             }
                         }
-                    }, op -> op.encodeAsUTF8().separateByLf().delimitateByTab().headerInfo(columnNameList));
+                    }, op -> {
+                        op.encodeAsUTF8().separateByLf().delimitateByTab().headerInfo(columnNameList);
+                        if (_delimiterDataMinimallyQuoted) { // since 1.2.9
+                            op.quoteMinimally(); // to fit with application policy
+                        }
+                    });
                 } catch (IOException e) {
                     handleDelimiterDataFailureException(table, delimiterFilePath, e);
                 }
@@ -365,6 +371,10 @@ public class DfLReverseOutputHandler {
 
     public void setDelimiterDataDir(String delimiterDataDir) {
         _delimiterDataDir = delimiterDataDir;
+    }
+
+    public void setDelimiterMinimallyQuoted(boolean delimiterDataMinimallyQuoted) {
+        _delimiterDataMinimallyQuoted = delimiterDataMinimallyQuoted;
     }
 
     // -----------------------------------------------------
