@@ -119,6 +119,12 @@ public class DfProcedureExecutionMetaExtractor {
             boolean executed;
             try {
                 executed = cs.execute();
+            } catch (RuntimeException e) { // actually MySQL JDBC threw it, see #209 (2024/07/24)
+                // debug information is on wrapping exception so simple here
+                final String msg = "Unexpected RuntimeException from JDBC. See \"Cause Exception\" for the detail.";
+                final DfJDBCException jdbcEx = new DfJDBCException(msg);
+                jdbcEx.initCause(e); // to show stacktrace
+                throw jdbcEx;
             } catch (SQLException e) { // retry without escape because Oracle sometimes hates escape
                 final String retrySql = createSql(procedure, existsReturn, /*escape*/false);
                 try {
@@ -538,7 +544,8 @@ public class DfProcedureExecutionMetaExtractor {
         }
         br.addItem("Test Value");
         br.addElement(buildTestValueDisp(testValueList));
-        br.addItem("Exception Message");
+        br.addItem("SQLException");
+        br.addElement(mainSqlExp.getClass());
         final String exceptionMessage = DfJDBCException.extractMessage(mainSqlExp);
         br.addElement(exceptionMessage);
         final SQLException nextEx = mainSqlExp.getNextException();
@@ -556,6 +563,13 @@ public class DfProcedureExecutionMetaExtractor {
                     br.addElement(DfJDBCException.extractMessage(retryNextEx));
                 }
             }
+        }
+        final Throwable cause = mainSqlExp.getCause();
+        if (cause != null) { // e.g. unexpected RuntimeException from JDBC
+            br.addItem("Cause Exception");
+            final StringBuilder sb = new StringBuilder();
+            buildCompactStackTrace(sb, cause, 0);
+            br.addElement(sb.toString().trim());
         }
         final String msg = br.buildExceptionMessage();
         final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
@@ -584,6 +598,39 @@ public class DfProcedureExecutionMetaExtractor {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    // copied from LastaFlute ApplicationExceptionResolver (with small adjustment)
+    protected void buildCompactStackTrace(StringBuilder sb, Throwable cause, int nestLevel) {
+        sb.append(ln()).append(nestLevel > 0 ? "Caused by: " : "");
+        sb.append(cause.getClass().getName()).append(": ").append(cause.getMessage());
+        final StackTraceElement[] stackTrace = cause.getStackTrace();
+        if (stackTrace == null) { // just in case
+            return;
+        }
+        final int limit = nestLevel == 0 ? 10 : 3;
+        int index = 0;
+        for (StackTraceElement element : stackTrace) {
+            if (index > limit) { // not all because it's not error
+                sb.append(ln()).append("  ...");
+                break;
+            }
+            final String className = element.getClassName();
+            final String fileName = element.getFileName(); // might be null
+            final int lineNumber = element.getLineNumber();
+            final String methodName = element.getMethodName();
+            sb.append(ln()).append("  at ").append(className).append(".").append(methodName);
+            sb.append("(").append(fileName);
+            if (lineNumber >= 0) {
+                sb.append(":").append(lineNumber);
+            }
+            sb.append(")");
+            ++index;
+        }
+        final Throwable nested = cause.getCause();
+        if (nested != null && nested != cause) {
+            buildCompactStackTrace(sb, nested, nestLevel + 1);
+        }
     }
 
     // -----------------------------------------------------
