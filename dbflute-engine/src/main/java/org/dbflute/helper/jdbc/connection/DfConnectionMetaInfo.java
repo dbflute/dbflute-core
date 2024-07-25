@@ -15,6 +15,8 @@
  */
 package org.dbflute.helper.jdbc.connection;
 
+import org.dbflute.util.Srl;
+
 /**
  * @author jflute
  */
@@ -32,15 +34,36 @@ public class DfConnectionMetaInfo {
     // ===================================================================================
     //                                                                             Display
     //                                                                             =======
+    // -----------------------------------------------------
+    //                                      Database Product
+    //                                      ----------------
     public String getProductDisp() {
         return _productName + " " + _productVersion;
     }
 
+    // -----------------------------------------------------
+    //                                           JDBC Driver
+    //                                           -----------
     public String getDriverDisp() {
         return _driverName + " " + _driverVersion + " for " + getJdbcDisp();
     }
 
-    protected String getJdbcDisp() {
+    public String getDriverDispMySQL() {
+        // driverVersion actually contains driver name so remove it
+        // and driverVersion has unneeded revision information so remove it
+        final String base;
+        if (_driverVersion != null) {
+            base = Srl.substringFirstFront(_driverVersion, "(Revision", "( Revision").trim();
+        } else {
+            base = _driverName;
+        }
+        return base + " for " + getJdbcDisp();
+    }
+
+    // -----------------------------------------------------
+    //                                          JDBC Version
+    //                                          ------------
+    public String getJdbcDisp() {
         return "JDBC " + _jdbcVersion;
     }
 

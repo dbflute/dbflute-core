@@ -180,18 +180,22 @@ public class DfTaskControlLogic {
         sb.append(ln);
 
         final DfConnectionMetaInfo metaInfo = getConnectionMetaInfo();
-        final String productDisp = metaInfo != null ? " (" + metaInfo.getProductDisp() + ")" : "";
-        final String databaseType = getDatabaseTypeFacadeProp().getTargetDatabase() + productDisp;
         sb.append(ln).append("  DBFLUTE_CLIENT: {").append(getBasicProperties().getProjectName()).append("}");
-        sb.append(ln).append("    database  = " + databaseType);
-        sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
-        sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
-        sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
+        sb.append(ln).append("    database  = ").append(getDatabaseTypeFacadeProp().getTargetDatabase());
+        if (metaInfo != null) {
+            sb.append(" (").append(buildDatabaseProductDisp(metaInfo)).append(")");
+        }
+        sb.append(ln).append("    language  = ").append(getBasicProperties().getTargetLanguage());
+        sb.append(ln).append("    container = ").append(getBasicProperties().getTargetContainerName());
+        sb.append(ln).append("    package   = ").append(getBasicProperties().getPackageBase());
         sb.append(ln);
         sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {").append(envType != null ? envType : "").append("}");
         final String driver = _databaseResource.getDriver();
         if (driver != null) { // basically true except cancelled
             sb.append(ln).append("    driver = ").append(driver);
+            if (metaInfo != null) {
+                sb.append(" (").append(buildDriverVersionDisp(metaInfo)).append(")");
+            }
             sb.append(ln).append("    url    = ").append(_databaseResource.getUrl());
             sb.append(ln).append("    schema = ").append(_databaseResource.getMainSchema());
             sb.append(ln).append("    user   = ").append(_databaseResource.getUser());
@@ -211,6 +215,18 @@ public class DfTaskControlLogic {
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/ {").append(displayTaskName).append("}");
         DfDBFluteTaskUtil.logFinalMessage(sb.toString());
+    }
+
+    protected String buildDatabaseProductDisp(DfConnectionMetaInfo metaInfo) {
+        return metaInfo.getProductDisp();
+    }
+
+    protected String buildDriverVersionDisp(DfConnectionMetaInfo metaInfo) {
+        if (getBasicProperties().isDatabaseMySQL()) { // needs to adjust
+            return metaInfo.getDriverDispMySQL();
+        } else {
+            return metaInfo.getDriverDisp();
+        }
     }
 
     protected String buildAdditionalSchemaDisp() {
