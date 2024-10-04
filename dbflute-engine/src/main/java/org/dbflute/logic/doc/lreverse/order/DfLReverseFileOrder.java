@@ -88,20 +88,24 @@ public class DfLReverseFileOrder {
     protected Map<File, DfLReverseOutputResource> toOverrideReverseOrderedMap(List<List<Table>> orderedList, File baseDir) {
         final DfLReverseExistingXlsInfo existingXlsInfo = extractExistingXlsInfo(baseDir);
         final Map<File, DfLReverseOutputResource> orderedMap = createOrderedMap();
-        final String dataDirPath = resolvePath(baseDir);
-        final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(dataDirPath);
-        final Map<String, File> translatedXlsMap = prepareTranslatedXlsMap(existingXlsInfo, tableNameMap);
+        final Map<String, File> existingXlsMap; // already resolve short name
+        {
+            final String dataDirPath = resolvePath(baseDir);
+            final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(dataDirPath);
+            existingXlsMap = prepareExistingXlsMap(existingXlsInfo, tableNameMap);
+        }
         final List<Table> addedTableList = DfCollectionUtil.newArrayList();
         int sectionNo = 1;
         for (List<Table> nestedList : orderedList) {
             for (Table table : nestedList) {
-                final File existingXls = translatedXlsMap.get(table.getTableDbName());
+                final File existingXls = existingXlsMap.get(table.getTableDbName());
                 if (existingXls == null) {
                     addedTableList.add(table);
                     continue;
                 }
+                // existing here
                 DfLReverseOutputResource resource = orderedMap.get(existingXls);
-                if (resource == null) {
+                if (resource == null) { // table of new section
                     final String mainName = extractMainName(nestedList);
                     final List<Table> initialList = new ArrayList<Table>();
                     resource = createOutputResource(existingXls, initialList, sectionNo, mainName);
@@ -124,12 +128,12 @@ public class DfLReverseFileOrder {
         });
     }
 
-    protected Map<String, File> prepareTranslatedXlsMap(DfLReverseExistingXlsInfo existingXlsInfo, Map<String, String> tableNameMap) {
+    protected Map<String, File> prepareExistingXlsMap(DfLReverseExistingXlsInfo existingXlsInfo, Map<String, String> tableNameMap) {
         final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
         final Map<String, File> translatedXlsMap = StringKeyMap.createAsFlexible();
         for (Entry<String, File> entry : existingXlsMap.entrySet()) {
             final String tableName = entry.getKey();
-            if (tableName.startsWith("$")) {
+            if (tableName.startsWith("$")) { // short name mark
                 final String translated = tableNameMap.get(tableName);
                 if (translated != null) {
                     translatedXlsMap.put(translated, entry.getValue());
@@ -177,6 +181,7 @@ public class DfLReverseFileOrder {
     //                                       Replace Reverse
     //                                       ---------------
     protected Map<File, DfLReverseOutputResource> toReplaceReverseOrderedMap(List<List<Table>> orderedList) {
+        // no logic for delimiter data because switched later by jflute (2024/10/04)
         final Map<File, DfLReverseOutputResource> orderedMap = DfCollectionUtil.newLinkedHashMap();
         int sectionNo = 1;
         for (List<Table> nestedList : orderedList) {

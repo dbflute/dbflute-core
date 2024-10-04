@@ -110,7 +110,8 @@ public class DfLReverseProcess {
      * {@link DfLReverseTitleSectionProvider}
      * 
      * // prepare table order
-     * {@link DfLReverseFileOrder}
+     * {@link DfLReverseFileOrder} // make actual order with several options
+     *  |-{@link DfLReverseExistingFileProvider} // confirm existing files
      *  |-{@link DfLReverseTableOrder} // analyze FK references
      * 
      * // reverse table data
