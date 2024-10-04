@@ -38,7 +38,7 @@ public class DfLReverseTitleSectionProvider {
     // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
-    public List<String> prepareTitleSection(List<Table> tableList) {
+    public List<String> prepareTitleSectionList(List<Table> tableList) {
         final List<String> sectionInfoList = new ArrayList<String>();
         sectionInfoList.add("...Outputting load data: tables=" + tableList.size());
         final Integer recordLimit = getRecordLimit();

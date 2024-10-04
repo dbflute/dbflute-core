@@ -29,14 +29,21 @@ import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfLReverseProcessFailureException;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingFileProvider;
 import org.dbflute.logic.doc.lreverse.order.DfLReverseFileOrder;
+import org.dbflute.logic.doc.lreverse.order.DfLReverseTableOrder;
 import org.dbflute.logic.doc.lreverse.origindate.DfLReverseOriginDateSynchronizer;
+import org.dbflute.logic.doc.lreverse.output.DfLReverseDataExtractor;
 import org.dbflute.logic.doc.lreverse.output.DfLReverseOutputHandler;
 import org.dbflute.logic.doc.lreverse.output.DfLReverseOutputHandlerFactory;
 import org.dbflute.logic.doc.lreverse.reverse.DfLReverseTableData;
 import org.dbflute.logic.doc.lreverse.schema.DfLReverseSchemaMetaProvider;
 import org.dbflute.logic.doc.lreverse.schema.DfLReverseSchemaTableFilter;
 import org.dbflute.logic.doc.lreverse.secretary.DfLReverseTitleSectionProvider;
+import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataEncodingDirectoryExtractor;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableDbNameExtractor;
 import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.system.DBFluteSystem;
@@ -83,18 +90,53 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
+    /**
+     * The Beginning of LoadDataReverse!
+     * <pre>
+     * call tree: (updated at 2024/10/04)
+     * 
+     * // prepare database
+     * {@link DfLReverseSchemaMetaProvider}
+     *  |-{@link DfSchemaXmlSerializer}
+     *  |-{@link DfSchemaXmlReader}
+     * 
+     * // filter table list
+     * {@link DfLReverseSchemaTableFilter}
+     *  |-{@link DfLReverseExistingFileProvider}
+     *    |-{@link DfDelimiterDataTableDbNameExtractor}
+     *    |-{@link DfDelimiterDataEncodingDirectoryExtractor}
+     * 
+     * // prepare title section list (as result info)
+     * {@link DfLReverseTitleSectionProvider}
+     * 
+     * // prepare table order
+     * {@link DfLReverseFileOrder}
+     *  |-{@link DfLReverseTableOrder} // analyze FK references
+     * 
+     * // reverse table data
+     * {@link DfLReverseTableData}
+     *   |-{@link DfLReverseOutputHandler} // actually write file
+     *     |-{@link DfLReverseDataExtractor} // actually select data
+     * 
+     * // output table name map
+     * {@link DfTableNameProp}
+     * 
+     * // synchronize origin data
+     * {@link DfLReverseOriginDateSynchronizer}
+     * </pre>
+     */
     public void execute() {
         final Database database = prepareDatabase();
         final List<Table> tableList = filterTableList(database);
-        final List<String> sectionInfoList = prepareTitleSection(tableList);
+        final List<String> titleSectionList = prepareTitleSectionList(tableList); // as result info
         final File baseDir = prepareBaseDir();
         final Map<File, DfLReverseOutputResource> orderedMap = prepareOrderedMap(tableList, baseDir);
 
-        reverseTableData(orderedMap, baseDir, sectionInfoList);
+        reverseTableData(orderedMap, baseDir, titleSectionList);
         outputTableNameMap();
 
-        synchronizeOriginDateIfNeeds(sectionInfoList);
-        outputResultMark(sectionInfoList);
+        synchronizeOriginDateIfNeeds(titleSectionList);
+        outputResultMark(titleSectionList);
     }
 
     // -----------------------------------------------------
@@ -108,8 +150,8 @@ public class DfLReverseProcess {
         return new DfLReverseSchemaTableFilter(_dataSource, _tableNameProp, _skippedTableList).filterTableList(database);
     }
 
-    protected List<String> prepareTitleSection(List<Table> tableList) {
-        return new DfLReverseTitleSectionProvider().prepareTitleSection(tableList);
+    protected List<String> prepareTitleSectionList(List<Table> tableList) {
+        return new DfLReverseTitleSectionProvider().prepareTitleSectionList(tableList);
     }
 
     protected File prepareBaseDir() {
@@ -127,8 +169,8 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                       Reverse Table
     //                                                                       =============
-    protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
-        new DfLReverseTableData(_dataSource, _outputHandler).reverseTableData(orderedMap, baseDir, sectionInfoList);
+    protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> titleSectionList) {
+        new DfLReverseTableData(_dataSource, _outputHandler).reverseTableData(orderedMap, baseDir, titleSectionList);
     }
 
     // ===================================================================================
@@ -146,7 +188,7 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                              Synchronize OriginDate
     //                                                              ======================
-    protected void synchronizeOriginDateIfNeeds(List<String> sectionInfoList) {
+    protected void synchronizeOriginDateIfNeeds(List<String> titleSectionList) {
         if (!isSynchronizeOriginDate()) {
             return;
         }
@@ -155,15 +197,15 @@ public class DfLReverseProcess {
         final DfLReverseOriginDateSynchronizer synchronizer = new DfLReverseOriginDateSynchronizer();
         final String syncResult = synchronizer.synchronizeOriginDate(dataDir);
         _log.info("  df:originDate: " + syncResult);
-        sectionInfoList.add("");
-        sectionInfoList.add("[loadingControlMap.dataprop]");
-        sectionInfoList.add("df:originDate: " + syncResult);
+        titleSectionList.add("");
+        titleSectionList.add("[loadingControlMap.dataprop]");
+        titleSectionList.add("df:originDate: " + syncResult);
     }
 
     // ===================================================================================
     //                                                                         Result Mark
     //                                                                         ===========
-    protected void outputResultMark(List<String> sectionInfoList) {
+    protected void outputResultMark(List<String> titleSectionList) {
         _log.info("...Outputting result mark for reversed data");
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append("* * * * * * * * * * *");
@@ -171,8 +213,8 @@ public class DfLReverseProcess {
         sb.append(ln()).append("* Load Data Reverse *");
         sb.append(ln()).append("*                   *");
         sb.append(ln()).append("* * * * * * * * * * *");
-        for (String sectionInfo : sectionInfoList) {
-            sb.append(ln()).append(sectionInfo);
+        for (String titleSection : titleSectionList) {
+            sb.append(ln()).append(titleSection);
         }
         final Date currentDate = DfTypeUtil.toDate(DBFluteSystem.currentTimeMillis());
         final String currentExp = DfTypeUtil.toString(currentDate, "yyyy/MM/dd HH:mm:ss");
