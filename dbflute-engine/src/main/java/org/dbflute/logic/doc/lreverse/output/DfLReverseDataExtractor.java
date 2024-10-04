@@ -96,17 +96,17 @@ public class DfLReverseDataExtractor {
     protected DfLReverseDataResult selectData(Table table) {
         final String tableSqlName = table.getTableSqlNameDirectUse();
 
-        boolean large = false;
+        boolean selectedAll = false;
         if (_largeBorder > 0) {
-            if (_extractingLimit < 0 || _largeBorder < _extractingLimit) {
+            if (_extractingLimit < 0 || _largeBorder < _extractingLimit) { // over border
                 final DfJdbcFacade facade = createJdbcFacade();
                 final int countAll = facade.selectCountAll(tableSqlName);
                 if (countAll > _largeBorder) { // it's large
-                    large = true;
+                    selectedAll = true;
                 }
             }
         } else if (_largeBorder == 0) { // means all large mode (all TSV files)
-            large = true;
+            selectedAll = true;
         }
 
         final List<String> sqlList = DfCollectionUtil.newArrayList();
@@ -114,10 +114,10 @@ public class DfLReverseDataExtractor {
             sqlList.addAll(trySqlList);
         });
         sqlList.add(buildDefaultExtractionSql(table));
-        if (large) { // also mainly here if e.g. xlsLimit = 0
-            return processLargeData(table, sqlList);
+        if (selectedAll) { // also mainly here if e.g. xlsLimit = 0 or delimiter data basis
+            return processAllData(table, sqlList);
         } else { // mainly here
-            return processNormalData(table, sqlList);
+            return processLimitedData(table, sqlList); // limited select
         }
     }
 
@@ -260,24 +260,14 @@ public class DfLReverseDataExtractor {
     }
 
     // ===================================================================================
-    //                                                                         Normal Data
-    //                                                                         ===========
-    protected DfLReverseDataResult processNormalData(Table table, List<String> sqlList) {
+    //                                                                            All Data
+    //                                                                            ========
+    protected DfLReverseDataResult processAllData(Table table, List<String> sqlList) {
         final DfJdbcFacade facade = createJdbcFacade();
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
-        final Integer limit = _extractingLimit;
-        final List<Map<String, String>> resultList = facade.selectStringList(sqlList, valueTypeMap, converter, limit);
-        return new DfLReverseDataResult(resultList);
-    }
 
-    // ===================================================================================
-    //                                                                          Large Data
-    //                                                                          ==========
-    protected DfLReverseDataResult processLargeData(Table table, final List<String> sqlList) {
-        final DfJdbcFacade facade = createJdbcFacade();
-        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
-        final DfJFadStringConverter converter = createStringConverter();
+        // use cursor way to avoid out of memory
         final DfJFadCursorCallback callback = facade.selectCursor(sqlList, valueTypeMap, converter);
         return new DfLReverseDataResult(callback);
     }
@@ -299,6 +289,20 @@ public class DfLReverseDataExtractor {
             final ValueType valueType = _columnValueTypeMap.get(columnName);
             return convertToStringValue(valueType.getValue(_rs, columnName));
         }
+    }
+
+    // ===================================================================================
+    //                                                                        Limited Data
+    //                                                                        ============
+    protected DfLReverseDataResult processLimitedData(Table table, List<String> sqlList) {
+        final DfJdbcFacade facade = createJdbcFacade();
+        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
+        final DfJFadStringConverter converter = createStringConverter();
+
+        // use SQL limit clause
+        final Integer limit = _extractingLimit;
+        final List<Map<String, String>> resultList = facade.selectStringList(sqlList, valueTypeMap, converter, limit);
+        return new DfLReverseDataResult(resultList);
     }
 
     // ===================================================================================
@@ -440,25 +444,17 @@ public class DfLReverseDataExtractor {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public int getExtractingLimit() {
-        return _extractingLimit;
-    }
-
     /**
      * @param extractingLimit The limit for extracting. (MinusAllowed: means no limit)
      */
     public void setExtractingLimit(int extractingLimit) {
-        this._extractingLimit = extractingLimit;
-    }
-
-    public int getLargeBorder() {
-        return _largeBorder;
+        _extractingLimit = extractingLimit;
     }
 
     /**
      * @param largeBorder The border count for large data. (MinusAllowed: means no border)
      */
     public void setLargeBorder(int largeBorder) {
-        this._largeBorder = largeBorder;
+        _largeBorder = largeBorder;
     }
 }

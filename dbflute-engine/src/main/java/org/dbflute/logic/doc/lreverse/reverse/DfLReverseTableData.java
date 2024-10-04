@@ -64,7 +64,7 @@ public class DfLReverseTableData {
     //                                                                       =============
     public void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
         deletePreviousDataFile(baseDir);
-        final Integer limit = getRecordLimit();
+        final Integer recordLimit = getRecordLimit();
         for (Entry<File, DfLReverseOutputResource> entry : orderedMap.entrySet()) {
             final File xlsFile = entry.getKey();
             final DfLReverseOutputResource resource = entry.getValue();
@@ -78,7 +78,7 @@ public class DfLReverseTableData {
             _log.info(sectionTitle);
             sectionInfoList.add("");
             sectionInfoList.add(sectionTitle);
-            _outputHandler.outputData(tableInfoMap, limit, xlsFile, resource, sectionInfoList);
+            _outputHandler.outputData(tableInfoMap, recordLimit, xlsFile, resource, sectionInfoList);
         }
     }
 

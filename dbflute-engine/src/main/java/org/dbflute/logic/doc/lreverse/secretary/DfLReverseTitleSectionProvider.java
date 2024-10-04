@@ -48,6 +48,8 @@ public class DfLReverseTitleSectionProvider {
         sectionInfoList.add("  isReplaceSchemaDirectUse = " + isReplaceSchemaDirectUse());
         sectionInfoList.add("  isOverrideExistingDataFile = " + isOverrideExistingDataFile());
         sectionInfoList.add("  isSynchronizeOriginDate = " + isSynchronizeOriginDate());
+        sectionInfoList.add("  isDelimiterDataBasis = " + isDelimiterDataBasis());
+        sectionInfoList.add("  isDelimiterDataMinimallyQuoted = " + isDelimiterDataMinimallyQuoted());
         final Integer xlsLimit = getXlsLimit();
         if (xlsLimit != null) { // e.g. xlsLimit = 0 (all TSV mode)
             sectionInfoList.add("  xlsLimit = " + xlsLimit);
@@ -92,9 +94,20 @@ public class DfLReverseTitleSectionProvider {
     }
 
     // -----------------------------------------------------
-    //                                        Output Handler
-    //                                        --------------
+    //                                              Xls Data
+    //                                              --------
     protected Integer getXlsLimit() {
         return getDocumentProperties().getLoadDataReverseXlsLimit();
+    }
+
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
+    protected boolean isDelimiterDataBasis() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
+    }
+
+    protected boolean isDelimiterDataMinimallyQuoted() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataMinimallyQuoted();
     }
 }

@@ -744,9 +744,9 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // -----------------------------------------------------
-    //                                             XLS Limit
-    //                                             ---------
-    public Integer getLoadDataReverseXlsLimit() {
+    //                                              XLS Data
+    //                                              --------
+    public Integer getLoadDataReverseXlsLimit() { // null allowed, not minus
         final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!loadDataReverseMap.isEmpty()) {
@@ -779,7 +779,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isSuppressQuoteEmptyString", false, getLoadDataReverseMap());
     }
 
-    public Integer getLoadDataReverseCellLengthLimit() {
+    public Integer getLoadDataReverseCellLengthLimit() { // null allowed
         final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!loadDataReverseMap.isEmpty()) {
@@ -788,6 +788,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (limitExp == null) {
             return null; // if null, default limit
         }
+        // no check of minus but maybe exception later by jflute (2024/10/04)
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
@@ -795,6 +796,20 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
+    public boolean isLoadDataReverseDelimiterDataBasis() { // since 1.2.9
+        // instead of xlsLimit=0: https://github.com/dbflute/dbflute-core/issues/214
+        final boolean defaultValue = isLoadDataReverseOldStyleDelimiterTrigger();
+        return isProperty("isDelimiterDataBasis", defaultValue, getLoadDataReverseMap());
+    }
+
+    protected boolean isLoadDataReverseOldStyleDelimiterTrigger() {
+        final Integer xlsLimit = getLoadDataReverseXlsLimit(); // not minus
+        return xlsLimit != null && xlsLimit.equals(0);
     }
 
     public boolean isLoadDataReverseDelimiterDataMinimallyQuoted() { // since 1.2.9

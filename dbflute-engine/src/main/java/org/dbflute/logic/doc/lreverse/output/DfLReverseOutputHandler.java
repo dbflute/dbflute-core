@@ -64,12 +64,25 @@ public class DfLReverseOutputHandler {
     //                                                                           =========
     protected final DataSource _dataSource;
     protected boolean _containsCommonColumn;
+
+    // -----------------------------------------------------
+    //                                              Xls Data
+    //                                              --------
     protected int _xlsLimit = 65000; // as default
     protected boolean _suppressLargeDataHandling; // default is in writer
     protected boolean _suppressQuoteEmptyString; // default is in writer
     protected Integer _cellLengthLimit; // default is in writer
+
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
     protected String _delimiterDataDir; // option for large data
+    protected boolean _delimiterDataBasis; // option for delimiter data @since 1.2.9
     protected boolean _delimiterDataMinimallyQuoted; // option for large data
+
+    // -----------------------------------------------------
+    //                                            Saved Data
+    //                                            ----------
     protected final Map<String, Table> _tableNameMap = new LinkedHashMap<String, Table>();
 
     // ===================================================================================
@@ -85,19 +98,27 @@ public class DfLReverseOutputHandler {
     /**
      * Output data excel templates. (using dataSource)
      * @param tableInfoMap The map of table to extract. (NotNull)
-     * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
+     * @param recordLimit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of XLS. (NotNull)
      * @param resource The resource information of output data. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
-    public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile, DfLReverseOutputResource resource,
+    public void outputData(Map<String, Table> tableInfoMap, int recordLimit, File xlsFile, DfLReverseOutputResource resource,
             List<String> sectionInfoList) {
         filterUnsupportedTable(tableInfoMap);
         final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
-        extractor.setExtractingLimit(limit);
-        extractor.setLargeBorder(_xlsLimit);
+        extractor.setExtractingLimit(recordLimit);
+        extractor.setLargeBorder(calculateLargeBorder());
         final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
-        transferToXls(tableInfoMap, loadDataMap, limit, xlsFile, resource, sectionInfoList);
+        transferToXls(tableInfoMap, loadDataMap, recordLimit, xlsFile, resource, sectionInfoList);
+    }
+
+    protected int calculateLargeBorder() {
+        if (_delimiterDataBasis) {
+            return 0; // delimiter data is treated as plain text file so no limit
+        } else { // tranditional
+            return _xlsLimit;
+        }
     }
 
     protected void filterUnsupportedTable(Map<String, Table> tableInfoMap) {
@@ -152,8 +173,8 @@ public class DfLReverseOutputHandler {
             final String tableInfo = "  " + table.getTableDispName() + " (" + extractedList.size() + ")";
             _log.info(tableInfo);
             sectionInfoList.add(tableInfo);
-            if (extractedList.size() > _xlsLimit) {
-                recordList = extractedList.subList(0, _xlsLimit); // just in case
+            if (extractedList.size() > calculateLargeBorder()) {
+                recordList = extractedList.subList(0, calculateLargeBorder()); // just in case
             } else {
                 recordList = extractedList;
             }
@@ -349,6 +370,9 @@ public class DfLReverseOutputHandler {
         _containsCommonColumn = containsCommonColumn;
     }
 
+    // -----------------------------------------------------
+    //                                              Xls Data
+    //                                              --------
     public void setXlsLimit(int xlsLimit) {
         _xlsLimit = xlsLimit;
     }
@@ -365,12 +389,19 @@ public class DfLReverseOutputHandler {
         _cellLengthLimit = cellLengthLimit;
     }
 
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
     public String getDelimiterDataDir() { // used for e.g. delete
         return _delimiterDataDir;
     }
 
     public void setDelimiterDataDir(String delimiterDataDir) {
         _delimiterDataDir = delimiterDataDir;
+    }
+
+    public void setDelimiterDataBasis(boolean delimiterDataBasis) {
+        _delimiterDataBasis = delimiterDataBasis;
     }
 
     public void setDelimiterMinimallyQuoted(boolean delimiterDataMinimallyQuoted) {
