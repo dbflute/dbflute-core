@@ -68,8 +68,8 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSchemaSource _dataSource;
-    protected final DfLReverseOutputHandler _outputHandler; // also provides tableNameMap
+    protected final DfSchemaSource _dataSource; // not null
+    protected final DfLReverseOutputHandler _outputHandler; // also provides tableNameMap, not null
 
     // shared data between components
     protected final DfTableNameProp _tableNameProp = new DfTableNameProp();
@@ -131,6 +131,7 @@ public class DfLReverseProcess {
         final List<Table> tableList = filterTableList(database);
         final List<String> sectionInfoList = prepareSectionInfoList(tableList); // as result info
         final File baseDir = prepareBaseDir();
+
         final Map<File, DfLReverseOutputResource> orderedMap = prepareOrderedMap(tableList, baseDir);
 
         reverseTableData(orderedMap, baseDir, sectionInfoList);
@@ -141,8 +142,8 @@ public class DfLReverseProcess {
     }
 
     // -----------------------------------------------------
-    //                                               Prepare
-    //                                               -------
+    //                                                 Ready
+    //                                                 -----
     protected Database prepareDatabase() {
         return new DfLReverseSchemaMetaProvider(_dataSource).prepareDatabase();
     }
@@ -157,7 +158,7 @@ public class DfLReverseProcess {
 
     protected File prepareBaseDir() {
         final String reverseDataDir;
-        if (isDelimiterDataBasisd()) { // @since 1.2.9
+        if (isDelimiterDataBasis()) { // @since 1.2.9
             reverseDataDir = getReverseDelimiterDataDir();
         } else {
             reverseDataDir = getReverseXlsDataDir();
@@ -169,20 +170,23 @@ public class DfLReverseProcess {
         return baseDir;
     }
 
+    // -----------------------------------------------------
+    //                                            File Order
+    //                                            ----------
     protected Map<File, DfLReverseOutputResource> prepareOrderedMap(List<Table> tableList, File baseDir) {
         return new DfLReverseFileOrder(_dataSource, _tableNameProp, _skippedTableList).prepareOrderedMap(tableList, baseDir);
     }
 
-    // ===================================================================================
-    //                                                                       Reverse Table
-    //                                                                       =============
+    // -----------------------------------------------------
+    //                                            Table Data
+    //                                            ----------
     protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
         new DfLReverseTableData(_dataSource, _outputHandler).reverseTableData(orderedMap, baseDir, sectionInfoList);
     }
 
-    // ===================================================================================
-    //                                                                      Table Name Map
-    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                        Table Name Map
+    //                                        --------------
     protected void outputTableNameMap(File baseDir) {
         final Map<String, Table> tableNameMap = _outputHandler.getTableNameMap();
         if (tableNameMap.isEmpty()) {
@@ -192,9 +196,9 @@ public class DfLReverseProcess {
         _tableNameProp.outputTableNameMap(baseDir, tableNameMap);
     }
 
-    // ===================================================================================
-    //                                                              Synchronize OriginDate
-    //                                                              ======================
+    // -----------------------------------------------------
+    //                                           Origin Date
+    //                                           -----------
     protected void synchronizeOriginDateIfNeeds(File baseDir, List<String> sectionInfoList) {
         if (!isSynchronizeOriginDate()) {
             return;
@@ -208,9 +212,9 @@ public class DfLReverseProcess {
         sectionInfoList.add("df:originDate: " + syncResult);
     }
 
-    // ===================================================================================
-    //                                                                         Result Mark
-    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Result Mark
+    //                                           -----------
     protected void outputResultMark(File baseDir, List<String> sectionInfoList) {
         _log.info("...Outputting result mark for reversed data");
         final StringBuilder sb = new StringBuilder();
@@ -275,7 +279,10 @@ public class DfLReverseProcess {
         return getDocumentProperties().isLoadDataReverseSynchronizeOriginDate();
     }
 
-    protected boolean isDelimiterDataBasisd() {
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
+    protected boolean isDelimiterDataBasis() {
         return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
     }
 
