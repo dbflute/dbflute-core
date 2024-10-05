@@ -719,7 +719,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
@@ -785,12 +785,12 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         try {
             limit = Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
         if (limit < 0) {
-            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be zero or plus number but minus: value=" + limit;
             throw new DfIllegalPropertySettingException(msg);
         }
@@ -818,7 +818,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
@@ -856,6 +856,34 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    }
+
+    // -----------------------------------------------------
+    //                         Section Table Guideline Limit
+    //                         -----------------------------
+    public Integer getLoadDataReverseSectionTableGuidelineLimit() { // null allowed, not minus
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
+        String tableLimit = null;
+        if (!loadDataReverseMap.isEmpty()) {
+            tableLimit = (String) loadDataReverseMap.get("sectionTableGuidelineLimit");
+        }
+        if (tableLimit == null) {
+            return null; // if null, default limit
+        }
+        final Integer limit;
+        try {
+            limit = Integer.valueOf(tableLimit);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
+            msg = msg + " should be number but: value=" + tableLimit;
+            throw new DfIllegalPropertyTypeException(msg, e);
+        }
+        if (limit <= 0) {
+            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
+            msg = msg + " should be plus number but zero or minus: value=" + limit;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return limit;
     }
 
     // ===================================================================================

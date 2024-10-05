@@ -61,7 +61,15 @@ public class DfLReverseFileOrder {
     }
 
     protected DfLReverseTableOrder createTableOrder() {
-        return new DfLReverseTableOrder();
+        return new DfLReverseTableOrder(prepareSectionTableGuidelineLimit());
+    }
+
+    protected Integer prepareSectionTableGuidelineLimit() {
+        Integer sectionTableGuidelineLimit = getSectionTableGuidelineLimit();
+        if (sectionTableGuidelineLimit == null) {
+            sectionTableGuidelineLimit = 9; // fixed traditional parameter
+        }
+        return sectionTableGuidelineLimit;
     }
 
     // ===================================================================================
@@ -358,6 +366,13 @@ public class DfLReverseFileOrder {
     //                                        --------------
     protected boolean isDelimiterDataBasis() {
         return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
+    }
+
+    // -----------------------------------------------------
+    //                         Section Table Guideline Limit
+    //                         -----------------------------
+    protected Integer getSectionTableGuidelineLimit() { // null allowed
+        return getProperties().getDocumentProperties().getLoadDataReverseSectionTableGuidelineLimit();
     }
 
     // ===================================================================================
