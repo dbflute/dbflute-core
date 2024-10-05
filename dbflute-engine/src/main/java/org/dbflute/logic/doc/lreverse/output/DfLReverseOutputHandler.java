@@ -68,7 +68,7 @@ public class DfLReverseOutputHandler {
     // -----------------------------------------------------
     //                                        Delimiter Data
     //                                        --------------
-    protected String _delimiterDataDir; // option for large data
+    protected String _largeDataDir; // option for large data (delimiter data when large xls)
     protected boolean _delimiterDataBasis; // option for delimiter data @since 1.2.9
     protected boolean _delimiterDataMinimallyQuoted; // option for large data
 
@@ -97,20 +97,20 @@ public class DfLReverseOutputHandler {
     //                                                                         ===========
     /**
      * Output load data to data file. (using dataSource)
-     * @param tableInfoMap The map of table to extract. (NotNull)
+     * @param tableMap The map of table to extract. (NotNull)
      * @param recordLimit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param outputDataFile The data file to output. (NotNull)
      * @param resource The resource information of output data. (NotNull)
      * @param sectionInfoList The list of section info for display. (NotNull)
      */
-    public void outputData(Map<String, Table> tableInfoMap, int recordLimit, File outputDataFile, DfLReverseOutputResource resource,
+    public void outputData(Map<String, Table> tableMap, int recordLimit, File outputDataFile, DfLReverseOutputResource resource,
             List<String> sectionInfoList) {
-        filterUnsupportedTable(tableInfoMap);
+        filterUnsupportedTable(tableMap);
         final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
         extractor.setExtractingLimit(recordLimit);
         extractor.setLargeBorder(calculateLargeBorder());
-        final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
-        transferDataToFile(tableInfoMap, loadDataMap, recordLimit, outputDataFile, resource, sectionInfoList);
+        final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableMap);
+        transferDataToFile(tableMap, loadDataMap, recordLimit, outputDataFile, resource, sectionInfoList);
     }
 
     protected int calculateLargeBorder() {
@@ -275,15 +275,15 @@ public class DfLReverseOutputHandler {
     //                                                                          ==========
     protected void outputLargeData(File outputDataFile, Table table, DfLReverseDataResult dataResult, int recordLimit,
             DfLReverseOutputResource resource, int sheetNumber, List<String> sectionInfoList) {
-        if (_delimiterDataDir == null) {
+        if (_largeDataDir == null) {
             return;
         }
-        final File largeDir = new File(_delimiterDataDir);
-        if (!largeDir.exists()) {
-            largeDir.mkdirs();
+        final File largeDataDir = new File(_largeDataDir);
+        if (!largeDataDir.exists()) {
+            largeDataDir.mkdirs();
         }
         final FileToken fileToken = new FileToken();
-        final File delimiterFile = prepareLargeDelimiterFile(outputDataFile, table, resource, sheetNumber, largeDir);
+        final File delimiterFile = prepareLargeDelimiterFile(outputDataFile, table, resource, sheetNumber, largeDataDir);
         final List<String> columnNameList = new ArrayList<String>();
         for (Column column : table.getColumnList()) {
             if (!_containsCommonColumn && column.isCommonColumn()) {
@@ -339,24 +339,24 @@ public class DfLReverseOutputHandler {
     }
 
     protected File prepareLargeDelimiterFile(File outputDataFile, Table table, DfLReverseOutputResource resource, int sheetNumber,
-            File largeDir) {
+            File largeDataDir) {
         final File delimiterFile;
         if (_delimiterDataBasis) { // @since 1.2.9
             // delimiter basis always is treated as large data using cursor for performance
             delimiterFile = outputDataFile;
         } else {
-            delimiterFile = createLargeXlsDelimiterFile(table, resource, sheetNumber, largeDir);
+            delimiterFile = createLargeXlsDelimiterFile(table, resource, sheetNumber, largeDataDir);
         }
         return delimiterFile;
     }
 
-    protected File createLargeXlsDelimiterFile(Table table, DfLReverseOutputResource resource, int sheetNumber, File largeDir) {
-        final String delimiterFilePath = buildLargeXlsDelimiterFilePath(table, resource, sheetNumber, largeDir);
+    protected File createLargeXlsDelimiterFile(Table table, DfLReverseOutputResource resource, int sheetNumber, File largeDataDir) {
+        final String delimiterFilePath = buildLargeXlsDelimiterFilePath(table, resource, sheetNumber, largeDataDir);
         return new File(delimiterFilePath);
     }
 
-    protected String buildLargeXlsDelimiterFilePath(Table table, DfLReverseOutputResource resource, int sheetNumber, File largeDir) {
-        final String dirPath = resolvePath(largeDir);
+    protected String buildLargeXlsDelimiterFilePath(Table table, DfLReverseOutputResource resource, int sheetNumber, File largeDataDir) {
+        final String dirPath = resolvePath(largeDataDir);
         final String fileName = buildLargeXlsDelimiterFilePrefix(resource, sheetNumber) + table.getTableDispName() + ".tsv";
         return dirPath + "/" + fileName;
     }
@@ -405,12 +405,12 @@ public class DfLReverseOutputHandler {
     // -----------------------------------------------------
     //                                        Delimiter Data
     //                                        --------------
-    public String getDelimiterDataDir() { // used for e.g. delete
-        return _delimiterDataDir;
+    public String getLargeDataDir() { // used for e.g. delete
+        return _largeDataDir;
     }
 
-    public void setDelimiterDataDir(String delimiterDataDir) {
-        _delimiterDataDir = delimiterDataDir;
+    public void setLargeDataDir(String largeDataDir) {
+        _largeDataDir = largeDataDir;
     }
 
     public void setDelimiterDataBasis(boolean delimiterDataBasis) {

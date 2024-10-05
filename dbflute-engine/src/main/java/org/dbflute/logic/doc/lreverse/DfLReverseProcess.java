@@ -156,13 +156,13 @@ public class DfLReverseProcess {
     }
 
     protected File prepareBaseDir() {
-        final String reverseXlsDataDir;
+        final String reverseDataDir;
         if (isDelimiterDataBasisd()) { // @since 1.2.9
-            reverseXlsDataDir = getReverseDelimiterDataDir();
+            reverseDataDir = getReverseDelimiterDataDir();
         } else {
-            reverseXlsDataDir = getReverseXlsDataDir();
+            reverseDataDir = getReverseXlsDataDir();
         }
-        final File baseDir = new File(reverseXlsDataDir);
+        final File baseDir = new File(reverseDataDir);
         if (!baseDir.exists()) {
             baseDir.mkdirs();
         }

@@ -36,6 +36,9 @@ import org.dbflute.util.Srl;
  */
 public class DfLReverseOriginDateSynchronizer {
 
+    // ===================================================================================
+    //                                                                         Synchronize
+    //                                                                         ===========
     public String synchronizeOriginDate(File dataDir) {
         final String mapPath = resolvePath(dataDir) + "/" + DfLoadingControlProp.LOADING_CONTROL_MAP_NAME;
         final File mapFile = new File(mapPath);
@@ -60,6 +63,9 @@ public class DfLReverseOriginDateSynchronizer {
         throw new IllegalStateException(msg);
     }
 
+    // ===================================================================================
+    //                                                                   Prepare MapString
+    //                                                                   =================
     protected String prepareSynchronizedOriginDateMapString(File mapFile, StringBuilder resultSb) {
         boolean prepared = false;
         final StringBuilder sb = new StringBuilder();
@@ -166,6 +172,9 @@ public class DfLReverseOriginDateSynchronizer {
         throw new IllegalStateException(msg);
     }
 
+    // ===================================================================================
+    //                                                                           Write Map
+    //                                                                           =========
     protected void writeMapStringToLoadingControlMap(File mapFile, String mapString) {
         BufferedWriter bw = null;
         try {

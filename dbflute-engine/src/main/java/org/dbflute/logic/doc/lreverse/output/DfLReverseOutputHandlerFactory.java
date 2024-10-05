@@ -45,7 +45,7 @@ public class DfLReverseOutputHandlerFactory {
         handler.setContainsCommonColumn(isContainsCommonColumn());
 
         // option of Delimiter Data
-        handler.setDelimiterDataDir(getDelimiterDataDir());
+        handler.setLargeDataDir(getDelimiterDataDir());
         handler.setDelimiterDataBasis(isDelimiterDataBasis());
         handler.setDelimiterMinimallyQuoted(isDelimiterDataMinimallyQuoted());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3

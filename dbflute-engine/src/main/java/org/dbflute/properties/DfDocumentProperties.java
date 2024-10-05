@@ -670,12 +670,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     // -----------------------------------------------------
     //                                         File Resource
     //                                         -------------
-    public String getLoadDataReverseDelimiterDataDir() { // for big data
+    public String getLoadDataReverseDelimiterDataDir() { // for delimiter basis or big data
         if (isLoadDataReverseReplaceSchemaDirectUse()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseTsvUTF8DataDir();
         } else {
-            final String templateDir = getLoadDataReverseXlsDataDir();
-            return templateDir + "/big-data/UTF-8";
+            // changed @since 1.2.9
+            //return templateDir + "/big-data/UTF-8";
+            return getDocumentOutputDirectory() + "/data/tsv/UTF-8";
         }
     }
 
@@ -683,8 +684,9 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (isLoadDataReverseReplaceSchemaDirectUse()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseXlsDataDir();
         } else {
-            final String outputDirectory = getDocumentOutputDirectory();
-            return outputDirectory + "/data";
+            // changed @since 1.2.9
+            //return getDocumentOutputDirectory() + "/data";
+            return getDocumentOutputDirectory() + "/data/xls";
         }
     }
 
