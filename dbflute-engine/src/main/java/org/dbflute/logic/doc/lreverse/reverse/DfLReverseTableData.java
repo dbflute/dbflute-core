@@ -62,27 +62,29 @@ public class DfLReverseTableData {
     // ===================================================================================
     //                                                                       Reverse Table
     //                                                                       =============
-    public void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> titleSectionList) {
+    public void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
         deletePreviousDataFile(baseDir);
         final Integer recordLimit = getRecordLimit();
         for (Entry<File, DfLReverseOutputResource> entry : orderedMap.entrySet()) {
-            final File xlsFile = entry.getKey();
+            final File outputDataFile = entry.getKey();
             final DfLReverseOutputResource resource = entry.getValue();
             final List<Table> tableList = resource.getTableList();
             final Map<String, Table> tableInfoMap = DfCollectionUtil.newLinkedHashMap();
             for (Table table : tableList) {
                 tableInfoMap.put(table.getTableDbName(), table);
             }
-            final String sectionTitle = "[" + xlsFile.getName() + "]: tables=" + tableList.size();
+            final String sectionTitle = "[" + outputDataFile.getName() + "]: tables=" + tableList.size();
             _log.info("");
             _log.info(sectionTitle);
-            titleSectionList.add("");
-            titleSectionList.add(sectionTitle);
-            _outputHandler.outputData(tableInfoMap, recordLimit, xlsFile, resource, titleSectionList);
+            sectionInfoList.add("");
+            sectionInfoList.add(sectionTitle);
+            // #for_now jflute needs to use baseDir (2024/10/05)
+            _outputHandler.outputData(tableInfoMap, recordLimit, outputDataFile, resource, sectionInfoList);
         }
     }
 
     protected void deletePreviousDataFile(File baseDir) {
+        // #for_now jflute needs to backup also tsv (2024/10/05)
         backupExistingXlsFile(baseDir);
         doDeletePreviousDataFile(baseDir, createXlsFileFilter());
         final String delimiterDataDir = _outputHandler.getDelimiterDataDir();

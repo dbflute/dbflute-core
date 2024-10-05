@@ -44,6 +44,13 @@ public class DfLReverseOutputHandlerFactory {
         final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(_dataSource);
         handler.setContainsCommonColumn(isContainsCommonColumn());
 
+        // option of Delimiter Data
+        handler.setDelimiterDataDir(getDelimiterDataDir());
+        handler.setDelimiterDataBasis(isDelimiterDataBasis());
+        handler.setDelimiterMinimallyQuoted(isDelimiterDataMinimallyQuoted());
+        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
+        //handler.setDelimiterDataTypeCsv(true);
+
         // option of Xls Data
         final Integer xlsLimit = getXlsLimit(); // if null, default limit
         if (xlsLimit != null) {
@@ -59,14 +66,6 @@ public class DfLReverseOutputHandlerFactory {
         if (cellLengthLimit != null) {
             handler.setCellLengthLimit(cellLengthLimit);
         }
-
-        // option of Delimiter Data
-        handler.setDelimiterDataDir(getDelimiterDataDir());
-        handler.setDelimiterDataBasis(isDelimiterDataBasis());
-        handler.setDelimiterMinimallyQuoted(isDelimiterDataMinimallyQuoted());
-        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
-        //handler.setDelimiterDataTypeCsv(true);
-
         return handler;
     }
 

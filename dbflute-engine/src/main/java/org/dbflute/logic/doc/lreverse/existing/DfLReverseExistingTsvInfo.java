@@ -18,26 +18,66 @@ package org.dbflute.logic.doc.lreverse.existing;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 1.2.7 (2023/02/02 at roppongi japanese)
  */
-public class DfLReverseExistingTsvInfo {
+public class DfLReverseExistingTsvInfo implements DfLReverseExistingFileInfo {
 
-    protected final Map<File, String> _existingTsvTableMap;
-    protected final Map<String, List<File>> _tableExistingTsvListMap;
+    protected final Map<File, String> _existingTsvTableMap; // not null
+    protected final Map<String, List<File>> _tableAllExistingTsvListMap; // not null
+    protected final Map<String, File> _tableFirstExistingTsvListMap; // not null
 
-    public DfLReverseExistingTsvInfo(Map<File, String> existingTsvTableMap, Map<String, List<File>> tableExistingTsvListMap) {
+    public DfLReverseExistingTsvInfo(Map<File, String> existingTsvTableMap, Map<String, List<File>> tableAllExistingTsvListMap,
+            Map<String, File> tableFirstExistingTsvListMap) {
         _existingTsvTableMap = existingTsvTableMap;
-        _tableExistingTsvListMap = tableExistingTsvListMap;
+        _tableAllExistingTsvListMap = tableAllExistingTsvListMap;
+        _tableFirstExistingTsvListMap = tableFirstExistingTsvListMap;
     }
 
+    /**
+     * @return The map of existing TSV file's table name. (NotNull)
+     */
     public Map<File, String> getExistingTsvTableMap() {
         return _existingTsvTableMap;
     }
 
-    public Map<String, List<File>> getTableExistingTsvListMap() {
-        return _tableExistingTsvListMap;
+    /**
+     * @return The map of table name's all existing TSV files. (NotNull)
+     */
+    public Map<String, List<File>> getTableAllExistingTsvListMap() {
+        return _tableAllExistingTsvListMap;
+    }
+
+    /**
+     * @return The map of table name's first existing TSV file. (NotNull)
+     */
+    public Map<String, File> getTableFirstExistingTsvMap() {
+        return _tableFirstExistingTsvListMap;
+    }
+
+    @Override
+    public Map<File, List<String>> getExistingFileTableListMap() {
+        final Map<File, List<String>> tableMap = DfCollectionUtil.newLinkedHashMap();
+        for (Entry<File, String> entry : getExistingTsvTableMap().entrySet()) {
+            final List<String> elementList = DfCollectionUtil.newArrayList();
+            elementList.add(entry.getValue());
+            tableMap.put(entry.getKey(), elementList); // adapting
+        }
+        return tableMap;
+    }
+
+    @Override
+    public Map<String, List<File>> getTableAllExistingFileListMap() {
+        return getTableAllExistingTsvListMap();
+    }
+
+    @Override
+    public Map<String, File> getTableFirstExistingFileMap() {
+        return getTableFirstExistingTsvMap();
     }
 }

@@ -29,13 +29,13 @@ import org.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
  */
 public class DfLReverseOutputResource {
 
-    protected final File _xlsFile;
+    protected final File _dataFile;
     protected final List<Table> _tableList;
     protected final Integer _sectionNo; // e.g. 01, 02
     protected final String _mainName; // in current section e.g. MEMBER
 
-    public DfLReverseOutputResource(File xlsFile, List<Table> tableList, Integer sectionNo, String mainName) {
-        _xlsFile = xlsFile;
+    public DfLReverseOutputResource(File dataFile, List<Table> tableList, Integer sectionNo, String mainName) {
+        _dataFile = dataFile;
         _tableList = tableList;
         _sectionNo = sectionNo;
         _mainName = mainName;
@@ -55,8 +55,8 @@ public class DfLReverseOutputResource {
         DfCollectionUtil.orderAccordingTo(_tableList, resource);
     }
 
-    public File getXlsFile() {
-        return _xlsFile;
+    public File getDataFile() {
+        return _dataFile;
     }
 
     public List<Table> getTableList() {

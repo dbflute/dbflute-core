@@ -136,7 +136,7 @@ public class DfLReverseSchemaTableFilter {
     //                                                                        Existing TSV
     //                                                                        ============
     protected Set<String> extractCommonExistingTsvTableSet(String commonTsvDataDir) { // e.g. .../common/reversetsv
-        return extractExistingTsvInfo(new File(commonTsvDataDir)).getTableExistingTsvListMap().keySet();
+        return extractExistingTsvInfo(new File(commonTsvDataDir)).getTableAllExistingTsvListMap().keySet();
     }
 
     protected DfLReverseExistingTsvInfo extractExistingTsvInfo(File commonTsvDataDir) { // e.g. .../common/reversetsv
@@ -147,7 +147,7 @@ public class DfLReverseSchemaTableFilter {
     //                                                                        Existing Xls
     //                                                                        ============
     protected Set<String> extractCommonExistingXlsTableSet(String commonXlsDataDir) {
-        return extractExistingXlsInfo(new File(commonXlsDataDir)).getTableExistingXlsMap().keySet();
+        return extractExistingXlsInfo(new File(commonXlsDataDir)).getTableFirstExistingXlsMap().keySet();
     }
 
     protected DfLReverseExistingXlsInfo extractExistingXlsInfo(File commonXlsDataDir) {

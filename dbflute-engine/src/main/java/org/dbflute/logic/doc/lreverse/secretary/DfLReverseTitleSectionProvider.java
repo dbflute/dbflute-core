@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Title Section means detail section information as display.
  * @author jflute
  * @since 1.2.5 as split (2021/01/04 Monday at roppongi japanese)
  */
@@ -38,7 +39,7 @@ public class DfLReverseTitleSectionProvider {
     // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
-    public List<String> prepareTitleSectionList(List<Table> tableList) {
+    public List<String> prepareSectionInfoList(List<Table> tableList) {
         final List<String> sectionInfoList = new ArrayList<String>();
         sectionInfoList.add("...Outputting load data: tables=" + tableList.size());
         final Integer recordLimit = getRecordLimit();

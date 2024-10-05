@@ -129,15 +129,15 @@ public class DfLReverseProcess {
     public void execute() {
         final Database database = prepareDatabase();
         final List<Table> tableList = filterTableList(database);
-        final List<String> titleSectionList = prepareTitleSectionList(tableList); // as result info
+        final List<String> sectionInfoList = prepareSectionInfoList(tableList); // as result info
         final File baseDir = prepareBaseDir();
         final Map<File, DfLReverseOutputResource> orderedMap = prepareOrderedMap(tableList, baseDir);
 
-        reverseTableData(orderedMap, baseDir, titleSectionList);
-        outputTableNameMap();
+        reverseTableData(orderedMap, baseDir, sectionInfoList);
+        outputTableNameMap(baseDir);
 
-        synchronizeOriginDateIfNeeds(titleSectionList);
-        outputResultMark(titleSectionList);
+        synchronizeOriginDateIfNeeds(baseDir, sectionInfoList);
+        outputResultMark(baseDir, sectionInfoList);
     }
 
     // -----------------------------------------------------
@@ -151,12 +151,18 @@ public class DfLReverseProcess {
         return new DfLReverseSchemaTableFilter(_dataSource, _tableNameProp, _skippedTableList).filterTableList(database);
     }
 
-    protected List<String> prepareTitleSectionList(List<Table> tableList) {
-        return new DfLReverseTitleSectionProvider().prepareTitleSectionList(tableList);
+    protected List<String> prepareSectionInfoList(List<Table> tableList) {
+        return new DfLReverseTitleSectionProvider().prepareSectionInfoList(tableList);
     }
 
     protected File prepareBaseDir() {
-        final File baseDir = new File(getReverseXlsDataDir());
+        final String reverseXlsDataDir;
+        if (isDelimiterDataBasisd()) { // @since 1.2.9
+            reverseXlsDataDir = getReverseDelimiterDataDir();
+        } else {
+            reverseXlsDataDir = getReverseXlsDataDir();
+        }
+        final File baseDir = new File(reverseXlsDataDir);
         if (!baseDir.exists()) {
             baseDir.mkdirs();
         }
@@ -170,43 +176,42 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                       Reverse Table
     //                                                                       =============
-    protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> titleSectionList) {
-        new DfLReverseTableData(_dataSource, _outputHandler).reverseTableData(orderedMap, baseDir, titleSectionList);
+    protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
+        new DfLReverseTableData(_dataSource, _outputHandler).reverseTableData(orderedMap, baseDir, sectionInfoList);
     }
 
     // ===================================================================================
     //                                                                      Table Name Map
     //                                                                      ==============
-    protected void outputTableNameMap() {
+    protected void outputTableNameMap(File baseDir) {
         final Map<String, Table> tableNameMap = _outputHandler.getTableNameMap();
         if (tableNameMap.isEmpty()) {
             return;
         }
         _log.info("...Outputting table name map for reversed tables");
-        _tableNameProp.outputTableNameMap(getReverseXlsDataDir(), tableNameMap);
+        _tableNameProp.outputTableNameMap(baseDir, tableNameMap);
     }
 
     // ===================================================================================
     //                                                              Synchronize OriginDate
     //                                                              ======================
-    protected void synchronizeOriginDateIfNeeds(List<String> titleSectionList) {
+    protected void synchronizeOriginDateIfNeeds(File baseDir, List<String> sectionInfoList) {
         if (!isSynchronizeOriginDate()) {
             return;
         }
         _log.info("...Synchronizing origin date for date adjustment");
-        final String dataDir = getReverseXlsDataDir();
         final DfLReverseOriginDateSynchronizer synchronizer = new DfLReverseOriginDateSynchronizer();
-        final String syncResult = synchronizer.synchronizeOriginDate(dataDir);
+        final String syncResult = synchronizer.synchronizeOriginDate(baseDir);
         _log.info("  df:originDate: " + syncResult);
-        titleSectionList.add("");
-        titleSectionList.add("[loadingControlMap.dataprop]");
-        titleSectionList.add("df:originDate: " + syncResult);
+        sectionInfoList.add("");
+        sectionInfoList.add("[loadingControlMap.dataprop]");
+        sectionInfoList.add("df:originDate: " + syncResult);
     }
 
     // ===================================================================================
     //                                                                         Result Mark
     //                                                                         ===========
-    protected void outputResultMark(List<String> titleSectionList) {
+    protected void outputResultMark(File baseDir, List<String> sectionInfoList) {
         _log.info("...Outputting result mark for reversed data");
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append("* * * * * * * * * * *");
@@ -214,13 +219,13 @@ public class DfLReverseProcess {
         sb.append(ln()).append("* Load Data Reverse *");
         sb.append(ln()).append("*                   *");
         sb.append(ln()).append("* * * * * * * * * * *");
-        for (String titleSection : titleSectionList) {
-            sb.append(ln()).append(titleSection);
+        for (String sectionInfo : sectionInfoList) {
+            sb.append(ln()).append(sectionInfo);
         }
         final Date currentDate = DfTypeUtil.toDate(DBFluteSystem.currentTimeMillis());
         final String currentExp = DfTypeUtil.toString(currentDate, "yyyy/MM/dd HH:mm:ss");
         sb.append(ln()).append(ln()).append("Output Date: ").append(currentExp);
-        final File dataPropFile = new File(getReverseXlsDataDir() + "/reverse-data-result.dfmark");
+        final File dataPropFile = new File(resolvePath(baseDir) + "/reverse-data-result.dfmark");
         if (dataPropFile.exists()) {
             dataPropFile.delete();
         }
@@ -255,12 +260,12 @@ public class DfLReverseProcess {
     // -----------------------------------------------------
     //                                         File Resource
     //                                         -------------
-    protected String getReverseXlsDataDir() {
-        return getDocumentProperties().getLoadDataReverseXlsDataDir();
+    protected String getReverseDelimiterDataDir() {
+        return getDocumentProperties().getLoadDataReverseDelimiterDataDir();
     }
 
-    protected String getDelimiterDataDir() {
-        return getDocumentProperties().getLoadDataReverseDelimiterDataDir();
+    protected String getReverseXlsDataDir() {
+        return getDocumentProperties().getLoadDataReverseXlsDataDir();
     }
 
     // -----------------------------------------------------
@@ -268,6 +273,10 @@ public class DfLReverseProcess {
     //                                          ------------
     protected boolean isSynchronizeOriginDate() {
         return getDocumentProperties().isLoadDataReverseSynchronizeOriginDate();
+    }
+
+    protected boolean isDelimiterDataBasisd() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
     }
 
     // ===================================================================================

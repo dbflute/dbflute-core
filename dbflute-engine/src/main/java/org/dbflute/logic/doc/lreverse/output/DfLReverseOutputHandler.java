@@ -16,8 +16,9 @@
 package org.dbflute.logic.doc.lreverse.output;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,12 +39,11 @@ import org.dbflute.helper.io.xls.DfTableXlsWriter;
 import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
 import org.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
-import org.dbflute.helper.token.file.FileMakingCallback;
-import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.logic.doc.lreverse.DfLReverseOutputResource;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,19 +66,19 @@ public class DfLReverseOutputHandler {
     protected boolean _containsCommonColumn;
 
     // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
+    protected String _delimiterDataDir; // option for large data
+    protected boolean _delimiterDataBasis; // option for delimiter data @since 1.2.9
+    protected boolean _delimiterDataMinimallyQuoted; // option for large data
+
+    // -----------------------------------------------------
     //                                              Xls Data
     //                                              --------
     protected int _xlsLimit = 65000; // as default
     protected boolean _suppressLargeDataHandling; // default is in writer
     protected boolean _suppressQuoteEmptyString; // default is in writer
     protected Integer _cellLengthLimit; // default is in writer
-
-    // -----------------------------------------------------
-    //                                        Delimiter Data
-    //                                        --------------
-    protected String _delimiterDataDir; // option for large data
-    protected boolean _delimiterDataBasis; // option for delimiter data @since 1.2.9
-    protected boolean _delimiterDataMinimallyQuoted; // option for large data
 
     // -----------------------------------------------------
     //                                            Saved Data
@@ -93,29 +93,29 @@ public class DfLReverseOutputHandler {
     }
 
     // ===================================================================================
-    //                                                                          Output Xls
-    //                                                                          ==========
+    //                                                                         Output Data
+    //                                                                         ===========
     /**
-     * Output data excel templates. (using dataSource)
+     * Output load data to data file. (using dataSource)
      * @param tableInfoMap The map of table to extract. (NotNull)
      * @param recordLimit The limit of extracted record. (MinusAllowed: if minus, no limit)
-     * @param xlsFile The file of XLS. (NotNull)
+     * @param outputDataFile The data file to output. (NotNull)
      * @param resource The resource information of output data. (NotNull)
-     * @param titleSectionList The list of section info. (NotNull)
+     * @param sectionInfoList The list of section info for display. (NotNull)
      */
-    public void outputData(Map<String, Table> tableInfoMap, int recordLimit, File xlsFile, DfLReverseOutputResource resource,
-            List<String> titleSectionList) {
+    public void outputData(Map<String, Table> tableInfoMap, int recordLimit, File outputDataFile, DfLReverseOutputResource resource,
+            List<String> sectionInfoList) {
         filterUnsupportedTable(tableInfoMap);
         final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
         extractor.setExtractingLimit(recordLimit);
         extractor.setLargeBorder(calculateLargeBorder());
         final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
-        transferToXls(tableInfoMap, loadDataMap, recordLimit, xlsFile, resource, titleSectionList);
+        transferDataToFile(tableInfoMap, loadDataMap, recordLimit, outputDataFile, resource, sectionInfoList);
     }
 
     protected int calculateLargeBorder() {
         if (_delimiterDataBasis) {
-            return 0; // delimiter data is treated as plain text file so no limit
+            return 0; // treated as large
         } else { // tranditional
             return _xlsLimit;
         }
@@ -134,32 +134,32 @@ public class DfLReverseOutputHandler {
     }
 
     /**
-     * Transfer data to excel. (state-less)
+     * Transfer load data to data file. (state-less)
      * @param tableMap The map of table. (NotNull)
      * @param loadDataMap The map of load data. (NotNull)
-     * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
-     * @param xlsFile The file of XLS. (NotNull)
+     * @param recordLimit The limit of extracted record. (MinusAllowed: if minus, no limit)
+     * @param outputDataFile The data file to output. (NotNull)
      * @param resource The resource information of output data. (NotNull)
-     * @param titleSectionList The list of section info. (NotNull)
+     * @param sectionInfoList The list of section info for display. (NotNull)
      */
-    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit, File xlsFile,
-            DfLReverseOutputResource resource, List<String> titleSectionList) {
+    protected void transferDataToFile(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int recordLimit,
+            File outputDataFile, DfLReverseOutputResource resource, List<String> sectionInfoList) {
         final DfDataSet dataSet = new DfDataSet();
-        int sheetNumber = 0;
+        int sheetNumber = 1;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
-            ++sheetNumber;
             final String tableDbName = entry.getKey();
             final Table table = entry.getValue();
             final DfLReverseDataResult dataResult = loadDataMap.get(tableDbName);
-            if (dataResult.isLargeData()) {
-                outputDelimiterData(table, dataResult, limit, resource, sheetNumber, titleSectionList);
-            } else {
+            if (dataResult.isLargeData()) { // delimiter basis or large table for xls
+                outputLargeData(outputDataFile, table, dataResult, recordLimit, resource, sheetNumber, sectionInfoList);
+            } else { // normal size xls
                 final List<Map<String, String>> extractedList = dataResult.getResultList();
-                setupXlsDataTable(dataSet, table, extractedList, sheetNumber, titleSectionList);
+                setupXlsDataTable(dataSet, table, extractedList, sheetNumber, sectionInfoList);
             }
+            ++sheetNumber;
         }
         if (dataSet.getTableSize() > 0) {
-            writeXlsData(dataSet, xlsFile);
+            writeXlsData(dataSet, outputDataFile);
         }
     }
 
@@ -167,12 +167,12 @@ public class DfLReverseOutputHandler {
     //                                                                            Xls Data
     //                                                                            ========
     protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int sheetNumber,
-            List<String> titleSectionList) {
+            List<String> sectionInfoList) {
         final List<Map<String, String>> recordList;
         {
             final String tableInfo = "  " + table.getTableDispName() + " (" + extractedList.size() + ")";
             _log.info(tableInfo);
-            titleSectionList.add(tableInfo);
+            sectionInfoList.add(tableInfo);
             if (extractedList.size() > calculateLargeBorder()) {
                 recordList = extractedList.subList(0, calculateLargeBorder()); // just in case
             } else {
@@ -271,21 +271,19 @@ public class DfLReverseOutputHandler {
     }
 
     // ===================================================================================
-    //                                                                      Delimiter Data
-    //                                                                      ==============
-    protected void outputDelimiterData(final Table table, DfLReverseDataResult templateDataResult, final int limit,
-            DfLReverseOutputResource resource, int sheetNumber, List<String> titleSectionList) {
+    //                                                                          Large Data
+    //                                                                          ==========
+    protected void outputLargeData(File outputDataFile, Table table, DfLReverseDataResult dataResult, int recordLimit,
+            DfLReverseOutputResource resource, int sheetNumber, List<String> sectionInfoList) {
         if (_delimiterDataDir == null) {
             return;
         }
-        final File delimiterDir = new File(_delimiterDataDir);
-        final String ext = "tsv"; // fixed
-        if (!delimiterDir.exists()) {
-            delimiterDir.mkdirs();
+        final File largeDir = new File(_delimiterDataDir);
+        if (!largeDir.exists()) {
+            largeDir.mkdirs();
         }
         final FileToken fileToken = new FileToken();
-        // file name uses DB name (no display name) just in case
-        final String delimiterFilePath = buildDelimiterFilePath(table, resource, sheetNumber, delimiterDir, ext);
+        final File delimiterFile = prepareLargeDelimiterFile(outputDataFile, table, resource, sheetNumber, largeDir);
         final List<String> columnNameList = new ArrayList<String>();
         for (Column column : table.getColumnList()) {
             if (!_containsCommonColumn && column.isCommonColumn()) {
@@ -293,58 +291,85 @@ public class DfLReverseOutputHandler {
             }
             columnNameList.add(column.getName());
         }
-        final DfJFadCursorCallback cursorCallback = templateDataResult.getCursorCallback();
+        final DfJFadCursorCallback cursorCallback = dataResult.getCursorCallback(); // not null here
         cursorCallback.select(new DfJFadCursorHandler() {
-            int count = 0;
+            int writtenRowCount = 0;
 
             public void handle(final DfJFadResultSetWrapper wrapper) {
+                FileOutputStream stream = null;
                 try {
-                    fileToken.make(delimiterFilePath, new FileMakingCallback() {
-                        public void write(FileMakingRowWriter writer) throws IOException, SQLException {
-                            while (wrapper.next()) {
-                                if (limit >= 0 && limit < count) {
-                                    break;
-                                }
-                                final List<String> valueList = new ArrayList<String>();
-                                for (String columnName : columnNameList) {
-                                    valueList.add(wrapper.getString(columnName));
-                                }
-                                writer.writeRow(valueList);
-                                ++count;
-                            }
-                        }
-                    }, op -> {
-                        op.encodeAsUTF8().separateByLf().delimitateByTab().headerInfo(columnNameList);
-                        if (_delimiterDataMinimallyQuoted) { // since 1.2.9
-                            op.quoteMinimally(); // to fit with application policy
-                        }
-                    });
+                    stream = new FileOutputStream(delimiterFile);
+                    makeFile(fileToken, stream, wrapper, columnNameList, recordLimit);
                 } catch (IOException e) {
-                    handleDelimiterDataFailureException(table, delimiterFilePath, e);
+                    handleDelimiterDataFailureException(table, delimiterFile, e);
+                } finally {
+                    if (stream != null) {
+                        try {
+                            stream.close();
+                        } catch (IOException ignored) {}
+                    }
                 }
-                final String delimiterInfo = "  " + delimiterFilePath + " (" + count + ")";
+                final String delimiterInfo = "  " + delimiterFile.getPath() + " (" + writtenRowCount + ")";
                 _log.info(delimiterInfo);
-                titleSectionList.add(delimiterInfo);
+                sectionInfoList.add(delimiterInfo);
+            }
+
+            protected void makeFile(FileToken fileToken, FileOutputStream stream, DfJFadResultSetWrapper wrapper,
+                    List<String> columnNameList, int recordLimit) throws FileNotFoundException, IOException {
+                fileToken.make(stream, writer -> {
+                    while (wrapper.next()) {
+                        if (recordLimit >= 0 && recordLimit < writtenRowCount) {
+                            break;
+                        }
+                        final List<String> valueList = new ArrayList<String>();
+                        for (String columnName : columnNameList) {
+                            valueList.add(wrapper.getString(columnName));
+                        }
+                        writer.writeRow(valueList);
+                        ++writtenRowCount;
+                    }
+                }, op -> {
+                    op.encodeAsUTF8().separateByLf().delimitateByTab().headerInfo(columnNameList);
+                    if (_delimiterDataMinimallyQuoted) { // since 1.2.9
+                        op.quoteMinimally(); // to fit with application policy
+                    }
+                });
             }
         });
     }
 
-    protected String buildDelimiterFilePath(Table table, DfLReverseOutputResource resource, int sheetNumber, File delimiterDir,
-            String ext) {
-        final String dirPath = delimiterDir.getPath();
-        final String fileName = buildDelimiterFilePrefix(resource, sheetNumber) + table.getTableDispName() + "." + ext;
+    protected File prepareLargeDelimiterFile(File outputDataFile, Table table, DfLReverseOutputResource resource, int sheetNumber,
+            File largeDir) {
+        final File delimiterFile;
+        if (_delimiterDataBasis) { // @since 1.2.9
+            // delimiter basis always is treated as large data using cursor for performance
+            delimiterFile = outputDataFile;
+        } else {
+            delimiterFile = createLargeXlsDelimiterFile(table, resource, sheetNumber, largeDir);
+        }
+        return delimiterFile;
+    }
+
+    protected File createLargeXlsDelimiterFile(Table table, DfLReverseOutputResource resource, int sheetNumber, File largeDir) {
+        final String delimiterFilePath = buildLargeXlsDelimiterFilePath(table, resource, sheetNumber, largeDir);
+        return new File(delimiterFilePath);
+    }
+
+    protected String buildLargeXlsDelimiterFilePath(Table table, DfLReverseOutputResource resource, int sheetNumber, File largeDir) {
+        final String dirPath = resolvePath(largeDir);
+        final String fileName = buildLargeXlsDelimiterFilePrefix(resource, sheetNumber) + table.getTableDispName() + ".tsv";
         return dirPath + "/" + fileName;
     }
 
-    protected String buildDelimiterFilePrefix(DfLReverseOutputResource resource, int sheetNumber) {
+    protected String buildLargeXlsDelimiterFilePrefix(DfLReverseOutputResource resource, int sheetNumber) {
         final int sectionNo = resource.getSectionNo();
         final String sectionPrefix = sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo);
         final String sheetPrefix = sheetNumber < 10 ? "0" + sheetNumber : String.valueOf(sheetNumber);
         return "cyclic_" + sectionPrefix + "_" + sheetPrefix + "-";
     }
 
-    protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception cause) {
-        String msg = "Failed to output delimiter data: table=" + table.getTableDispName() + " file=" + delimiterFilePath;
+    protected void handleDelimiterDataFailureException(Table table, File delimiterFile, Exception cause) {
+        String msg = "Failed to output delimiter data: table=" + table.getTableDispName() + " file=" + delimiterFile;
         throw new IllegalStateException(msg, cause);
     }
 
@@ -364,29 +389,17 @@ public class DfLReverseOutputHandler {
     }
 
     // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String resolvePath(File file) {
+        return Srl.replace(file.getPath(), "\\", "/");
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setContainsCommonColumn(boolean containsCommonColumn) {
         _containsCommonColumn = containsCommonColumn;
-    }
-
-    // -----------------------------------------------------
-    //                                              Xls Data
-    //                                              --------
-    public void setXlsLimit(int xlsLimit) {
-        _xlsLimit = xlsLimit;
-    }
-
-    public void setSuppressLargeDataHandling(boolean suppressLargeDataHandling) {
-        _suppressLargeDataHandling = suppressLargeDataHandling;
-    }
-
-    public void setSuppressQuoteEmptyString(boolean suppressQuoteEmptyString) {
-        _suppressQuoteEmptyString = suppressQuoteEmptyString;
-    }
-
-    public void setCellLengthLimit(int cellLengthLimit) {
-        _cellLengthLimit = cellLengthLimit;
     }
 
     // -----------------------------------------------------
@@ -406,6 +419,25 @@ public class DfLReverseOutputHandler {
 
     public void setDelimiterMinimallyQuoted(boolean delimiterDataMinimallyQuoted) {
         _delimiterDataMinimallyQuoted = delimiterDataMinimallyQuoted;
+    }
+
+    // -----------------------------------------------------
+    //                                              Xls Data
+    //                                              --------
+    public void setXlsLimit(int xlsLimit) {
+        _xlsLimit = xlsLimit;
+    }
+
+    public void setSuppressLargeDataHandling(boolean suppressLargeDataHandling) {
+        _suppressLargeDataHandling = suppressLargeDataHandling;
+    }
+
+    public void setSuppressQuoteEmptyString(boolean suppressQuoteEmptyString) {
+        _suppressQuoteEmptyString = suppressQuoteEmptyString;
+    }
+
+    public void setCellLengthLimit(int cellLengthLimit) {
+        _cellLengthLimit = cellLengthLimit;
     }
 
     // -----------------------------------------------------

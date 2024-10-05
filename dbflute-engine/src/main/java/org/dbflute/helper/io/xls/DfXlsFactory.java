@@ -83,7 +83,7 @@ public class DfXlsFactory {
     // ===================================================================================
     //                                                                      File Extension
     //                                                                      ==============
-    public String getDefaultFileExtension() {
+    public String getDefaultFileExtension() { // contains front dot
         return XSSF_TYPE_MAP.isEmpty() ? ".xls" : ".xlsx";
     }
 
