@@ -42,6 +42,7 @@ import org.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.logic.doc.lreverse.DfLReverseOutputResource;
 import org.dbflute.properties.DfAdditionalTableProperties;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -362,10 +363,11 @@ public class DfLReverseOutputHandler {
     }
 
     protected String buildLargeXlsDelimiterFilePrefix(DfLReverseOutputResource resource, int sheetNumber) {
+        final String fileTitle = getReverseDelimiterFileTitle();
         final int sectionNo = resource.getSectionNo();
         final String sectionPrefix = sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo);
         final String sheetPrefix = sheetNumber < 10 ? "0" + sheetNumber : String.valueOf(sheetNumber);
-        return "cyclic_" + sectionPrefix + "_" + sheetPrefix + "-";
+        return fileTitle + "_" + sectionPrefix + "_" + sheetPrefix + "-";
     }
 
     protected void handleDelimiterDataFailureException(Table table, File delimiterFile, Exception cause) {
@@ -380,12 +382,24 @@ public class DfLReverseOutputHandler {
         return DfBuildProperties.getInstance();
     }
 
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
     }
 
     protected DfAdditionalTableProperties getAdditionalTableProperties() {
         return getProperties().getAdditionalTableProperties();
+    }
+
+    // -----------------------------------------------------
+    //                                         File Resource
+    //                                         -------------
+    // #for_now jflute setter way? or direct properties way? (2024/10/06)
+    protected String getReverseDelimiterFileTitle() {
+        return getDocumentProperties().getLoadDataReverseDelimiterFileTitle();
     }
 
     // ===================================================================================
