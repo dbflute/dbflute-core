@@ -825,6 +825,36 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // -----------------------------------------------------
+    //                         Section Table Guideline Limit
+    //                         -----------------------------
+    public Integer getLoadDataReverseSectionTableGuidelineLimit() { // null allowed, not minus
+        // you can increase table count in one section to avoid git differences a little
+        // https://github.com/dbflute/dbflute-core/issues/216
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
+        String tableLimit = null;
+        if (!loadDataReverseMap.isEmpty()) {
+            tableLimit = (String) loadDataReverseMap.get("sectionTableGuidelineLimit");
+        }
+        if (tableLimit == null) {
+            return null; // if null, default limit
+        }
+        final Integer limit;
+        try {
+            limit = Integer.valueOf(tableLimit);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
+            msg = msg + " should be number but: value=" + tableLimit;
+            throw new DfIllegalPropertyTypeException(msg, e);
+        }
+        if (limit <= 0) {
+            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
+            msg = msg + " should be plus number but zero or minus: value=" + limit;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return limit;
+    }
+
+    // -----------------------------------------------------
     //                                     Table Except List
     //                                     -----------------
     protected List<String> _tableExceptList;
@@ -856,34 +886,6 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
-    }
-
-    // -----------------------------------------------------
-    //                         Section Table Guideline Limit
-    //                         -----------------------------
-    public Integer getLoadDataReverseSectionTableGuidelineLimit() { // null allowed, not minus
-        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
-        String tableLimit = null;
-        if (!loadDataReverseMap.isEmpty()) {
-            tableLimit = (String) loadDataReverseMap.get("sectionTableGuidelineLimit");
-        }
-        if (tableLimit == null) {
-            return null; // if null, default limit
-        }
-        final Integer limit;
-        try {
-            limit = Integer.valueOf(tableLimit);
-        } catch (NumberFormatException e) {
-            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
-            msg = msg + " should be number but: value=" + tableLimit;
-            throw new DfIllegalPropertyTypeException(msg, e);
-        }
-        if (limit <= 0) {
-            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
-            msg = msg + " should be plus number but zero or minus: value=" + limit;
-            throw new DfIllegalPropertySettingException(msg);
-        }
-        return limit;
     }
 
     // ===================================================================================
