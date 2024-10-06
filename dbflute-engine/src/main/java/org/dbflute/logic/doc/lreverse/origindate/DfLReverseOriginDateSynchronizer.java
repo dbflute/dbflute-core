@@ -55,7 +55,7 @@ public class DfLReverseOriginDateSynchronizer {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the loading control map (so cannot synchronize).");
         br.addItem("Advice");
-        br.addElement("The loadingControlMap.dataprop should exist in reversexls");
+        br.addElement("The loadingControlMap.dataprop should exist in reversetsv/reversexls");
         br.addElement("if synchronization of origin date is valid for LoadDataReverse.");
         br.addItem("Map File");
         br.addElement(mapFile);
