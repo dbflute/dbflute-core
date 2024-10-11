@@ -146,6 +146,7 @@ import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.optional.OptionalThing;
+import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -305,7 +306,7 @@ public class Column {
      * Get the parent Table of the column
      */
     public Table getTable() {
-        if (_table == null) {
+        if (_table == null) { // basically no way
             String msg = "This Column did not have 'table': columnName=" + _name;
             throw new IllegalStateException(msg);
         }
@@ -427,17 +428,19 @@ public class Column {
         if (_cachedColumnAlias != null) {
             return _cachedColumnAlias;
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = _plainComment;
-        if (comment != null) {
-            final String alias = prop.extractAliasFromDbComment(comment);
-            if (alias != null) {
-                _cachedColumnAlias = alias;
-                return _cachedColumnAlias;
-            }
+        final String alias = buildAlias(getPlainComment());
+        if (alias != null) {
+            _cachedColumnAlias = alias;
+            return _cachedColumnAlias;
         }
         _cachedColumnAlias = "";
         return _cachedColumnAlias;
+    }
+
+    protected String buildAlias(String plainComment) { // null allowed
+        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(plainComment);
+        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
+        return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
@@ -686,7 +689,7 @@ public class Column {
     }
 
     public void setPlainComment(String plainComment) { // can be protected? (protected in Table.java) by jflute (2018/05/04)
-        this._plainComment = plainComment;
+        _plainComment = plainComment;
         _cachedColumnAlias = null; // needs to clear because the value is from plain comment
         _cachedColumnComment = null; // me too
     }
@@ -700,10 +703,22 @@ public class Column {
         if (_cachedColumnComment != null) {
             return _cachedColumnComment;
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.extractCommentFromDbComment(_plainComment);
-        _cachedColumnComment = comment != null ? comment : "";
+        _cachedColumnComment = buildDescriptionComment();
         return _cachedColumnComment;
+    }
+
+    protected String buildDescriptionComment() {
+        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
+        final String tableDbName = getTable().getTableDbName();
+        final String columnDbName = getName();
+        final String plainDescprition; // null allowed
+        if (dbcommentProp.hasColumnDfpropAlias(tableDbName, columnDbName)) { // unneeded alias delimiter handling
+            plainDescprition = getPlainComment();
+        } else { // mainly here
+            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(getPlainComment());
+        }
+        final String unified = dbcommentProp.unifyColumnPlainDescription(tableDbName, columnDbName, plainDescprition);
+        return unified != null ? unified : "";
     }
 
     public void setComment(String comment) { // unused? (not exists in Table.java) by jflute (2018/05/04)
@@ -711,30 +726,30 @@ public class Column {
     }
 
     public String getCommentForSchemaHtml() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveSchemaHtmlContent(getComment());
         return comment != null ? comment : "";
     }
 
     public String getCommentForSchemaHtmlPre() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveSchemaHtmlPreText(getComment());
         return comment != null ? comment : "";
     }
 
     public boolean isCommentForJavaDocValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return hasComment() && prop.isEntityJavaDocDbCommentValid();
     }
 
     public String getCommentForJavaDoc() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveJavaDocContent(getComment(), "    ");
         return comment != null ? comment : "";
     }
 
     public boolean isCommentForDBMetaValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return hasComment() && prop.isEntityDBMetaDbCommentValid();
     }
 
@@ -742,7 +757,7 @@ public class Column {
         if (!isCommentForDBMetaValid()) {
             return "null";
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveDBMetaCodeSettingText(getComment());
         return comment != null ? "\"" + comment + "\"" : "null";
     }
@@ -876,7 +891,7 @@ public class Column {
     }
 
     public String getPrimaryKeyTitleForSchemaHtml() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String value = prop.resolveSchemaHtmlTagAttr(_primaryKeyName);
         if (value == null) {
             return "";
@@ -984,7 +999,7 @@ public class Column {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // mainly for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ",<br>";
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
@@ -1250,7 +1265,7 @@ public class Column {
         if (_referrerList == null) {
             _referrerList = new ArrayList<ForeignKey>(5);
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ",<br>";
         final StringBuffer sb = new StringBuffer();
@@ -1401,7 +1416,7 @@ public class Column {
             sb.append(oneUniqueSb);
             sb.append(")");
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
     }
@@ -1507,7 +1522,7 @@ public class Column {
             sb.append(oneIndexSb);
             sb.append(")");
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String title = prop.resolveSchemaHtmlTagAttr(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
     }
@@ -2175,8 +2190,16 @@ public class Column {
         return getProperties().getBasicProperties();
     }
 
+    protected DfAdditionalDbCommentProperties getAdditionalDbCommentProperties() {
+        return getProperties().getAdditionalDbCommentProperties();
+    }
+
     protected DfClassificationProperties getClassificationProperties() {
         return getProperties().getClassificationProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 
     protected DfIncludeQueryProperties getIncludeQueryProperties() {

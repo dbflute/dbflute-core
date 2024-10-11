@@ -151,7 +151,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return null;
     }
 
-    public String extractCommentFromDbComment(String comment) { // comment is trimmed
+    public String extractDescriptionFromDbComment(String comment) { // comment is trimmed
         if (isAliasHandling(comment)) {
             if (hasAliasDelimiter(comment)) {
                 final String delimiter = getAliasDelimiterInDbComment();

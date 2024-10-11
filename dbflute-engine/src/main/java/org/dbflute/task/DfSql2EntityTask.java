@@ -352,6 +352,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final Column column = new Column();
                 setupColumnName(columnName, column);
 
+                // should be called after column name and synonym settings
+                // and before at least comment settings (basically other items)
+                tbl.addColumn(column);
+
                 // an element removed from pkMap if true
                 // and a table name related to primary key is returned
                 final String pkRelatedTableName = setupPrimaryKey(pkMap, entityName, columnName, column);
@@ -362,7 +366,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupColumnSizeContainsDigit(metaMap, columnName, column);
                 setupColumnComment(metaMap, columnName, column);
                 setupSql2EntityElement(entityName, entityInfo, metaMap, columnName, column, pkRelatedTableName, logSb);
-                tbl.addColumn(column);
             }
             if (!pkMap.isEmpty()) { // if not-removed columns exist
                 throwPrimaryKeyNotFoundException(entityName, pkMap, columnNameSet);
@@ -547,6 +550,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String relatedColumnName = columnMeta.getSql2EntityRelatedColumnName();
             final Column relatedColumn = relatedTable.getColumn(relatedColumnName);
             if (relatedColumn != null) {
+                // #for_now jflute plainComment? is alias/description/additionalDbComment handling correct? (2024/10/11)
                 relatedComment = relatedColumn.getPlainComment();
             }
         }

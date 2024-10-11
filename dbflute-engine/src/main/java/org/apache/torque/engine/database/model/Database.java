@@ -2443,8 +2443,14 @@ public class Database {
     // -----------------------------------------------------
     //                                            DB Comment
     //                                            ----------
+    // already unused in template since 1.2.9 (but keep compatible just in case)
     public boolean isAliasDelimiterInDbCommentValid() {
         return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
+    }
+
+    // used in e.g. SchemaHTML template for alias item display determination
+    public boolean needsTableAliasItem() { // e.g. may be dfprop alias only
+        return isAliasDelimiterInDbCommentValid() || getTableList().stream().anyMatch(table -> table.hasAlias());
     }
 
     public boolean isEntityJavaDocDbCommentValid() {

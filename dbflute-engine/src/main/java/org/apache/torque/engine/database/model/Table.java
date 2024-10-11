@@ -164,6 +164,7 @@ import org.dbflute.logic.generate.table.DfSerialSequenceExtractor;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.dbflute.optional.OptionalThing;
+import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.properties.DfClassificationProperties;
@@ -481,20 +482,22 @@ public class Table {
      * @return The table alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
-        if (_cachedColumnAlias != null) {
-            return _cachedColumnAlias;
+        if (_cachedTableAlias != null) {
+            return _cachedTableAlias;
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = _plainComment;
-        if (comment != null) {
-            final String alias = prop.extractAliasFromDbComment(comment);
-            if (alias != null) {
-                _cachedColumnAlias = alias;
-                return _cachedColumnAlias;
-            }
+        final String alias = buildAlias(getPlainComment());
+        if (alias != null) {
+            _cachedTableAlias = alias;
+            return _cachedTableAlias;
         }
-        _cachedColumnAlias = "";
-        return _cachedColumnAlias;
+        _cachedTableAlias = "";
+        return _cachedTableAlias;
+    }
+
+    protected String buildAlias(String plainComment) { // null allowed
+        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(plainComment);
+        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
+        return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
@@ -503,6 +506,12 @@ public class Table {
             return "";
         }
         return "(" + alias + ")";
+    }
+
+    // used in e.g. SchemaHTML template for alias item display determination
+    public boolean needsColumnAliasItem() { // e.g. may be dfprop alias only
+        final boolean aliasDelimiterInDbCommentValid = getDocumentProperties().isAliasDelimiterInDbCommentValid();
+        return aliasDelimiterInDbCommentValid || getColumnList().stream().anyMatch(column -> column.hasAlias());
     }
 
     // -----------------------------------------------------
@@ -579,17 +588,17 @@ public class Table {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
-    protected String _cachedColumnAlias; // for performance (e.g. SchemaPolicyCheck)
-    protected String _cachedColumnComment; // me too
+    protected String _cachedTableAlias; // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedTableComment; // me too
 
     public String getPlainComment() { // may contain its alias name
         return _plainComment;
     }
 
-    protected void setPlainComment(String _plainComment) { // added for clearing cache so protected
-        this._plainComment = _plainComment;
-        _cachedColumnAlias = null; // needs to clear because the value is from plain comment
-        _cachedColumnComment = null; // me too
+    protected void setPlainComment(String plainComment) { // added for clearing cache so protected
+        _plainComment = plainComment;
+        _cachedTableAlias = null; // needs to clear because the value is from plain comment
+        _cachedTableComment = null; // me too
     }
 
     public boolean hasComment() { // means resolved comment (not plain)
@@ -598,45 +607,56 @@ public class Table {
     }
 
     public String getComment() {
-        if (_cachedColumnComment != null) {
-            return _cachedColumnComment;
+        if (_cachedTableComment != null) {
+            return _cachedTableComment;
         }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.extractCommentFromDbComment(_plainComment);
-        _cachedColumnComment = comment != null ? comment : "";
-        return _cachedColumnComment;
+        _cachedTableComment = buildDescriptionComment();
+        return _cachedTableComment;
+    }
+
+    protected String buildDescriptionComment() {
+        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
+        final String tableDbName = getTableDbName();
+        final String plainDescprition; // null allowed
+        if (dbcommentProp.hasTableDfpropAlias(tableDbName)) { // unneeded alias delimiter handling
+            plainDescprition = getPlainComment();
+        } else { // mainly here
+            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(getPlainComment());
+        }
+        final String unified = dbcommentProp.unifyTablePlainDescription(tableDbName, plainDescprition);
+        return unified != null ? unified : "";
     }
 
     public String getCommentForSchemaHtml() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         String comment = prop.resolveSchemaHtmlContent(getComment());
         return comment != null ? comment : "";
     }
 
     public String getCommentForSchemaHtmlPre() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveSchemaHtmlPreText(getComment());
         return comment != null ? comment : "";
     }
 
     public boolean isCommentForJavaDocValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return hasComment() && prop.isEntityJavaDocDbCommentValid();
     }
 
     public String getCommentForJavaDoc() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveJavaDocContent(getComment(), "");
         return comment != null ? comment : "";
     }
 
     public boolean isCommentForDBMetaValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return hasComment() && prop.isEntityDBMetaDbCommentValid();
     }
 
     public String getCommentForDBMeta() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final String comment = prop.resolveDBMetaCodeSettingText(getComment());
         return comment != null ? comment : "";
     }
@@ -674,7 +694,7 @@ public class Table {
         sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
         sb.append(", nameLength=").append(getTableDbName().length());
         sb.append(", columnCount=").append(getColumns().length);
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return " title=\"" + prop.resolveSchemaHtmlTagAttr(sb.toString()) + "\"";
     }
 
@@ -701,9 +721,8 @@ public class Table {
     }
 
     /**
-     * Adds a new column to the column list and set the
-     * parent table of the column to the current table
-     * @param col the column to add
+     * Adds a new column to the column list and set the parent table of the column to the current table.
+     * @param col the column to add, whose column DB name and synonym are initialized. (NotNull)
      */
     public void addColumn(Column col) {
         col.setTable(this);
@@ -1304,7 +1323,7 @@ public class Table {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ", ";
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
@@ -1888,7 +1907,7 @@ public class Table {
 
     public String getReferrerTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ", ";
         final List<ForeignKey> referrerList = getReferrerList();
@@ -2816,12 +2835,20 @@ public class Table {
         return getProperties().getDatabaseProperties();
     }
 
+    protected DfAdditionalDbCommentProperties getAdditionalDbCommentProperties() {
+        return getProperties().getAdditionalDbCommentProperties();
+    }
+
     protected DfClassificationProperties getClassificationProperties() {
         return getProperties().getClassificationProperties();
     }
 
     protected DfCommonColumnProperties getCommonColumnProperties() {
         return getProperties().getCommonColumnProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 
     protected DfIncludeQueryProperties getIncludeQueryProperties() {
@@ -4268,7 +4295,7 @@ public class Table {
     public String getBehaviorQueryPathTitleForSchemaHtml(String behaviorQueryPath) {
         String title = getBehaviorQueryPathTitle(behaviorQueryPath);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(title)) {
-            final DfDocumentProperties prop = getProperties().getDocumentProperties();
+            final DfDocumentProperties prop = getDocumentProperties();
             title = prop.resolveSchemaHtmlContent(title);
             return "(" + title + ")";
         } else {
@@ -4289,7 +4316,7 @@ public class Table {
     public String getBehaviorQueryPathDescriptionForSchemaHtml(String behaviorQueryPath) {
         String description = getBehaviorQueryPathDescription(behaviorQueryPath);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(description)) {
-            final DfDocumentProperties prop = getProperties().getDocumentProperties();
+            final DfDocumentProperties prop = getDocumentProperties();
             description = prop.resolveSchemaHtmlPreText(description);
             return description;
         } else {

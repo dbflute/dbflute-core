@@ -598,7 +598,7 @@ ${schemaPolicyDisplay.violationMessageHtmlPreText}
 #end
 
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())
-#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($needsTableAliasItem = $database.needsTableAliasItem())
 <h2>Table List</h2>
 <div class="keywordsearch">
 	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
@@ -609,7 +609,7 @@ ${schemaPolicyDisplay.violationMessageHtmlPreText}
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 		<th>Alias</th>
 #end
 		<th>Name</th>
@@ -631,7 +631,7 @@ ${schemaPolicyDisplay.violationMessageHtmlPreText}
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
 		<td class="rownumcell">${rownum}</td>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 		<td class="aliascell">${table.alias}</td>
 #end
 		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
@@ -876,7 +876,7 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 
 // this index value depends on DBFlute settings
 // so defines it here as global for easy-to-understand
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 var NAME_INDEX = 2; // number, alias, name
 #else
 var NAME_INDEX = 1; // number, name
@@ -2646,7 +2646,7 @@ UnmappedColumnArea.prototype = {
 		var columnList = [];
 		for (var i = 0, max = trs.length; i < max; i++) {
 			// TODO check that column name column num is 6
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 			columnList.push(trs[i].getElementsByTagName('td')[7].innerText);
 #else
 			columnList.push(trs[i].getElementsByTagName('td')[6].innerText);

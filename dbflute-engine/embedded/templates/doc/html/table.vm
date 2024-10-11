@@ -29,7 +29,7 @@ ${table.aliasExpression}${table.tableDispName}
 #end
 </h2>
 <div class="tablecomment ${table.tableDbName}_comment" data-name="${table.tableDbName}"><pre>${table.commentForSchemaHtmlPre}</pre></div>
-#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($needsColumnAliasItem = $table.needsColumnAliasItem())
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
 #set ($canBeColumnNullObject = $table.canBeColumnNullObject())
@@ -43,7 +43,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<th>UQ</th>
 		<th>IX</th>
 		<th>Not<br />Null</th>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsColumnAliasItem)
 		<th>Alias</th>
 #end
 		<th>Name</th>
@@ -77,7 +77,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
 		<td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
 		<td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsColumnAliasItem)
 		<td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
 #end
 		<td class="${col.schemaHtmlColumnNameCssClass} columnnamecell" id="${col.columnIdForSchemaHtml}">${col.name}</td>

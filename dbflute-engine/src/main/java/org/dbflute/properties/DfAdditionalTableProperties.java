@@ -28,7 +28,6 @@ public final class DfAdditionalTableProperties extends DfAbstractDBFluteProperti
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
      * @param prop Properties. (NotNull)
      */
     public DfAdditionalTableProperties(Properties prop) {

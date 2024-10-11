@@ -17,6 +17,7 @@ package org.dbflute;
 
 import java.util.Properties;
 
+import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.dbflute.properties.DfAdditionalTableProperties;
@@ -125,6 +126,13 @@ public final class DfBuildProperties {
     //                                                 -----
     public DfBasicProperties getBasicProperties() {
         return getHandler().getBasicProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                  Additional DbComment
+    //                                  --------------------
+    public DfAdditionalDbCommentProperties getAdditionalDbCommentProperties() {
+        return getHandler().getAdditionalDbCommentProperties(getProperties());
     }
 
     // -----------------------------------------------------
