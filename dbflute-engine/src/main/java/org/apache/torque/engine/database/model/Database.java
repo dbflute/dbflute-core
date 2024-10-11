@@ -2448,13 +2448,31 @@ public class Database {
         return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
     }
 
+    public boolean isEntityJavaDocDbCommentValid() {
+        return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
+    }
+
     // used in e.g. SchemaHTML template for alias item display determination
     public boolean needsTableAliasItem() { // e.g. may be dfprop alias only
         return isAliasDelimiterInDbCommentValid() || getTableList().stream().anyMatch(table -> table.hasAlias());
     }
 
-    public boolean isEntityJavaDocDbCommentValid() {
-        return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
+    public boolean hasSchemaAlias() {
+        final String schemaAlias = getProperties().getAdditionalDbCommentProperties().findSchemaAlias();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(schemaAlias);
+    }
+
+    public boolean hasSchemaDescription() {
+        final String schemaDescription = getProperties().getAdditionalDbCommentProperties().findSchemaDescription();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(schemaDescription);
+    }
+
+    public String getSchemaAlias() { // null allowed so use determination method before
+        return getProperties().getAdditionalDbCommentProperties().findSchemaAlias();
+    }
+
+    public String getSchemaDescription() { // null allowed so use determination method before
+        return getProperties().getAdditionalDbCommentProperties().findSchemaDescription();
     }
 
     // -----------------------------------------------------

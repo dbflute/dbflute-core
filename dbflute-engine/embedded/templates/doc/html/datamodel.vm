@@ -124,6 +124,23 @@ h4 {
 }
 
 /* -------------------------------------------------
+                                    Schema Comment
+------------------------------------------------- */
+pre.schemaalias {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	color: #3F7E5E;
+	font-size: 2.0em;
+}
+
+pre.schemadescription {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	color: #3F7E5E;
+	font-size: 1.2em;
+}
+
+/* -------------------------------------------------
                                    Database Table
 ------------------------------------------------- */
 table {
@@ -595,6 +612,18 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 ${schemaPolicyDisplay.violationMessageHtmlPreText}
 </pre>
 #end
+#end
+
+#if ($database.hasSchemaAlias())
+<pre class="schemaalias">
+${database.schemaAlias}
+</pre>
+#end
+
+#if ($database.hasSchemaDescription())
+<pre class="schemadescription">
+${database.schemaDescription}
+</pre>
 #end
 
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())

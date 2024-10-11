@@ -28,6 +28,11 @@ import org.dbflute.util.Srl;
 public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProperties {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String KEY_SCHEMA = "$$schema$$";
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
@@ -41,6 +46,10 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     //                                                              additionalDbCommentMap
     //                                                              ======================
     // # map: {
+    // #     $$schema$$ = map:{
+    // #         ; alias = [schema alias]
+    // #         ; description = [schema description]
+    // #     }
     // #     [table-name] = map:{
     // #         ; alias = [table alias]
     // #         ; description = [table description]
@@ -140,6 +149,15 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     //                                                 Alias
     //                                                 -----
     @SuppressWarnings("unchecked")
+    public String findSchemaAlias() { // null allowed: null means not defined 
+        final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalDbCommentMap().get(KEY_SCHEMA);
+        if (componentMap == null) {
+            return null;
+        }
+        return (String) componentMap.get("alias");
+    }
+
+    @SuppressWarnings("unchecked")
     public String findTableAlias(String tableName) { // null allowed: null means not defined 
         final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalDbCommentMap().get(tableName);
         if (componentMap == null) {
@@ -163,6 +181,15 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     // -----------------------------------------------------
     //                                           Description
     //                                           -----------
+    @SuppressWarnings("unchecked")
+    public String findSchemaDescription() { // null allowed: null means not defined 
+        final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalDbCommentMap().get(KEY_SCHEMA);
+        if (componentMap == null) {
+            return null;
+        }
+        return (String) componentMap.get("description");
+    }
+
     @SuppressWarnings("unchecked")
     public String findTableDescription(String tableName) { // null allowed: null means not defined 
         final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalDbCommentMap().get(tableName);
