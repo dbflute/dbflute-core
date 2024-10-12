@@ -1000,7 +1000,15 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     protected Comparator<Table> createTableDisplayOrderBy() {
-        return new DfDocTableOrder().createTableDisplayOrderBy();
+        final DfDocTableOrder tableOrder = new DfDocTableOrder();
+        if (isTableDisplayOrderPluralFormHead()) {
+            tableOrder.usePluralFormHead();
+        }
+        return tableOrder.createTableDisplayOrderBy();
+    }
+
+    public boolean isTableDisplayOrderPluralFormHead() { // closet
+        return isProperty("isTableDisplayOrderPluralFormHead", false, getSchemaSyncCheckMap());
     }
 
     // ===================================================================================

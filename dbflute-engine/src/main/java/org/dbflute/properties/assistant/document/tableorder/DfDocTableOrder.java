@@ -18,12 +18,20 @@ package org.dbflute.properties.assistant.document.tableorder;
 import java.util.Comparator;
 
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 1.2.9 split from DfDocumentProperties (2024/10/12 Saturday at nakamguro)
  */
 public class DfDocTableOrder {
+
+    protected boolean _pluralFormHead;
+
+    public DfDocTableOrder usePluralFormHead() {
+        _pluralFormHead = true;
+        return this;
+    }
 
     public Comparator<Table> createTableDisplayOrderBy() {
         return new Comparator<Table>() {
@@ -77,10 +85,31 @@ public class DfDocTableOrder {
                 // = = =
                 // Table
                 // = = =
-                final String name1 = table1.getName();
-                final String name2 = table2.getName();
+                String name1 = table1.getName();
+                String name2 = table2.getName();
+                if (_pluralFormHead) {
+                    name1 = adjustPluralFormHead(name1);
+                    name2 = adjustPluralFormHead(name2);
+                }
                 return name1.compareTo(name2);
             }
         };
+    }
+
+    protected String adjustPluralFormHead(String tableName) { // @since 1.2.9
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // default:
+        //   [member_..., members] => [member_..., members] // headache
+        //   [MEMBER_..., MEMBERS] => [MEMBERS, MEMBER_...] // no problem
+        // 
+        // pluralFormHead:
+        //   [member_..., members] => [members, member_...] // adjusted!
+        //   [MEMBER_..., MEMBERS] => [MEMBERS, MEMBER_...] // no change
+        //
+        // underscore "_" is latter than lower alphabets but former than upper alphabets as ascii
+        // so adjust it here
+        // _/_/_/_/_/_/_/_/_/_/
+        final String sortDelimiter = "|"; // is latter than underscore and upper alphabets as ascii
+        return Srl.replace(tableName, "_", sortDelimiter);
     }
 }
