@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
@@ -34,6 +35,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReader;
+import org.dbflute.properties.assistant.document.tableorder.DfDocTableOrder;
 import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -991,63 +993,14 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     // ===================================================================================
     //                                                              Table Display Order By
     //                                                              ======================
-    public Comparator<Table> getTableDisplayOrderBy() {
-        return new Comparator<Table>() {
-            public int compare(Table table1, Table table2) {
-                // = = = =
-                // Schema
-                // = = = =
-                // The main schema has priority
-                {
-                    final boolean mainSchema1 = table1.isMainSchema();
-                    final boolean mainSchema2 = table2.isMainSchema();
-                    if (mainSchema1 != mainSchema2) {
-                        if (mainSchema1) {
-                            return -1;
-                        }
-                        if (mainSchema2) {
-                            return 1;
-                        }
-                        // unreachable
-                    }
-                    final String schema1 = table1.getDocumentSchema();
-                    final String schema2 = table2.getDocumentSchema();
-                    if (schema1 != null && schema2 != null && !schema1.equals(schema2)) {
-                        return schema1.compareTo(schema2);
-                    } else if (schema1 == null && schema2 != null) {
-                        return 1; // nulls last
-                    } else if (schema1 != null && schema2 == null) {
-                        return -1; // nulls last
-                    }
-                    // passed: when both are NOT main and are same schema
-                }
+    public List<Table> prepareTableDisplayOrderedList(List<Table> tableList) {
+        final TreeSet<Table> tableSet = new TreeSet<Table>(createTableDisplayOrderBy());
+        tableSet.addAll(tableList);
+        return new ArrayList<Table>(tableSet);
+    }
 
-                // = = =
-                // Type
-                // = = =
-                {
-                    final String type1 = table1.getType();
-                    final String type2 = table2.getType();
-                    if (!type1.equals(type2)) {
-                        // The table type has priority
-                        if (table1.isTypeTable()) {
-                            return -1;
-                        }
-                        if (table2.isTypeTable()) {
-                            return 1;
-                        }
-                        return type1.compareTo(type2);
-                    }
-                }
-
-                // = = =
-                // Table
-                // = = =
-                final String name1 = table1.getName();
-                final String name2 = table2.getName();
-                return name1.compareTo(name2);
-            }
-        };
+    protected Comparator<Table> createTableDisplayOrderBy() {
+        return new DfDocTableOrder().createTableDisplayOrderBy();
     }
 
     // ===================================================================================

@@ -132,12 +132,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
@@ -322,10 +320,7 @@ public class Database {
     }
 
     public List<Table> getTableDisplaySortedList() {
-        final Comparator<Table> tableDisplayOrderBy = getProperties().getDocumentProperties().getTableDisplayOrderBy();
-        final TreeSet<Table> tableSet = new TreeSet<Table>(tableDisplayOrderBy);
-        tableSet.addAll(getTableList());
-        return new ArrayList<Table>(tableSet);
+        return getProperties().getDocumentProperties().prepareTableDisplayOrderedList(getTableList());
     }
 
     public List<Table> getBehaviorTableList() {
