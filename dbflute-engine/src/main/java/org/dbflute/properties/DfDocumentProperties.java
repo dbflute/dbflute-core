@@ -1008,7 +1008,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     public boolean isTableDisplayOrderPluralFormHead() { // closet
-        return isProperty("isTableDisplayOrderPluralFormHead", false, getSchemaSyncCheckMap());
+        return isProperty("isTableDisplayOrderPluralFormHead", false, getDocumentMap());
     }
 
     // ===================================================================================
