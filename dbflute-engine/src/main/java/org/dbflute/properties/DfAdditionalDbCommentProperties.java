@@ -76,11 +76,16 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
 
     public Map<String, Object> getAdditionalDbCommentMap() {
         if (_additionalDbCommentMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_additionalDbCommentMap, DEFAULT_EMPTY_MAP);
-            _additionalDbCommentMap = StringKeyMap.createAsFlexibleOrdered();
-            _additionalDbCommentMap.putAll(map);
+            final Map<String, Object> resolvedMap = resolveSplit(KEY_additionalDbCommentMap, preparePlainMap());
+            final StringKeyMap<Object> flexibleMap = StringKeyMap.createAsFlexibleOrdered(); // root has table names
+            flexibleMap.putAll(resolvedMap);
+            _additionalDbCommentMap = flexibleMap;
         }
         return _additionalDbCommentMap;
+    }
+
+    protected Map<String, Object> preparePlainMap() {
+        return mapProp("torque." + KEY_additionalDbCommentMap, DEFAULT_EMPTY_MAP);
     }
 
     // ===================================================================================
