@@ -18,6 +18,7 @@ package org.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -31,6 +32,7 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     //                                                                          Definition
     //                                                                          ==========
     public static final String KEY_SCHEMA = "$$schema$$";
+    public static final String KEY_ALL = "$$ALL$$";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,6 +52,14 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     // #         ; alias = [schema alias]
     // #         ; description = [schema description]
     // #     }
+    // #     $$ALL$$ = map:{
+    // #         ; columnMap = map:{
+    // #             [column-name] = map:{
+    // #                 alias = [column alias]
+    // #                 description = [column description]
+    // #             }
+    // #         }
+    // #     }
     // #     [table-name] = map:{
     // #         ; alias = [table alias]
     // #         ; description = [table description]
@@ -62,12 +72,12 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     // #     }
     // # }
     public static final String KEY_additionalDbCommentMap = "additionalDbCommentMap";
-    protected Map<String, Object> _additionalDbCommentMap;
+    protected Map<String, Object> _additionalDbCommentMap; // lazy loaded
 
     public Map<String, Object> getAdditionalDbCommentMap() {
         if (_additionalDbCommentMap == null) {
             final Map<String, Object> map = mapProp("torque." + KEY_additionalDbCommentMap, DEFAULT_EMPTY_MAP);
-            _additionalDbCommentMap = newLinkedHashMap();
+            _additionalDbCommentMap = StringKeyMap.createAsFlexibleOrdered();
             _additionalDbCommentMap.putAll(map);
         }
         return _additionalDbCommentMap;
@@ -143,8 +153,8 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     }
 
     // ===================================================================================
-    //                                                                      Finding Helper
-    //                                                                      ==============
+    //                                                                       Direct Finder
+    //                                                                       =============
     // -----------------------------------------------------
     //                                                 Alias
     //                                                 -----
@@ -167,8 +177,17 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     }
 
     public String findColumnAlias(String tableName, String columnName) { // null allowed: null means not defined
-        final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
-        if (columnMap == null) {
+        final String columnAlias = searchColumnAlias(tableName, columnName);
+        if (columnAlias != null) {
+            return columnAlias;
+        } else {
+            return searchColumnAliasFromAll(columnName);
+        }
+    }
+
+    protected String searchColumnAlias(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = searchColumnMap(tableName);
+        if (columnMap.isEmpty()) {
             return null;
         }
         final Map<String, String> elementMap = columnMap.get(columnName);
@@ -176,6 +195,15 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
             return null;
         }
         return elementMap.get("alias");
+    }
+
+    protected String searchColumnAliasFromAll(String columnName) {
+        final Map<String, Map<String, String>> allMap = searchColumnMap(KEY_ALL);
+        final Map<String, String> allElement = allMap.get(columnName);
+        if (allElement != null) {
+            return allElement.get("alias");
+        }
+        return null;
     }
 
     // -----------------------------------------------------
@@ -200,8 +228,17 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     }
 
     public String findColumnDescription(String tableName, String columnName) { // null allowed: null means not defined
-        final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
-        if (columnMap == null) {
+        final String columnDescription = searchColumnDescription(tableName, columnName);
+        if (columnDescription != null) {
+            return columnDescription;
+        } else {
+            return searchColumnDescriptionFromAll(columnName);
+        }
+    }
+
+    protected String searchColumnDescription(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = searchColumnMap(tableName);
+        if (columnMap.isEmpty()) {
             return null;
         }
         final Map<String, String> elementMap = columnMap.get(columnName);
@@ -211,15 +248,30 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
         return elementMap.get("description");
     }
 
+    protected String searchColumnDescriptionFromAll(String columnName) {
+        final Map<String, Map<String, String>> allMap = searchColumnMap(KEY_ALL);
+        final Map<String, String> allElement = allMap.get(columnName);
+        if (allElement != null) {
+            return allElement.get("description");
+        }
+        return null;
+    }
+
     // -----------------------------------------------------
     //                                            Column Map
     //                                            ----------
     @SuppressWarnings("unchecked")
-    protected Map<String, Map<String, String>> findColumnMap(String tableName) { // null allowed: null means not defined
+    protected Map<String, Map<String, String>> searchColumnMap(String tableName) { // not null, empty allowed when undefined
         final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalDbCommentMap().get(tableName);
         if (componentMap == null) {
             return DfCollectionUtil.emptyMap();
         }
-        return (Map<String, Map<String, String>>) componentMap.get("columnMap");
+        final Map<String, Map<String, String>> columnMap = (Map<String, Map<String, String>>) componentMap.get("columnMap");
+        if (columnMap == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        final StringKeyMap<Map<String, String>> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+        flexibleMap.putAll(columnMap);
+        return flexibleMap;
     }
 }
