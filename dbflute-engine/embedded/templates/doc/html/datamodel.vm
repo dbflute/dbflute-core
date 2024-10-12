@@ -159,7 +159,7 @@ td {
 	padding:2px;
 }
 .tablecomment {
-	font-size: 0.9em;
+	font-size: 1.0em;
 	color: #3F7E5E;
 	padding:0 0 0.2em 1em;
 }
@@ -200,7 +200,7 @@ td {
 	font-size: 0.7em;
 }
 .commentcell {
-	font-size: 0.8em;
+	font-size: 0.9em;
 	color: #3F7E5E;
 }
 .commentcellerror {
