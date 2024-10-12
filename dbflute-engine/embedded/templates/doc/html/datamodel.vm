@@ -197,7 +197,7 @@ td {
 	font-size: 0.6em;
 }
 .relcell {
-	font-size: 0.7em;
+	font-size: 0.8em;
 }
 .commentcell {
 	font-size: 0.9em;
