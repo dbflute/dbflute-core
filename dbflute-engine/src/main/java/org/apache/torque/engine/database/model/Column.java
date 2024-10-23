@@ -147,6 +147,7 @@ import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfAdditionalDbCommentProperties;
+import org.dbflute.properties.DfAdditionalNotNullProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -626,6 +627,14 @@ public class Column {
         // o off course, not char type
         // o basically CLOB cannot accept equal condition
         return isJavaNativeStringObject() && !isDbTypeChar() && !isDbTypePlainClob();
+    }
+
+    public boolean isNotNullBusiness() {
+        return getAdditionalNotNullProperties().isColumnNotNullBusiness(getTable().getTableDbName(), getName());
+    }
+
+    public boolean isNotNullMaybe() {
+        return getAdditionalNotNullProperties().isColumnNotNullMaybe(getTable().getTableDbName(), getName());
     }
 
     // -----------------------------------------------------
@@ -2192,6 +2201,10 @@ public class Column {
 
     protected DfAdditionalDbCommentProperties getAdditionalDbCommentProperties() {
         return getProperties().getAdditionalDbCommentProperties();
+    }
+
+    protected DfAdditionalNotNullProperties getAdditionalNotNullProperties() {
+        return getProperties().getAdditionalNotNullProperties();
     }
 
     protected DfClassificationProperties getClassificationProperties() {

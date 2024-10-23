@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.dbflute.properties.DfAdditionalNotNullProperties;
 import org.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfAdditionalUniqueKeyProperties;
@@ -100,6 +101,18 @@ public final class DfPropertiesHandler {
             _additionalForeignKeyProperties = new DfAdditionalForeignKeyProperties(prop);
         }
         return _additionalForeignKeyProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                    Additional NotNull
+    //                                    ------------------
+    protected DfAdditionalNotNullProperties _additionalNotNullProperties;
+
+    public DfAdditionalNotNullProperties getAdditionalNotNullProperties(Properties prop) {
+        if (_additionalNotNullProperties == null) {
+            _additionalNotNullProperties = new DfAdditionalNotNullProperties(prop);
+        }
+        return _additionalNotNullProperties;
     }
 
     // -----------------------------------------------------

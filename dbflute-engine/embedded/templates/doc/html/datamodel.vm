@@ -182,6 +182,14 @@ td {
 .flgcell {
 	text-align: center;
 }
+.notnullbusiness {
+	font-style: italic;
+	font-size: 0.7em;
+}
+.notnullmaybe {
+	font-style: italic;
+	font-size: 0.7em;
+}
 .flgplus {
 	font-size: 0.7em;
 }
