@@ -27,7 +27,7 @@ public class DfFreeGenResource {
     //                                                                           =========
     protected final String _baseDir; // null allowed
     protected final DfFreeGenResourceType _resourceType; // not null
-    protected final String _resourceFile; // not null
+    protected final String _resourceFile; // basically not null (but may be unused when e.g. empty resource)
     protected final String _encoding; // null allowed
 
     // ===================================================================================
