@@ -17,6 +17,8 @@ package org.dbflute.twowaysql;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -174,6 +176,25 @@ public class DisplaySqlBuilderTest extends RuntimeTestCase {
         // ## Assert ##
         log(actual);
         assertTrue(actual.contains("FOO_DATE = '12@34@56'"));
+    }
+
+    // -----------------------------------------------------
+    //                                        Illegal Format
+    //                                        --------------
+    public void test_buildDisplaySql_date_but_HHmmssFormat() {
+        // ## Arrange ##
+        String sql = "select * from where FOO_DATE = ?";
+        LocalDate fooDate = DfTypeUtil.toLocalDate("2025/04/11");
+        DisplaySqlBuilder builder = createTargetWithDatePattern("timestamp $df:{yyyy-MM-dd HH:mm:ss}");
+
+        // ## Act ##
+        // ## Assert ##
+        assertException(UnsupportedTemporalTypeException.class, () -> {
+            builder.buildDisplaySql(sql, new Object[] { fooDate });
+        }).handle(cause -> {
+            String message = cause.getMessage();
+            assertContains(message, "HourOfDay");
+        });
     }
 
     // ===================================================================================
