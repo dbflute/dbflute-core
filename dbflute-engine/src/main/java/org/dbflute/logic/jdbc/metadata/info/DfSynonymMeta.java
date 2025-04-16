@@ -42,7 +42,7 @@ public class DfSynonymMeta {
     protected Map<String, DfForeignKeyMeta> _foreignKeyMap;
     protected Map<String, Map<Integer, String>> _indexMap;
     protected String _dbLinkName;
-    protected List<DfColumnMeta> _columnMetaInfoList;
+    protected List<DfColumnMeta> _columnMetaList;
     protected boolean _selectable;
     protected String _tableComment;
     protected Map<String, UserColComments> _columnCommentMap;
@@ -93,8 +93,8 @@ public class DfSynonymMeta {
             }
         }
         String columns = "";
-        if (_columnMetaInfoList != null) {
-            columns = "(" + _columnMetaInfoList.size() + " columns for DB link)";
+        if (_columnMetaList != null) {
+            columns = "(" + _columnMetaList.size() + " columns for DB link)";
         }
         final String synonymSchema = _synonymOwner != null ? _synonymOwner.getPureSchema() : "";
         final String tableSchema = _tableOwner != null ? _tableOwner.getPureSchema() : "";
@@ -113,7 +113,7 @@ public class DfSynonymMeta {
     }
 
     public void setSynonymOwner(UnifiedSchema synonymOwner) {
-        this._synonymOwner = synonymOwner;
+        _synonymOwner = synonymOwner;
     }
 
     public String getSynonymName() {
@@ -121,7 +121,7 @@ public class DfSynonymMeta {
     }
 
     public void setSynonymName(String synonymName) {
-        this._synonymName = synonymName;
+        _synonymName = synonymName;
     }
 
     public UnifiedSchema getTableOwner() {
@@ -129,7 +129,7 @@ public class DfSynonymMeta {
     }
 
     public void setTableOwner(UnifiedSchema tableOwner) {
-        this._tableOwner = tableOwner;
+        _tableOwner = tableOwner;
     }
 
     public String getTableName() {
@@ -137,7 +137,7 @@ public class DfSynonymMeta {
     }
 
     public void setTableName(String tableName) {
-        this._tableName = tableName;
+        _tableName = tableName;
     }
 
     public DfPrimaryKeyMeta getPrimaryKey() {
@@ -145,7 +145,7 @@ public class DfSynonymMeta {
     }
 
     public void setPrimaryKey(DfPrimaryKeyMeta primaryKey) {
-        this._primaryKey = primaryKey;
+        _primaryKey = primaryKey;
     }
 
     public boolean isAutoIncrement() {
@@ -153,7 +153,7 @@ public class DfSynonymMeta {
     }
 
     public void setAutoIncrement(boolean autoIncrement) {
-        this._autoIncrement = autoIncrement;
+        _autoIncrement = autoIncrement;
     }
 
     public Map<String, Map<Integer, String>> getUniqueKeyMap() {
@@ -161,7 +161,7 @@ public class DfSynonymMeta {
     }
 
     public void setUniqueKeyMap(Map<String, Map<Integer, String>> uniqueKeyMap) {
-        this._uniqueKeyMap = uniqueKeyMap;
+        _uniqueKeyMap = uniqueKeyMap;
     }
 
     public Map<String, DfForeignKeyMeta> getForeignKeyMap() {
@@ -169,7 +169,7 @@ public class DfSynonymMeta {
     }
 
     public void setForeignKeyMap(Map<String, DfForeignKeyMeta> foreignKeyMap) {
-        this._foreignKeyMap = foreignKeyMap;
+        _foreignKeyMap = foreignKeyMap;
     }
 
     public Map<String, Map<Integer, String>> getIndexMap() {
@@ -177,7 +177,7 @@ public class DfSynonymMeta {
     }
 
     public void setIndexMap(Map<String, Map<Integer, String>> indexMap) {
-        this._indexMap = indexMap;
+        _indexMap = indexMap;
     }
 
     public String getDBLinkName() {
@@ -185,15 +185,15 @@ public class DfSynonymMeta {
     }
 
     public void setDBLinkName(String dbLinkName) {
-        this._dbLinkName = dbLinkName;
+        _dbLinkName = dbLinkName;
     }
 
-    public List<DfColumnMeta> getColumnMetaInfoList() {
-        return _columnMetaInfoList != null ? _columnMetaInfoList : new ArrayList<DfColumnMeta>();
+    public List<DfColumnMeta> getColumnMetaList() {
+        return _columnMetaList != null ? _columnMetaList : new ArrayList<DfColumnMeta>();
     }
 
-    public void setColumnMetaInfoList(List<DfColumnMeta> columnMetaInfoList4DBLink) {
-        this._columnMetaInfoList = columnMetaInfoList4DBLink;
+    public void setColumnMetaList(List<DfColumnMeta> columnMetaList4DBLink) {
+        _columnMetaList = columnMetaList4DBLink;
     }
 
     public boolean isSelectable() {
@@ -201,7 +201,7 @@ public class DfSynonymMeta {
     }
 
     public void setSelectable(boolean selectable) {
-        this._selectable = selectable;
+        _selectable = selectable;
     }
 
     public String getTableComment() {
@@ -209,7 +209,7 @@ public class DfSynonymMeta {
     }
 
     public void setTableComment(String tableComment) {
-        this._tableComment = tableComment;
+        _tableComment = tableComment;
     }
 
     public Map<String, UserColComments> getColumnCommentMap() {
@@ -217,6 +217,6 @@ public class DfSynonymMeta {
     }
 
     public void setColumnCommentMap(Map<String, UserColComments> columnCommentMap) {
-        this._columnCommentMap = columnCommentMap;
+        _columnCommentMap = columnCommentMap;
     }
 }

@@ -81,7 +81,7 @@ public class DfJdbcTypeMapper {
     }
 
     protected String findPointMappingType(DfColumnMeta columnMeta) {
-        final String tableName = columnMeta.getTableName();
+        final String tableName = columnMeta.getTableName(); // physical table only for now
         if (tableName == null) {
             return null;
         }

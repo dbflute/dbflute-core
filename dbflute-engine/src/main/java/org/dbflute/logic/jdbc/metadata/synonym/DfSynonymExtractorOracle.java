@@ -128,8 +128,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
 
                 if (info.isSelectable()) { // e.g. procedure synonym
                     // set up column definition for supplement info
-                    final List<DfColumnMeta> columnMetaInfoList = getSynonymColumns(conn, synonymOwner, synonymName);
-                    info.setColumnMetaInfoList(columnMetaInfoList);
+                    final List<DfColumnMeta> columnMetaList = getSynonymColumns(conn, synonymOwner, synonymName);
+                    info.setColumnMetaList(columnMetaList);
                 }
 
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {

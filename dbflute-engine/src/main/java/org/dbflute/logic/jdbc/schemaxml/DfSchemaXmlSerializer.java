@@ -1188,13 +1188,13 @@ public class DfSchemaXmlSerializer {
         if (synonym == null) { // means not synonym or no supplementary info
             return columnList;
         }
-        final List<DfColumnMeta> metaInfoList = synonym.getColumnMetaInfoList();
-        if (metaInfoList.isEmpty()) {
-            return metaInfoList;
+        final List<DfColumnMeta> columnMetaList = synonym.getColumnMetaList();
+        if (columnMetaList.isEmpty()) {
+            return columnMetaList;
         }
         if (synonym.isDBLink() && columnList.isEmpty()) {
-            columnList = metaInfoList;
-        } else if (metaInfoList.size() != columnList.size()) {
+            columnList = columnMetaList;
+        } else if (columnMetaList.size() != columnList.size()) {
             // for Oracle's bug(?), which is following:
             // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
             // For example, Schema A, B are like this:
@@ -1205,7 +1205,7 @@ public class DfSchemaXmlSerializer {
             // Why? my friend, the Oracle JDBC Driver!
             // - - - - - - - - - -/
             final StringSet columnSet = StringSet.createAsCaseInsensitive();
-            for (DfColumnMeta columnMeta : metaInfoList) {
+            for (DfColumnMeta columnMeta : columnMetaList) {
                 columnSet.add(columnMeta.getColumnName());
             }
             final List<DfColumnMeta> filteredList = new ArrayList<DfColumnMeta>();

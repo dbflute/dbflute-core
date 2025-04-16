@@ -26,6 +26,9 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author jflute
+ */
 public class DfCustomizeEntityMetaExtractor {
 
     // ===================================================================================

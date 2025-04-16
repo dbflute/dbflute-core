@@ -30,26 +30,39 @@ public class DfColumnMeta {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _tableName;
-    protected String _columnName;
+    protected String _tableName; // null allowed if e.g. Sql2Entity, Synonym
+    protected String _columnName; // basically not null
     protected int _jdbcDefValue;
-    protected String _dbTypeName;
+    protected String _dbTypeName; // basically not null
     protected int _columnSize;
     protected int _decimalDigits;
-    protected Integer _datetimePrecision;
+    protected Integer _datetimePrecision; // null allowed
     protected boolean _required;
-    protected String _columnComment;
-    protected String _defaultValue;
+    protected String _columnComment; // null allowed
+    protected String _defaultValue; // null allowed
 
-    // only when Sql2Entity task
+    // -----------------------------------------------------
+    //                                            Sql2Entity
+    //                                            ----------
+    // only when Sql2Entity task (null allowed)
     protected String _sql2entityRelatedTableName;
     protected String _sql2entityRelatedColumnName;
     protected String _sql2entityForcedJavaNative;
+
+    // -----------------------------------------------------
+    //                                             Procedure
+    //                                             ---------
     protected boolean _procedureParameter;
 
-    // basically only when procedure parameter
+    // basically only when procedure parameter (null allowed)
     protected DfTypeArrayInfo _typeArrayInfo;
     protected DfTypeStructInfo _typeStructInfo;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfColumnMeta() {
+    }
 
     // ===================================================================================
     //                                                                       Determination
@@ -139,7 +152,7 @@ public class DfColumnMeta {
     }
 
     public void setTableName(String tableName) {
-        this._tableName = tableName;
+        _tableName = tableName;
     }
 
     public String getColumnName() {
@@ -147,7 +160,7 @@ public class DfColumnMeta {
     }
 
     public void setColumnName(String columnName) {
-        this._columnName = columnName;
+        _columnName = columnName;
     }
 
     public int getColumnSize() {
@@ -155,7 +168,7 @@ public class DfColumnMeta {
     }
 
     public void setColumnSize(int columnSize) {
-        this._columnSize = columnSize;
+        _columnSize = columnSize;
     }
 
     public int getDecimalDigits() {
@@ -163,7 +176,7 @@ public class DfColumnMeta {
     }
 
     public void setDecimalDigits(int decimalDigits) {
-        this._decimalDigits = decimalDigits;
+        _decimalDigits = decimalDigits;
     }
 
     public Integer getDatetimePrecision() {
@@ -179,7 +192,7 @@ public class DfColumnMeta {
     }
 
     public void setDefaultValue(String defaultValue) {
-        this._defaultValue = defaultValue;
+        _defaultValue = defaultValue;
     }
 
     public boolean isRequired() {
@@ -187,7 +200,7 @@ public class DfColumnMeta {
     }
 
     public void setRequired(boolean required) {
-        this._required = required;
+        _required = required;
     }
 
     public int getJdbcDefValue() {
@@ -195,7 +208,7 @@ public class DfColumnMeta {
     }
 
     public void setJdbcDefValue(int jdbcDefValue) {
-        this._jdbcDefValue = jdbcDefValue;
+        _jdbcDefValue = jdbcDefValue;
     }
 
     public String getDbTypeName() {
@@ -203,7 +216,7 @@ public class DfColumnMeta {
     }
 
     public void setDbTypeName(String dbTypeName) {
-        this._dbTypeName = dbTypeName;
+        _dbTypeName = dbTypeName;
     }
 
     public String getColumnComment() {
@@ -211,15 +224,18 @@ public class DfColumnMeta {
     }
 
     public void setColumnComment(String columnComment) {
-        this._columnComment = columnComment;
+        _columnComment = columnComment;
     }
 
+    // -----------------------------------------------------
+    //                                            Sql2Entity
+    //                                            ----------
     public String getSql2EntityRelatedTableName() {
         return _sql2entityRelatedTableName;
     }
 
     public void setSql2EntityRelatedTableName(String sql2entityRelatedTableName) {
-        this._sql2entityRelatedTableName = sql2entityRelatedTableName;
+        _sql2entityRelatedTableName = sql2entityRelatedTableName;
     }
 
     public String getSql2EntityRelatedColumnName() {
@@ -227,7 +243,7 @@ public class DfColumnMeta {
     }
 
     public void setSql2EntityRelatedColumnName(String sql2entityRelatedColumnName) {
-        this._sql2entityRelatedColumnName = sql2entityRelatedColumnName;
+        _sql2entityRelatedColumnName = sql2entityRelatedColumnName;
     }
 
     public String getSql2EntityForcedJavaNative() {
@@ -235,15 +251,18 @@ public class DfColumnMeta {
     }
 
     public void setSql2EntityForcedJavaNative(String sql2entityForcedJavaNative) {
-        this._sql2entityForcedJavaNative = sql2entityForcedJavaNative;
+        _sql2entityForcedJavaNative = sql2entityForcedJavaNative;
     }
 
+    // -----------------------------------------------------
+    //                                             Procedure
+    //                                             ---------
     public boolean isProcedureParameter() {
         return _procedureParameter;
     }
 
     public void setProcedureParameter(boolean procedureParameter) {
-        this._procedureParameter = procedureParameter;
+        _procedureParameter = procedureParameter;
     }
 
     public DfTypeArrayInfo getTypeArrayInfo() {
@@ -251,7 +270,7 @@ public class DfColumnMeta {
     }
 
     public void setTypeArrayInfo(DfTypeArrayInfo typeArrayInfo) {
-        this._typeArrayInfo = typeArrayInfo;
+        _typeArrayInfo = typeArrayInfo;
     }
 
     public DfTypeStructInfo getTypeStructInfo() {
@@ -259,6 +278,6 @@ public class DfColumnMeta {
     }
 
     public void setTypeStructInfo(DfTypeStructInfo typeStructInfo) {
-        this._typeStructInfo = typeStructInfo;
+        _typeStructInfo = typeStructInfo;
     }
 }
