@@ -43,9 +43,9 @@ public class DfCustomizeEntityMetaExtractor {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public Map<String, DfColumnMeta> extractColumnMetaInfoMap(ResultSet rs, String sql, DfForcedJavaNativeProvider forcedJavaNativeProvider)
+    public Map<String, DfColumnMeta> extractColumnMetaMap(ResultSet rs, String sql, DfForcedJavaNativeProvider forcedJavaNativeProvider)
             throws SQLException {
-        final Map<String, DfColumnMeta> columnMetaInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexibleOrdered();
         final ResultSetMetaData md = rs.getMetaData();
         for (int i = 1; i <= md.getColumnCount(); i++) {
             final DfColumnMeta columnMeta = new DfColumnMeta();
@@ -116,9 +116,9 @@ public class DfCustomizeEntityMetaExtractor {
             // column comment is not set here (no comment on meta data)
             // if select column comment is specified, comment will be set later
 
-            columnMetaInfoMap.put(columnName, columnMeta);
+            columnMetaMap.put(columnName, columnMeta);
         }
-        return columnMetaInfoMap;
+        return columnMetaMap;
     }
 
     // ===================================================================================

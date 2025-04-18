@@ -153,7 +153,7 @@ public class DfProcedureExecutionMetaExtractor {
                         if (rs == null) {
                             break;
                         }
-                        final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
+                        final Map<String, DfColumnMeta> columnMetaMap = extractColumnMetaMap(rs, sql);
                         final DfProcedureNotParamResultMeta notParamResult = new DfProcedureNotParamResultMeta();
                         final String propertyName;
                         if (procedure.isCalledBySelect() && closetIndex == 0) {
@@ -166,7 +166,7 @@ public class DfProcedureExecutionMetaExtractor {
                             propertyName = "notParamResult" + (closetIndex + 1);
                         }
                         notParamResult.setPropertyName(propertyName);
-                        notParamResult.setResultSetColumnInfoMap(columnMetaInfoMap);
+                        notParamResult.setResultSetColumnInfoMap(columnMetaMap);
                         procedure.addNotParamResult(notParamResult);
                         ++closetIndex;
                     } finally {
@@ -194,7 +194,7 @@ public class DfProcedureExecutionMetaExtractor {
                     ResultSet rs = null;
                     try {
                         rs = (ResultSet) obj;
-                        final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
+                        final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaMap(rs, sql);
                         column.setResultSetColumnInfoMap(columnMetaInfoMap);
                     } finally {
                         closeResult(rs);
@@ -645,10 +645,10 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     // ===================================================================================
-    //                                                                    Column Meta Info
-    //                                                                    ================
-    protected Map<String, DfColumnMeta> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
-        return _extractor.extractColumnMetaInfoMap(rs, sql, null);
+    //                                                                         Column Meta
+    //                                                                         ===========
+    protected Map<String, DfColumnMeta> extractColumnMetaMap(ResultSet rs, String sql) throws SQLException {
+        return _extractor.extractColumnMetaMap(rs, sql, null);
     }
 
     // ===================================================================================

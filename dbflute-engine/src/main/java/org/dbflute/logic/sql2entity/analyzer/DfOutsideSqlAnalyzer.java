@@ -189,7 +189,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     protected Map<String, DfColumnMeta> extractColumnMetaMap(String sql, ResultSet rs) throws SQLException {
         final Map<String, String> columnForcedJavaNativeMap = createColumnForcedJavaNativeMap(sql);
         final DfCustomizeEntityMetaExtractor extractor = new DfCustomizeEntityMetaExtractor();
-        return extractor.extractColumnMetaInfoMap(rs, sql, new DfForcedJavaNativeProvider() {
+        return extractor.extractColumnMetaMap(rs, sql, new DfForcedJavaNativeProvider() {
             public String provide(String columnName) {
                 return columnForcedJavaNativeMap.get(columnName);
             }
