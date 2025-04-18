@@ -332,7 +332,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setColumnName(String columnName) {
-        this._columnName = columnName;
+        _columnName = columnName;
     }
 
     public DfProcedureColumnType getProcedureColumnType() {
@@ -340,7 +340,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setProcedureColumnType(DfProcedureColumnType procedureColumnType) {
-        this._procedureColumnType = procedureColumnType;
+        _procedureColumnType = procedureColumnType;
     }
 
     public int getJdbcDefType() {
@@ -348,7 +348,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setJdbcDefType(int jdbcDefType) {
-        this._jdbcDefType = jdbcDefType;
+        _jdbcDefType = jdbcDefType;
     }
 
     public String getDbTypeName() {
@@ -356,7 +356,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setDbTypeName(String dbTypeName) {
-        this._dbTypeName = dbTypeName;
+        _dbTypeName = dbTypeName;
     }
 
     public Integer getColumnSize() {
@@ -364,7 +364,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setColumnSize(Integer columnSize) {
-        this._columnSize = columnSize;
+        _columnSize = columnSize;
     }
 
     public Integer getDecimalDigits() {
@@ -372,7 +372,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setDecimalDigits(Integer decimalDigits) {
-        this._decimalDigits = decimalDigits;
+        _decimalDigits = decimalDigits;
     }
 
     public Integer getOverloadNo() {
@@ -380,7 +380,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setOverloadNo(Integer overloadNo) {
-        this._overloadNo = overloadNo;
+        _overloadNo = overloadNo;
     }
 
     public String getColumnComment() {
@@ -388,7 +388,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setColumnComment(String columnComment) {
-        this._columnComment = columnComment;
+        _columnComment = columnComment;
     }
 
     public String getColumnSpecificName() {

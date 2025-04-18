@@ -118,24 +118,25 @@ public class DfProcedurePmbSetupper {
                 if (!column.isBindParameter()) {
                     continue;
                 }
-                final String columnName;
+                final String resolvedColumnName;
                 {
                     final String plainColumnName = column.getColumnName();
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(plainColumnName)) {
-                        columnName = resolveVendorColumnNameHeadable(plainColumnName);
+                        resolvedColumnName = resolveVendorColumnNameHeadable(plainColumnName);
                     } else {
-                        columnName = "arg" + (index + 1);
+                        resolvedColumnName = "arg" + (index + 1);
                     }
                 }
                 final String propertyName;
                 {
-                    propertyName = convertColumnNameToPropertyName(columnName);
+                    propertyName = convertColumnNameToPropertyName(resolvedColumnName);
                 }
 
                 // procedure's overload is unsupported because of this (override property) 
                 propertyNameColumnInfoMap.put(propertyName, column);
 
-                final ProcedurePropertyInfo propertyInfo = processProcedureProperty(pmbName, column, propertyName);
+                final ProcedurePropertyInfo propertyInfo =
+                        processProcedureProperty(procedure, resolvedColumnName, pmbName, column, propertyName);
                 final String propertyType = propertyInfo.getPropertyType();
                 if (propertyInfo.isRefCustomizeEntity()) {
                     refCustomizeEntity = true;
@@ -143,7 +144,7 @@ public class DfProcedurePmbSetupper {
                 propertyNameTypeMap.put(propertyName, propertyType);
                 final DfProcedureColumnType procedureColumnType = column.getProcedureColumnType();
                 propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
-                propertyNameColumnNameMap.put(propertyName, columnName);
+                propertyNameColumnNameMap.put(propertyName, resolvedColumnName);
                 String msg = "    " + propertyType + " " + propertyName + ";";
                 msg = msg + " // " + column.getProcedureColumnType();
                 msg = msg + "(" + column.getJdbcDefType() + ", " + column.getDbTypeName() + ")";
@@ -204,9 +205,11 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                       Property Type
     //                                                                       =============
-    protected ProcedurePropertyInfo processProcedureProperty(String pmbName, DfProcedureColumnMeta column, String propertyName) {
+    protected ProcedurePropertyInfo processProcedureProperty(DfProcedureMeta procedure, String resolvedColumnName, String pmbName,
+            DfProcedureColumnMeta column, String propertyName) {
         final ProcedurePropertyInfo propertyInfo = new ProcedurePropertyInfo();
-        propertyInfo.setColumnInfo(column);
+        propertyInfo.setResolvedColumnName(resolvedColumnName);
+        propertyInfo.setColumnMeta(column);
         if (isResultSetProperty(column)) {
             if (column.hasResultSetColumnInfo()) {
                 final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
@@ -222,21 +225,22 @@ public class DfProcedurePmbSetupper {
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
 
-        final String specialType = doProcessSpecialType(pmbName, column, propertyInfo);
+        final String specialType = doProcessSpecialType(procedure, pmbName, column, propertyInfo);
         final String propertyType;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(specialType)) {
             propertyType = specialType;
         } else {
             final String dbTypeName = column.getDbTypeName();
-            propertyType = findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
+            propertyType = findPlainPropertyType(procedure, resolvedColumnName, jdbcDefType, dbTypeName, columnSize, decimalDigits);
         }
         propertyInfo.setPropertyType(propertyType);
         return propertyInfo;
     }
 
-    protected String doProcessSpecialType(String pmbName, DfProcedureColumnMeta column, ProcedurePropertyInfo propertyInfo) {
+    protected String doProcessSpecialType(DfProcedureMeta procedure, String pmbName, DfProcedureColumnMeta column,
+            ProcedurePropertyInfo propertyInfo) {
         if (getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
-            final String wallOfOracleType = doProcessGreatWallOfOracleType(pmbName, column, propertyInfo);
+            final String wallOfOracleType = doProcessGreatWallOfOracleType(procedure, pmbName, column, propertyInfo);
             if (Srl.is_NotNull_and_NotTrimmedEmpty(wallOfOracleType)) {
                 return wallOfOracleType;
             }
@@ -251,16 +255,18 @@ public class DfProcedurePmbSetupper {
         return propertyType;
     }
 
-    protected String doProcessGreatWallOfOracleType(String pmbName, DfProcedureColumnMeta column, ProcedurePropertyInfo propertyInfo) {
+    protected String doProcessGreatWallOfOracleType(DfProcedureMeta procedure, String pmbName, DfProcedureColumnMeta column,
+            ProcedurePropertyInfo propertyInfo) {
         final String propertyType;
         if (column.isOracleTreatedAsArray() && column.hasTypeArrayInfo()) {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY"
             // (it's not useful for type mapping, so search like this)
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
-            propertyType = getGenericListClassName(doProcessArrayProperty(arrayInfo, propertyInfo));
+            final String processArrayProperty = doProcessArrayProperty(procedure, arrayInfo, propertyInfo);
+            propertyType = getGenericListClassName(processArrayProperty);
         } else if (column.isOracleStruct() && column.hasTypeStructInfo()) {
             final DfTypeStructInfo structInfo = column.getTypeStructInfo();
-            propertyType = doProcessStructProperty(structInfo, propertyInfo);
+            propertyType = doProcessStructProperty(procedure, structInfo, propertyInfo);
         } else {
             propertyType = null;
         }
@@ -285,35 +291,36 @@ public class DfProcedurePmbSetupper {
     // -----------------------------------------------------
     //                                        Array Property
     //                                        --------------
-    protected String doProcessArrayProperty(DfTypeArrayInfo arrayInfo, ProcedurePropertyInfo propertyInfo) {
+    protected String doProcessArrayProperty(DfProcedureMeta procedure, DfTypeArrayInfo arrayInfo, ProcedurePropertyInfo propertyInfo) {
         final String propertyType;
         if (arrayInfo.hasNestedArray()) { // array in array
             final DfTypeArrayInfo nestedArrayInfo = arrayInfo.getNestedArrayInfo();
-            final String nestedType = doProcessArrayProperty(nestedArrayInfo, propertyInfo); // recursive call
+            final String nestedType = doProcessArrayProperty(procedure, nestedArrayInfo, propertyInfo); // recursive call
             propertyType = getGenericListClassName(nestedType);
         } else if (arrayInfo.hasElementStructInfo()) { // struct in array
             final DfTypeStructInfo structInfo = arrayInfo.getElementStructInfo();
-            propertyType = doProcessStructProperty(structInfo, propertyInfo);
+            propertyType = doProcessStructProperty(procedure, structInfo, propertyInfo);
         } else { // scalar in array
             final String dbTypeName = arrayInfo.getElementType();
-            propertyType = findPlainPropertyType(Types.OTHER, dbTypeName, null, null);
+            final String resolvedColumnName = propertyInfo.getResolvedColumnName();
+            propertyType = findPlainPropertyType(procedure, resolvedColumnName, Types.OTHER, dbTypeName, null, null);
         }
         arrayInfo.setElementJavaNative(propertyType);
         return propertyType;
     }
 
-    protected String findArrayScalarElementPropertyType(DfTypeArrayInfo arrayInfo) {
+    protected String findArrayScalarElementPropertyType(DfProcedureMeta procedure, String resolvedColumnName, DfTypeArrayInfo arrayInfo) {
         // by only name
         final String dbTypeName = arrayInfo.getElementType();
-        return findPlainPropertyType(Types.OTHER, dbTypeName, null, null);
+        return findPlainPropertyType(procedure, resolvedColumnName, Types.OTHER, dbTypeName, null, null);
     }
 
     // -----------------------------------------------------
     //                                       Struct Property
     //                                       ---------------
-    protected String doProcessStructProperty(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
+    protected String doProcessStructProperty(DfProcedureMeta procedure, DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
         // register entity generation for struct that contains nested array & struct 
-        registerEntityInfoIfNeeds(structInfo, propertyInfo);
+        registerEntityInfoIfNeeds(procedure, structInfo, propertyInfo);
 
         // entityType is class name can used on program
         // so it adjusts project prefix here
@@ -322,22 +329,22 @@ public class DfProcedurePmbSetupper {
         return entityType;
     }
 
-    protected void registerEntityInfoIfNeeds(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
+    protected void registerEntityInfoIfNeeds(DfProcedureMeta procedure, DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
         final String typeName = getStructEntityNameResouce(structInfo);
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMeta> attrMap = structInfo.getAttributeInfoMap();
             _entityInfoMap.put(typeName, createEntityInfo(typeName, attrMap, structInfo));
-            setupStructAttribute(structInfo, propertyInfo);
+            setupStructAttribute(procedure, structInfo, propertyInfo);
         }
     }
 
-    protected void setupStructAttribute(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
+    protected void setupStructAttribute(DfProcedureMeta procedure, DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
         final StringKeyMap<DfColumnMeta> attrMap = structInfo.getAttributeInfoMap();
         for (DfColumnMeta attrInfo : attrMap.values()) { // nested array or struct handling
             if (attrInfo.hasTypeArrayInfo()) { // array in struct
                 final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
                 if (typeArrayInfo.hasElementStructInfo()) { // struct in array in struct
-                    registerEntityInfoIfNeeds(typeArrayInfo.getElementStructInfo(), propertyInfo);
+                    registerEntityInfoIfNeeds(procedure, typeArrayInfo.getElementStructInfo(), propertyInfo);
                 }
                 if (typeArrayInfo.hasElementJavaNative()) {
                     final String elementJavaNative = typeArrayInfo.getElementJavaNative();
@@ -346,19 +353,21 @@ public class DfProcedurePmbSetupper {
                     final String elementType;
                     if (typeArrayInfo.hasNestedArray()) { // array in array in struct
                         final DfTypeArrayInfo nestedArrayInfo = typeArrayInfo.getNestedArrayInfo();
-                        elementType = getGenericListClassName(doProcessArrayProperty(nestedArrayInfo, propertyInfo));
+                        final String processArrayProperty = doProcessArrayProperty(procedure, nestedArrayInfo, propertyInfo);
+                        elementType = getGenericListClassName(processArrayProperty);
                     } else if (typeArrayInfo.hasElementStructInfo()) { // struct in array in struct
                         final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
                         elementType = buildStructEntityType(elementStructInfo);
                     } else { // scalar in array in struct
-                        elementType = findArrayScalarElementPropertyType(attrInfo.getTypeArrayInfo());
+                        final String columnName = attrInfo.getColumnName(); // as resolved
+                        elementType = findArrayScalarElementPropertyType(procedure, columnName, attrInfo.getTypeArrayInfo());
                     }
                     typeArrayInfo.setElementJavaNative(elementType);
                     attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(elementType));
                 }
             } else if (attrInfo.hasTypeStructInfo()) {
                 final DfTypeStructInfo nestedStructInfo = attrInfo.getTypeStructInfo();
-                registerEntityInfoIfNeeds(nestedStructInfo, propertyInfo);
+                registerEntityInfoIfNeeds(procedure, nestedStructInfo, propertyInfo);
                 if (nestedStructInfo.hasEntityType()) {
                     attrInfo.setSql2EntityForcedJavaNative(nestedStructInfo.getEntityType());
                 } else {
@@ -394,7 +403,8 @@ public class DfProcedurePmbSetupper {
         return doCreateEntityInfo(entityName, columnMap, structInfo);
     }
 
-    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap, DfTypeStructInfo structInfo) {
+    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap,
+            DfTypeStructInfo structInfo) {
         final DfCustomizeEntityInfo entityInfo;
         if (structInfo != null) {
             entityInfo = new DfCustomizeEntityInfo(entityName, columnMap, structInfo);
@@ -406,9 +416,28 @@ public class DfProcedurePmbSetupper {
     }
 
     // -----------------------------------------------------
-    //                                         Assist Helper
-    //                                         -------------
-    protected String findPlainPropertyType(int jdbcDefType, String dbTypeName, Integer columnSize, Integer decimalDigits) {
+    //                                          Assist Logic
+    //                                          ------------
+    /**
+     * @param procedure The meta of the current procedure. (NotNull)
+     * @param resolvedColumnName The resolved name of the column for point typeMapping. (NullAllowed: almost not null but just in case)
+     * @param jdbcDefType The type number of official JDBC definition.
+     * @param dbTypeName The name of DB type on database. (NotNull)
+     * @param columnSize The size of the column. (NullAllowed: if no meta)
+     * @param decimalDigits The digits of the column. (NullAllowed: if no meta)
+     * @return The found Java native type of the column. (NotNull: Object as default)
+     */
+    protected String findPlainPropertyType(DfProcedureMeta procedure, String resolvedColumnName, int jdbcDefType, String dbTypeName,
+            Integer columnSize, Integer decimalDigits) {
+        if (resolvedColumnName != null) { // try point typeMapping
+            // point typeMapping for proceudre parameter since 1.2.9
+            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+            final String procedureName = procedure.getProcedureName();
+            final String translatedType = prop.translateProcedureParameterJdbcType(procedureName, resolvedColumnName);
+            if (translatedType != null) { // translated
+                return TypeMap.findJavaNativeByJdbcType(translatedType, columnSize, decimalDigits);
+            }
+        }
         if (_columnExtractor.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
             final String torqueType = _columnExtractor.getColumnJdbcType(jdbcDefType, dbTypeName);
             return TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
@@ -427,16 +456,25 @@ public class DfProcedurePmbSetupper {
     }
 
     protected static class ProcedurePropertyInfo {
-        protected DfProcedureColumnMeta _columnInfo;
-        protected String _propertyType;
+        protected String _resolvedColumnName; // not null after setup
+        protected DfProcedureColumnMeta _columnMeta; // not null after setup
+        protected String _propertyType; // not null after setup
         protected boolean _refCustomizeEntity;
 
-        public DfProcedureColumnMeta getColumnInfo() {
-            return _columnInfo;
+        public String getResolvedColumnName() {
+            return _resolvedColumnName;
         }
 
-        public void setColumnInfo(DfProcedureColumnMeta columnInfo) {
-            _columnInfo = columnInfo;
+        public void setResolvedColumnName(String resolvedColumnName) {
+            _resolvedColumnName = resolvedColumnName;
+        }
+
+        public DfProcedureColumnMeta getColumnMeta() {
+            return _columnMeta;
+        }
+
+        public void setColumnMeta(DfProcedureColumnMeta columnMeta) {
+            _columnMeta = columnMeta;
         }
 
         public String getPropertyType() {

@@ -26,6 +26,7 @@ import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlLocation;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -279,6 +280,60 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
 
     public static enum ProcedureSynonymHandlingType {
         NONE, INCLUDE, SWITCH
+    }
+
+    // -----------------------------------------------------
+    //                       Procedure Parameter TypeMapping
+    //                       -------------------------------
+    // ; procedureParameterPointJdbcTypeMappingMap = map:{
+    //     ; [procedure-name] = map:{
+    //         ; [parameter-name (hint)] = [JDBC type]
+    //     }
+    // }
+    protected Map<String, Object> _procedureParameterPointJdbcTypeMappingMap;
+
+    protected Map<String, Object> getProcedureParameterPointJdbcTypeMappingMap() { // closet
+        if (_procedureParameterPointJdbcTypeMappingMap != null) {
+            return _procedureParameterPointJdbcTypeMappingMap;
+        }
+        final String key = "procedureParameterPointJdbcTypeMappingMap";
+        _procedureParameterPointJdbcTypeMappingMap = getOutsideSqlPropertyAsMap(key);
+        if (_procedureParameterPointJdbcTypeMappingMap == null) {
+            _procedureParameterPointJdbcTypeMappingMap = DfCollectionUtil.emptyMap();
+        }
+        return _procedureParameterPointJdbcTypeMappingMap;
+    }
+
+    public String translateProcedureParameterJdbcType(String procedureName, String parameterName) {
+        if (parameterName == null) { // just in case
+            return null;
+        }
+        final Map<String, Object> jdbcTypeMappingMap = getProcedureParameterPointJdbcTypeMappingMap();
+        @SuppressWarnings("unchecked")
+        final Map<String, String> parameterTypeMap = (Map<String, String>) jdbcTypeMappingMap.get(procedureName);
+        final String pointMappingType = doFindPointMappingType(parameterName, parameterTypeMap);
+        if (pointMappingType != null) { // mapping by point procedure
+            return pointMappingType;
+        }
+        @SuppressWarnings("unchecked")
+        final Map<String, String> allParameterTypeMap = (Map<String, String>) jdbcTypeMappingMap.get("$$ALL$$");
+        return doFindPointMappingType(parameterName, allParameterTypeMap); // mapping by all procedures
+    }
+
+    // copied from DfJdbcTypeMapper.java and modified a little
+    protected String doFindPointMappingType(String parameterName, Map<String, String> parameterTypeMap) {
+        if (parameterTypeMap != null) {
+            for (Entry<String, String> entry : parameterTypeMap.entrySet()) {
+                final String parameterHint = entry.getKey();
+                if (DfNameHintUtil.isHitByTheHint(parameterName, parameterHint)) {
+                    final String value = entry.getValue();
+                    if (value != null) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     // ===================================================================================
@@ -728,5 +783,10 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
     @SuppressWarnings("unchecked")
     protected List<String> getOutsideSqlPropertyAsList(String key) {
         return (List<String>) getOutsideSqlDefinitionMap().get(key);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getOutsideSqlPropertyAsMap(String key) {
+        return (Map<String, Object>) getOutsideSqlDefinitionMap().get(key);
     }
 }
