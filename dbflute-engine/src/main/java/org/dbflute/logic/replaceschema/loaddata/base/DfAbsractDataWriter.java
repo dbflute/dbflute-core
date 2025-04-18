@@ -171,7 +171,7 @@ public abstract class DfAbsractDataWriter {
     //                                            Null Value
     //                                            ----------
     protected boolean processNull(String dataDirectory, String tableName, String columnName, Object value, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
+            int bindCount, Map<String, DfColumnMeta> columnMetaMap, int rowNumber) throws SQLException {
         if (!isNullValue(value)) {
             return false;
         }
@@ -186,17 +186,17 @@ public abstract class DfAbsractDataWriter {
             ps.setNull(bindCount, cachedType); // basically no exception
             return true;
         }
-        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
-        if (columnInfo != null) {
+        final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
+        if (columnMeta != null) {
             // use mapped type at first
-            final String mappedJdbcType = _columnHandler.getColumnJdbcType(columnInfo);
+            final String mappedJdbcType = _columnHandler.getColumnJdbcType(columnMeta);
             final Integer mappedJdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(mappedJdbcType);
             try {
                 ps.setNull(bindCount, mappedJdbcDefValue);
                 cacheMap.put(columnName, mappedJdbcDefValue);
             } catch (SQLException e) {
                 // retry by plain type
-                final int plainJdbcDefValue = columnInfo.getJdbcDefValue();
+                final int plainJdbcDefValue = columnMeta.getJdbcDefValue();
                 try {
                     ps.setNull(bindCount, plainJdbcDefValue);
                     cacheMap.put(columnName, plainJdbcDefValue);
@@ -205,7 +205,7 @@ public abstract class DfAbsractDataWriter {
                     br.addNotice("Failed to execute setNull(bindCount, jdbcDefValue).");
                     br.addItem("Column");
                     br.addElement(tableName + "." + columnName);
-                    br.addElement(columnInfo.toString());
+                    br.addElement(columnMeta.toString());
                     br.addItem("Mapped JDBC Type");
                     br.addElement(mappedJdbcType);
                     br.addItem("First JDBC Def-Value");
