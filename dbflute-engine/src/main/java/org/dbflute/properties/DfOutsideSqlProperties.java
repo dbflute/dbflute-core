@@ -88,6 +88,9 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
         return isProperty("isForcedlySuppressProcedureMetaData", false);
     }
 
+    // -----------------------------------------------------
+    //                              Target Procedure Catalog
+    //                              ------------------------
     protected List<String> _targetProcedureCatalogList;
 
     protected List<String> getTargetProcedureCatalogList() {
@@ -121,6 +124,9 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                               Target Procedure Schema
+    //                               -----------------------
     protected List<String> _targetProcedureSchemaList;
 
     protected List<String> getTargetProcedureSchemaList() {
@@ -154,6 +160,9 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                                 Target Procedure Name
+    //                                 ---------------------
     protected List<String> _targetProcedureNameList;
     protected List<String> _targetProcedureNameToDBLinkList;
 
@@ -216,6 +225,9 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                               ExecutionMeta Procedure
+    //                               -----------------------
     protected List<String> _executionMetaProcedureNameList;
 
     protected List<String> getExecutionMetaProcedureNameList() {
@@ -247,6 +259,9 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                                     Procedure Synonym
+    //                                     -----------------
     public ProcedureSynonymHandlingType getProcedureSynonymHandlingType() {
         final String key = "procedureSynonymHandlingType";
         final String property = getProperty(key, ProcedureSynonymHandlingType.NONE.name(), getOutsideSqlDefinitionMap());
