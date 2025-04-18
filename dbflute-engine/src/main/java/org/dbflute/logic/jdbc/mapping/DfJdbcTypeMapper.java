@@ -81,9 +81,14 @@ public class DfJdbcTypeMapper {
     }
 
     protected String findPointMappingType(DfColumnMeta columnMeta) {
-        final String tableName = columnMeta.getTableName(); // physical table only for now
+        String tableName = columnMeta.getTableName(); // physical table only for now
         if (tableName == null) {
-            return null;
+            // also for Sql2Entity (outosideSql, procedure) since 1.2.9
+            // https://github.com/dbflute/dbflute-core/issues/226
+            tableName = columnMeta.getSql2EntityRelatedTableName();
+            if (tableName == null) {
+                return null;
+            }
         }
         Map<String, String> columnTypeMap = _pointToJdbcTypeMap.get(tableName);
         final String foundType = doFindPointMappingType(columnMeta, columnTypeMap);
