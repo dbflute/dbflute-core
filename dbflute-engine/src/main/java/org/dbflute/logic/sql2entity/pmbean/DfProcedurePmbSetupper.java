@@ -225,6 +225,7 @@ public class DfProcedurePmbSetupper {
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
 
+        // #hope jflute pointTypeMapping should be before special type determination (2025/04/19)
         final String specialType = doProcessSpecialType(procedure, pmbName, column, propertyInfo);
         final String propertyType;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(specialType)) {
@@ -237,6 +238,9 @@ public class DfProcedurePmbSetupper {
         return propertyInfo;
     }
 
+    // -----------------------------------------------------
+    //                                          Special Type
+    //                                          ------------
     protected String doProcessSpecialType(DfProcedureMeta procedure, String pmbName, DfProcedureColumnMeta column,
             ProcedurePropertyInfo propertyInfo) {
         if (getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
@@ -246,8 +250,11 @@ public class DfProcedurePmbSetupper {
             }
         }
         final String propertyType;
-        if (column.isOracleNumber()) {
+        if (column.isOracleNumber() && column.getColumnSize() == null && column.getDecimalDigits() == null) {
             // because the length setting of procedure parameter is unsupported on Oracle
+            //  e.g. o "sea_id number", x "sea_id number(14,2)"
+            // however table-related type can be set e.g. sea_id MAIHAMA.SEA_ID%TYPE
+            // so fixed the if-statement as pinpoint determination (2025/04/19)
             propertyType = TypeMap.getDefaultDecimalJavaNativeType();
         } else {
             propertyType = null;
