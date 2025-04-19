@@ -44,7 +44,7 @@ public class DfCustomizeEntityMetaExtractor {
     //                                                                                Main
     //                                                                                ====
     public Map<String, DfColumnMeta> extractColumnMetaMap(ResultSet rs, String sql, DfForcedJavaNativeProvider forcedJavaNativeProvider)
-            throws SQLException {
+            throws SQLException { // returns mutable map
         final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexibleOrdered();
         final ResultSetMetaData md = rs.getMetaData();
         for (int i = 1; i <= md.getColumnCount(); i++) {

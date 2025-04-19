@@ -197,6 +197,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     }
 
     protected Map<String, String> createColumnForcedJavaNativeMap(String sql) {
+        // e.g. -- ##java.math.BigInteger MAX_MEMBER_ID##
         final List<DfSql2EntityMark> entityPropertyTypeList = getEntityPropertyTypeList(sql);
         final Map<String, String> columnJavaNativeMap = StringKeyMap.createAsFlexible();
         for (DfSql2EntityMark mark : entityPropertyTypeList) {

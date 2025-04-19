@@ -44,7 +44,7 @@ public class DfColumnMeta {
     // -----------------------------------------------------
     //                                            Sql2Entity
     //                                            ----------
-    // only when Sql2Entity task (null allowed)
+    // only when Sql2Entity task, contains procedure result set (null allowed)
     protected String _sql2entityRelatedTableName;
     protected String _sql2entityRelatedColumnName;
     protected String _sql2entityForcedJavaNative;
@@ -52,6 +52,8 @@ public class DfColumnMeta {
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
+    // only when procedure on Sql2Entity (null allowed)
+    protected String _procedureName; // from procedure meta
     protected boolean _procedureParameter;
 
     // basically only when procedure parameter (null allowed)
@@ -257,6 +259,14 @@ public class DfColumnMeta {
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
+    public String getProcedureName() {
+        return _procedureName;
+    }
+
+    public void setProcedureName(String procedureName) {
+        _procedureName = procedureName;
+    }
+
     public boolean isProcedureParameter() {
         return _procedureParameter;
     }

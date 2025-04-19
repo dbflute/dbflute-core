@@ -153,7 +153,7 @@ public class DfProcedureExecutionMetaExtractor {
                         if (rs == null) {
                             break;
                         }
-                        final Map<String, DfColumnMeta> columnMetaMap = extractColumnMetaMap(rs, sql);
+                        final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(procedure, rs, sql);
                         final DfProcedureNotParamResultMeta notParamResult = new DfProcedureNotParamResultMeta();
                         final String propertyName;
                         if (procedure.isCalledBySelect() && closetIndex == 0) {
@@ -194,8 +194,8 @@ public class DfProcedureExecutionMetaExtractor {
                     ResultSet rs = null;
                     try {
                         rs = (ResultSet) obj;
-                        final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaMap(rs, sql);
-                        column.setResultSetColumnInfoMap(columnMetaInfoMap);
+                        final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(procedure, rs, sql);
+                        column.setResultSetColumnInfoMap(columnMetaMap);
                     } finally {
                         closeResult(rs);
                     }
@@ -647,8 +647,14 @@ public class DfProcedureExecutionMetaExtractor {
     // ===================================================================================
     //                                                                         Column Meta
     //                                                                         ===========
-    protected Map<String, DfColumnMeta> extractColumnMetaMap(ResultSet rs, String sql) throws SQLException {
-        return _extractor.extractColumnMetaMap(rs, sql, null);
+    protected Map<String, DfColumnMeta> prepareColumnMetaMap(DfProcedureMeta procedure, ResultSet rs, String sql) throws SQLException {
+        final Map<String, DfColumnMeta> columnMetaMap = _extractor.extractColumnMetaMap(rs, sql, /*forcedJavaNativeProvider*/null);
+        columnMetaMap.values().forEach(columnMeta -> {
+            // for "procedure:" prefix of pointTypeMapping
+            // https://github.com/dbflute/dbflute-core/issues/229
+            columnMeta.setProcedureName(procedure.getProcedureName());
+        });
+        return columnMetaMap;
     }
 
     // ===================================================================================
