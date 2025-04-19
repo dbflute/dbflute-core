@@ -81,22 +81,21 @@ public class DfJdbcTypeMapper {
     }
 
     protected String findPointMappingType(DfColumnMeta columnMeta) {
-        String tableName = columnMeta.getTableName(); // physical table only for now
-        if (tableName == null) {
+        String tableName = columnMeta.getTableName(); // only for domain entity
+        if (Srl.is_Null_or_TrimmedEmpty(tableName)) {
             // also for Sql2Entity (outosideSql, procedure) since 1.2.9
             // https://github.com/dbflute/dbflute-core/issues/226
-            tableName = columnMeta.getSql2EntityRelatedTableName();
-            if (tableName == null) {
-                return null;
+            tableName = columnMeta.getSql2EntityRelatedTableName(); // for outosideSql, procedure
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(tableName)) {
+            final Map<String, String> byTableTypeMap = _pointToJdbcTypeMap.get(tableName);
+            final String foundType = doFindPointMappingType(columnMeta, byTableTypeMap);
+            if (foundType != null) {
+                return foundType;
             }
         }
-        Map<String, String> columnTypeMap = _pointToJdbcTypeMap.get(tableName);
-        final String foundType = doFindPointMappingType(columnMeta, columnTypeMap);
-        if (foundType != null) {
-            return foundType;
-        }
-        columnTypeMap = _pointToJdbcTypeMap.get("$$ALL$$");
-        return doFindPointMappingType(columnMeta, columnTypeMap);
+        final Map<String, String> allTypeMap = _pointToJdbcTypeMap.get("$$ALL$$");
+        return doFindPointMappingType(columnMeta, allTypeMap);
     }
 
     protected String doFindPointMappingType(DfColumnMeta columnMeta, Map<String, String> columnTypeMap) {
