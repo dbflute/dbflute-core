@@ -52,9 +52,10 @@ public class DfCustomizeEntityMetaExtractor {
 
             String sql2EntityRelatedTableName = null;
             try {
+                // if Oracle, unfortunately returns null? or empty? fixedly 
                 sql2EntityRelatedTableName = md.getTableName(i);
             } catch (SQLException continued) {
-                // because this table name is not required, basically only for classification
+                // because this table name is not required, basically for classification, typeMapping, ...
                 String msg = "ResultSetMetaData.getTableName(" + i + ") threw the exception: " + continued.getMessage();
                 _log.info(msg);
             }
