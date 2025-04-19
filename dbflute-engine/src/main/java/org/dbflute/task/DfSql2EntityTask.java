@@ -324,7 +324,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final Set<String> entityNameSet = entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
             final DfCustomizeEntityInfo entityInfo = entityInfoMap.get(entityName);
-            final Map<String, DfColumnMeta> columnMetaMap = entityInfo.getColumnMap();
+            final Map<String, DfColumnMeta> columnMetaMap = entityInfo.getColumnMetaMap();
             final DfOutsideSqlFile outsideSqlFile = entityInfo.getOutsideSqlFile();
 
             final Table tbl = new Table();

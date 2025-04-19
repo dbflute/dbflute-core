@@ -402,21 +402,22 @@ public class DfProcedurePmbSetupper {
     // -----------------------------------------------------
     //                                           Entity Info
     //                                           -----------
-    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap) {
-        return doCreateEntityInfo(entityName, columnMap, null);
+    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMeta> columnMetaMap) {
+        return doCreateEntityInfo(entityName, columnMetaMap, null);
     }
 
-    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap, DfTypeStructInfo structInfo) {
-        return doCreateEntityInfo(entityName, columnMap, structInfo);
+    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMeta> columnMetaMap,
+            DfTypeStructInfo structInfo) {
+        return doCreateEntityInfo(entityName, columnMetaMap, structInfo);
     }
 
-    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap,
+    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMeta> columnMetaMap,
             DfTypeStructInfo structInfo) {
         final DfCustomizeEntityInfo entityInfo;
         if (structInfo != null) {
-            entityInfo = new DfCustomizeEntityInfo(entityName, columnMap, structInfo);
+            entityInfo = new DfCustomizeEntityInfo(entityName, columnMetaMap, structInfo);
         } else {
-            entityInfo = new DfCustomizeEntityInfo(entityName, columnMap);
+            entityInfo = new DfCustomizeEntityInfo(entityName, columnMetaMap);
         }
         entityInfo.setProcedureHandling(true);
         return entityInfo;
