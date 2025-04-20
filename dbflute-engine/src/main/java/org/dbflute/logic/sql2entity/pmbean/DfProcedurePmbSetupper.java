@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.TypeMap;
@@ -221,19 +222,17 @@ public class DfProcedurePmbSetupper {
             }
             return propertyInfo;
         }
+
         final int jdbcDefType = column.getJdbcDefType();
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
+        final String dbTypeName = column.getDbTypeName();
 
-        // #hope jflute pointTypeMapping should be before special type determination (2025/04/19)
-        final String specialType = doProcessSpecialType(procedure, pmbName, column, propertyInfo);
-        final String propertyType;
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(specialType)) {
-            propertyType = specialType;
-        } else {
-            final String dbTypeName = column.getDbTypeName();
-            propertyType = findPlainPropertyType(procedure, resolvedColumnName, jdbcDefType, dbTypeName, columnSize, decimalDigits);
-        }
+        final String propertyType =
+                findPropertyType(procedure, resolvedColumnName, jdbcDefType, dbTypeName, columnSize, decimalDigits, () -> {
+                    // special type should be after pointTypeMapping
+                    return doProcessSpecialType(procedure, pmbName, column, propertyInfo); // as afterPointMapping
+                });
         propertyInfo.setPropertyType(propertyType);
         return propertyInfo;
     }
@@ -249,17 +248,14 @@ public class DfProcedurePmbSetupper {
                 return wallOfOracleType;
             }
         }
-        final String propertyType;
-        if (column.isOracleNumber() && column.getColumnSize() == null && column.getDecimalDigits() == null) {
+        if (column.isOracleNumber() && isOracleUnlabeledNumber(column)) {
             // because the length setting of procedure parameter is unsupported on Oracle
             //  e.g. o "sea_id number", x "sea_id number(14,2)"
             // however table-related type can be set e.g. sea_id MAIHAMA.SEA_ID%TYPE
             // so fixed the if-statement as pinpoint determination (2025/04/19)
-            propertyType = TypeMap.getDefaultDecimalJavaNativeType();
-        } else {
-            propertyType = null;
+            return TypeMap.getDefaultDecimalJavaNativeType(); // not null
         }
-        return propertyType;
+        return null;
     }
 
     protected String doProcessGreatWallOfOracleType(DfProcedureMeta procedure, String pmbName, DfProcedureColumnMeta column,
@@ -278,6 +274,16 @@ public class DfProcedurePmbSetupper {
             propertyType = null;
         }
         return propertyType;
+    }
+
+    protected boolean isOracleUnlabeledNumber(DfProcedureColumnMeta column) {
+        final Integer columnSize = column.getColumnSize();
+        final Integer decimalDigits = column.getDecimalDigits();
+
+        // #for_now jflute NUMBER(22) means unlabeled number type at least current Oracle JDBC (2025/04/20)
+        final boolean fixedNumber = columnSize != null && columnSize.equals(22);
+        final boolean nonDigits = decimalDigits == null || decimalDigits.equals(0);
+        return fixedNumber && nonDigits;
     }
 
     // -----------------------------------------------------
@@ -310,7 +316,7 @@ public class DfProcedurePmbSetupper {
         } else { // scalar in array
             final String dbTypeName = arrayInfo.getElementType();
             final String resolvedColumnName = propertyInfo.getResolvedColumnName();
-            propertyType = findPlainPropertyType(procedure, resolvedColumnName, Types.OTHER, dbTypeName, null, null);
+            propertyType = findPropertyType(procedure, resolvedColumnName, Types.OTHER, dbTypeName, null, null, null);
         }
         arrayInfo.setElementJavaNative(propertyType);
         return propertyType;
@@ -319,7 +325,7 @@ public class DfProcedurePmbSetupper {
     protected String findArrayScalarElementPropertyType(DfProcedureMeta procedure, String resolvedColumnName, DfTypeArrayInfo arrayInfo) {
         // by only name
         final String dbTypeName = arrayInfo.getElementType();
-        return findPlainPropertyType(procedure, resolvedColumnName, Types.OTHER, dbTypeName, null, null);
+        return findPropertyType(procedure, resolvedColumnName, Types.OTHER, dbTypeName, null, null, null);
     }
 
     // -----------------------------------------------------
@@ -426,38 +432,6 @@ public class DfProcedurePmbSetupper {
     // -----------------------------------------------------
     //                                          Assist Logic
     //                                          ------------
-    /**
-     * @param procedure The meta of the current procedure. (NotNull)
-     * @param resolvedColumnName The resolved name of the column for point typeMapping. (NullAllowed: almost not null but just in case)
-     * @param jdbcDefType The type number of official JDBC definition.
-     * @param dbTypeName The name of DB type on database. (NotNull)
-     * @param columnSize The size of the column. (NullAllowed: if no meta)
-     * @param decimalDigits The digits of the column. (NullAllowed: if no meta)
-     * @return The found Java native type of the column. (NotNull: Object as default)
-     */
-    protected String findPlainPropertyType(DfProcedureMeta procedure, String resolvedColumnName, int jdbcDefType, String dbTypeName,
-            Integer columnSize, Integer decimalDigits) {
-        if (resolvedColumnName != null) { // try point typeMapping
-            // point typeMapping for proceudre parameter since 1.2.9
-            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
-            final String procedureName = procedure.getProcedureName();
-            final String translatedType = prop.translateProcedureParameterJdbcType(procedureName, resolvedColumnName);
-            if (translatedType != null) { // translated
-                return TypeMap.findJavaNativeByJdbcType(translatedType, columnSize, decimalDigits);
-            }
-        }
-        if (_columnExtractor.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
-            final String torqueType = _columnExtractor.getColumnJdbcType(jdbcDefType, dbTypeName);
-            return TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
-        } else {
-            return "Object"; // procedure has many-many types so it uses Object type (not String)
-
-            // it's not complete because nested properties are not target
-            // for example, attributes in STRUCT type
-            // but it's OK, that's the specification of DBFlute
-        }
-    }
-
     protected String getGenericListClassName(String element) {
         final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
         return grammarInfo.buildGenericListClassName(element); // List<ELEMENT>
@@ -499,6 +473,48 @@ public class DfProcedurePmbSetupper {
 
         public void setRefCustomizeEntity(boolean refCustomizeEntity) {
             _refCustomizeEntity = refCustomizeEntity;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                Property TypeMapping
+    //                                                                ====================
+    /**
+     * @param procedure The meta of the current procedure. (NotNull)
+     * @param resolvedColumnName The resolved name of the column for point typeMapping. (NullAllowed: almost not null but just in case)
+     * @param jdbcDefType The type number of official JDBC definition.
+     * @param dbTypeName The name of DB type on database. (NotNull)
+     * @param columnSize The size of the column. (NullAllowed: if no meta)
+     * @param decimalDigits The digits of the column. (NullAllowed: if no meta)
+     * @param afterPointMapping The callback to mapping type after pointTypeMapping. (NullAllowed: not required)
+     * @return The found Java native type of the column. (NotNull: Object as default)
+     */
+    protected String findPropertyType(DfProcedureMeta procedure, String resolvedColumnName, int jdbcDefType, String dbTypeName,
+            Integer columnSize, Integer decimalDigits, Supplier<String> afterPointMapping) {
+        if (resolvedColumnName != null) { // try point typeMapping
+            // point typeMapping for proceudre parameter since 1.2.9
+            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+            final String procedureName = procedure.getProcedureName();
+            final String translatedType = prop.translateProcedureParameterJdbcType(procedureName, resolvedColumnName);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(translatedType)) { // translated
+                return TypeMap.findJavaNativeByJdbcType(translatedType, columnSize, decimalDigits); // not null
+            }
+        }
+        if (afterPointMapping != null) { // after-point mapping
+            final String afterPointType = afterPointMapping.get();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(afterPointType)) { // use after-point type
+                return afterPointType;
+            }
+        }
+        if (_columnExtractor.hasMappingJdbcType(jdbcDefType, dbTypeName)) { // normal mapping 
+            final String torqueType = _columnExtractor.getColumnJdbcType(jdbcDefType, dbTypeName);
+            return TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits); // not null
+        } else { // finally
+            return "Object"; // procedure has many-many types so it uses Object type (not String)
+
+            // it's not complete because nested properties are not target
+            // for example, attributes in STRUCT type
+            // but it's OK, that's the specification of DBFlute
         }
     }
 

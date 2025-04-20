@@ -312,7 +312,7 @@ public final class DfOutsideSqlProperties extends DfAbstractDBFluteProperties {
         @SuppressWarnings("unchecked")
         final Map<String, String> parameterTypeMap = (Map<String, String>) jdbcTypeMappingMap.get(procedureName);
         final String pointMappingType = doFindPointMappingType(parameterName, parameterTypeMap);
-        if (pointMappingType != null) { // mapping by point procedure
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(pointMappingType)) { // mapping by point procedure
             return pointMappingType;
         }
         @SuppressWarnings("unchecked")
