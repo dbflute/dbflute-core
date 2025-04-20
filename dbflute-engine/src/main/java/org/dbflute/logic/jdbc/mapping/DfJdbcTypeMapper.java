@@ -96,10 +96,11 @@ public class DfJdbcTypeMapper {
 
         final String procedureName = columnMeta.getProcedureName(); // from procedure meta
         if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureName)) { // procedure on sql2entity
-            String procedureKey = "procedure:" + procedureName; // e.g. "precedure:SP_SEA"
+            final String procedurePrefix = "procedure:";
+            String procedureKey = procedurePrefix + procedureName; // e.g. "precedure:SP_SEA"
             Map<String, String> byProcedureTypeMap = _pointToJdbcTypeMap.get(procedureKey); // null allowed
             if (byProcedureTypeMap == null) { // retry to save e.g. "precedure: SP_SEA"
-                procedureKey = "procedure: " + procedureName; // has space
+                procedureKey = procedurePrefix + " " + procedureName; // has space
                 byProcedureTypeMap = _pointToJdbcTypeMap.get(procedureKey); // null allowed
             }
             final String foundType = doFindPointMappingType(columnMeta, byProcedureTypeMap);
