@@ -287,6 +287,13 @@ public class DfProcedureColumnMeta {
     }
 
     // ===================================================================================
+    //                                                               Procedure Column Type
+    //                                                               =====================
+    public boolean isProcedureColumnType_Return() {
+        return DfProcedureColumnType.procedureColumnReturn.equals(_procedureColumnType);
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {

@@ -1795,6 +1795,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
         return isProperty("isCompatibleMonolithicDiffMapHistory", false);
     }
 
+    public boolean isCompatibleProcedureReturnValueNameAsArg() { // closet, "returnValue" back to "arg1"
+        return isProperty("isCompatibleProcedureReturnValueNameAsArg", false); // since 1.2.9
+    }
+
     // -----------------------------------------------------
     //                                      Java8 Compatible
     //                                      ----------------

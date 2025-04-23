@@ -115,23 +115,16 @@ public class DfProcedurePmbSetupper {
 
             // Procedure Parameter handling
             int index = 0;
+            boolean alreadyReturnNameResolved = false; // just in case
             for (DfProcedureColumnMeta column : procedureColumnList) {
                 if (!column.isBindParameter()) {
                     continue;
                 }
-                final String resolvedColumnName;
-                {
-                    final String plainColumnName = column.getColumnName();
-                    if (Srl.is_NotNull_and_NotTrimmedEmpty(plainColumnName)) {
-                        resolvedColumnName = resolveVendorColumnNameHeadable(plainColumnName);
-                    } else {
-                        resolvedColumnName = "arg" + (index + 1);
-                    }
+                final String resolvedColumnName = resolveColumnName(procedure, index, alreadyReturnNameResolved, column);
+                if (column.isProcedureColumnType_Return()) {
+                    alreadyReturnNameResolved = true;
                 }
-                final String propertyName;
-                {
-                    propertyName = convertColumnNameToPropertyName(resolvedColumnName);
-                }
+                final String propertyName = convertColumnNameToPropertyName(resolvedColumnName);
 
                 // procedure's overload is unsupported because of this (override property) 
                 propertyNameColumnInfoMap.put(propertyName, column);
@@ -201,6 +194,51 @@ public class DfProcedurePmbSetupper {
             _continuedFailureMessageMap.putAll(executionMetaHandler.getContinuedFailureMessageMap());
         }
         return procedureList;
+    }
+
+    // ===================================================================================
+    //                                                                         Column Name
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                   Resolve Column Name
+    //                                   -------------------
+    protected String resolveColumnName(DfProcedureMeta procedure, int index, boolean alreadyReturnNameResolved,
+            DfProcedureColumnMeta column) {
+        final String resolvedColumnName;
+        final String plainColumnName = column.getColumnName();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(plainColumnName)) {
+            resolvedColumnName = resolveVendorColumnNameHeadable(plainColumnName);
+        } else {
+            resolvedColumnName = deriveNoNameColumnResolvedName(procedure, column, index, alreadyReturnNameResolved);
+        }
+        return resolvedColumnName;
+    }
+
+    // -----------------------------------------------------
+    //                           NoName Column Resolved Name
+    //                           ---------------------------
+    protected String deriveNoNameColumnResolvedName(DfProcedureMeta procedure, DfProcedureColumnMeta column, int index,
+            boolean alreadyReturnExists) {
+        final int argNumber = index + 1;
+        if (getLittleAdjustmentProperties().isCompatibleProcedureReturnValueNameAsArg()) {
+            return buildNoNameColumnDefaultSimpleArgName(argNumber);
+        }
+        // use standard name to avoid "arg1" return name (e.g. Oracle)
+        // https://github.com/dbflute/dbflute-core/issues/230
+        final String returnKeyword = "returnValue"; // according to PostgreSQL
+        if (column.isProcedureColumnType_Return()) {
+            if (alreadyReturnExists) { // second or more return value, just in case
+                return returnKeyword + argNumber; // e.g. returnValue2
+            } else { // return standard here
+                return returnKeyword;
+            }
+        } else {
+            return buildNoNameColumnDefaultSimpleArgName(argNumber);
+        }
+    }
+
+    protected String buildNoNameColumnDefaultSimpleArgName(final int argNumber) {
+        return "arg" + argNumber;
     }
 
     // ===================================================================================
@@ -521,6 +559,9 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                        Convert Name
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                    ParameterBean Name
+    //                                    ------------------
     protected String convertProcedureNameToPmbName(String procedureName) {
         // here you do not need to handle project prefix
         // because the prefix is resolved at table object
@@ -530,18 +571,22 @@ public class DfProcedurePmbSetupper {
         return Srl.camelize(procedureName) + "Pmb";
     }
 
-    protected String resolveVendorProcedureNameHeadache(String procedureName) {
-        if (getBasicProperties().isDatabaseSQLServer()) { // SQLServer returns 'sp_foo;1'
-            procedureName = Srl.substringLastFront(procedureName, ";");
-        }
-        return procedureName;
-    }
-
     protected String convertProcedurePmbNameToEntityName(String pmbName, String propertyName) {
         final String baseName = Srl.substringLastFront(pmbName, "Pmb");
         return baseName + Srl.initCap(propertyName);
     }
 
+    // -----------------------------------------------------
+    //                                         Property Name
+    //                                         -------------
+    protected String convertColumnNameToPropertyName(String columnName) {
+        columnName = resolveVendorColumnNameHeadable(columnName);
+        return Srl.initBeansProp(Srl.camelize(columnName));
+    }
+
+    // -----------------------------------------------------
+    //                                         Property Type
+    //                                         -------------
     protected String convertProcedureListPropertyType(String entityName) {
         // propertyType is class name can used on program
         // so it adjusts project prefix here
@@ -551,9 +596,14 @@ public class DfProcedurePmbSetupper {
         return grammarInfo.buildGenericListClassName(propertyType);
     }
 
-    protected String convertColumnNameToPropertyName(String columnName) {
-        columnName = resolveVendorColumnNameHeadable(columnName);
-        return Srl.initBeansProp(Srl.camelize(columnName));
+    // ===================================================================================
+    //                                                                 Resolve Vendor Name
+    //                                                                 ===================
+    protected String resolveVendorProcedureNameHeadache(String procedureName) {
+        if (getBasicProperties().isDatabaseSQLServer()) { // SQLServer returns 'sp_foo;1'
+            procedureName = Srl.substringLastFront(procedureName, ";");
+        }
+        return procedureName;
     }
 
     protected String resolveVendorColumnNameHeadable(String columnName) {
