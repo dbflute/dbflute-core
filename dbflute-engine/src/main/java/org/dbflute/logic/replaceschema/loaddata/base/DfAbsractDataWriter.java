@@ -1036,7 +1036,7 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                                         Column Meta
     //                                                                         ===========
-    protected Map<String, DfColumnMeta> getColumnMetaMap(DfLoadedSchemaTable schemaTable) {
+    protected Map<String, DfColumnMeta> prepareColumnMetaMap(DfLoadedSchemaTable schemaTable) {
         final String onfileName = schemaTable.getOnfileTableName();
         if (_columnInfoCacheMap.containsKey(onfileName)) {
             return _columnInfoCacheMap.get(onfileName);

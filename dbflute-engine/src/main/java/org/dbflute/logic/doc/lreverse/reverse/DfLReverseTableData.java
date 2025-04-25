@@ -74,7 +74,7 @@ public class DfLReverseTableData {
             final List<Table> tableList = resource.getTableList();
             final Map<String, Table> tableMap = DfCollectionUtil.newLinkedHashMap();
             for (Table table : tableList) {
-                tableMap.put(table.getTableDbName(), table);
+                tableMap.put(table.getTableDbName(), table); // e.g. MEMBER, nextschema.MEMBER
             }
             final String sectionTitle;
             if (resource.isOneToOneFile()) {

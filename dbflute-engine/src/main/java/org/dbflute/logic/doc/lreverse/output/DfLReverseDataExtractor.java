@@ -85,7 +85,7 @@ public class DfLReverseDataExtractor {
     public Map<String, DfLReverseDataResult> extractData(Map<String, Table> tableMap) {
         final Map<String, DfLReverseDataResult> loadDataMap = new LinkedHashMap<String, DfLReverseDataResult>();
         for (Entry<String, Table> entry : tableMap.entrySet()) {
-            final String tableDbName = entry.getKey();
+            final String tableDbName = entry.getKey(); // e.g. MEMBER, nextschema.MEMBER
             final Table table = entry.getValue();
             final DfLReverseDataResult result = selectData(table);
             loadDataMap.put(tableDbName, result);

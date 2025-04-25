@@ -159,7 +159,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         final String dataDirectory = Srl.substringLastFront(_filePath, "/");
         final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
         final DfLoadedSchemaTable schemaTable = extractSchemaTable();
-        final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(schemaTable);
+        final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(schemaTable);
         if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(_filePath, schemaTable);
         }

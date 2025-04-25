@@ -98,9 +98,9 @@ public class DfLReverseOutputHandler {
     //                                                                         ===========
     /**
      * Output load data to data file. (using dataSource)
-     * @param tableMap The map of table to extract. (NotNull)
+     * @param tableMap The map of table to extract, keyed by tableDbName. (NotNull)
      * @param recordLimit The limit of extracted record. (MinusAllowed: if minus, no limit)
-     * @param outputDataFile The data file to output. (NotNull)
+     * @param outputDataFile The data file to output, resolved as table order, existing. (NotNull)
      * @param resource The resource information of output data. (NotNull)
      * @param sectionInfoList The list of section info for display. (NotNull)
      */
@@ -122,24 +122,24 @@ public class DfLReverseOutputHandler {
         }
     }
 
-    protected void filterUnsupportedTable(Map<String, Table> tableInfoMap) {
+    protected void filterUnsupportedTable(Map<String, Table> tableMap) {
         // additional tables are unsupported here
         // because it's not an important function
         final Map<String, Object> additionalTableMap = getAdditionalTableProperties().getAdditionalTableMap();
         for (String tableDbName : additionalTableMap.keySet()) {
-            if (tableInfoMap.containsKey(tableDbName)) {
+            if (tableMap.containsKey(tableDbName)) {
                 _log.info("...Skipping additional table: " + tableDbName);
-                tableInfoMap.remove(tableDbName);
+                tableMap.remove(tableDbName);
             }
         }
     }
 
     /**
      * Transfer load data to data file. (state-less)
-     * @param tableMap The map of table. (NotNull)
-     * @param loadDataMap The map of load data. (NotNull)
+     * @param tableMap The map of table, keyed by tableDbName. (NotNull)
+     * @param loadDataMap The map of load data, keyed by tableDbName. (NotNull)
      * @param recordLimit The limit of extracted record. (MinusAllowed: if minus, no limit)
-     * @param outputDataFile The data file to output. (NotNull)
+     * @param outputDataFile The data file to output, resolved as table order, existing. (NotNull)
      * @param resource The resource information of output data. (NotNull)
      * @param sectionInfoList The list of section info for display. (NotNull)
      */
@@ -148,7 +148,7 @@ public class DfLReverseOutputHandler {
         final DfDataSet dataSet = new DfDataSet();
         int sheetNumber = 1;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
-            final String tableDbName = entry.getKey();
+            final String tableDbName = entry.getKey(); // e.g. MEMBER, nextschema.MEMBER
             final Table table = entry.getValue();
             final DfLReverseDataResult dataResult = loadDataMap.get(tableDbName);
             if (dataResult.isLargeData()) { // delimiter basis or large table for xls

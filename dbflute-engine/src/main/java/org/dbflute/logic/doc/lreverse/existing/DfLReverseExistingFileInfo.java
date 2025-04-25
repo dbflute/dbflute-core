@@ -26,17 +26,17 @@ import java.util.Map;
 public interface DfLReverseExistingFileInfo {
 
     /**
-     * @return The map of existing file's table names. (NotNull)
+     * @return The map of existing file's table DB names. (NotNull)
      */
     Map<File, List<String>> getExistingFileTableListMap();
 
     /**
-     * @return The map of table name's all existing files. (NotNull)
+     * @return The map of table DB name's all existing files. (NotNull)
      */
     Map<String, List<File>> getTableAllExistingFileListMap();
 
     /**
-     * @return The map of table name's first existing files. (NotNull)
+     * @return The map of table DB name's first existing files. (NotNull)
      */
     Map<String, File> getTableFirstExistingFileMap();
 }

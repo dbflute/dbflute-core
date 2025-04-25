@@ -172,7 +172,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
 
         // TODO jflute @@@@@@@@@@ (2025/04/25)
         final DfLoadedSchemaTable schemaTable = createSchemaTable(tableDbName);
-        final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(schemaTable);
+        final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(schemaTable);
         if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(file, tableDbName);
         }
@@ -480,7 +480,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
             final DfDataTable table = dataSet.getTable(i);
             final String tableDbName = table.getTableDbName();
 
-            final Map<String, DfColumnMeta> metaMetaMap = getColumnMetaMap(createSchemaTable(tableDbName));
+            final Map<String, DfColumnMeta> metaMetaMap = prepareColumnMetaMap(createSchemaTable(tableDbName));
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
                 if (!metaMetaMap.containsKey(dataColumn.getColumnDbName())) {
@@ -520,7 +520,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableDbName = table.getTableDbName();
 
-            final Map<String, DfColumnMeta> metaMetaMap = getColumnMetaMap(createSchemaTable(tableDbName));
+            final Map<String, DfColumnMeta> metaMetaMap = prepareColumnMetaMap(createSchemaTable(tableDbName));
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 

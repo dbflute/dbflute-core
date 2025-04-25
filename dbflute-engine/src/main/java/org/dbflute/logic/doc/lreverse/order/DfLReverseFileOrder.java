@@ -159,9 +159,9 @@ public class DfLReverseFileOrder {
         final Map<String, File> firstExistingFileMap = existingFileInfo.getTableFirstExistingFileMap();
         final Map<String, File> translatedXlsMap = StringKeyMap.createAsFlexible();
         for (Entry<String, File> entry : firstExistingFileMap.entrySet()) {
-            final String tableName = entry.getKey();
-            if (tableName.startsWith("$")) { // short name mark, basically xls only
-                final String translated = tableNameMap.get(tableName);
+            final String tableDbName = entry.getKey(); // e.g. MEMBER, nextschema.MEMBER
+            if (tableDbName.startsWith("$")) { // short name mark, basically xls only
+                final String translated = tableNameMap.get(tableDbName);
                 if (translated != null) {
                     translatedXlsMap.put(translated, entry.getValue()); // short-name resolved
                 }

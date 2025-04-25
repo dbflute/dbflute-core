@@ -68,7 +68,7 @@ public class DfLReverseExistingFileProvider {
         final Map<String, File> tableFirstExistingTsvMap = StringKeyMap.createAsFlexible();
         for (File existingTsv : existingTsvList) {
             final String fileName = existingTsv.getName(); // e.g. cyclic_07_02-PURCHASE_PAYMENT.tsv, PURCHASE_PAYMENT.tsv
-            final String tableDbName = new DfDelimiterDataTableNameExtractor(fileName).extractOnfileTableName();
+            final String tableDbName = extractOnfileTableName(fileName); // e.g. MEMBER, nextschema.MEMBER
 
             // one TSV file always has only one table
             existingTsvTableMap.put(existingTsv, tableDbName);
@@ -87,6 +87,10 @@ public class DfLReverseExistingFileProvider {
             }
         }
         return new DfLReverseExistingTsvInfo(existingTsvTableMap, tableAllExistingTsvListMap, tableFirstExistingTsvMap);
+    }
+
+    protected String extractOnfileTableName(String fileName) {
+        return new DfDelimiterDataTableNameExtractor(fileName).extractOnfileTableName();
     }
 
     protected List<File> findExistingTsvList(File tsvDataDir) {
