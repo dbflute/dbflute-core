@@ -16,6 +16,7 @@
 package org.dbflute.logic.replaceschema.loaddata.base.secretary;
 
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 
 /**
  * The handler of xls data. (reading, writing)
@@ -23,5 +24,5 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
  */
 public interface DfColumnBindTypeProvider {
 
-    Class<?> provide(String tableName, DfColumnMeta columnMeta);
+    Class<?> provide(DfLoadedSchemaTable schemaTable, DfColumnMeta columnMeta);
 }

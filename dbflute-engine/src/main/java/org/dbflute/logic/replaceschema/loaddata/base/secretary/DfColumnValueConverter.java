@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -65,13 +66,13 @@ public class DfColumnValueConverter {
     // ===================================================================================
     //                                                                             Convert
     //                                                                             =======
-    public void convert(String tableName, Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
+    public void convert(DfLoadedSchemaTable schemaTable, Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
         final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>(columnValueMap.size());
         final Set<String> convertedSet = new HashSet<String>(1);
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
             final Object plainValue = entry.getValue(); // null allowed
-            Object resolvedValue = resolveConvertValue(tableName, columnName, plainValue, convertedSet, columnMetaMap);
+            Object resolvedValue = resolveConvertValue(schemaTable, columnName, plainValue, convertedSet, columnMetaMap);
             if (convertedSet.isEmpty()) { // if no convert
                 resolvedValue = resolveDefaultValue(columnName, resolvedValue);
             } else {
@@ -87,7 +88,7 @@ public class DfColumnValueConverter {
     // ===================================================================================
     //                                                                       Convert Value
     //                                                                       =============
-    protected Object resolveConvertValue(String tableName, String columnName, Object plainValue, Set<String> convertedSet,
+    protected Object resolveConvertValue(DfLoadedSchemaTable schemaTable, String columnName, Object plainValue, Set<String> convertedSet,
             Map<String, DfColumnMeta> columnMetaMap) {
         if (_convertValueMap == null || _convertValueMap.isEmpty()) {
             return plainValue;
@@ -103,7 +104,7 @@ public class DfColumnValueConverter {
             final String before = entry.getKey();
             final String after = resolveVariableAsAfter(entry.getValue());
 
-            final String typed = processType(tableName, columnName, columnMetaMap, filteredValue, before, after);
+            final String typed = processType(schemaTable, columnName, columnMetaMap, filteredValue, before, after);
             if (typed != null) {
                 filteredValue = typed;
                 converted = true;
@@ -113,7 +114,7 @@ public class DfColumnValueConverter {
             if (Srl.startsWithIgnoreCase(before, containMark)) {
                 final String realBefore = resolveVariableAsBefore(Srl.substringFirstRear(before, containMark));
                 if (realBefore == null) {
-                    throw new IllegalStateException("Cannot use contain:$$null$$: " + tableName + "." + columnName);
+                    throw new IllegalStateException("Cannot use contain:$$null$$: " + schemaTable + "." + columnName);
                 }
                 if (filteredValue != null && filteredValue.contains(realBefore)) {
                     filteredValue = Srl.replace(filteredValue, realBefore, (after != null ? after : ""));
@@ -221,27 +222,27 @@ public class DfColumnValueConverter {
     // ===================================================================================
     //                                                                        Type Process
     //                                                                        ============
-    protected String processType(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
-            String before, String after) {
+    protected String processType(DfLoadedSchemaTable schemaTable, String columnName, Map<String, DfColumnMeta> columnMetaMap,
+            String filteredValue, String before, String after) {
         String processed = null;
-        processed = processString(tableName, columnName, columnMetaMap, filteredValue, before, after);
+        processed = processString(schemaTable, columnName, columnMetaMap, filteredValue, before, after);
         if (processed != null) {
             return processed;
         }
-        processed = processTimestamp(tableName, columnName, columnMetaMap, filteredValue, before, after);
+        processed = processTimestamp(schemaTable, columnName, columnMetaMap, filteredValue, before, after);
         if (processed != null) {
             return processed;
         }
         return null;
     }
 
-    protected String processString(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
-            String before, String after) {
+    protected String processString(DfLoadedSchemaTable schemaTable, String columnName, Map<String, DfColumnMeta> columnMetaMap,
+            String filteredValue, String before, String after) {
         if (!"$$String$$".equalsIgnoreCase(before)) {
             return null; // no converted
         }
         final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
-        final Class<?> boundType = _bindTypeProvider.provide(tableName, columnMeta);
+        final Class<?> boundType = _bindTypeProvider.provide(schemaTable, columnMeta);
         if (!String.class.isAssignableFrom(boundType)) {
             return null; // no converted
         }
@@ -253,13 +254,13 @@ public class DfColumnValueConverter {
         return null; // no converted
     }
 
-    protected String processTimestamp(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
-            String before, String after) {
+    protected String processTimestamp(DfLoadedSchemaTable schemaTable, String columnName, Map<String, DfColumnMeta> columnMetaMap,
+            String filteredValue, String before, String after) {
         if (!"$$Timestamp$$".equalsIgnoreCase(before)) {
             return null; // no converted
         }
         final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
-        final Class<?> boundType = _bindTypeProvider.provide(tableName, columnMeta);
+        final Class<?> boundType = _bindTypeProvider.provide(schemaTable, columnMeta);
         if (!Timestamp.class.isAssignableFrom(boundType)) {
             return null; // no converted
         }

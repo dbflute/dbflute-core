@@ -19,15 +19,15 @@ package org.dbflute.logic.replaceschema.loaddata.delimiter.secretary;
  * @author jflute
  * @since 1.2.5 extracted from DfDelimiterDataWriterImpl (2021/01/20 Wednesday at roppongi japanese)
  */
-public class DfDelimiterDataTableDbNameExtractor {
+public class DfDelimiterDataTableNameExtractor {
 
     protected final String _filePath; // not null
 
-    public DfDelimiterDataTableDbNameExtractor(String filePath) {
+    public DfDelimiterDataTableNameExtractor(String filePath) {
         _filePath = filePath;
     }
 
-    public String extractTableDbName() {
+    public String extractOnfileTableName() {
         final String tableDbName;
         {
             // slash is option, dot is required

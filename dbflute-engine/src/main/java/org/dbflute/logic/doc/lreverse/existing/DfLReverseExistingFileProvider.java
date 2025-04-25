@@ -30,7 +30,7 @@ import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataEncodingDirectoryExtractor;
-import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableDbNameExtractor;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableNameExtractor;
 import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -68,7 +68,7 @@ public class DfLReverseExistingFileProvider {
         final Map<String, File> tableFirstExistingTsvMap = StringKeyMap.createAsFlexible();
         for (File existingTsv : existingTsvList) {
             final String fileName = existingTsv.getName(); // e.g. cyclic_07_02-PURCHASE_PAYMENT.tsv, PURCHASE_PAYMENT.tsv
-            final String tableDbName = new DfDelimiterDataTableDbNameExtractor(fileName).extractTableDbName();
+            final String tableDbName = new DfDelimiterDataTableNameExtractor(fileName).extractOnfileTableName();
 
             // one TSV file always has only one table
             existingTsvTableMap.put(existingTsv, tableDbName);

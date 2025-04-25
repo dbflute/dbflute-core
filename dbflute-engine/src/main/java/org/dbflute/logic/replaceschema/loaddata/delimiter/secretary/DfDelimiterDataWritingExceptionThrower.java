@@ -27,6 +27,7 @@ import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.exception.DfDelimiterDataTableNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.loaddata.base.DfAbsractDataWriter.StringProcessor;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.properties.DfBasicProperties;
 
 /**
@@ -37,7 +38,7 @@ public class DfDelimiterDataWritingExceptionThrower {
 
     protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
 
-    public void throwTableNotFoundException(String fileName, String tableDbName) {
+    public void throwTableNotFoundException(String fileName, DfLoadedSchemaTable schemaTable) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The table specified on the delimiter file was not found in the schema.");
         br.addItem("Advice");
@@ -46,12 +47,12 @@ public class DfDelimiterDataWritingExceptionThrower {
         br.addItem("Delimiter File");
         br.addElement(fileName);
         br.addItem("Table");
-        br.addElement(tableDbName);
+        br.addElement(schemaTable);
         final String msg = br.buildExceptionMessage();
         throw new DfDelimiterDataTableNotFoundException(msg);
     }
 
-    public String buildFailureMessage(String fileName, String tableDbName, String executedSql, List<String> valueList,
+    public String buildFailureMessage(String fileName, DfLoadedSchemaTable schemaTable, String executedSql, List<String> valueList,
             Map<String, Map<String, Class<?>>> bindTypeCacheMap, Map<String, Map<String, StringProcessor>> stringProcessorCacheMap,
             SQLException sqlEx) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -70,7 +71,7 @@ public class DfDelimiterDataWritingExceptionThrower {
         br.addItem("Delimiter File");
         br.addElement(fileName);
         br.addItem("Table");
-        br.addElement(tableDbName);
+        br.addElement(schemaTable);
         if (sqlEx != null) {
             br.addItem("SQLException");
             br.addElement(sqlEx.getClass().getName());
@@ -85,7 +86,8 @@ public class DfDelimiterDataWritingExceptionThrower {
             br.addItem("Bound Values");
             br.addElement(valueList);
         }
-        final Map<String, Class<?>> bindTypeMap = bindTypeCacheMap.get(tableDbName);
+        final String onfileTableName = schemaTable.getOnfileTableName();
+        final Map<String, Class<?>> bindTypeMap = bindTypeCacheMap.get(onfileTableName);
         if (bindTypeMap != null) {
             br.addItem("Bind Type");
             final Set<Entry<String, Class<?>>> entrySet = bindTypeMap.entrySet();
@@ -93,7 +95,7 @@ public class DfDelimiterDataWritingExceptionThrower {
                 br.addElement(entry.getKey() + " = " + entry.getValue());
             }
         }
-        final Map<String, StringProcessor> stringProcessorMap = stringProcessorCacheMap.get(tableDbName);
+        final Map<String, StringProcessor> stringProcessorMap = stringProcessorCacheMap.get(onfileTableName);
         if (bindTypeMap != null) {
             br.addItem("String Processor");
             final Set<Entry<String, StringProcessor>> entrySet = stringProcessorMap.entrySet();

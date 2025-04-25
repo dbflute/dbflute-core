@@ -18,13 +18,14 @@ package org.dbflute.logic.replaceschema.loaddata.base.interceptor;
 import java.util.Map;
 
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 
 /**
  * @author jflute
  */
 public interface DfDataWritingInterceptor {
 
-    void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap);
+    void processBeforeHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap);
 
-    void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap);
+    void processFinallyHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap);
 }

@@ -43,7 +43,7 @@ import org.dbflute.logic.doc.lreverse.secretary.DfLReverseTitleSectionProvider;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataEncodingDirectoryExtractor;
-import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableDbNameExtractor;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableNameExtractor;
 import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.system.DBFluteSystem;
@@ -103,7 +103,7 @@ public class DfLReverseProcess {
      * // filter table list
      * {@link DfLReverseSchemaTableFilter}
      *  |-{@link DfLReverseExistingFileProvider}
-     *    |-{@link DfDelimiterDataTableDbNameExtractor}
+     *    |-{@link DfDelimiterDataTableNameExtractor}
      *    |-{@link DfDelimiterDataEncodingDirectoryExtractor}
      * 
      * // prepare title section list (as result info)
