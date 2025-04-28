@@ -179,7 +179,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         List<String> valueListSnapshot = null;
 
         int rowNumber = 0; // not line on file, as registered record
-        String executedSql = null;
+        String preparedSql = null;
         int committedRowCount = 0; // may committed per limit size, for skip in retry
 
         FileInputStream fis = null;
@@ -274,13 +274,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
                 if (ps == null) {
                     beginTransaction(conn); // for performance (suppress implicit transaction per SQL)
-                    executedSql = sqlBuilder.buildSql();
-                    ps = prepareStatement(conn, executedSql);
+                    preparedSql = sqlBuilder.buildPreparedSql();
+                    ps = prepareStatement(conn, preparedSql);
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                 final Set<String> sysdateColumnSet = sqlBuilder.getSysdateColumnSet();
                 resolveRelativeDate(dataDirectory, schemaTable, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
-                handleLoggingInsert(schemaTable, columnValueMap, loggingInsertType, rowNumber);
+                handleLoggingInsert(schemaTable, columnValueMap, loggingInsertType, rowNumber, preparedSql);
 
                 int bindCount = 1;
                 for (Entry<String, Object> entry : columnValueMap.entrySet()) {
@@ -356,13 +356,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             // request retry if it needs (e.g. execution exception of batch insert)
             // the snapshot is used only when retry failure basically
             final DfJDBCException wrapped = DfJDBCException.voice(e);
-            final String msg = buildFailureMessage(_filePath, schemaTable, executedSql, columnValueList, wrapped);
+            final String msg = buildFailureMessage(_filePath, schemaTable, preparedSql, columnValueList, wrapped);
             throw new DfDelimiterDataRegistrationFailureException(msg, wrapped.getNextException())
                     .retryIfNeeds(createRetryResource(canBatchUpdate, committedRowCount))
                     .snapshotRow(createRowSnapshot(columnNameList, valueListSnapshot, rowNumber));
         } catch (RuntimeException e) {
             // unneeded snapshot at this side but just in case (or changing determination future)
-            final String msg = buildFailureMessage(_filePath, schemaTable, executedSql, columnValueList, null);
+            final String msg = buildFailureMessage(_filePath, schemaTable, preparedSql, columnValueList, null);
             throw new DfDelimiterDataRegistrationFailureException(msg, e)
                     .snapshotRow(createRowSnapshot(columnNameList, valueListSnapshot, rowNumber));
         } finally {
@@ -379,14 +379,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     protected DfLoadedSchemaTable extractSchemaTable() {
-        final String tableDbName = new DfDelimiterDataTableNameExtractor(_filePath).extractOnfileTableName();
-        if (Srl.contains(tableDbName, ".")) { // with schema e.g. PUBLIC.SEA
-            final String schemaExpression = Srl.substringLastFront(tableDbName, ".");
-            final String pureTableName = Srl.substringLastRear(tableDbName, ".");
+        final String onfileTableName = new DfDelimiterDataTableNameExtractor(_filePath).extractOnfileTableName();
+        if (Srl.contains(onfileTableName, ".")) { // with schema e.g. PUBLIC.SEA
+            final String schemaExpression = Srl.substringLastFront(onfileTableName, ".");
+            final String tablePureName = Srl.substringLastRear(onfileTableName, ".");
             final UnifiedSchema dynamicSchema = UnifiedSchema.createAsDynamicSchema(schemaExpression);
-            return new DfLoadedSchemaTable(dynamicSchema, pureTableName, tableDbName);
+            return new DfLoadedSchemaTable(dynamicSchema, tablePureName, onfileTableName);
         } else { // no schema specified, basically here
-            return new DfLoadedSchemaTable(_unifiedSchema, tableDbName, tableDbName); // as main schema
+            return new DfLoadedSchemaTable(_unifiedSchema, onfileTableName, onfileTableName); // as main schema
         }
     }
 
@@ -415,7 +415,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, DfLoadedSchemaTable schemaTable,
             final Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, List<String> valueList) {
         final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
-        sqlBuilder.setTableDbName(schemaTable);
+        sqlBuilder.setSchemaTable(schemaTable);
         sqlBuilder.setColumnMetaMap(columnMetaMap);
         sqlBuilder.setColumnNameList(columnNameList);
         sqlBuilder.setValueList(valueList);

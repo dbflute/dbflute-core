@@ -202,7 +202,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
                 }
                 if (doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                         , columnMetaMap // meta data
-                        , conn, ps // JDBC resources
+                        , conn, ps, preparedSql // JDBC resources
                         , loggingInsertType, suppressBatchUpdate)) { // option
                     ++loadedRowCount;
                     if (existsEmptyRow) {
@@ -238,7 +238,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
                         try {
                             doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                                     , columnMetaMap // meta data
-                                    , conn, retryPs // JDBC resources
+                                    , conn, retryPs, preparedSql // JDBC resources
                                     , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
                         } catch (SQLException rowEx) {
                             retryEx = rowEx;
@@ -359,8 +359,8 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
     //                                               DataRow
     //                                               -------
     protected boolean doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps, LoggingInsertType loggingInsertType,
-            boolean suppressBatchUpdate) throws SQLException {
+            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps, String preparedSql,
+            LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final String dataDirectory = resource.getDataDirectory();
@@ -376,7 +376,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         final int rowNumber = dataRow.getRowNumber();
         final DfLoadedSchemaTable schemaTable = createSchemaTable(tableDbName);
         resolveRelativeDate(dataDirectory, schemaTable, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
-        handleLoggingInsert(schemaTable, columnValueMap, loggingInsertType, rowNumber);
+        handleLoggingInsert(schemaTable, columnValueMap, loggingInsertType, rowNumber, preparedSql);
 
         int bindCount = 1;
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {

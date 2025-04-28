@@ -1048,9 +1048,9 @@ public abstract class DfAbsractDataWriter {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             final UnifiedSchema unifiedSchema = schemaTable.getUnifiedSchema();
-            final String tableDbName = schemaTable.getTableDbName();
+            final String tablePureName = schemaTable.getTablePureName();
             final List<DfColumnMeta> columnList;
-            columnList = _columnHandler.getColumnList(metaData, unifiedSchema, tableDbName);
+            columnList = _columnHandler.getColumnList(metaData, unifiedSchema, tablePureName);
             for (DfColumnMeta columnInfo : columnList) {
                 columnMetaMap.put(columnInfo.getColumnName(), columnInfo);
             }
@@ -1098,15 +1098,18 @@ public abstract class DfAbsractDataWriter {
     //                                                                        Log Handling
     //                                                                        ============
     protected void handleLoggingInsert(DfLoadedSchemaTable schemaTable, Map<String, Object> columnValueMap,
-            LoggingInsertType loggingInsertType, int recordCount) {
+            LoggingInsertType loggingInsertType, int rowNumber, String preparedSql) {
+        if (rowNumber == 1) { // first line
+            _log.info(preparedSql); // to confirm insert SQL (e.g. schema prefix)
+        }
         boolean logging = false;
         if (LoggingInsertType.ALL.equals(loggingInsertType)) {
             logging = true;
         } else if (LoggingInsertType.PART.equals(loggingInsertType)) {
-            if (recordCount <= 10) { // first 10 lines
+            if (rowNumber <= 10) { // first 10 lines
                 logging = true;
-            } else if (recordCount == 11) {
-                _log.info(schemaTable + ":{... more several records}");
+            } else if (rowNumber == 11) {
+                _log.info(schemaTable.getOnfileTableName() + ":{... more several records}");
             }
         }
         if (logging) {

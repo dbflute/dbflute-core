@@ -28,16 +28,16 @@ public class DfLoadedSchemaTable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final UnifiedSchema _unifiedSchema; // not null (basically main schema)
-    protected final String _tableDbName; // not null (basically same as on-file name)
+    protected final UnifiedSchema _unifiedSchema; // not null (basically main schema but may be other schema)
+    protected final String _tablePureName; // not null (basically same as on-file name)
     protected final String _onfileTableName; // not null (basically same as table DB name)
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLoadedSchemaTable(UnifiedSchema unifiedSchema, String tableDbName, String onfileTableName) {
+    public DfLoadedSchemaTable(UnifiedSchema unifiedSchema, String tablePureName, String onfileTableName) {
         _unifiedSchema = unifiedSchema;
-        _tableDbName = tableDbName;
+        _tablePureName = tablePureName;
         _onfileTableName = onfileTableName;
     }
 
@@ -45,20 +45,13 @@ public class DfLoadedSchemaTable {
     //                                                                      SQL Expression
     //                                                                      ==============
     public String buildTableSqlName() { // may have schema prefix, and quoted
-        return buildSqlSchemaPrefix() + quoteTableNameIfNeeds(_tableDbName);
+        final String resolvedPureName = quoteTablePureNameIfNeeds(_tablePureName);
+        return _unifiedSchema.buildSqlName(resolvedPureName);
     }
 
-    protected String buildSqlSchemaPrefix() {
-        if (_unifiedSchema.isMainSchema()) {
-            return ""; // executable without schema
-        } else {
-            return _unifiedSchema.getCatalogSchema() + ".";
-        }
-    }
-
-    protected String quoteTableNameIfNeeds(String tableDbName) {
+    protected String quoteTablePureNameIfNeeds(String tablePureName) {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeedsDirectUse(tableDbName);
+        return prop.quoteTableNameIfNeedsDirectUse(tablePureName);
     }
 
     // ===================================================================================
@@ -66,10 +59,10 @@ public class DfLoadedSchemaTable {
     //                                                                      ==============
     @Override
     public String toString() {
-        if (_tableDbName.equals(_onfileTableName)) { // no schema specified, basically here
-            return "{" + _unifiedSchema + "." + _tableDbName + "}";
+        if (_tablePureName.equals(_onfileTableName)) { // no schema specified, basically here
+            return "{" + _unifiedSchema + "." + _tablePureName + "}";
         } else { // schema specified on file
-            return "{" + _unifiedSchema + "." + _tableDbName + " :: " + _onfileTableName + "}";
+            return "{" + _unifiedSchema + "." + _tablePureName + " :: " + _onfileTableName + "}";
         }
     }
 
@@ -80,8 +73,8 @@ public class DfLoadedSchemaTable {
         return _unifiedSchema;
     }
 
-    public String getTableDbName() {
-        return _tableDbName;
+    public String getTablePureName() {
+        return _tablePureName;
     }
 
     public String getOnfileTableName() {

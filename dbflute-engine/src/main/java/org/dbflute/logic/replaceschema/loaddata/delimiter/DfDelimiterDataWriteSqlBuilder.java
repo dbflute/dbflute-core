@@ -60,9 +60,9 @@ public class DfDelimiterDataWriteSqlBuilder {
     protected Set<String> _sysdateColumnSet; // null allowed (lazy-loaded)
 
     // ===================================================================================
-    //                                                                           Build SQL
-    //                                                                           =========
-    public String buildSql() {
+    //                                                                        Prepared SQL
+    //                                                                        ============
+    public String buildPreparedSql() {
         final Map<String, String> columnValueMap = createBasicColumnValueMap();
         final StringBuilder sb = new StringBuilder();
         final StringBuilder sbValues = new StringBuilder();
@@ -187,11 +187,11 @@ public class DfDelimiterDataWriteSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public DfLoadedSchemaTable getTableDbName() {
+    public DfLoadedSchemaTable getSchemaTable() {
         return _schemaTable;
     }
 
-    public void setTableDbName(DfLoadedSchemaTable schemaTable) {
+    public void setSchemaTable(DfLoadedSchemaTable schemaTable) {
         _schemaTable = schemaTable;
     }
 
