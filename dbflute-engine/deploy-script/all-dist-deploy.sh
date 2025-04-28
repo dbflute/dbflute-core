@@ -80,6 +80,7 @@ mvn -e compile
 cd ../dbflute-test-dbms-postgresql/dbflute_maihamadb
 rm ./log/*.log
 . nextschema-renewal.sh
+. resolaschema-manage.sh replace-schema
 . manage.sh renewal
 cd ..
 mvn -e compile
