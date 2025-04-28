@@ -1037,9 +1037,9 @@ public abstract class DfAbsractDataWriter {
     //                                                                         Column Meta
     //                                                                         ===========
     protected Map<String, DfColumnMeta> prepareColumnMetaMap(DfLoadedSchemaTable schemaTable) {
-        final String onfileName = schemaTable.getOnfileTableName();
-        if (_columnInfoCacheMap.containsKey(onfileName)) {
-            return _columnInfoCacheMap.get(onfileName);
+        final String onfileTableName = schemaTable.getOnfileTableName();
+        if (_columnInfoCacheMap.containsKey(onfileTableName)) {
+            return _columnInfoCacheMap.get(onfileTableName);
         }
         prepareTableCaseTranslationIfNeeds(); // because the name might be user favorite case name
         final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexible();
@@ -1054,7 +1054,7 @@ public abstract class DfAbsractDataWriter {
             for (DfColumnMeta columnInfo : columnList) {
                 columnMetaMap.put(columnInfo.getColumnName(), columnInfo);
             }
-            _columnInfoCacheMap.put(onfileName, columnMetaMap);
+            _columnInfoCacheMap.put(onfileTableName, columnMetaMap);
             return columnMetaMap;
         } catch (SQLException e) {
             String msg = "Failed to get column meta informations: table=" + schemaTable;
@@ -1152,7 +1152,18 @@ public abstract class DfAbsractDataWriter {
                 for (String columnName : columnNameList) {
                     final String onfileTableName = schemaTable.getOnfileTableName();
                     if (prop.hasImplicitClassification(onfileTableName, columnName)) {
-                        checker.check(file, schemaTable, columnName, conn);
+                        checker.check(file, schemaTable, columnName, conn, onfileTableName);
+                    } else { // retry
+                        if (onfileTableName.contains(".")) { // has schema prefix on file name
+                            // #for_now jflute pure searching is only for main schema (2025/04/28)
+                            // additional schema may have same name in other schema so ambiguous
+                            if (schemaTable.getUnifiedSchema().isMainSchema()) {
+                                final String tablePureName = schemaTable.getTablePureName();
+                                if (prop.hasImplicitClassification(tablePureName, columnName)) {
+                                    checker.check(file, schemaTable, columnName, conn, tablePureName);
+                                }
+                            }
+                        }
                     }
                 }
             }

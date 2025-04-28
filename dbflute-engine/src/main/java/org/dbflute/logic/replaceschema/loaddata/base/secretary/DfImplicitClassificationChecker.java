@@ -42,10 +42,13 @@ public class DfImplicitClassificationChecker {
 
     private static final Logger _log = LoggerFactory.getLogger(DfImplicitClassificationChecker.class);
 
-    public void check(File file, DfLoadedSchemaTable schemaTable, String columnDbName, Connection conn) throws SQLException {
-        final String onfileTableName = schemaTable.getOnfileTableName();
+    public void check(File file, DfLoadedSchemaTable schemaTable, String columnDbName, Connection conn, String clsTableKey)
+            throws SQLException {
         final DfClassificationProperties prop = getClassificationProperties();
-        final String classificationName = prop.getClassificationName(onfileTableName, columnDbName);
+        final String classificationName = prop.getClassificationName(clsTableKey, columnDbName);
+        if (classificationName == null) { // no classification (but already checked so no way basically)
+            return;
+        }
         final DfClassificationTop classificationTop = prop.getClassificationTop(classificationName);
         if (classificationTop == null) { // no way (just in case)
             return;
