@@ -68,22 +68,22 @@ public class DfLReverseExistingFileProvider {
         final Map<String, File> tableFirstExistingTsvMap = StringKeyMap.createAsFlexible();
         for (File existingTsv : existingTsvList) {
             final String fileName = existingTsv.getName(); // e.g. cyclic_07_02-PURCHASE_PAYMENT.tsv, PURCHASE_PAYMENT.tsv
-            final String tableDbName = extractOnfileTableName(fileName); // e.g. MEMBER, nextschema.MEMBER
+            final String onfileTableName = extractOnfileTableName(fileName); // e.g. MEMBER, nextschema.MEMBER
 
             // one TSV file always has only one table
-            existingTsvTableMap.put(existingTsv, tableDbName);
+            existingTsvTableMap.put(existingTsv, onfileTableName);
 
             // one table can be related to plural files (e.g. per encoding)
-            List<File> allExistingTsvList = tableAllExistingTsvListMap.get(tableDbName);
+            List<File> allExistingTsvList = tableAllExistingTsvListMap.get(onfileTableName);
             if (allExistingTsvList == null) {
                 allExistingTsvList = DfCollectionUtil.newArrayList();
-                tableAllExistingTsvListMap.put(tableDbName, allExistingTsvList);
+                tableAllExistingTsvListMap.put(onfileTableName, allExistingTsvList);
             }
             allExistingTsvList.add(existingTsv);
 
             // first file only for simple operation
-            if (!tableFirstExistingTsvMap.containsKey(tableDbName)) {
-                tableFirstExistingTsvMap.put(tableDbName, existingTsv);
+            if (!tableFirstExistingTsvMap.containsKey(onfileTableName)) {
+                tableFirstExistingTsvMap.put(onfileTableName, existingTsv);
             }
         }
         return new DfLReverseExistingTsvInfo(existingTsvTableMap, tableAllExistingTsvListMap, tableFirstExistingTsvMap);

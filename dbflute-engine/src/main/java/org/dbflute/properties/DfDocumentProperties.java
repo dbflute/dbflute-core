@@ -890,6 +890,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
 
+    // -----------------------------------------------------
+    //                                     Additional Schema
+    //                                     -----------------
+    public boolean isLoadDataReverseIncludeAdditionalSchema() { // since 1.2.9 (2025/04/27)
+        return isProperty("isIncludeAdditionalSchema", false, getLoadDataReverseMap());
+    }
+
     // ===================================================================================
     //                                                                     SchemaSyncCheck
     //                                                                     ===============

@@ -170,7 +170,6 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
             return 0;
         }
 
-        // TODO jflute @@@@@@@@@@ (2025/04/25)
         final DfLoadedSchemaTable schemaTable = createSchemaTable(tableDbName);
         final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(schemaTable);
         if (columnMetaMap.isEmpty()) {

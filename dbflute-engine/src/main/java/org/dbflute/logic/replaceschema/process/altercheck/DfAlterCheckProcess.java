@@ -433,7 +433,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml, DfCraftDiffAssertDirection direction) {
         // no use history here (use SchemaDiff directly later)
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsSimpleManagingSchema(_dataSource, schemaXml);
         final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
         serializer.enableCraftDiff(_dataSource, craftMetaDir, direction);
         return serializer;

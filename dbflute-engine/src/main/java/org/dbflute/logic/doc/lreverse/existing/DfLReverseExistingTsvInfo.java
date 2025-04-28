@@ -40,21 +40,21 @@ public class DfLReverseExistingTsvInfo implements DfLReverseExistingFileInfo {
     }
 
     /**
-     * @return The map of existing TSV file's table DB name. (NotNull)
+     * @return The map of existing TSV file's on-file table name. (NotNull)
      */
     public Map<File, String> getExistingTsvTableMap() {
         return _existingTsvTableMap;
     }
 
     /**
-     * @return The map of table DB name's all existing TSV files. (NotNull)
+     * @return The map of on-file table name's all existing TSV files. (NotNull)
      */
     public Map<String, List<File>> getTableAllExistingTsvListMap() {
         return _tableAllExistingTsvListMap;
     }
 
     /**
-     * @return The map of table DB name's first existing TSV file. (NotNull)
+     * @return The map of on-file table name's first existing TSV file. (NotNull)
      */
     public Map<String, File> getTableFirstExistingTsvMap() {
         return _tableFirstExistingTsvListMap;

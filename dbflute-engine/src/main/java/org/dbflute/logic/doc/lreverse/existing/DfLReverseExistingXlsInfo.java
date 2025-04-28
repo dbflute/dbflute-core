@@ -36,21 +36,21 @@ public class DfLReverseExistingXlsInfo implements DfLReverseExistingFileInfo {
     }
 
     /**
-     * @return The map of existing xls file's table names. (NotNull)
+     * @return The map of existing xls file's on-file table names. (NotNull)
      */
     public Map<File, List<String>> getExistingXlsTableListMap() {
         return _existingXlsTableListMap;
     }
 
     /**
-     * @return The map of table name's all existing xls files. (NotNull)
+     * @return The map of on-file table name's all existing xls files. (NotNull)
      */
     public Map<String, List<File>> getTableAllExistingXlsListMap() {
         return _tableAllExistingXlsListMap;
     }
 
     /**
-     * @return The map of table name's first existing xls file. (NotNull)
+     * @return The map of on-file table name's first existing xls file. (NotNull)
      */
     public Map<String, File> getTableFirstExistingXlsMap() {
         return _tableFirstExistingXlsMap;

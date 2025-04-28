@@ -75,10 +75,12 @@ public class DfLReverseSchemaTableFilter {
         final List<Table> exceptSkippedList = DfCollectionUtil.newArrayList();
         _log.info("...Filtering reversed table: " + tableList.size());
         for (Table table : tableList) {
-            if (table.isTypeView() || table.isAdditionalSchema()) {
-                // fixedly out of target
-                //   view object - view is not an object which has own data
-                //   additional schema - tables on main schema only are target
+            if (table.isTypeView()) {
+                // fixedly out of target: view is not an object which has own data
+                continue;
+            }
+            if (!isIncludeAdditionalSchema() && table.isAdditionalSchema()) {
+                // optionally out of target: tables on main schema as default
                 continue;
             }
             if (commonSkippedTableSet.contains(table.getTableDbName())) {
@@ -181,6 +183,13 @@ public class DfLReverseSchemaTableFilter {
     //                                          ------------
     protected boolean isReverseTableTarget(String name) {
         return getDocumentProperties().isLoadDataReverseTableTarget(name);
+    }
+
+    // -----------------------------------------------------
+    //                                     Additional Schema
+    //                                     -----------------
+    protected boolean isIncludeAdditionalSchema() {
+        return getDocumentProperties().isLoadDataReverseIncludeAdditionalSchema();
     }
 
     // -----------------------------------------------------

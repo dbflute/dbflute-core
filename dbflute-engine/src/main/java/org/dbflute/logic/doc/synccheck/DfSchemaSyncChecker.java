@@ -192,7 +192,7 @@ public class DfSchemaSyncChecker {
 
     protected DfSchemaXmlSerializer doCreateSerializer(DfSchemaSource dataSource, String historyFile) {
         final String schemaXml = getSchemaXml();
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsSchemaSync(dataSource, schemaXml, historyFile);
         final String craftMetaDir = getSchemaSyncCheckCraftMetaDir();
         if (!getDocumentProperties().isSchemaSyncCheckSuppressCraftDiff()) {
             serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
