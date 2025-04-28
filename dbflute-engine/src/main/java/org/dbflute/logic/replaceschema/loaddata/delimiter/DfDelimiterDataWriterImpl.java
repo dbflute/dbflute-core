@@ -547,7 +547,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                   Exception Thrower
     //                                                                   =================
     protected void throwTableNotFoundException(String fileName, DfLoadedSchemaTable schemaTable) {
-        new DfDelimiterDataWritingExceptionThrower().throwTableNotFoundException(fileName, schemaTable);
+        new DfDelimiterDataWritingExceptionThrower().throwTableNotFoundException(fileName, schemaTable, _columnMetaCacheMap);
     }
 
     protected String buildFailureMessage(String fileName, DfLoadedSchemaTable schemaTable, String executedSql, List<String> valueList,

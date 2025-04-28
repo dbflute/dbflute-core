@@ -26,6 +26,7 @@ import org.dbflute.bhv.exception.SQLExceptionAdviser;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.exception.DfDelimiterDataTableNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfAbsractDataWriter.StringProcessor;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.properties.DfBasicProperties;
@@ -38,7 +39,8 @@ public class DfDelimiterDataWritingExceptionThrower {
 
     protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
 
-    public void throwTableNotFoundException(String fileName, DfLoadedSchemaTable schemaTable) {
+    public void throwTableNotFoundException(String fileName, DfLoadedSchemaTable schemaTable,
+            Map<String, Map<String, DfColumnMeta>> columnMetaCacheMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The table specified on the delimiter file was not found in the schema.");
         br.addItem("Advice");
@@ -48,6 +50,8 @@ public class DfDelimiterDataWritingExceptionThrower {
         br.addElement(fileName);
         br.addItem("Table");
         br.addElement(schemaTable);
+        br.addItem("columnMetaCacheMap");
+        br.addElement(columnMetaCacheMap);
         final String msg = br.buildExceptionMessage();
         throw new DfDelimiterDataTableNotFoundException(msg);
     }

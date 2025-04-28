@@ -113,7 +113,7 @@ public abstract class DfAbsractDataWriter {
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
 
     /** The cache map of meta info. The key is table name. (ordered for display) */
-    protected final Map<String, Map<String, DfColumnMeta>> _columnInfoCacheMap = StringKeyMap.createAsFlexibleOrdered();
+    protected final Map<String, Map<String, DfColumnMeta>> _columnMetaCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
     /** The cache map of bind type. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, Class<?>>> _bindTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
@@ -1038,8 +1038,8 @@ public abstract class DfAbsractDataWriter {
     //                                                                         ===========
     protected Map<String, DfColumnMeta> prepareColumnMetaMap(DfLoadedSchemaTable schemaTable) {
         final String onfileTableName = schemaTable.getOnfileTableName();
-        if (_columnInfoCacheMap.containsKey(onfileTableName)) {
-            return _columnInfoCacheMap.get(onfileTableName);
+        if (_columnMetaCacheMap.containsKey(onfileTableName)) {
+            return _columnMetaCacheMap.get(onfileTableName);
         }
         prepareTableCaseTranslationIfNeeds(); // because the name might be user favorite case name
         final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexible();
@@ -1051,10 +1051,10 @@ public abstract class DfAbsractDataWriter {
             final String tablePureName = schemaTable.getTablePureName();
             final List<DfColumnMeta> columnList;
             columnList = _columnHandler.getColumnList(metaData, unifiedSchema, tablePureName);
-            for (DfColumnMeta columnInfo : columnList) {
-                columnMetaMap.put(columnInfo.getColumnName(), columnInfo);
+            for (DfColumnMeta columnMeta : columnList) {
+                columnMetaMap.put(columnMeta.getColumnName(), columnMeta);
             }
-            _columnInfoCacheMap.put(onfileTableName, columnMetaMap);
+            _columnMetaCacheMap.put(onfileTableName, columnMetaMap);
             return columnMetaMap;
         } catch (SQLException e) {
             String msg = "Failed to get column meta informations: table=" + schemaTable;
