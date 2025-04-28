@@ -198,6 +198,8 @@ map:{
         ; isReplaceSchemaDirectUse = true
         ; isOverrideExistingDataFile = false
         ; isSynchronizeOriginDate = false
+        ; isDelimiterDataBasis = true
+        ; isIncludeAdditionalSchema = false
     }
     # - - - - - - - - - -/
 
