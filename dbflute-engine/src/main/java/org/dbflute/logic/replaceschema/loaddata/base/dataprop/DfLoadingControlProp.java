@@ -280,6 +280,10 @@ public class DfLoadingControlProp {
         if (adjustmentMap == null) {
             return false;
         }
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ by jflute (2025/04/28)
+        // matching with on-file table name in dataprop
+        // if schema prefix on file name, also table name in dataprop should have it
+        // _/_/_/_/_/_/_/_/_/_/
         final String onfileTableName = schemaTable.getOnfileTableName();
         return adjustmentMap.containsKey(onfileTableName) || adjustmentMap.containsKey(KEY_ALL_MARK);
     }
@@ -546,6 +550,7 @@ public class DfLoadingControlProp {
         if (largeTextFileMap == null || largeTextFileMap.isEmpty()) {
             return false;
         }
+        // also same reason as date adjustment, see the comment for the detail by jflute (2025/04/28)
         final String onfileTableName = schemaTable.getOnfileTableName();
         @SuppressWarnings("unchecked")
         final List<String> columnList = (List<String>) largeTextFileMap.get(onfileTableName);
