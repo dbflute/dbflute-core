@@ -64,18 +64,18 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                             =======
     public Object execute(Object[] args) {
         final Object bean = extractBeanFromArgsChecked(args);
-        final UpdateOption<ConditionBean> option = extractUpdateOptionChecked(args);
+        final UpdateOption<ConditionBean> option = extractUpdateOptionChecked(args); // null allowed
         prepareStatementConfigOnThreadIfExists(option);
 
-        final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bean, option);
-        if (propertyTypes.length == 0) {
+        final TnPropertyType[] updatePropertyTypes = createUpdatePropertyTypes(bean, option);
+        if (updatePropertyTypes.length == 0) {
             if (isLogEnabled()) {
                 log(createNonUpdateLogMessage(bean));
             }
             return getNonUpdateReturn();
         }
-        final String sql = filterExecutedSql(createUpdateSql(bean, propertyTypes, option));
-        return doExecute(bean, propertyTypes, sql, option);
+        final String sql = filterExecutedSql(createUpdateSql(bean, updatePropertyTypes, option));
+        return doExecute(bean, updatePropertyTypes, sql, option);
     }
 
     protected UpdateOption<ConditionBean> extractUpdateOptionChecked(Object[] args) {
@@ -95,8 +95,8 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         }
     }
 
-    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql, UpdateOption<ConditionBean> option) {
-        final TnUpdateEntityHandler handler = createUpdateEntityHandler(propertyTypes, sql, option);
+    protected Object doExecute(Object bean, TnPropertyType[] updatePropertyTypes, String sql, UpdateOption<ConditionBean> option) {
+        final TnUpdateEntityHandler handler = createUpdateEntityHandler(updatePropertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
         final int result = handler.execute(realArgs);
@@ -106,6 +106,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     // ===================================================================================
     //                                                                       Update Column
     //                                                                       =============
+    // this array of property types are related to update SQL and bind variables
     protected TnPropertyType[] createUpdatePropertyTypes(Object bean, UpdateOption<ConditionBean> option) {
         final Set<String> modifiedSet = getModifiedPropertyNames(bean);
         final List<TnPropertyType> typeList = new ArrayList<TnPropertyType>();
@@ -117,9 +118,12 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             if (pt.isPrimaryKey()) {
                 continue;
             }
-            if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // optimistic lock
-                    || isStatementProperty(option, pt) // statement
-                    || isSpecifiedProperty(option, modifiedSet, pt)) { // specified
+            if (determineOptimisticLockAutoUpdateDisabled(option, timestampProp, versionNoProp, pt)) {
+                continue;
+            }
+            if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // e.g. VERSION_NO
+                    || isStatementProperty(option, pt) // e.g. SEA_COUNT = SEA_COUNT + 1
+                    || isSpecifiedProperty(option, modifiedSet, pt)) { // means setter-called property
                 typeList.add(pt);
             }
         }
@@ -130,9 +134,26 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return _beanMetaData.getModifiedPropertyNames(bean);
     }
 
+    // -----------------------------------------------------
+    //                                Forced Except Property
+    //                                ----------------------
+    protected boolean determineOptimisticLockAutoUpdateDisabled(UpdateOption<ConditionBean> option, String timestampProp,
+            String versionNoProp, TnPropertyType pt) {
+        // first option determination for performance (even if small) because (maybe) 99.99% false 
+        final boolean disabled = option != null && option.isOptimisticLockAutoUpdateDisabled();
+        return disabled && isOptimisticLockProperty(timestampProp, versionNoProp, pt);
+    }
+
+    // -----------------------------------------------------
+    //                         Property Simple Determination
+    //                         -----------------------------
     protected boolean isOptimisticLockProperty(String timestampProp, String versionNoProp, TnPropertyType pt) {
         final String propertyName = pt.getPropertyName();
         return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
+    }
+
+    protected boolean isStatementProperty(UpdateOption<ConditionBean> option, TnPropertyType pt) {
+        return option != null && option.hasStatement(pt.getColumnDbName());
     }
 
     protected boolean isSpecifiedProperty(UpdateOption<ConditionBean> option, Set<String> modifiedSet, TnPropertyType pt) {
@@ -147,21 +168,17 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return modifiedSet.contains(pt.getPropertyName());
     }
 
-    protected boolean isStatementProperty(UpdateOption<ConditionBean> option, TnPropertyType pt) {
-        return option != null && option.hasStatement(pt.getColumnDbName());
-    }
-
     // ===================================================================================
     //                                                                          Update SQL
     //                                                                          ==========
     /**
      * Create update SQL. The update is by the primary keys or unique keys.
      * @param bean The bean of the entity to update. (NotNull)
-     * @param propertyTypes The types of property for update. (NotNull)
-     * @param option An option of update. (NullAllowed)
+     * @param updatePropertyTypes The types of property for update. (NotNull)
+     * @param option An option of update. (NullAllowed: not required)
      * @return The update SQL. (NotNull)
      */
-    protected String createUpdateSql(Object bean, TnPropertyType[] propertyTypes, UpdateOption<ConditionBean> option) {
+    protected String createUpdateSql(Object bean, TnPropertyType[] updatePropertyTypes, UpdateOption<ConditionBean> option) {
         checkPrimaryKey();
         final String tableDbName = _targetDBMeta.getTableDbName();
         final Set<String> uniqueDrivenPropSet = extractUniqueDrivenPropSet(bean);
@@ -169,7 +186,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         sb.append("update ").append(_targetDBMeta.getTableSqlName()).append(" set ");
         final String versionNoPropertyName = _beanMetaData.getVersionNoPropertyName();
         int columnCount = 0;
-        for (TnPropertyType pt : propertyTypes) {
+        for (TnPropertyType pt : updatePropertyTypes) {
             final String columnDbName = pt.getColumnDbName();
             final ColumnSqlName columnSqlName = pt.getColumnSqlName();
             final String propertyName = pt.getPropertyName();
