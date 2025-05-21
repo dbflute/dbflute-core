@@ -48,7 +48,8 @@ public class FileTokenTest extends RuntimeTestCase {
         final String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
         final String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
         final String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
-        String all = header + ln() + first + ln() + second + ln() + third;
+        final String fourth = "\"\na\",bb,\" \n c \n\n c\",\"\n\n\nd\",\"e\n\n\n\"";
+        String all = header + ln() + first + ln() + second + ln() + third + ln() + fourth;
         ByteArrayInputStream ins = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
         // ## Act ##
@@ -93,6 +94,20 @@ public class FileTokenTest extends RuntimeTestCase {
                     assertEquals("d\n", valueList.get(3));
                     assertEquals("e", valueList.get(4));
                     assertEquals(third, resource.getRowString());
+                    Map<String, String> columnValueMap = resource.toColumnValueMap();
+                    assertEquals(columnValueMap.get("A"), valueList.get(0));
+                    assertEquals(columnValueMap.get("B"), valueList.get(1));
+                    assertEquals(columnValueMap.get("C"), valueList.get(2));
+                    assertEquals(columnValueMap.get("D"), valueList.get(3));
+                    assertEquals(columnValueMap.get("E"), valueList.get(4));
+                    markSet.add("done");
+                } else if (index == 3) {
+                    assertEquals("\na", valueList.get(0));
+                    assertEquals("bb", valueList.get(1)); // no quotation
+                    assertEquals(" \n c \n\n c", valueList.get(2));
+                    assertEquals("\n\n\nd", valueList.get(3));
+                    assertEquals("e\n\n\n", valueList.get(4));
+                    assertEquals(fourth, resource.getRowString());
                     Map<String, String> columnValueMap = resource.toColumnValueMap();
                     assertEquals(columnValueMap.get("A"), valueList.get(0));
                     assertEquals(columnValueMap.get("B"), valueList.get(1));

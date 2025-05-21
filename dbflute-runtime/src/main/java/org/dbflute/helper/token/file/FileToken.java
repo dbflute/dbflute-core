@@ -175,63 +175,87 @@ public class FileToken {
         assertObjectNotNull("delimiter", delimiter);
         assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
 
-        String lineString = null;
-        String preContinueString = "";
-        final List<String> temporaryValueList = new ArrayList<String>();
+        final String lineSeparatorInValue = getTokenizedRestoredLineSeparator();
+        final StringBuilder lineStringSb = new StringBuilder();
+        final StringBuilder preContinuedSb = new StringBuilder();
+        final StringBuilder rowStringSb = new StringBuilder();
+        final List<String> columnValueList = new ArrayList<String>();
         final List<String> filteredValueList = new ArrayList<String>();
 
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(ins, encoding));
 
-            final StringBuilder realRowStringSb = new StringBuilder();
             FileTokenizingHeaderInfo headerInfo = null;
-            int count = -1;
+            int loopIndex = -1;
             int rowNumber = 1;
             int lineNumber = 0;
             while (true) {
-                ++count;
-                if ("".equals(preContinueString)) {
-                    lineNumber = count + 1;
+                ++loopIndex;
+                if (preContinuedSb.length() == 0) { // first line for the row
+                    lineNumber = loopIndex + 1;
                 }
 
-                lineString = br.readLine();
-                if (lineString == null) {
-                    break;
+                {
+                    final String readLine = br.readLine();
+                    if (readLine == null) {
+                        break;
+                    }
+                    clearAppend(lineStringSb, readLine);
                 }
-                if (count == 0) { // first line
-                    lineString = removeUTF8BomIfNeeds(lineString, option);
+
+                // /- - - - - - - - - - - - - - - - - - - - - -
+                // initialize column definition from first line
+                // - - - - - - - - - -/
+                if (loopIndex == 0) { // first line
+                    removeUTF8BomIfNeeds(lineStringSb, option); // modified as mutable
                     if (option.isBeginFirstLine()) {
                         headerInfo = createFileTokenizingHeaderInfo(); // as empty
                     } else {
-                        headerInfo = analyzeHeaderInfo(delimiter, lineString);
+                        headerInfo = analyzeHeaderInfo(delimiter, lineStringSb.toString());
                         continue;
                     }
                 }
-                final String rowString;
-                if (preContinueString.equals("")) {
-                    rowString = lineString;
-                    realRowStringSb.append(lineString);
-                } else {
-                    final String lineSeparator = getTokenizedRestoredLineSeparator();
-                    rowString = preContinueString + lineSeparator + lineString;
-                    realRowStringSb.append(lineSeparator).append(lineString);
+
+                // /- - - - - - - - - - - - - - -
+                // analyze values in line strings
+                // - - - - - - - - - -/
+                {
+                    // no quotation value having line separator is unsupported
+                    // so when second or more lines of one column value,
+                    // preContinuedSb always has at least one character e.g. "
+                    if (preContinuedSb.length() > 0) {
+                        // should be before lineStringSb switched
+                        rowStringSb.append(lineSeparatorInValue).append(lineStringSb); // keep as complete row string
+
+                        // performance tuning, suppress incremental strings from many line separators by jflute (2025/05/21)
+                        // (same as ReplaceSchema's delimiter data writer)
+                        //rowString = preContinueString + lineSeparatorInValue + lineString;
+                        preContinuedSb.append(lineSeparatorInValue).append(lineStringSb); // used only here so changing is no problem
+                        clearAppend(lineStringSb, preContinuedSb); // lineStringSb is switched to "prevoious fragment + current"
+                    } else { // first element for the column value
+                        rowStringSb.append(lineStringSb); // keep as complete row string
+                    }
+                    // here lineStringSb may be (complete) row string or "prevoious fragment + current"
+                    final ValueLineInfo valueLineInfo = analyzeValueList(lineStringSb.toString(), delimiter);
+                    final List<String> extractedList = valueLineInfo.getValueList();
+                    if (valueLineInfo.isContinueNextLine()) {
+                        // latestFragment always starts with quotation e.g. if "sea\nhangar" => "sea
+                        final String latestFragment = extractedList.remove(extractedList.size() - 1); // e.g. "sea
+                        clearAppend(preContinuedSb, latestFragment); // to analyze next line
+                        columnValueList.addAll(extractedList); // save complete values only
+                        continue; // try next line for remainder fragment of the one value
+                    }
+                    columnValueList.addAll(extractedList);
                 }
-                final ValueLineInfo valueLineInfo = arrangeValueList(rowString, delimiter);
-                final List<String> ls = valueLineInfo.getValueList();
-                if (valueLineInfo.isContinueNextLine()) {
-                    preContinueString = (String) ls.remove(ls.size() - 1);
-                    temporaryValueList.addAll(ls);
-                    continue;
-                }
-                temporaryValueList.addAll(ls);
+                // *one record is prepared here as lineStringSb
 
                 try {
                     final FileTokenizingRowResource resource = createFileTokenizingRowResource();
                     resource.setHeaderInfo(headerInfo);
 
                     if (option.isHandleEmptyAsNull()) {
-                        for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext();) {
+                        for (final Iterator<String> ite = columnValueList.iterator(); ite.hasNext();) {
                             final String value = (String) ite.next();
                             if ("".equals(value)) {
                                 filteredValueList.add(null);
@@ -241,20 +265,19 @@ public class FileToken {
                         }
                         resource.setValueList(filteredValueList);
                     } else {
-                        resource.setValueList(temporaryValueList);
+                        resource.setValueList(columnValueList);
                     }
 
-                    final String realRowString = realRowStringSb.toString();
-                    realRowStringSb.setLength(0);
-                    resource.setRowString(realRowString);
+                    resource.setRowString(rowStringSb.toString());
                     resource.setRowNumber(rowNumber);
                     resource.setLineNumber(lineNumber);
                     handlingCall.handleRow(resource);
                 } finally {
                     ++rowNumber;
-                    temporaryValueList.clear();
+                    columnValueList.clear();
                     filteredValueList.clear();
-                    preContinueString = "";
+                    preContinuedSb.setLength(0);
+                    rowStringSb.setLength(0);
                 }
             }
         } catch (SQLException e) {
@@ -269,6 +292,11 @@ public class FileToken {
         }
     }
 
+    protected void clearAppend(StringBuilder sb, CharSequence appended) {
+        sb.setLength(0);
+        sb.append(appended);
+    }
+
     protected FileTokenizingRowResource createFileTokenizingRowResource() {
         return new FileTokenizingRowResource();
     }
@@ -277,7 +305,10 @@ public class FileToken {
         return "\n";
     }
 
-    protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
+    // -----------------------------------------------------
+    //                                     Analyze ValueList
+    //                                     -----------------
+    protected ValueLineInfo analyzeValueList(String lineString, String delimiter) {
         final List<String> valueList = new ArrayList<String>();
 
         // Don't use split!
@@ -418,7 +449,7 @@ public class FileToken {
 
     protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, String lineString) {
         // analyze column header like value list for delimiter in column name if quoted
-        final ValueLineInfo lineInfo = arrangeValueList(lineString, delimiter);
+        final ValueLineInfo lineInfo = analyzeValueList(lineString, delimiter);
         final FileTokenizingHeaderInfo headerInfo = new FileTokenizingHeaderInfo();
         headerInfo.acceptColumnNameList(lineInfo.getValueList().stream().map(vl -> {
             return vl.trim(); /* leading and trailing spaces is unneeded in header (non value) */
@@ -456,11 +487,9 @@ public class FileToken {
     // -----------------------------------------------------
     //                                             UTF-8 BOM
     //                                             ---------
-    protected String removeUTF8BomIfNeeds(String text, FileTokenizingOption option) {
-        if (option.isRemoveUTF8Bom() && text != null && !text.isEmpty() && text.charAt(0) == '\uFEFF') {
-            return text.substring(1);
-        } else {
-            return text;
+    protected void removeUTF8BomIfNeeds(StringBuilder firstSb, FileTokenizingOption option) {
+        if (option.isRemoveUTF8Bom() && firstSb != null && firstSb.length() >= 1 && firstSb.charAt(0) == '\uFEFF') {
+            clearAppend(firstSb, firstSb.substring(1)); // remove first character (Bom)
         }
     }
 

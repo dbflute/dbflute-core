@@ -220,6 +220,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // - - - - - - - - - -/
                 filterLineStringIfNeeds(lineStringSb); // might be clear-appended
                 {
+                    // no quotation value having line separator is unsupported
+                    // so when second or more lines of one column value,
+                    // preContinuedSb always has at least one character e.g. "
                     if (preContinuedSb.length() > 0) {
                         // done performance tuning, suppress incremental strings from many line separators by jflute (2018/03/02)
                         // it needs to change lineString, preContinueString to StringBuilder type...
@@ -227,18 +230,20 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // and insert has array-copy so may not be fast
                         //lineStringSb.insert(0, "\n").insert(0, preContinuedSb); (2021/01/21)
                         preContinuedSb.append(lineSeparatorInValue).append(lineStringSb); // used only here so changing is no problem
-                        clearAppend(lineStringSb, preContinuedSb);
+                        clearAppend(lineStringSb, preContinuedSb); // lineStringSb is switched to "one prevoious + current"
                     }
                     final DfDelimiterDataValueLineInfo valueLineInfo = analyzeValueLine(lineStringSb.toString(), _delimiter);
                     final List<String> extractedList = valueLineInfo.getValueList(); // empty string resolved later
                     if (valueLineInfo.isContinueNextLine()) {
-                        clearAppend(preContinuedSb, extractedList.remove(extractedList.size() - 1));
-                        columnValueList.addAll(extractedList);
-                        continue; // keeping valueList that has previous values
+                        // latestFragment always starts with quotation e.g. if "sea\nhangar" => "sea
+                        final String latestFragment = extractedList.remove(extractedList.size() - 1); // e.g. "sea
+                        clearAppend(preContinuedSb, latestFragment); // to analyze next line
+                        columnValueList.addAll(extractedList); // save complete values only
+                        continue; // try next line for remainder fragment of the one value
                     }
                     columnValueList.addAll(extractedList);
                 }
-                // *one record is prepared here
+                // *one record is prepared here as lineStringSb
 
                 // /- - - - - - - - - - - - - -
                 // check definition differences
