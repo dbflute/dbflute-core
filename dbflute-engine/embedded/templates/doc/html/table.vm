@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2024 the original author or authors.
+## Copyright 2014-2025 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ ${table.aliasExpression}${table.tableDispName}
 #end
 </h2>
 <div class="tablecomment ${table.tableDbName}_comment" data-name="${table.tableDbName}"><pre>${table.commentForSchemaHtmlPre}</pre></div>
-#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($needsColumnAliasItem = $table.needsColumnAliasItem())
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
 #set ($canBeColumnNullObject = $table.canBeColumnNullObject())
@@ -43,7 +43,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<th>UQ</th>
 		<th>IX</th>
 		<th>Not<br />Null</th>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsColumnAliasItem)
 		<th>Alias</th>
 #end
 		<th>Name</th>
@@ -76,8 +76,17 @@ ${table.aliasExpression}${table.tableDispName}
 		<td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
 		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
 		<td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
-		<td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($col.isNotNull())
+		<td class="flgcell">*</td>
+#elseif ($col.isNotNullBusiness())
+		<td class="flgcell notnullbusiness" title="Business NotNull">b</td>
+#elseif ($col.isNotNullMaybe())
+		<td class="flgcell notnullmaybe" title="Maybe NotNull">m</td>
+#else
+## front space of nbsp is to keep compatible (to avoid differences) (2024/10/15) 
+		<td class="flgcell"> &nbsp;</td>
+#end
+#if ($needsColumnAliasItem)
 		<td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
 #end
 		<td class="${col.schemaHtmlColumnNameCssClass} columnnamecell" id="${col.columnIdForSchemaHtml}">${col.name}</td>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,15 @@ public class DfLReverseOutputHandlerFactory {
     public DfLReverseOutputHandler createOutputHandler() {
         final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(_dataSource);
         handler.setContainsCommonColumn(isContainsCommonColumn());
+
+        // option of Delimiter Data
+        handler.setLargeDataDir(getDelimiterDataDir());
+        handler.setDelimiterDataBasis(isDelimiterDataBasis());
+        handler.setDelimiterMinimallyQuoted(isDelimiterDataMinimallyQuoted());
+        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
+        //handler.setDelimiterDataTypeCsv(true);
+
+        // option of Xls Data
         final Integer xlsLimit = getXlsLimit(); // if null, default limit
         if (xlsLimit != null) {
             handler.setXlsLimit(xlsLimit);
@@ -57,9 +66,6 @@ public class DfLReverseOutputHandlerFactory {
         if (cellLengthLimit != null) {
             handler.setCellLengthLimit(cellLengthLimit);
         }
-        handler.setDelimiterDataDir(getDelimiterDataDir());
-        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
-        //handler.setDelimiterDataTypeCsv(true);
         return handler;
     }
 
@@ -83,6 +89,14 @@ public class DfLReverseOutputHandlerFactory {
 
     protected Integer getXlsLimit() {
         return getDocumentProperties().getLoadDataReverseXlsLimit();
+    }
+
+    protected boolean isDelimiterDataBasis() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
+    }
+
+    protected boolean isDelimiterDataMinimallyQuoted() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataMinimallyQuoted();
     }
 
     protected boolean isSuppressLargeDataHandling() {

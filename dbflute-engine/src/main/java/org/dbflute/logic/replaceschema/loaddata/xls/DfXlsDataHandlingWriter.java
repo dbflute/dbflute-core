@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfAbsractDataWriter;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedDataInfo;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnValueConverter;
@@ -169,7 +170,8 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
             return 0;
         }
 
-        final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(tableDbName);
+        final DfLoadedSchemaTable schemaTable = createSchemaTable(tableDbName);
+        final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(schemaTable);
         if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(file, tableDbName);
         }
@@ -200,7 +202,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
                 }
                 if (doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                         , columnMetaMap // meta data
-                        , conn, ps // JDBC resources
+                        , conn, ps, preparedSql // JDBC resources
                         , loggingInsertType, suppressBatchUpdate)) { // option
                     ++loadedRowCount;
                     if (existsEmptyRow) {
@@ -236,7 +238,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
                         try {
                             doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                                     , columnMetaMap // meta data
-                                    , conn, retryPs // JDBC resources
+                                    , conn, retryPs, preparedSql // JDBC resources
                                     , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
                         } catch (SQLException rowEx) {
                             retryEx = rowEx;
@@ -257,8 +259,8 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
                     }
                 }
             }
-            noticeLoadedRowSize(tableDbName, loadedRowCount);
-            checkImplicitClassification(file, tableDbName, columnNameList);
+            noticeLoadedRowSize(schemaTable, loadedRowCount);
+            checkImplicitClassification(file, schemaTable, columnNameList);
             return loadedRowCount;
         } catch (RuntimeException e) {
             handleWriteTableFailureException(dataDirectory, file, tableDbName, e);
@@ -305,18 +307,18 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         }
         // use columnMetaMap to check (not use DataTable's meta data here)
         // at old age, columnMetaMap is not required but required now
-        checkColumnDef(file, dataTable.getTableDbName(), columnDefNameList, columnMetaMap);
+        checkColumnDef(file, createSchemaTable(dataTable.getTableDbName()), columnDefNameList, columnMetaMap);
     }
 
     protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
+            _dataWritingInterceptor.processBeforeHandlingTable(createSchemaTable(tableDbName), columnInfoMap);
         }
     }
 
     protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
+            _dataWritingInterceptor.processFinallyHandlingTable(createSchemaTable(tableDbName), columnInfoMap);
         }
     }
 
@@ -357,8 +359,8 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
     //                                               DataRow
     //                                               -------
     protected boolean doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps, LoggingInsertType loggingInsertType,
-            boolean suppressBatchUpdate) throws SQLException {
+            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps, String preparedSql,
+            LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final String dataDirectory = resource.getDataDirectory();
@@ -372,8 +374,9 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         final Set<String> sysdateColumnSet = extractSysdateColumnSet(dataDirectory, columnValueMap);
         convertColumnValueIfNeeds(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
         final int rowNumber = dataRow.getRowNumber();
-        resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
-        handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
+        final DfLoadedSchemaTable schemaTable = createSchemaTable(tableDbName);
+        resolveRelativeDate(dataDirectory, schemaTable, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
+        handleLoggingInsert(schemaTable, columnValueMap, loggingInsertType, rowNumber, preparedSql);
 
         int bindCount = 1;
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {
@@ -412,10 +415,12 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
     protected void processBindColumnValue(DfXlsDataResource resource, String dataDirectory, File file, String tableDbName,
             String columnName, Object obj, Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnMetaMap,
             int rowNumber) throws SQLException {
+        final DfLoadedSchemaTable schemaTable = createSchemaTable(tableDbName);
+
         // - - - - - - - - - - - - - - - - - - -
         // Process Null (against Null Headache)
         // - - - - - - - - - - - - - - - - - - -
-        if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap, rowNumber)) {
+        if (processNull(dataDirectory, schemaTable, columnName, obj, ps, bindCount, columnMetaMap, rowNumber)) {
             return;
         }
 
@@ -424,7 +429,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         // - - - - - - - - - - - - - - -
         // If the value is not null and the value has the own type except string,
         // It registers the value to statement by the type.
-        if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap, rowNumber)) {
+        if (processNotNullNotString(dataDirectory, schemaTable, columnName, obj, conn, ps, bindCount, columnMetaMap, rowNumber)) {
             return;
         }
 
@@ -432,7 +437,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         // Process NotNull and StringExpression
         // - - - - - - - - - - - - - - - - - - -
         final String value = (String) obj;
-        processNotNullString(dataDirectory, file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap, rowNumber);
+        processNotNullString(dataDirectory, file, schemaTable, columnName, value, conn, ps, bindCount, columnMetaMap, rowNumber);
     }
 
     // ===================================================================================
@@ -469,12 +474,12 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         return new ArrayList<File>(sortedFileSet);
     }
 
-    protected void filterValidColumn(final DfDataSet dataSet) {
+    protected void filterValidColumn(DfDataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
-            final String tableName = table.getTableDbName();
+            final String tableDbName = table.getTableDbName();
 
-            final Map<String, DfColumnMeta> metaMetaMap = getColumnMetaMap(tableName);
+            final Map<String, DfColumnMeta> metaMetaMap = prepareColumnMetaMap(createSchemaTable(tableDbName));
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
                 if (!metaMetaMap.containsKey(dataColumn.getColumnDbName())) {
@@ -487,7 +492,7 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
     // ===================================================================================
     //                                                                 Column Value Filter
     //                                                                 ===================
-    protected void convertColumnValueIfNeeds(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
+    protected void convertColumnValueIfNeeds(String dataDirectory, String tableDbName, Map<String, Object> columnValueMap,
             Map<String, DfColumnMeta> columnMetaMap) {
         // handling both convertValueMap and defaultValueMap
         final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(dataDirectory);
@@ -499,12 +504,12 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
             return;
         }
         final DfColumnBindTypeProvider bindTypeProvider = new DfColumnBindTypeProvider() {
-            public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
-                return getBindType(tableName, columnMeta);
+            public Class<?> provide(DfLoadedSchemaTable schemaTable, DfColumnMeta columnMeta) {
+                return getBindType(schemaTable, columnMeta);
             }
         };
         final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap, bindTypeProvider);
-        converter.convert(tableName, columnValueMap, columnMetaMap);
+        converter.convert(createSchemaTable(tableDbName), columnValueMap, columnMetaMap);
     }
 
     protected void setupDefaultValue(String dataDirectory, final DfDataSet dataSet) {
@@ -512,9 +517,9 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
-            final String tableName = table.getTableDbName();
+            final String tableDbName = table.getTableDbName();
 
-            final Map<String, DfColumnMeta> metaMetaMap = getColumnMetaMap(tableName);
+            final Map<String, DfColumnMeta> metaMetaMap = prepareColumnMetaMap(createSchemaTable(tableDbName));
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
@@ -589,6 +594,14 @@ public class DfXlsDataHandlingWriter extends DfAbsractDataWriter implements DfXl
             };
             return createdState.toString();
         }
+    }
+
+    // ===================================================================================
+    //                                                                        Schema Table
+    //                                                                        ============
+    protected DfLoadedSchemaTable createSchemaTable(String tableDbName) {
+        // #for_now jflute cross schema is unsupported on xls loading (only for tsv) (2025/04/25)
+        return new DfLoadedSchemaTable(_unifiedSchema, tableDbName, tableDbName); // adapter
     }
 
     // ===================================================================================

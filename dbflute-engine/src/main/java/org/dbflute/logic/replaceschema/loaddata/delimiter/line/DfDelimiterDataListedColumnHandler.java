@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.dbflute.exception.DfDelimiterDataColumnDefNotFoundException;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 
 /**
  * @author jflute
@@ -36,19 +37,20 @@ public class DfDelimiterDataListedColumnHandler {
     // basic attribute
     protected final String _dataDirectory;
     protected final File _dataFile;
-    protected final String _tableDbName;
+    protected final DfLoadedSchemaTable _schemaTable;
 
-    public DfDelimiterDataListedColumnHandler(String dataDirectory, File dataFile, String tableDbName) {
+    public DfDelimiterDataListedColumnHandler(String dataDirectory, File dataFile, DfLoadedSchemaTable schemaTable) {
         _dataDirectory = dataDirectory;
         _dataFile = dataFile;
-        _tableDbName = tableDbName;
+        _schemaTable = schemaTable;
     }
 
-    public void setupColumnNameList(List<String> columnNameList, DfDelimiterDataFirstLineInfo firstLineInfo, Map<String, DfColumnMeta> columnMetaMap,
-            Map<String, String> defaultValueMap, Predicate<String> needsCheckingColumnDef, Consumer<List<String>> columnDefChecker) {
+    public void setupColumnNameList(List<String> columnNameList, DfDelimiterDataFirstLineInfo firstLineInfo,
+            Map<String, DfColumnMeta> columnMetaMap, Map<String, String> defaultValueMap, Predicate<String> needsCheckingColumnDef,
+            Consumer<List<String>> columnDefChecker) {
         columnNameList.addAll(firstLineInfo.getColumnNameList());
         if (columnNameList.isEmpty()) {
-            throwDelimiterDataColumnDefNotFoundException(_dataFile, _tableDbName);
+            throwDelimiterDataColumnDefNotFoundException(_dataFile, _schemaTable);
         }
         if (needsCheckingColumnDef.test(_dataDirectory)) {
             columnDefChecker.accept(columnNameList);
@@ -67,7 +69,7 @@ public class DfDelimiterDataListedColumnHandler {
         columnNameList.addAll(additionalColumnList); // defined columns + default columns (existing in DB)
     }
 
-    protected void throwDelimiterDataColumnDefNotFoundException(File dataFile, String tableDbName) {
+    protected void throwDelimiterDataColumnDefNotFoundException(File dataFile, DfLoadedSchemaTable schemaTable) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The column definition on the delimiter file was not found.");
         br.addItem("Advice");
@@ -75,7 +77,7 @@ public class DfDelimiterDataListedColumnHandler {
         br.addItem("Delimiter File");
         br.addElement(dataFile);
         br.addItem("Table");
-        br.addElement(tableDbName);
+        br.addElement(schemaTable);
         final String msg = br.buildExceptionMessage();
         throw new DfDelimiterDataColumnDefNotFoundException(msg);
     }

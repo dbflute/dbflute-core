@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class DfFreeGenResource {
     //                                                                           =========
     protected final String _baseDir; // null allowed
     protected final DfFreeGenResourceType _resourceType; // not null
-    protected final String _resourceFile; // not null
+    protected final String _resourceFile; // basically not null (but may be unused when e.g. empty resource)
     protected final String _encoding; // null allowed
 
     // ===================================================================================

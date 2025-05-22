@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -287,6 +287,13 @@ public class DfProcedureColumnMeta {
     }
 
     // ===================================================================================
+    //                                                               Procedure Column Type
+    //                                                               =====================
+    public boolean isProcedureColumnType_Return() {
+        return DfProcedureColumnType.procedureColumnReturn.equals(_procedureColumnType);
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
@@ -332,7 +339,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setColumnName(String columnName) {
-        this._columnName = columnName;
+        _columnName = columnName;
     }
 
     public DfProcedureColumnType getProcedureColumnType() {
@@ -340,7 +347,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setProcedureColumnType(DfProcedureColumnType procedureColumnType) {
-        this._procedureColumnType = procedureColumnType;
+        _procedureColumnType = procedureColumnType;
     }
 
     public int getJdbcDefType() {
@@ -348,7 +355,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setJdbcDefType(int jdbcDefType) {
-        this._jdbcDefType = jdbcDefType;
+        _jdbcDefType = jdbcDefType;
     }
 
     public String getDbTypeName() {
@@ -356,7 +363,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setDbTypeName(String dbTypeName) {
-        this._dbTypeName = dbTypeName;
+        _dbTypeName = dbTypeName;
     }
 
     public Integer getColumnSize() {
@@ -364,7 +371,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setColumnSize(Integer columnSize) {
-        this._columnSize = columnSize;
+        _columnSize = columnSize;
     }
 
     public Integer getDecimalDigits() {
@@ -372,7 +379,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setDecimalDigits(Integer decimalDigits) {
-        this._decimalDigits = decimalDigits;
+        _decimalDigits = decimalDigits;
     }
 
     public Integer getOverloadNo() {
@@ -380,7 +387,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setOverloadNo(Integer overloadNo) {
-        this._overloadNo = overloadNo;
+        _overloadNo = overloadNo;
     }
 
     public String getColumnComment() {
@@ -388,7 +395,7 @@ public class DfProcedureColumnMeta {
     }
 
     public void setColumnComment(String columnComment) {
-        this._columnComment = columnComment;
+        _columnComment = columnComment;
     }
 
     public String getColumnSpecificName() {

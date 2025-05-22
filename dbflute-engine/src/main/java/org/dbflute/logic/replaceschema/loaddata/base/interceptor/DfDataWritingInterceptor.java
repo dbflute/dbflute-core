@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ package org.dbflute.logic.replaceschema.loaddata.base.interceptor;
 import java.util.Map;
 
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 
 /**
  * @author jflute
  */
 public interface DfDataWritingInterceptor {
 
-    void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap);
+    void processBeforeHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap);
 
-    void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap);
+    void processFinallyHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap);
 }

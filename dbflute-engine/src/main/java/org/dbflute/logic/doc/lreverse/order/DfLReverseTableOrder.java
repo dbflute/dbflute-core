@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,16 @@ import org.dbflute.util.Srl;
 public class DfLReverseTableOrder {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    public static final int STANDARD_SIZE = 9;
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final int _sectionTableGuidelineLimit; // not minus
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfLReverseTableOrder(int sectionTableGuidelineLimit) {
+        this._sectionTableGuidelineLimit = sectionTableGuidelineLimit;
+    }
 
     // ===================================================================================
     //                                                                      Analyzer Order
@@ -125,10 +132,10 @@ public class DfLReverseTableOrder {
     }
 
     protected List<List<Table>> doGroupingCategory(List<List<Table>> outputOrderedList, boolean secondLevel) {
-        final int standardSize = STANDARD_SIZE;
+        final int sectionTableGuidelineLimit = getSectionTableGuidelineLimit();
         final List<List<Table>> groupedList = new ArrayList<List<Table>>();
         for (List<Table> tableList : outputOrderedList) {
-            if (secondLevel && (!isFirstLevelGroup(tableList) || tableList.size() <= standardSize)) {
+            if (secondLevel && (!isFirstLevelGroup(tableList) || tableList.size() <= sectionTableGuidelineLimit)) {
                 groupedList.add(new ArrayList<Table>(tableList));
                 continue;
             }
@@ -179,12 +186,12 @@ public class DfLReverseTableOrder {
     }
 
     protected List<List<Table>> groupingSize(List<List<Table>> outputOrderedList) {
-        final int standardSize = STANDARD_SIZE;
+        final int sectionTableGuidelineLimit = getSectionTableGuidelineLimit();
         final List<List<Table>> groupedList = new ArrayList<List<Table>>();
         for (List<Table> tableList : outputOrderedList) {
             final int tableSize = tableList.size();
 
-            if (!groupedList.isEmpty() && tableSize < standardSize) {
+            if (!groupedList.isEmpty() && tableSize < sectionTableGuidelineLimit) {
                 // handle only-one table
                 if (tableSize == 1) {
                     final Table onlyOneTable = tableList.get(0);
@@ -204,7 +211,7 @@ public class DfLReverseTableOrder {
                                 existsFK = true;
                             }
                         }
-                        if (!isFirstLevelGroup(previousList) && previousList.size() < standardSize) {
+                        if (!isFirstLevelGroup(previousList) && previousList.size() < sectionTableGuidelineLimit) {
                             // not group and small
                             candidatePreviousList = previousList;
                         }
@@ -246,7 +253,7 @@ public class DfLReverseTableOrder {
                 result = true; // small groups are joined
             }
         }
-        return result && (lastList.size() + tableList.size()) <= STANDARD_SIZE;
+        return result && (lastList.size() + tableList.size()) <= getSectionTableGuidelineLimit();
     }
 
     protected boolean isFirstLevelGroup(List<Table> tableList) {
@@ -381,5 +388,12 @@ public class DfLReverseTableOrder {
         final String firstPrefix = Srl.substringFirstFront(tableName, "_");
         final String firstRear = Srl.substringFirstRear(tableName, "_");
         return firstPrefix + "_" + Srl.substringFirstFront(firstRear, "_");
+    }
+
+    // ===================================================================================
+    //                                                                        Section Size
+    //                                                                        ============
+    protected int getSectionTableGuidelineLimit() {
+        return _sectionTableGuidelineLimit;
     }
 }

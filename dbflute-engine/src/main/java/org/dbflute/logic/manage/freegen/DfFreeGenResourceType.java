@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Map;
 import org.dbflute.logic.manage.freegen.table.appcls.DfAppClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.appcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.elasticsearch.DfElasticsearchTableLoader;
+import org.dbflute.logic.manage.freegen.table.empty.DfFrgEmptyTableLoader;
 import org.dbflute.logic.manage.freegen.table.filepath.DfFilePathTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonGeneralTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonKeyTableLoader;
@@ -41,6 +42,7 @@ public enum DfFreeGenResourceType {
     PROP, XLS, FILE_PATH, JSON_GENERAL, JSON_KEY, JSON_SCHEMA // general
     , SOLR, ELASTICSEARCH, SWAGGER // product
     , MAIL_FLUTE, PM_FILE, LASTA_DOC, APP_CLS, WEB_CLS // lastaflute
+    , EMPTY // super flexible
     ;
 
     public static final Map<DfFreeGenResourceType, DfFreeGenTableLoader> tableLoaderMap;
@@ -60,5 +62,6 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.EMPTY, new DfFrgEmptyTableLoader());
     }
 }

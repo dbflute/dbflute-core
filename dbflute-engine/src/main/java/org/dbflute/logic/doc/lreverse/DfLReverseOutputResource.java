@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,18 +29,37 @@ import org.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
  */
 public class DfLReverseOutputResource {
 
-    protected final File _xlsFile;
-    protected final List<Table> _tableList;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final File _dataFile; // same as order map's key
+    protected final List<Table> _tableList; // tables in one xls file or only-one table if delimiter
     protected final Integer _sectionNo; // e.g. 01, 02
     protected final String _mainName; // in current section e.g. MEMBER
+    protected final boolean _oneToOneFile;
 
-    public DfLReverseOutputResource(File xlsFile, List<Table> tableList, Integer sectionNo, String mainName) {
-        _xlsFile = xlsFile;
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfLReverseOutputResource(File dataFile, Table table, Integer sectionNo, String mainName) {
+        _dataFile = dataFile;
+        _tableList = DfCollectionUtil.newArrayList(table); // 1:1 for TSV;
+        _sectionNo = sectionNo;
+        _mainName = mainName;
+        _oneToOneFile = true;
+    }
+
+    public DfLReverseOutputResource(File dataFile, List<Table> tableList, Integer sectionNo, String mainName) {
+        _dataFile = dataFile;
         _tableList = tableList;
         _sectionNo = sectionNo;
         _mainName = mainName;
+        _oneToOneFile = false;
     }
 
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void acceptTableOrder(List<String> tableNameList) {
         final List<String> lowerList = new ArrayList<String>();
         for (String tableName : tableNameList) {
@@ -55,16 +74,25 @@ public class DfLReverseOutputResource {
         DfCollectionUtil.orderAccordingTo(_tableList, resource);
     }
 
-    public File getXlsFile() {
-        return _xlsFile;
+    // ===================================================================================
+    //                                                                  Table Registration
+    //                                                                  ==================
+    public void addTable(Table table) {
+        if (_oneToOneFile && _tableList.size() == 1) {
+            throw new IllegalStateException("Already only-one table exists: " + _tableList + ", " + table);
+        }
+        _tableList.add(table);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public File getDataFile() {
+        return _dataFile;
     }
 
     public List<Table> getTableList() {
         return _tableList;
-    }
-
-    public void addTable(Table table) {
-        _tableList.add(table);
     }
 
     public int getSectionNo() {
@@ -73,5 +101,9 @@ public class DfLReverseOutputResource {
 
     public String getMainName() {
         return _mainName;
+    }
+
+    public boolean isOneToOneFile() {
+        return _oneToOneFile;
     }
 }

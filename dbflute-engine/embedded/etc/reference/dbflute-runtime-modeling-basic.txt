@@ -1,0 +1,65 @@
+
+# ========================================================================================
+#                                                                    Behavior Command Flow
+#                                                                    =====================
+
+ +----------------------+
+ | MemberBhv (Behavior) |--------+
+ +----------------------+        |
+  memberBhv.selectList(cb)       |
+      |                          |
+      v                          |
+   +------------------------+    |
+   | BehaviorCommandInvoker |    |
+   +------------------------+    |
+    |    |                       |
+    |    |                    /--| new
+    |    v                   v
+    |  +-----------------------+
+    |  | SelectEntityCBCommand | // implements BehaviorCommand
+    |  +-----------------------+
+    |      | new
+    |      v
+    |    +-------------------+ // (S2Dao layer)
+    |--->| SelectCBExecution | // implements TnSqlCommand, SqlExecution
+         +-------------------+
+             |
+             v
+           +----------------------+ // (S2Dao layer)
+           | TnBasicSelectHandler | // extends TnAbstractBasicSqlHandler
+           +----------------------+
+
+
+
+ +----------------------+
+ | MemberBhv (Behavior) |--------------+
+ +----------------------+              |
+  memberBhv.update(entity)             |
+  memberBhv.updateNonstrict(entity)    +---+
+  memberBhv.varyingUpdate(entity)          |
+  memberBhv.varyingUpdateNonstrict(entity) |
+      |                                    |
+      v                                +---+
+   +------------------------+          |
+   | BehaviorCommandInvoker |          |
+   +------------------------+          |
+    |    |                             |
+    |    |                    /--------+ new
+    |    v                   v
+    |  +--------------------------------+
+    |  |  UpdateEntityCommand           | // implements BehaviorCommand
+    |  |  UpdateNonstrictEntityCommand  |
+    |  +--------------------------------+
+    |      | new
+    |      v
+    |   +------------------------------+ // (S2Dao layer)
+    +-->| TnUpdateEntityDynamicCommand | // implements TnSqlCommand, SqlExecution
+        +------------------------------+ // (build update SQL)
+             |
+             v
+          +-----------------------+ // (S2Dao layer)
+          | TnUpdateEntityHandler | // extends TnAbstractBasicSqlHandler
+          +-----------------------+ // (bind variables on SQL)
+
+
+

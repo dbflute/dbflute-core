@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfAbsractDataWriter;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.line.DfDelimiterDataFirstLineAnalyzer;
@@ -48,7 +49,7 @@ import org.dbflute.logic.replaceschema.loaddata.delimiter.line.DfDelimiterDataLi
 import org.dbflute.logic.replaceschema.loaddata.delimiter.line.DfDelimiterDataValueLineAnalyzer;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.line.DfDelimiterDataValueLineInfo;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataJdbcHandler;
-import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableDbNameExtractor;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableNameExtractor;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataWritingExceptionThrower;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -157,14 +158,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     protected void doWriteData(DfDelimiterDataResultInfo resultInfo, boolean forcedlySuppressBatch, int offsetRowCount) throws IOException {
         final String dataDirectory = Srl.substringLastFront(_filePath, "/");
         final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
-        final String tableDbName = extractTableDbName();
-        final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(tableDbName);
+        final DfLoadedSchemaTable schemaTable = extractSchemaTable();
+        final Map<String, DfColumnMeta> columnMetaMap = prepareColumnMetaMap(schemaTable);
         if (columnMetaMap.isEmpty()) {
-            throwTableNotFoundException(_filePath, tableDbName);
+            throwTableNotFoundException(_filePath, schemaTable);
         }
 
         // process before handling table
-        beforeHandlingTable(tableDbName, columnMetaMap);
+        beforeHandlingTable(schemaTable, columnMetaMap);
 
         final String lineSeparatorInValue = "\n"; // fixedly
         final File dataFile = new File(_filePath);
@@ -178,7 +179,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         List<String> valueListSnapshot = null;
 
         int rowNumber = 0; // not line on file, as registered record
-        String executedSql = null;
+        String preparedSql = null;
         int committedRowCount = 0; // may committed per limit size, for skip in retry
 
         FileInputStream fis = null;
@@ -210,7 +211,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // - - - - - - - - - -/
                 if (loopIndex == 0) {
                     firstLineInfo = analyzeFirstLine(lineStringSb.toString(), _delimiter);
-                    setupColumnNameList(columnNameList, dataDirectory, dataFile, tableDbName, firstLineInfo, columnMetaMap);
+                    setupColumnNameList(columnNameList, dataDirectory, dataFile, schemaTable, firstLineInfo, columnMetaMap);
                     continue;
                 }
 
@@ -219,6 +220,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // - - - - - - - - - -/
                 filterLineStringIfNeeds(lineStringSb); // might be clear-appended
                 {
+                    // no quotation value having line separator is unsupported
+                    // so when second or more lines of one column value,
+                    // preContinuedSb always has at least one character e.g. "
                     if (preContinuedSb.length() > 0) {
                         // done performance tuning, suppress incremental strings from many line separators by jflute (2018/03/02)
                         // it needs to change lineString, preContinueString to StringBuilder type...
@@ -226,24 +230,26 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // and insert has array-copy so may not be fast
                         //lineStringSb.insert(0, "\n").insert(0, preContinuedSb); (2021/01/21)
                         preContinuedSb.append(lineSeparatorInValue).append(lineStringSb); // used only here so changing is no problem
-                        clearAppend(lineStringSb, preContinuedSb);
+                        clearAppend(lineStringSb, preContinuedSb); // lineStringSb is switched to "one prevoious + current"
                     }
                     final DfDelimiterDataValueLineInfo valueLineInfo = analyzeValueLine(lineStringSb.toString(), _delimiter);
                     final List<String> extractedList = valueLineInfo.getValueList(); // empty string resolved later
                     if (valueLineInfo.isContinueNextLine()) {
-                        clearAppend(preContinuedSb, extractedList.remove(extractedList.size() - 1));
-                        columnValueList.addAll(extractedList);
-                        continue; // keeping valueList that has previous values
+                        // latestFragment always starts with quotation e.g. if "sea\nhangar" => "sea
+                        final String latestFragment = extractedList.remove(extractedList.size() - 1); // e.g. "sea
+                        clearAppend(preContinuedSb, latestFragment); // to analyze next line
+                        columnValueList.addAll(extractedList); // save complete values only
+                        continue; // try next line for remainder fragment of the one value
                     }
                     columnValueList.addAll(extractedList);
                 }
-                // *one record is prepared here
+                // *one record is prepared here as lineStringSb
 
                 // /- - - - - - - - - - - - - -
                 // check definition differences
                 // - - - - - - - - - -/
                 if (isDifferentColumnValueCount(firstLineInfo, columnValueList)) {
-                    handleDifferentColumnValueCount(resultInfo, dataDirectory, tableDbName, firstLineInfo, columnValueList);
+                    handleDifferentColumnValueCount(resultInfo, dataDirectory, schemaTable, firstLineInfo, columnValueList);
 
                     // clear temporary variables
                     clear(preContinuedSb);
@@ -267,19 +273,19 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // process registration to database
                 // - - - - - - - - - -/
                 final DfDelimiterDataWriteSqlBuilder sqlBuilder =
-                        createSqlBuilder(resultInfo, tableDbName, columnMetaMap, columnNameList, columnValueList);
+                        createSqlBuilder(resultInfo, schemaTable, columnMetaMap, columnNameList, columnValueList);
                 if (conn == null) {
                     conn = _dataSource.getConnection();
                 }
                 if (ps == null) {
                     beginTransaction(conn); // for performance (suppress implicit transaction per SQL)
-                    executedSql = sqlBuilder.buildSql();
-                    ps = prepareStatement(conn, executedSql);
+                    preparedSql = sqlBuilder.buildPreparedSql();
+                    ps = prepareStatement(conn, preparedSql);
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                 final Set<String> sysdateColumnSet = sqlBuilder.getSysdateColumnSet();
-                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
-                handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
+                resolveRelativeDate(dataDirectory, schemaTable, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
+                handleLoggingInsert(schemaTable, columnValueMap, loggingInsertType, rowNumber, preparedSql);
 
                 int bindCount = 1;
                 for (Entry<String, Object> entry : columnValueMap.entrySet()) {
@@ -289,7 +295,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // /- - - - - - - - - - - - - - - - - -
                     // process Null (against Null Headache)
                     // - - - - - - - - - -/
-                    if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap, rowNumber)) {
+                    if (processNull(dataDirectory, schemaTable, columnName, obj, ps, bindCount, columnMetaMap, rowNumber)) {
                         bindCount++;
                         continue;
                     }
@@ -299,7 +305,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // - - - - - - - - - -/
                     // If the value is not null and the value has the own type except string,
                     // It registers the value to statement by the type.
-                    if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap,
+                    if (processNotNullNotString(dataDirectory, schemaTable, columnName, obj, conn, ps, bindCount, columnMetaMap,
                             rowNumber)) {
                         bindCount++;
                         continue;
@@ -309,7 +315,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // process NotNull and StringExpression
                     // - - - - - - - - - -/
                     final String value = (String) obj;
-                    processNotNullString(dataDirectory, dataFile, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap,
+                    processNotNullString(dataDirectory, dataFile, schemaTable, columnName, value, conn, ps, bindCount, columnMetaMap,
                             rowNumber);
                     bindCount++;
                 }
@@ -348,20 +354,20 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 commitTransaction(conn);
                 committedRowCount = committedRowCount + addedBatchSize;
             }
-            noticeLoadedRowSize(tableDbName, rowNumber);
+            noticeLoadedRowSize(schemaTable, rowNumber);
             resultInfo.registerLoadedMeta(dataDirectory, _filePath, rowNumber);
-            checkImplicitClassification(dataFile, tableDbName, columnNameList);
+            checkImplicitClassification(dataFile, schemaTable, columnNameList);
         } catch (SQLException e) {
             // request retry if it needs (e.g. execution exception of batch insert)
             // the snapshot is used only when retry failure basically
             final DfJDBCException wrapped = DfJDBCException.voice(e);
-            final String msg = buildFailureMessage(_filePath, tableDbName, executedSql, columnValueList, wrapped);
+            final String msg = buildFailureMessage(_filePath, schemaTable, preparedSql, columnValueList, wrapped);
             throw new DfDelimiterDataRegistrationFailureException(msg, wrapped.getNextException())
                     .retryIfNeeds(createRetryResource(canBatchUpdate, committedRowCount))
                     .snapshotRow(createRowSnapshot(columnNameList, valueListSnapshot, rowNumber));
         } catch (RuntimeException e) {
             // unneeded snapshot at this side but just in case (or changing determination future)
-            final String msg = buildFailureMessage(_filePath, tableDbName, executedSql, columnValueList, null);
+            final String msg = buildFailureMessage(_filePath, schemaTable, preparedSql, columnValueList, null);
             throw new DfDelimiterDataRegistrationFailureException(msg, e)
                     .snapshotRow(createRowSnapshot(columnNameList, valueListSnapshot, rowNumber));
         } finally {
@@ -373,12 +379,20 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             }
             close(ps);
             close(conn);
-            finallyHandlingTable(tableDbName, columnMetaMap); // process after (finally) handling table
+            finallyHandlingTable(schemaTable, columnMetaMap); // process after (finally) handling table
         }
     }
 
-    protected String extractTableDbName() {
-        return new DfDelimiterDataTableDbNameExtractor(_filePath).extractTableDbName();
+    protected DfLoadedSchemaTable extractSchemaTable() {
+        final String onfileTableName = new DfDelimiterDataTableNameExtractor(_filePath).extractOnfileTableName();
+        if (Srl.contains(onfileTableName, ".")) { // with schema e.g. PUBLIC.SEA
+            final String schemaExpression = Srl.substringLastFront(onfileTableName, ".");
+            final String tablePureName = Srl.substringLastRear(onfileTableName, ".");
+            final UnifiedSchema dynamicSchema = UnifiedSchema.createAsDynamicSchema(schemaExpression);
+            return new DfLoadedSchemaTable(dynamicSchema, tablePureName, onfileTableName);
+        } else { // no schema specified, basically here
+            return new DfLoadedSchemaTable(_unifiedSchema, onfileTableName, onfileTableName); // as main schema
+        }
     }
 
     protected boolean canBatchUpdate(boolean forcedlySuppressBatch, String dataDirectory) {
@@ -403,10 +417,10 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         sb.append(appended);
     }
 
-    protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, String tableDbName,
+    protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, DfLoadedSchemaTable schemaTable,
             final Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, List<String> valueList) {
         final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
-        sqlBuilder.setTableDbName(tableDbName);
+        sqlBuilder.setSchemaTable(schemaTable);
         sqlBuilder.setColumnMetaMap(columnMetaMap);
         sqlBuilder.setColumnNameList(columnNameList);
         sqlBuilder.setValueList(valueList);
@@ -414,8 +428,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         sqlBuilder.setConvertValueMap(_convertValueMap);
         sqlBuilder.setDefaultValueMap(_defaultValueMap);
         sqlBuilder.setBindTypeProvider(new DfColumnBindTypeProvider() {
-            public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
-                return getBindType(tableName, columnMeta);
+            public Class<?> provide(DfLoadedSchemaTable schemaTable, DfColumnMeta columnMeta) {
+                return getBindType(schemaTable, columnMeta);
             }
         });
         sqlBuilder.setDefaultValueProp(_defaultValueProp);
@@ -434,15 +448,15 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                      Before/Finally
     //                                                                      ==============
-    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
+    protected void beforeHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
+            _dataWritingInterceptor.processBeforeHandlingTable(schemaTable, columnInfoMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
+    protected void finallyHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
+            _dataWritingInterceptor.processFinallyHandlingTable(schemaTable, columnInfoMap);
         }
     }
 
@@ -462,12 +476,12 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                       Listed Column
     //                                                                       =============
-    protected void setupColumnNameList(List<String> columnNameList, String dataDirectory, File dataFile, String tableDbName,
+    protected void setupColumnNameList(List<String> columnNameList, String dataDirectory, File dataFile, DfLoadedSchemaTable schemaTable,
             DfDelimiterDataFirstLineInfo firstLineInfo, Map<String, DfColumnMeta> columnMetaMap) {
-        final DfDelimiterDataListedColumnHandler handler = new DfDelimiterDataListedColumnHandler(dataDirectory, dataFile, tableDbName);
+        final DfDelimiterDataListedColumnHandler handler = new DfDelimiterDataListedColumnHandler(dataDirectory, dataFile, schemaTable);
         handler.setupColumnNameList(columnNameList, firstLineInfo, columnMetaMap, _defaultValueMap,
                 ldataDirectory -> isCheckColumnDef(ldataDirectory),
-                lcolumnNameList -> checkColumnDef(dataFile, tableDbName, lcolumnNameList, columnMetaMap));
+                lcolumnNameList -> checkColumnDef(dataFile, schemaTable, lcolumnNameList, columnMetaMap));
     }
 
     // ===================================================================================
@@ -484,9 +498,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return valueList.size() < firstLineInfo.getColumnNameList().size();
     }
 
-    protected void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, String dataDirectory, String tableDbName,
-            DfDelimiterDataFirstLineInfo firstLineInfo, List<String> valueList) {
-        _loadingControlProp.handleDifferentColumnValueCount(resultInfo, dataDirectory, _filePath, tableDbName, firstLineInfo, valueList);
+    protected void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, String dataDirectory,
+            DfLoadedSchemaTable schemaTable, DfDelimiterDataFirstLineInfo firstLineInfo, List<String> valueList) {
+        _loadingControlProp.handleDifferentColumnValueCount(resultInfo, dataDirectory, _filePath, schemaTable, firstLineInfo, valueList);
     }
 
     // ===================================================================================
@@ -537,14 +551,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                   Exception Thrower
     //                                                                   =================
-    protected void throwTableNotFoundException(String fileName, String tableDbName) {
-        new DfDelimiterDataWritingExceptionThrower().throwTableNotFoundException(fileName, tableDbName);
+    protected void throwTableNotFoundException(String fileName, DfLoadedSchemaTable schemaTable) {
+        new DfDelimiterDataWritingExceptionThrower().throwTableNotFoundException(fileName, schemaTable, _columnMetaCacheMap);
     }
 
-    protected String buildFailureMessage(String fileName, String tableDbName, String executedSql, List<String> valueList,
+    protected String buildFailureMessage(String fileName, DfLoadedSchemaTable schemaTable, String executedSql, List<String> valueList,
             SQLException sqlEx) {
         final DfDelimiterDataWritingExceptionThrower wer = new DfDelimiterDataWritingExceptionThrower();
-        return wer.buildFailureMessage(fileName, tableDbName, executedSql, valueList, _bindTypeCacheMap, _stringProcessorCacheMap, sqlEx);
+        return wer.buildFailureMessage(fileName, schemaTable, executedSql, valueList, _bindTypeCacheMap, _stringProcessorCacheMap, sqlEx);
     }
 
     // ===================================================================================

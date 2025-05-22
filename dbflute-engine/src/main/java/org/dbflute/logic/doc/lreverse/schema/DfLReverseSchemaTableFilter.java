@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,10 +75,12 @@ public class DfLReverseSchemaTableFilter {
         final List<Table> exceptSkippedList = DfCollectionUtil.newArrayList();
         _log.info("...Filtering reversed table: " + tableList.size());
         for (Table table : tableList) {
-            if (table.isTypeView() || table.isAdditionalSchema()) {
-                // fixedly out of target
-                //   view object - view is not an object which has own data
-                //   additional schema - tables on main schema only are target
+            if (table.isTypeView()) {
+                // fixedly out of target: view is not an object which has own data
+                continue;
+            }
+            if (!isIncludeAdditionalSchema() && table.isAdditionalSchema()) {
+                // optionally out of target: tables on main schema as default
                 continue;
             }
             if (commonSkippedTableSet.contains(table.getTableDbName())) {
@@ -136,7 +138,7 @@ public class DfLReverseSchemaTableFilter {
     //                                                                        Existing TSV
     //                                                                        ============
     protected Set<String> extractCommonExistingTsvTableSet(String commonTsvDataDir) { // e.g. .../common/reversetsv
-        return extractExistingTsvInfo(new File(commonTsvDataDir)).getTableExistingTsvListMap().keySet();
+        return extractExistingTsvInfo(new File(commonTsvDataDir)).getTableAllExistingTsvListMap().keySet();
     }
 
     protected DfLReverseExistingTsvInfo extractExistingTsvInfo(File commonTsvDataDir) { // e.g. .../common/reversetsv
@@ -147,7 +149,7 @@ public class DfLReverseSchemaTableFilter {
     //                                                                        Existing Xls
     //                                                                        ============
     protected Set<String> extractCommonExistingXlsTableSet(String commonXlsDataDir) {
-        return extractExistingXlsInfo(new File(commonXlsDataDir)).getTableExistingXlsMap().keySet();
+        return extractExistingXlsInfo(new File(commonXlsDataDir)).getTableFirstExistingXlsMap().keySet();
     }
 
     protected DfLReverseExistingXlsInfo extractExistingXlsInfo(File commonXlsDataDir) {
@@ -181,6 +183,13 @@ public class DfLReverseSchemaTableFilter {
     //                                          ------------
     protected boolean isReverseTableTarget(String name) {
         return getDocumentProperties().isLoadDataReverseTableTarget(name);
+    }
+
+    // -----------------------------------------------------
+    //                                     Additional Schema
+    //                                     -----------------
+    protected boolean isIncludeAdditionalSchema() {
+        return getDocumentProperties().isLoadDataReverseIncludeAdditionalSchema();
     }
 
     // -----------------------------------------------------

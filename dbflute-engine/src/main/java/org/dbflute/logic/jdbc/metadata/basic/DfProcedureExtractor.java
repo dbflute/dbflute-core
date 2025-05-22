@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,13 +447,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 procedureName = procedureMeta.getProcedureName();
                 ResultSet columnRs = null;
                 try {
-                    columnRs = doGetProcedureColumns(metaData, procedureMeta);
+                    columnRs = doGetProcedureColumns(metaData, procedureMeta, /*retry*/false);
                     setupProcedureColumnMeta(procedureMeta, columnRs);
-                } catch (SQLException e) {
-                    throw e;
                 } finally {
                     closeResult(columnRs);
                 }
+                retryGetProcedureColumns(metaData, procedureMeta);
+                adjustProcedureColumnList(procedureMeta);
             }
         } catch (SQLException e) {
             throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
@@ -466,6 +466,21 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             closeConnection(conn);
         }
         return procedureMetaList;
+    }
+
+    protected void retryGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta procedureMeta) throws SQLException {
+        if (isDatabaseMySQL() && procedureMeta.getProcedureColumnList().isEmpty()) {
+            ResultSet columnRs = null;
+            try {
+                // to avoid MySQL JDBC-8.0.x headache, see this method for the detail
+                columnRs = doGetProcedureColumns(metaData, procedureMeta, /*retry*/true);
+                if (columnRs != null) { // null allowed if retry
+                    setupProcedureColumnMeta(procedureMeta, columnRs);
+                }
+            } finally {
+                closeResult(columnRs);
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -580,7 +595,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                     Procedure Columns
     //                                     -----------------
-    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta procedureMeta) throws SQLException {
+    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta procedureMeta, boolean retry) throws SQLException {
         final String catalogName = procedureMeta.getProcedureCatalog();
         final String schemaName = procedureMeta.getProcedureSchema().getPureSchema();
         final String procedurePureName = procedureMeta.buildProcedurePureName();
@@ -588,8 +603,15 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         final String procedureArgName;
         if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
             // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
+            // however, MySQL JDBC-8.0.x headache is here: https://github.com/dbflute/dbflute-core/issues/208
             catalogArgName = catalogName;
-            procedureArgName = Srl.connectPrefix(procedurePureName, catalogName, ".");
+            if (retry) {
+                // since (maybe) MySQL JDBC-8.0.x + MySQL-8.0.x, needs to use pure name
+                procedureArgName = procedurePureName;
+            } else {
+                // as default (basically for under JDBC-5.x or MySQL-5.7.x)
+                procedureArgName = Srl.connectPrefix(procedurePureName, catalogName, ".");
+            }
         } else if (isDatabaseOracle() && procedureMeta.isPackageProcdure()) {
             catalogArgName = procedureMeta.getProcedurePackage();
             procedureArgName = procedurePureName; // needs to use pure name
@@ -597,7 +619,16 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             catalogArgName = catalogName;
             procedureArgName = procedurePureName;
         }
-        return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
+        try {
+            return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
+        } catch (RuntimeException | SQLException e) {
+            if (retry) {
+                _log.debug("*Failed to retry getting procedure columns: procedure=" + procedureMeta, e);
+                return null; // null allowed if retry
+            } else {
+                throw e;
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -719,7 +750,6 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             procedureColumnMeta.setColumnSpecificName(columnSpecificName);
             procedureMeta.addProcedureColumn(procedureColumnMeta);
         }
-        adjustProcedureColumnList(procedureMeta);
     }
 
     protected int toInt(String title, String value) {

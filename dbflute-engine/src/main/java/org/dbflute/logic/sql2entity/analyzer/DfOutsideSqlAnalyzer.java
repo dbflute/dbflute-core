@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,7 +189,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     protected Map<String, DfColumnMeta> extractColumnMetaMap(String sql, ResultSet rs) throws SQLException {
         final Map<String, String> columnForcedJavaNativeMap = createColumnForcedJavaNativeMap(sql);
         final DfCustomizeEntityMetaExtractor extractor = new DfCustomizeEntityMetaExtractor();
-        return extractor.extractColumnMetaInfoMap(rs, sql, new DfForcedJavaNativeProvider() {
+        return extractor.extractColumnMetaMap(rs, sql, new DfForcedJavaNativeProvider() {
             public String provide(String columnName) {
                 return columnForcedJavaNativeMap.get(columnName);
             }
@@ -197,6 +197,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     }
 
     protected Map<String, String> createColumnForcedJavaNativeMap(String sql) {
+        // e.g. -- ##java.math.BigInteger MAX_MEMBER_ID##
         final List<DfSql2EntityMark> entityPropertyTypeList = getEntityPropertyTypeList(sql);
         final Map<String, String> columnJavaNativeMap = StringKeyMap.createAsFlexible();
         for (DfSql2EntityMark mark : entityPropertyTypeList) {

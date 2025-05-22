@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ public class DfJdbcTypeMapper {
     protected final DfMapperResource _resource;
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfJdbcTypeMapper(Map<String, String> nameToJdbcTypeMap, Map<String, Map<String, String>> pointToJdbcTypeMap,
             DfMapperResource resource) {
         _nameToJdbcTypeMap = nameToJdbcTypeMap;
@@ -64,8 +64,8 @@ public class DfJdbcTypeMapper {
     }
 
     // ===================================================================================
-    //                                                                 Torque Type Getting
-    //                                                                 ===================
+    //                                                                   JDBC Type by Meta
+    //                                                                   =================
     /**
      * Get the JDBC type of the column. (contains point type-mapping) <br>
      * Look at the java-doc of overload method if you want to know the priority of mapping.
@@ -74,24 +74,53 @@ public class DfJdbcTypeMapper {
      */
     public String getColumnJdbcType(DfColumnMeta columnMeta) {
         final String pointMappingType = findPointMappingType(columnMeta);
-        if (pointMappingType != null) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(pointMappingType)) {
             return pointMappingType;
         }
         return getColumnJdbcType(columnMeta.getJdbcDefValue(), columnMeta.getDbTypeName());
     }
 
+    // -----------------------------------------------------
+    //                                     Point TypeMapping
+    //                                     -----------------
+    // pointTypeMapping is supported only when having column meta, using e.g. table name
     protected String findPointMappingType(DfColumnMeta columnMeta) {
-        final String tableName = columnMeta.getTableName();
-        if (tableName == null) {
-            return null;
+        final String tableName = preparePointMappingTableName(columnMeta);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(tableName)) {
+            final Map<String, String> byTableTypeMap = _pointToJdbcTypeMap.get(tableName); // null allowed
+            final String foundType = doFindPointMappingType(columnMeta, byTableTypeMap);
+            if (foundType != null) {
+                return foundType;
+            }
         }
-        Map<String, String> columnTypeMap = _pointToJdbcTypeMap.get(tableName);
-        final String foundType = doFindPointMappingType(columnMeta, columnTypeMap);
-        if (foundType != null) {
-            return foundType;
+
+        final String procedureName = columnMeta.getProcedureName(); // from procedure meta
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureName)) { // procedure on sql2entity
+            final String procedurePrefix = "procedure:";
+            String procedureKey = procedurePrefix + procedureName; // e.g. "precedure:SP_SEA"
+            Map<String, String> byProcedureTypeMap = _pointToJdbcTypeMap.get(procedureKey); // null allowed
+            if (byProcedureTypeMap == null) { // retry to save e.g. "precedure: SP_SEA"
+                procedureKey = procedurePrefix + " " + procedureName; // has space
+                byProcedureTypeMap = _pointToJdbcTypeMap.get(procedureKey); // null allowed
+            }
+            final String foundType = doFindPointMappingType(columnMeta, byProcedureTypeMap);
+            if (foundType != null) {
+                return foundType;
+            }
         }
-        columnTypeMap = _pointToJdbcTypeMap.get("$$ALL$$");
-        return doFindPointMappingType(columnMeta, columnTypeMap);
+
+        final Map<String, String> allTypeMap = _pointToJdbcTypeMap.get("$$ALL$$"); // null allowed
+        return doFindPointMappingType(columnMeta, allTypeMap);
+    }
+
+    protected String preparePointMappingTableName(DfColumnMeta columnMeta) {
+        String tableName = columnMeta.getTableName(); // only for domain entity
+        if (Srl.is_Null_or_TrimmedEmpty(tableName)) {
+            // also for Sql2Entity (outosideSql, procedure) since 1.2.9
+            // https://github.com/dbflute/dbflute-core/issues/226
+            tableName = columnMeta.getSql2EntityRelatedTableName(); // for outosideSql, procedure
+        }
+        return tableName;
     }
 
     protected String doFindPointMappingType(DfColumnMeta columnMeta, Map<String, String> columnTypeMap) {
@@ -110,6 +139,9 @@ public class DfJdbcTypeMapper {
         return null;
     }
 
+    // ===================================================================================
+    //                                                                  JDBC Type by Parts
+    //                                                                  ==================
     /**
      * Get the JDBC type of the column. <br> 
      * The priority of mapping is as follows:
@@ -125,7 +157,7 @@ public class DfJdbcTypeMapper {
      * @return The JDBC type of the column. (NotNull)
      */
     public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
-        final String jdbcType = doGetColumnJdbcType(jdbcDefType, dbTypeName);
+        final String jdbcType = deriveColumnJdbcType(jdbcDefType, dbTypeName);
         if (jdbcType == null) {
             // * * * * * *
             // Priority 5
@@ -135,6 +167,9 @@ public class DfJdbcTypeMapper {
         return jdbcType;
     }
 
+    // ===================================================================================
+    //                                                                   Mapping JDBC Type
+    //                                                                   =================
     /**
      * Does it have a mapping about the type?
      * @param jdbcDefType The definition type of JDBC.
@@ -142,10 +177,13 @@ public class DfJdbcTypeMapper {
      * @return The JDBC type of the column. (NotNull)
      */
     public boolean hasMappingJdbcType(int jdbcDefType, String dbTypeName) {
-        return doGetColumnJdbcType(jdbcDefType, dbTypeName) != null;
+        return deriveColumnJdbcType(jdbcDefType, dbTypeName) != null;
     }
 
-    public String doGetColumnJdbcType(int jdbcDefType, String dbTypeName) {
+    // ===================================================================================
+    //                                                                JDBC Type Derivation
+    //                                                                ====================
+    protected String deriveColumnJdbcType(int jdbcDefType, String dbTypeName) {
         // * * * * * *
         // Priority 1
         // * * * * * *
@@ -226,9 +264,9 @@ public class DfJdbcTypeMapper {
         return null;
     }
 
-    // -----------------------------------------------------
-    //                                          Concept Type
-    //                                          ------------
+    // ===================================================================================
+    //                                                          Concept Type Determination
+    //                                                          ==========================
     public boolean isConceptTypeUUID(final String dbTypeName) { // mapped by UUID
         if (isPostgreSQLUuid(dbTypeName)) {
             return true;
@@ -273,9 +311,12 @@ public class DfJdbcTypeMapper {
         return isPostgreSQLNumeric(dbTypeName); // procedure only
     }
 
+    // ===================================================================================
+    //                                                         Pinpoint Type Determination
+    //                                                         ===========================
     // -----------------------------------------------------
-    //                                         Pinpoint Type
-    //                                         -------------
+    //                                          DB Type Name
+    //                                          ------------
     public boolean isMySQLDatetime(final String dbTypeName) {
         return _resource.isDbmsMySQL() && matchIgnoreCase(dbTypeName, "datetime");
     }

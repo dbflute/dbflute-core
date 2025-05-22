@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ public class DfCustomizeEntityInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _tableDbName;
-    protected final Map<String, DfColumnMeta> _columnMap;
-    protected final DfTypeStructInfo _typeStructInfo;
+    protected final String _tableDbName; // not null
+    protected final Map<String, DfColumnMeta> _columnMetaMap; // not null
+    protected final DfTypeStructInfo _typeStructInfo; // null allowed
 
     // additional information (outsideSql only)
     protected File _sqlFile;
@@ -65,13 +65,13 @@ public class DfCustomizeEntityInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMap) {
-        this(tableDbName, columnMap, null);
+    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMetaMap) {
+        this(tableDbName, columnMetaMap, null);
     }
 
-    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMap, DfTypeStructInfo typeStructInfo) {
+    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMetaMap, DfTypeStructInfo typeStructInfo) {
         _tableDbName = tableDbName;
-        _columnMap = columnMap;
+        _columnMetaMap = columnMetaMap;
         _typeStructInfo = typeStructInfo;
     }
 
@@ -112,7 +112,7 @@ public class DfCustomizeEntityInfo {
         if (commentMap == null || commentMap.isEmpty()) {
             return;
         }
-        for (Entry<String, DfColumnMeta> entry : _columnMap.entrySet()) {
+        for (Entry<String, DfColumnMeta> entry : _columnMetaMap.entrySet()) {
             final String columnName = entry.getKey();
             final String selectColumnComment = commentMap.get(columnName); // commentMap should be flexible
             if (Srl.is_NotNull_and_NotTrimmedEmpty(selectColumnComment)) {
@@ -157,8 +157,8 @@ public class DfCustomizeEntityInfo {
         return _tableDbName;
     }
 
-    public Map<String, DfColumnMeta> getColumnMap() {
-        return _columnMap;
+    public Map<String, DfColumnMeta> getColumnMetaMap() {
+        return _columnMetaMap;
     }
 
     public DfTypeStructInfo getTypeStructInfo() {

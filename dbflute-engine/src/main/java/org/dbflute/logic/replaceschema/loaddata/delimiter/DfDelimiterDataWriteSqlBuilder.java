@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.Set;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnValueConverter;
@@ -39,23 +40,29 @@ public class DfDelimiterDataWriteSqlBuilder {
     //====================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _tableDbName;
-    protected Map<String, DfColumnMeta> _columnMetaMap;
-    protected List<String> _columnNameList;
-    protected List<String> _valueList;
-    protected Map<String, Set<String>> _notFoundColumnMap;
-    protected Map<String, Map<String, String>> _convertValueMap;
-    protected Map<String, String> _defaultValueMap;
-    protected DfColumnBindTypeProvider _bindTypeProvider;
-    protected Map<String, String> _basicColumnValueMap;
-    protected Map<String, String> _allColumnConvertMap;
-    protected DfDefaultValueProp _defaultValueProp;
-    protected Set<String> _sysdateColumnSet;
+    // -----------------------------------------------------
+    //                                        Basic Resource
+    //                                        -- ------------
+    protected DfLoadedSchemaTable _schemaTable; // not null (after setup)
+    protected Map<String, DfColumnMeta> _columnMetaMap; // not null (after setup)
+    protected List<String> _columnNameList; // not null (after setup)
+    protected List<String> _valueList; // not null (after setup)
+    protected Map<String, Set<String>> _notFoundColumnMap; // not null (after setup)
+    protected Map<String, Map<String, String>> _convertValueMap; // not null (after setup)
+    protected Map<String, String> _defaultValueMap; // not null (after setup)
+    protected DfColumnBindTypeProvider _bindTypeProvider; // not null (after setup)
+    protected DfDefaultValueProp _defaultValueProp; // not null (after setup)
+
+    // -----------------------------------------------------
+    //                                          Internal Use
+    //                                          ------------
+    protected Map<String, String> _basicColumnValueCacheMap; // null allowed (lazy-loaded)
+    protected Set<String> _sysdateColumnSet; // null allowed (lazy-loaded)
 
     // ===================================================================================
-    //                                                                           Build SQL
-    //                                                                           =========
-    public String buildSql() {
+    //                                                                        Prepared SQL
+    //                                                                        ============
+    public String buildPreparedSql() {
         final Map<String, String> columnValueMap = createBasicColumnValueMap();
         final StringBuilder sb = new StringBuilder();
         final StringBuilder sbValues = new StringBuilder();
@@ -64,7 +71,7 @@ public class DfDelimiterDataWriteSqlBuilder {
             sb.append(", ").append(columnSqlName);
             sbValues.append(", ?");
         }
-        final String tableSqlName = quoteTableNameIfNeeds(_tableDbName);
+        final String tableSqlName = _schemaTable.buildTableSqlName();
         sb.delete(0, ", ".length()).insert(0, "insert into " + tableSqlName + " (").append(")");
         sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
         sb.append(sbValues);
@@ -92,7 +99,7 @@ public class DfDelimiterDataWriteSqlBuilder {
         adjustColumnValueBeforeConvert(columnValueMap);
         final DfColumnValueConverter converter = createColumnValueConverter();
         converter.treatEmptyBeforeAsNull(); // for compatible with e.g. $$empty$$ = $$empty$$
-        converter.convert(_tableDbName, columnValueMap, _columnMetaMap);
+        converter.convert(_schemaTable, columnValueMap, _columnMetaMap);
     }
 
     protected void adjustColumnValueBeforeConvert(Map<String, Object> columnValueMap) {
@@ -126,10 +133,10 @@ public class DfDelimiterDataWriteSqlBuilder {
     //                                                                           SQL Parts
     //                                                                           =========
     protected Map<String, String> createBasicColumnValueMap() {
-        if (_basicColumnValueMap != null) {
-            return _basicColumnValueMap;
+        if (_basicColumnValueCacheMap != null) {
+            return _basicColumnValueCacheMap;
         }
-        _basicColumnValueMap = new LinkedHashMap<String, String>();
+        _basicColumnValueCacheMap = new LinkedHashMap<String, String>();
         int columnCount = -1;
         for (String columnName : _columnNameList) {
             columnCount++;
@@ -152,26 +159,27 @@ public class DfDelimiterDataWriteSqlBuilder {
             }
             if (!_columnMetaMap.isEmpty() && _columnMetaMap.containsKey(columnName)) {
                 String realDbName = _columnMetaMap.get(columnName).getColumnName();
-                _basicColumnValueMap.put(realDbName, value);
+                _basicColumnValueCacheMap.put(realDbName, value);
             } else {
-                _basicColumnValueMap.put(columnName, value);
+                _basicColumnValueCacheMap.put(columnName, value);
             }
         }
-        return _basicColumnValueMap;
+        return _basicColumnValueCacheMap;
     }
 
     private void handleNotFoundColumn(String columnName) {
-        Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableDbName);
+        final String onfileTableName = _schemaTable.getOnfileTableName();
+        Set<String> notFoundColumnSet = _notFoundColumnMap.get(onfileTableName);
         if (notFoundColumnSet == null) {
             notFoundColumnSet = new LinkedHashSet<String>();
-            _notFoundColumnMap.put(_tableDbName, notFoundColumnSet);
+            _notFoundColumnMap.put(onfileTableName, notFoundColumnSet);
         }
         notFoundColumnSet.add(columnName);
     }
 
     protected String buildDelimiterDataRegistrationFailureMessage(int columnCount) {
         String msg = "valueList.get(columnCount) threw the exception:";
-        msg = msg + " tableName=" + _tableDbName + " columnNameList=" + _columnNameList;
+        msg = msg + " tableName=" + _schemaTable + " columnNameList=" + _columnNameList;
         msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
         return msg;
     }
@@ -179,6 +187,14 @@ public class DfDelimiterDataWriteSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public DfLoadedSchemaTable getSchemaTable() {
+        return _schemaTable;
+    }
+
+    public void setSchemaTable(DfLoadedSchemaTable schemaTable) {
+        _schemaTable = schemaTable;
+    }
+
     public Map<String, DfColumnMeta> getColumnMetaMap() {
         return _columnMetaMap;
     }
@@ -201,14 +217,6 @@ public class DfDelimiterDataWriteSqlBuilder {
 
     public void setNotFoundColumnMap(Map<String, Set<String>> notFoundColumnMap) {
         _notFoundColumnMap = notFoundColumnMap;
-    }
-
-    public String getTableDbName() {
-        return _tableDbName;
-    }
-
-    public void setTableDbName(String tableDbName) {
-        _tableDbName = tableDbName;
     }
 
     public List<String> getValueList() {

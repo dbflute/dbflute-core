@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
@@ -34,6 +35,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReader;
+import org.dbflute.properties.assistant.document.tableorder.DfDocTableOrder;
 import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -151,7 +153,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return null;
     }
 
-    public String extractCommentFromDbComment(String comment) { // comment is trimmed
+    public String extractDescriptionFromDbComment(String comment) { // comment is trimmed
         if (isAliasHandling(comment)) {
             if (hasAliasDelimiter(comment)) {
                 final String delimiter = getAliasDelimiterInDbComment();
@@ -670,25 +672,32 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     // -----------------------------------------------------
     //                                         File Resource
     //                                         -------------
+    public String getLoadDataReverseDelimiterDataDir() { // for delimiter basis or big data
+        if (isLoadDataReverseReplaceSchemaDirectUse()) {
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseTsvUTF8DataDir();
+        } else {
+            // changed @since 1.2.9
+            //return templateDir + "/big-data/UTF-8";
+            return getDocumentOutputDirectory() + "/data/tsv/UTF-8";
+        }
+    }
+
     public String getLoadDataReverseXlsDataDir() {
         if (isLoadDataReverseReplaceSchemaDirectUse()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseXlsDataDir();
         } else {
-            final String outputDirectory = getDocumentOutputDirectory();
-            return outputDirectory + "/data";
+            // changed @since 1.2.9
+            //return getDocumentOutputDirectory() + "/data";
+            return getDocumentOutputDirectory() + "/data/xls";
         }
     }
 
-    public String getLoadDataReverseDelimiterDataDir() { // for big data
-        if (isLoadDataReverseReplaceSchemaDirectUse()) {
-            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseTsvUTF8DataDir();
-        } else {
-            final String templateDir = getLoadDataReverseXlsDataDir();
-            return templateDir + "/big-data";
-        }
+    public String getLoadDataReverseDelimiterFileTitle() {
+        // different from xls because delimiter file has table name so long file name
+        return isLoadDataReverseReplaceSchemaDirectUse() ? "cyclic" : "reverse";
     }
 
-    public String getLoadDataReverseFileTitle() {
+    public String getLoadDataReverseXlsFileTitle() {
         return isLoadDataReverseReplaceSchemaDirectUse() ? "cyclic-data" : "reverse-data";
     }
 
@@ -712,7 +721,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
@@ -744,9 +753,28 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // -----------------------------------------------------
-    //                                             XLS Limit
-    //                                             ---------
-    public Integer getLoadDataReverseXlsLimit() {
+    //                                        Delimiter Data
+    //                                        --------------
+    public boolean isLoadDataReverseDelimiterDataBasis() { // since 1.2.9
+        // instead of xlsLimit=0: https://github.com/dbflute/dbflute-core/issues/214
+        final boolean defaultValue = isLoadDataReverseOldStyleDelimiterTrigger();
+        return isProperty("isDelimiterDataBasis", defaultValue, getLoadDataReverseMap());
+    }
+
+    protected boolean isLoadDataReverseOldStyleDelimiterTrigger() {
+        final Integer xlsLimit = getLoadDataReverseXlsLimit(); // not minus
+        return xlsLimit != null && xlsLimit.equals(0);
+    }
+
+    public boolean isLoadDataReverseDelimiterDataMinimallyQuoted() { // since 1.2.9
+        // to fit with application policy: https://github.com/dbflute/dbflute-core/issues/205
+        return isProperty("isDelimiterDataMinimallyQuoted", false, getLoadDataReverseMap());
+    }
+
+    // -----------------------------------------------------
+    //                                              XLS Data
+    //                                              --------
+    public Integer getLoadDataReverseXlsLimit() { // null allowed, not minus
         final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!loadDataReverseMap.isEmpty()) {
@@ -759,12 +787,12 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         try {
             limit = Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
         if (limit < 0) {
-            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be zero or plus number but minus: value=" + limit;
             throw new DfIllegalPropertySettingException(msg);
         }
@@ -779,7 +807,7 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isSuppressQuoteEmptyString", false, getLoadDataReverseMap());
     }
 
-    public Integer getLoadDataReverseCellLengthLimit() {
+    public Integer getLoadDataReverseCellLengthLimit() { // null allowed
         final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!loadDataReverseMap.isEmpty()) {
@@ -788,13 +816,44 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (limitExp == null) {
             return null; // if null, default limit
         }
+        // no check of minus but maybe exception later by jflute (2024/10/04)
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_documentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
+    }
+
+    // -----------------------------------------------------
+    //                         Section Table Guideline Limit
+    //                         -----------------------------
+    public Integer getLoadDataReverseSectionTableGuidelineLimit() { // null allowed, not minus
+        // you can increase table count in one section to avoid git differences a little
+        // https://github.com/dbflute/dbflute-core/issues/216
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
+        String tableLimit = null;
+        if (!loadDataReverseMap.isEmpty()) {
+            tableLimit = (String) loadDataReverseMap.get("sectionTableGuidelineLimit");
+        }
+        if (tableLimit == null) {
+            return null; // if null, default limit
+        }
+        final Integer limit;
+        try {
+            limit = Integer.valueOf(tableLimit);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
+            msg = msg + " should be number but: value=" + tableLimit;
+            throw new DfIllegalPropertyTypeException(msg, e);
+        }
+        if (limit <= 0) {
+            String msg = "The property 'sectionTableGuidelineLimit' of loadDataReverse in " + KEY_documentMap;
+            msg = msg + " should be plus number but zero or minus: value=" + limit;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return limit;
     }
 
     // -----------------------------------------------------
@@ -829,6 +888,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    }
+
+    // -----------------------------------------------------
+    //                                     Additional Schema
+    //                                     -----------------
+    public boolean isLoadDataReverseIncludeAdditionalSchema() { // since 1.2.9 (2025/04/27)
+        return isProperty("isIncludeAdditionalSchema", false, getLoadDataReverseMap());
     }
 
     // ===================================================================================
@@ -934,63 +1000,22 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     // ===================================================================================
     //                                                              Table Display Order By
     //                                                              ======================
-    public Comparator<Table> getTableDisplayOrderBy() {
-        return new Comparator<Table>() {
-            public int compare(Table table1, Table table2) {
-                // = = = =
-                // Schema
-                // = = = =
-                // The main schema has priority
-                {
-                    final boolean mainSchema1 = table1.isMainSchema();
-                    final boolean mainSchema2 = table2.isMainSchema();
-                    if (mainSchema1 != mainSchema2) {
-                        if (mainSchema1) {
-                            return -1;
-                        }
-                        if (mainSchema2) {
-                            return 1;
-                        }
-                        // unreachable
-                    }
-                    final String schema1 = table1.getDocumentSchema();
-                    final String schema2 = table2.getDocumentSchema();
-                    if (schema1 != null && schema2 != null && !schema1.equals(schema2)) {
-                        return schema1.compareTo(schema2);
-                    } else if (schema1 == null && schema2 != null) {
-                        return 1; // nulls last
-                    } else if (schema1 != null && schema2 == null) {
-                        return -1; // nulls last
-                    }
-                    // passed: when both are NOT main and are same schema
-                }
+    public List<Table> prepareTableDisplayOrderedList(List<Table> tableList) {
+        final TreeSet<Table> tableSet = new TreeSet<Table>(createTableDisplayOrderBy());
+        tableSet.addAll(tableList);
+        return new ArrayList<Table>(tableSet);
+    }
 
-                // = = =
-                // Type
-                // = = =
-                {
-                    final String type1 = table1.getType();
-                    final String type2 = table2.getType();
-                    if (!type1.equals(type2)) {
-                        // The table type has priority
-                        if (table1.isTypeTable()) {
-                            return -1;
-                        }
-                        if (table2.isTypeTable()) {
-                            return 1;
-                        }
-                        return type1.compareTo(type2);
-                    }
-                }
+    protected Comparator<Table> createTableDisplayOrderBy() {
+        final DfDocTableOrder tableOrder = new DfDocTableOrder();
+        if (isTableDisplayOrderPluralFormHead()) {
+            tableOrder.usePluralFormHead();
+        }
+        return tableOrder.createTableDisplayOrderBy();
+    }
 
-                // = = =
-                // Table
-                // = = =
-                final String name1 = table1.getName();
-                final String name2 = table2.getName();
-                return name1.compareTo(name2);
-            }
-        };
+    public boolean isTableDisplayOrderPluralFormHead() { // closet
+        return isProperty("isTableDisplayOrderPluralFormHead", false, getDocumentMap());
     }
 
     // ===================================================================================

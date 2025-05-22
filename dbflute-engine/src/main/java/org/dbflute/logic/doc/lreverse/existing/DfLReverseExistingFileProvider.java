@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.dbflute.logic.doc.lreverse.existing;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataEncodingDirectoryExtractor;
-import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableDbNameExtractor;
+import org.dbflute.logic.replaceschema.loaddata.delimiter.secretary.DfDelimiterDataTableNameExtractor;
 import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
@@ -58,42 +57,59 @@ public class DfLReverseExistingFileProvider {
     //                                                                        Existing TSV
     //                                                                        ============
     /**
-     * @param tsvDataDir The base directory that has TSV encoding directory and TSV files, e.g. "./playsql/data/tsv/reversetsv". (NotNull)
+     * @param tsvDataDir The base directory that has TSV encoding directory and TSV files,
+     *  e.g. "./playsql/data/tsv/reversetsv" or "...reversetsv/UTF-8". (NotNull)
      * @return The information of existing TSV files for table name handling. (NotNull) 
      */
     public DfLReverseExistingTsvInfo extractExistingTsvInfo(File tsvDataDir) {
         final List<File> existingTsvList = findExistingTsvList(tsvDataDir);
         final Map<File, String> existingTsvTableMap = DfCollectionUtil.newLinkedHashMap();
-        final Map<String, List<File>> tableExistingTsvListMap = StringKeyMap.createAsFlexible();
+        final Map<String, List<File>> tableAllExistingTsvListMap = StringKeyMap.createAsFlexible();
+        final Map<String, File> tableFirstExistingTsvMap = StringKeyMap.createAsFlexible();
         for (File existingTsv : existingTsvList) {
             final String fileName = existingTsv.getName(); // e.g. cyclic_07_02-PURCHASE_PAYMENT.tsv, PURCHASE_PAYMENT.tsv
-            final String tableDbName = new DfDelimiterDataTableDbNameExtractor(fileName).extractTableDbName();
+            final String onfileTableName = extractOnfileTableName(fileName); // e.g. MEMBER, nextschema.MEMBER
 
             // one TSV file always has only one table
-            existingTsvTableMap.put(existingTsv, tableDbName);
+            existingTsvTableMap.put(existingTsv, onfileTableName);
 
             // one table can be related to plural files (e.g. per encoding)
-            List<File> tableExistingTsvList = tableExistingTsvListMap.get(tableDbName);
-            if (tableExistingTsvList == null) {
-                tableExistingTsvList = DfCollectionUtil.newArrayList();
-                tableExistingTsvListMap.put(tableDbName, tableExistingTsvList);
+            List<File> allExistingTsvList = tableAllExistingTsvListMap.get(onfileTableName);
+            if (allExistingTsvList == null) {
+                allExistingTsvList = DfCollectionUtil.newArrayList();
+                tableAllExistingTsvListMap.put(onfileTableName, allExistingTsvList);
             }
-            tableExistingTsvList.add(existingTsv);
+            allExistingTsvList.add(existingTsv);
+
+            // first file only for simple operation
+            if (!tableFirstExistingTsvMap.containsKey(onfileTableName)) {
+                tableFirstExistingTsvMap.put(onfileTableName, existingTsv);
+            }
         }
-        return new DfLReverseExistingTsvInfo(existingTsvTableMap, tableExistingTsvListMap);
+        return new DfLReverseExistingTsvInfo(existingTsvTableMap, tableAllExistingTsvListMap, tableFirstExistingTsvMap);
+    }
+
+    protected String extractOnfileTableName(String fileName) {
+        return new DfDelimiterDataTableNameExtractor(fileName).extractOnfileTableName();
     }
 
     protected List<File> findExistingTsvList(File tsvDataDir) {
-        List<File> tsvList = DfCollectionUtil.newArrayList();
-        final DfDelimiterDataEncodingDirectoryExtractor extractor = new DfDelimiterDataEncodingDirectoryExtractor(tsvDataDir);
-        final List<String> encodingDirectoryList = extractor.extractEncodingDirectoryList(); // e.g. UTF-8, Shift_JIS
-        for (String encoding : encodingDirectoryList) {
-            final File encodingDir = new File(resolvePath(tsvDataDir) + "/" + encoding); // e.g. .../tsv/reversetsv/UTF-8
-            final File[] tsvFiles = encodingDir.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".tsv");
+        final List<File> tsvList = DfCollectionUtil.newArrayList();
+        if (isTsvUpperBaseDirectory(tsvDataDir)) { // not encoding directory now e.g. reversetsv, tsv
+            // needs to search each encoding directoiries
+            final DfDelimiterDataEncodingDirectoryExtractor extractor = new DfDelimiterDataEncodingDirectoryExtractor(tsvDataDir);
+            final List<String> encodingDirectoryList = extractor.extractEncodingDirectoryList(); // e.g. UTF-8, Shift_JIS
+            for (String encoding : encodingDirectoryList) {
+                final File encodingDir = new File(resolvePath(tsvDataDir) + "/" + encoding); // e.g. .../tsv/reversetsv/UTF-8
+                final File[] tsvFiles = listTsvFiles(encodingDir);
+                if (tsvFiles != null) {
+                    for (File tsvFile : tsvFiles) {
+                        tsvList.add(tsvFile);
+                    }
                 }
-            });
+            }
+        } else { // encoding directory now e.g. reversetsv/UTF-8
+            final File[] tsvFiles = listTsvFiles(tsvDataDir);
             if (tsvFiles != null) {
                 for (File tsvFile : tsvFiles) {
                     tsvList.add(tsvFile);
@@ -103,17 +119,27 @@ public class DfLReverseExistingFileProvider {
         return tsvList;
     }
 
+    protected boolean isTsvUpperBaseDirectory(File tsvDataDir) { // e.g. reversetsv, tsv
+        return tsvDataDir.getName().endsWith("tsv");
+    }
+
+    protected File[] listTsvFiles(File encodingDir) { // null allowed
+        return encodingDir.listFiles((dir, name) -> name.endsWith(".tsv"));
+    }
+
     // ===================================================================================
     //                                                                        Existing Xls
     //                                                                        ============
     /**
+     * It is precondition that tables on xls files are unique.
      * @param xlsDataDir The base directory that has xls files, e.g. "./playsql/data/ut/reversexls". (NotNull)
      * @return The information of existing xls files for table name handling. (NotNull) 
      */
     public DfLReverseExistingXlsInfo extractExistingXlsInfo(File xlsDataDir) {
         final List<File> existingXlsList = findExistingXlsList(xlsDataDir);
         final Map<File, List<String>> existingXlsTableListMap = DfCollectionUtil.newLinkedHashMap();
-        final Map<String, File> tableExistingXlsMap = StringKeyMap.createAsFlexible();
+        final Map<String, List<File>> tableAllExistingXlsListMap = StringKeyMap.createAsFlexible();
+        final Map<String, File> tableFirstExistingXlsMap = StringKeyMap.createAsFlexible();
         final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(resolvePath(xlsDataDir));
         for (File existingXls : existingXlsList) {
             final DfTableXlsReader reader = createTableXlsReader(xlsDataDir, existingXls, tableNameMap);
@@ -123,15 +149,29 @@ public class DfLReverseExistingFileProvider {
                 final DfDataTable dataTable = dataSet.getTable(i);
                 final String tableDbName = dataTable.getTableDbName();
                 tableList.add(tableDbName);
-                if (tableExistingXlsMap.containsKey(tableDbName)) {
-                    // #for_now jflute when common determination, unneeded? (2023/02/06)
-                    throwLoadDataReverseDuplicateTableException(tableExistingXlsMap, tableDbName);
+
+                // one table can be related to plural files (e.g. in other xls files)
+                List<File> allExistingXlsList = tableAllExistingXlsListMap.get(tableDbName);
+                if (allExistingXlsList == null) {
+                    allExistingXlsList = DfCollectionUtil.newArrayList();
+                    tableAllExistingXlsListMap.put(tableDbName, allExistingXlsList);
                 }
-                tableExistingXlsMap.put(tableDbName, existingXls);
+                allExistingXlsList.add(existingXls);
+
+                // first file only for simple operation
+                if (!tableFirstExistingXlsMap.containsKey(tableDbName)) {
+                    tableFirstExistingXlsMap.put(tableDbName, existingXls);
+                }
+
+                // yes by jflute (2024/10/05)
+                //if (tableFirstExistingXlsMap.containsKey(tableDbName)) {
+                //    // for_now jflute when common determination, unneeded? (2023/02/06)
+                //    throwLoadDataReverseDuplicateTableException(tableFirstExistingXlsMap, tableDbName);
+                //}
             }
             existingXlsTableListMap.put(existingXls, tableList); // xls may have plural tables
         }
-        return new DfLReverseExistingXlsInfo(existingXlsTableListMap, tableExistingXlsMap);
+        return new DfLReverseExistingXlsInfo(existingXlsTableListMap, tableAllExistingXlsListMap, tableFirstExistingXlsMap);
     }
 
     protected DfTableXlsReader createTableXlsReader(File baseDir, File existingXls, Map<String, String> tableNameMap) {

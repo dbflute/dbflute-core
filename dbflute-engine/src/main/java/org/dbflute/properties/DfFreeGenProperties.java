@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,11 +77,12 @@ public final class DfFreeGenProperties extends DfAbstractDBFluteProperties {
     //         }
     //     }
     // }
+    public static final String KEY_freeGenMap = "freeGenMap";
     protected Map<String, Object> _freeGenMap;
 
     public Map<String, Object> getFreeGenMap() {
         if (_freeGenMap == null) {
-            final String mapName = "freeGenMap";
+            final String mapName = KEY_freeGenMap;
             final Map<String, Object> specifiedMap = resolveSplit(mapName, doGetFreeGenMap(mapName));
             _freeGenMap = newLinkedHashMap(); // should be ordered, not only embedded first but also appcls referring namedcls
             reflectEmbeddedProperties(); // uses _freeGenMap

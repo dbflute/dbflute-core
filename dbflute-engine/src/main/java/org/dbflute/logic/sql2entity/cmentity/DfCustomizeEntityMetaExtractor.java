@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author jflute
+ */
 public class DfCustomizeEntityMetaExtractor {
 
     // ===================================================================================
@@ -40,18 +43,19 @@ public class DfCustomizeEntityMetaExtractor {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public Map<String, DfColumnMeta> extractColumnMetaInfoMap(ResultSet rs, String sql, DfForcedJavaNativeProvider forcedJavaNativeProvider)
-            throws SQLException {
-        final Map<String, DfColumnMeta> columnMetaInfoMap = StringKeyMap.createAsFlexibleOrdered();
+    public Map<String, DfColumnMeta> extractColumnMetaMap(ResultSet rs, String sql, DfForcedJavaNativeProvider forcedJavaNativeProvider)
+            throws SQLException { // returns mutable map
+        final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexibleOrdered();
         final ResultSetMetaData md = rs.getMetaData();
         for (int i = 1; i <= md.getColumnCount(); i++) {
             final DfColumnMeta columnMeta = new DfColumnMeta();
 
             String sql2EntityRelatedTableName = null;
             try {
+                // if Oracle, unfortunately returns null? or empty? fixedly 
                 sql2EntityRelatedTableName = md.getTableName(i);
             } catch (SQLException continued) {
-                // because this table name is not required, basically only for classification
+                // because this table name is not required, basically for classification, typeMapping, ...
                 String msg = "ResultSetMetaData.getTableName(" + i + ") threw the exception: " + continued.getMessage();
                 _log.info(msg);
             }
@@ -113,9 +117,9 @@ public class DfCustomizeEntityMetaExtractor {
             // column comment is not set here (no comment on meta data)
             // if select column comment is specified, comment will be set later
 
-            columnMetaInfoMap.put(columnName, columnMeta);
+            columnMetaMap.put(columnName, columnMeta);
         }
-        return columnMetaInfoMap;
+        return columnMetaMap;
     }
 
     // ===================================================================================

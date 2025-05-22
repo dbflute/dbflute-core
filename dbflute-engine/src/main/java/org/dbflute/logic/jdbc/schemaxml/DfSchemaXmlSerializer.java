@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,10 +222,13 @@ public class DfSchemaXmlSerializer {
         _schemaDiff = DfSchemaDiff.createAsSerializer(schemaXml);
     }
 
+    // -----------------------------------------------------
+    //                                        as Core (JDBC)
+    //                                        --------------
     /**
      * Create instance as core process (that is JDBC task). 
      * @param dataSource The data source of the database. (NotNull)
-     * @return The new instance. (NotNull)
+     * @return The new instance for the purpose. (NotNull)
      */
     public static DfSchemaXmlSerializer createAsCore(DfSchemaSource dataSource) {
         final DfBuildProperties buildProp = DfBuildProperties.getInstance();
@@ -242,40 +245,71 @@ public class DfSchemaXmlSerializer {
         return serializer;
     }
 
-    protected static boolean determineCoreDiffPiece() {
-        return !DfBuildProperties.getInstance().getLittleAdjustmentProperties().isCompatibleMonolithicDiffMapHistory();
-    }
-
+    // -----------------------------------------------------
+    //                                    as LoadDataReverse
+    //                                    ------------------
     /**
-     * Create instance as manage process e.g. LoadDataReverse, SchemaPolicyCheck, AlterCheck. <br>
-     * CraftDiff settings are not set here. 
+     * Create instance as LoadDataReverse process. <br>
+     * Several settings (e.g. CraftDiff, except/target, history) are not set here. <br>
+     * AdditionalSchema can be selected by argument option.
      * @param dataSource The data source of the database. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
-     * @return The new instance. (NotNull)
+     * @return The new instance for the purpose. (NotNull)
      */
-    public static DfSchemaXmlSerializer createAsManage(DfSchemaSource dataSource, String schemaXml) {
-        return createAsManage(dataSource, schemaXml, /*historyFile*/null);
+    public static DfSchemaXmlSerializer createAsLoadDataReverse(DfSchemaSource dataSource, String schemaXml,
+            boolean includeAdditionalSchema) {
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, /*historyFactory*/null);
+        serializer.suppressExceptTarget();
+        if (!includeAdditionalSchema) {
+            serializer.suppressAdditionalSchema();
+        }
+        return serializer;
     }
 
+    // -----------------------------------------------------
+    //                                    as SchemaSyncCheck
+    //                                    ------------------
     /**
-     * Create instance as manage process e.g. SchemaSyncCheck. <br>
-     * CraftDiff settings are not set here. 
+     * Create instance as SchemaSyncCheck process. <br>
+     * Several settings (e.g. CraftDiff, except/target) are not set here.
      * @param dataSource The data source of the database. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
      * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
-     * @return The new instance. (NotNull)
+     * @return The new instance for the purpose. (NotNull)
      */
-    public static DfSchemaXmlSerializer createAsManage(DfSchemaSource dataSource, String schemaXml, String historyFile) {
+    public static DfSchemaXmlSerializer createAsSchemaSync(DfSchemaSource dataSource, String schemaXml, String historyFile) {
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml // converting to factory
                 , historyFile != null ? () -> DfSchemaHistory.createAsMonolithic(historyFile) : null);
         return serializer.suppressExceptTarget().suppressAdditionalSchema();
     }
 
+    // -----------------------------------------------------
+    //                             as simple Managing Schema
+    //                             -------------------------
+    /**
+     * Create instance as simple managing schema process e.g. SchemaPolicyCheck, AlterCheck. <br>
+     * Several settings (e.g. CraftDiff, except/target, history) are not set here.
+     * @param dataSource The data source of the database. (NotNull)
+     * @param schemaXml The XML file to output meta info of the schema. (NotNull)
+     * @return The new instance for the purpose. (NotNull)
+     */
+    public static DfSchemaXmlSerializer createAsSimpleManagingSchema(DfSchemaSource dataSource, String schemaXml) {
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, /*historyFactory*/null);
+        serializer.suppressExceptTarget().suppressAdditionalSchema();
+        return serializer;
+    }
+
+    // -----------------------------------------------------
+    //                                            Serializer
+    //                                            ----------
     protected static DfSchemaXmlSerializer newSerializer(DfSchemaSource dataSource, String schemaXml,
             Supplier<DfSchemaHistory> historyFactory) {
         return new DfSchemaXmlSerializer(dataSource, schemaXml, historyFactory);
     }
 
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     protected DfSchemaXmlSerializer suppressExceptTarget() {
         // contains non-generated tables and procedures
         _tableExtractor.suppressExceptTarget();
@@ -1188,13 +1222,13 @@ public class DfSchemaXmlSerializer {
         if (synonym == null) { // means not synonym or no supplementary info
             return columnList;
         }
-        final List<DfColumnMeta> metaInfoList = synonym.getColumnMetaInfoList();
-        if (metaInfoList.isEmpty()) {
-            return metaInfoList;
+        final List<DfColumnMeta> columnMetaList = synonym.getColumnMetaList();
+        if (columnMetaList.isEmpty()) {
+            return columnMetaList;
         }
         if (synonym.isDBLink() && columnList.isEmpty()) {
-            columnList = metaInfoList;
-        } else if (metaInfoList.size() != columnList.size()) {
+            columnList = columnMetaList;
+        } else if (columnMetaList.size() != columnList.size()) {
             // for Oracle's bug(?), which is following:
             // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
             // For example, Schema A, B are like this:
@@ -1205,7 +1239,7 @@ public class DfSchemaXmlSerializer {
             // Why? my friend, the Oracle JDBC Driver!
             // - - - - - - - - - -/
             final StringSet columnSet = StringSet.createAsCaseInsensitive();
-            for (DfColumnMeta columnMeta : metaInfoList) {
+            for (DfColumnMeta columnMeta : columnMetaList) {
                 columnSet.add(columnMeta.getColumnName());
             }
             final List<DfColumnMeta> filteredList = new ArrayList<DfColumnMeta>();

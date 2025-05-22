@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
@@ -41,9 +42,13 @@ public class DfImplicitClassificationChecker {
 
     private static final Logger _log = LoggerFactory.getLogger(DfImplicitClassificationChecker.class);
 
-    public void check(File file, String tableDbName, String columnDbName, Connection conn) throws SQLException {
+    public void check(File file, DfLoadedSchemaTable schemaTable, String columnDbName, Connection conn, String clsTableKey)
+            throws SQLException {
         final DfClassificationProperties prop = getClassificationProperties();
-        final String classificationName = prop.getClassificationName(tableDbName, columnDbName);
+        final String classificationName = prop.getClassificationName(clsTableKey, columnDbName);
+        if (classificationName == null) { // no classification (but already checked so no way basically)
+            return;
+        }
         final DfClassificationTop classificationTop = prop.getClassificationTop(classificationName);
         if (classificationTop == null) { // no way (just in case)
             return;
@@ -63,7 +68,7 @@ public class DfImplicitClassificationChecker {
         }
         final boolean quote = prop.isCodeTypeNeedsQuoted(classificationName);
         final List<String> codeList = prop.getClassificationElementCodeList(classificationName);
-        final String sql = buildDistinctSql(tableDbName, columnDbName, quote, codeList);
+        final String sql = buildDistinctSql(schemaTable, columnDbName, quote, codeList);
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -75,7 +80,7 @@ public class DfImplicitClassificationChecker {
                 illegalCodeList.add(rs.getString(1));
             }
             if (!illegalCodeList.isEmpty()) {
-                handleLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName, classificationName, codeList,
+                handleLoadDataIllegalImplicitClassificationValueException(file, schemaTable, columnDbName, classificationName, codeList,
                         illegalCodeList, undefinedHandlingType);
             }
         } finally {
@@ -88,11 +93,12 @@ public class DfImplicitClassificationChecker {
         }
     }
 
-    protected String buildDistinctSql(String tableDbName, String columnDbName, boolean quote, List<String> codeList) {
+    protected String buildDistinctSql(DfLoadedSchemaTable schemaTable, String columnDbName, boolean quote, List<String> codeList) {
         final StringBuilder sb = new StringBuilder();
-        final String tableSqlName = toTableSqlName(tableDbName);
         final String columnSqlName = toColumnSqlName(columnDbName);
-        sb.append("select distinct ").append(columnSqlName).append(" from ").append(tableSqlName);
+        final String tableSqlName = schemaTable.buildTableSqlName();
+        sb.append("select distinct ").append(columnSqlName);
+        sb.append(" from ").append(tableSqlName);
         sb.append(" where ").append(columnSqlName).append(" not in ");
         sb.append("(");
         int index = 0;
@@ -116,8 +122,8 @@ public class DfImplicitClassificationChecker {
         return getLittleAdjustmentProperties().quoteColumnNameIfNeeds(columnDbName);
     }
 
-    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName, String columnDbName,
-            String classificationName, List<String> codeList, List<String> illegalCodeList,
+    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, DfLoadedSchemaTable schemaTable,
+            String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList,
             ClassificationUndefinedHandlingType undefinedHandlingType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was found.");
@@ -143,7 +149,7 @@ public class DfImplicitClassificationChecker {
         br.addItem("Data File");
         br.addElement(file.getPath());
         br.addItem("Table");
-        br.addElement(tableDbName);
+        br.addElement(schemaTable);
         br.addItem("Column");
         br.addElement(columnDbName);
         br.addItem("Classification");

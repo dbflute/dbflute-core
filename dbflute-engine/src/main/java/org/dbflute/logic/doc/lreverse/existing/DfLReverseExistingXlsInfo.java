@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,52 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public class DfLReverseExistingXlsInfo {
+public class DfLReverseExistingXlsInfo implements DfLReverseExistingFileInfo {
 
     protected final Map<File, List<String>> _existingXlsTableListMap;
-    protected final Map<String, File> _tableExistingXlsMap;
+    protected final Map<String, List<File>> _tableAllExistingXlsListMap;
+    protected final Map<String, File> _tableFirstExistingXlsMap;
 
-    public DfLReverseExistingXlsInfo(Map<File, List<String>> existingXlsTableListMap, Map<String, File> tableExistingXlsMap) {
+    public DfLReverseExistingXlsInfo(Map<File, List<String>> existingXlsTableListMap, Map<String, List<File>> tableAllExistingXlsListMap,
+            Map<String, File> tableFirstExistingXlsMap) {
         _existingXlsTableListMap = existingXlsTableListMap;
-        _tableExistingXlsMap = tableExistingXlsMap;
+        _tableAllExistingXlsListMap = tableAllExistingXlsListMap;
+        _tableFirstExistingXlsMap = tableFirstExistingXlsMap;
     }
 
+    /**
+     * @return The map of existing xls file's on-file table names. (NotNull)
+     */
     public Map<File, List<String>> getExistingXlsTableListMap() {
         return _existingXlsTableListMap;
     }
 
-    public Map<String, File> getTableExistingXlsMap() {
-        return _tableExistingXlsMap;
+    /**
+     * @return The map of on-file table name's all existing xls files. (NotNull)
+     */
+    public Map<String, List<File>> getTableAllExistingXlsListMap() {
+        return _tableAllExistingXlsListMap;
+    }
+
+    /**
+     * @return The map of on-file table name's first existing xls file. (NotNull)
+     */
+    public Map<String, File> getTableFirstExistingXlsMap() {
+        return _tableFirstExistingXlsMap;
+    }
+
+    @Override
+    public Map<File, List<String>> getExistingFileTableListMap() {
+        return getExistingXlsTableListMap();
+    }
+
+    @Override
+    public Map<String, List<File>> getTableAllExistingFileListMap() {
+        return getTableAllExistingXlsListMap();
+    }
+
+    @Override
+    public Map<String, File> getTableFirstExistingFileMap() {
+        return getTableFirstExistingXlsMap();
     }
 }

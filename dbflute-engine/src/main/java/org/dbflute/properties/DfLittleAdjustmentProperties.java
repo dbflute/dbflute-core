@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1793,6 +1793,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
 
     public boolean isCompatibleMonolithicDiffMapHistory() { // closet, for emergency so will be deleted future
         return isProperty("isCompatibleMonolithicDiffMapHistory", false);
+    }
+
+    public boolean isCompatibleProcedureReturnValueNameAsArg() { // closet, "returnValue" back to "arg1"
+        return isProperty("isCompatibleProcedureReturnValueNameAsArg", false); // since 1.2.9
     }
 
     // -----------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.sql.Types;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.xls.DfXlsDataHandlingWriter;
@@ -55,7 +56,7 @@ public class DfAbstractDataWriterTest extends EngineTestCase {
         // ## Arrange ##
         final DfXlsDataHandlingWriter impl = new DfXlsDataHandlingWriter(null, null) {
             @Override
-            protected Class<?> getBindType(String tableName, DfColumnMeta columnMetaInfo) {
+            protected Class<?> getBindType(DfLoadedSchemaTable schemaTable, DfColumnMeta columnMetaInfo) {
                 return BigDecimal.class;
             }
         };
@@ -67,7 +68,8 @@ public class DfAbstractDataWriterTest extends EngineTestCase {
         columnMetaInfoMap.put("foo", info);
 
         // ## Act ##
-        boolean actual = impl.processBoolean("tbl", "foo", "0", null, null, 0, columnMetaInfoMap, 3);
+        DfLoadedSchemaTable schemaTable = new DfLoadedSchemaTable(UnifiedSchema.createAsDynamicSchema(""), "tbl", "tbl");
+        boolean actual = impl.processBoolean(schemaTable, "foo", "0", null, null, 0, columnMetaInfoMap, 3);
 
         // ## Assert ##
         log("actual=" + actual);

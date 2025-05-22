@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.dbflute.logic.doc.lreverse.order;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +23,18 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.lreverse.DfLReverseOutputResource;
+import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingFileInfo;
 import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingFileProvider;
-import org.dbflute.logic.doc.lreverse.existing.DfLReverseExistingXlsInfo;
 import org.dbflute.logic.replaceschema.loaddata.xls.dataprop.DfTableNameProp;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -45,10 +46,10 @@ public class DfLReverseFileOrder {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSchemaSource _dataSource;
-    protected final DfTableNameProp _tableNameProp;
-    protected final List<Table> _skippedTableList;
-    protected final DfLReverseTableOrder _tableOrder;
+    protected final DfSchemaSource _dataSource; // not null
+    protected final DfTableNameProp _tableNameProp; // not null
+    protected final List<Table> _skippedTableList; // not null
+    protected final DfLReverseTableOrder _tableOrder; // not null
 
     // ===================================================================================
     //                                                                         Constructor
@@ -61,7 +62,15 @@ public class DfLReverseFileOrder {
     }
 
     protected DfLReverseTableOrder createTableOrder() {
-        return new DfLReverseTableOrder();
+        return new DfLReverseTableOrder(prepareSectionTableGuidelineLimit());
+    }
+
+    protected Integer prepareSectionTableGuidelineLimit() {
+        Integer sectionTableGuidelineLimit = getSectionTableGuidelineLimit();
+        if (sectionTableGuidelineLimit == null) {
+            sectionTableGuidelineLimit = 9; // fixed traditional parameter
+        }
+        return sectionTableGuidelineLimit;
     }
 
     // ===================================================================================
@@ -73,7 +82,7 @@ public class DfLReverseFileOrder {
         if (isOverrideExistingDataFile()) {
             orderedMap = toOverrideReverseOrderedMap(orderedList, baseDir);
         } else {
-            orderedMap = toReplaceReverseOrderedMap(orderedList);
+            orderedMap = toReplaceReverseOrderedMap(orderedList, baseDir);
         }
         return orderedMap;
     }
@@ -82,40 +91,65 @@ public class DfLReverseFileOrder {
         return _tableOrder.analyzeOrder(tableList, _skippedTableList);
     }
 
-    // -----------------------------------------------------
-    //                                      Override Reverse
-    //                                      ----------------
+    // ===================================================================================
+    //                                                                    Override Reverse
+    //                                                                    ================
     protected Map<File, DfLReverseOutputResource> toOverrideReverseOrderedMap(List<List<Table>> orderedList, File baseDir) {
-        final DfLReverseExistingXlsInfo existingXlsInfo = extractExistingXlsInfo(baseDir);
+        final DfLReverseExistingFileInfo existingFileInfo = extractExistingFileInfo(baseDir);
         final Map<File, DfLReverseOutputResource> orderedMap = createOrderedMap();
-        final String dataDirPath = resolvePath(baseDir);
-        final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(dataDirPath);
-        final Map<String, File> translatedXlsMap = prepareTranslatedXlsMap(existingXlsInfo, tableNameMap);
-        final List<Table> addedTableList = DfCollectionUtil.newArrayList();
-        int sectionNo = 1;
+        final Map<String, File> existingFileMap; // already resolve short name
+        {
+            final String dataDirPath = resolvePath(baseDir);
+            final Map<String, String> tableNameMap = _tableNameProp.findTableNameMap(dataDirPath);
+            existingFileMap = prepareExistingFileMap(existingFileInfo, tableNameMap);
+        }
+        final List<Table> newTableList = DfCollectionUtil.newArrayList();
+        int failoverSectionNo = 1;
         for (List<Table> nestedList : orderedList) {
             for (Table table : nestedList) {
-                final File existingXls = translatedXlsMap.get(table.getTableDbName());
-                if (existingXls == null) {
-                    addedTableList.add(table);
+                final File existingFile = findExistingFileByTable(existingFileMap, table); // null allowed: not found
+                if (existingFile == null) { // new table
+                    newTableList.add(table);
                     continue;
                 }
-                DfLReverseOutputResource resource = orderedMap.get(existingXls);
-                if (resource == null) {
+                // existing table
+                DfLReverseOutputResource resource = orderedMap.get(existingFile);
+                if (resource == null) { // table of new section, always here if delimiter basis
                     final String mainName = extractMainName(nestedList);
-                    final List<Table> initialList = new ArrayList<Table>();
-                    resource = createOutputResource(existingXls, initialList, sectionNo, mainName);
-                    orderedMap.put(existingXls, resource);
-                    ++sectionNo;
+                    final int currentSectionNo = extractCurrentSectionNo(existingFile, failoverSectionNo);
+                    if (isDelimiterDataBasis()) {
+                        resource = createOutputResource(existingFile, table, currentSectionNo, mainName);
+                    } else {
+                        final List<Table> tableList = DfCollectionUtil.newArrayList(table);
+                        resource = createOutputResource(existingFile, tableList, currentSectionNo, mainName);
+                    }
+                    orderedMap.put(existingFile, resource);
+                    ++failoverSectionNo;
+                } else { // second or more table of the existing section
+                    resource.addTable(table);
                 }
-                resource.addTable(table);
             }
         }
-        registerAddedTableIfExists(orderedMap, addedTableList, sectionNo);
-        orderTableByExistingOrder(orderedMap, existingXlsInfo);
+        registerNewTableIfExists(orderedMap, newTableList, baseDir);
+        orderTableByExistingOrder(orderedMap, existingFileInfo);
         return orderedMap;
     }
 
+    // -----------------------------------------------------
+    //                                    Existing File Info
+    //                                    ------------------
+    protected DfLReverseExistingFileInfo extractExistingFileInfo(File baseDir) {
+        final DfLReverseExistingFileProvider provider = new DfLReverseExistingFileProvider(_tableNameProp);
+        if (isDelimiterDataBasis()) { // @since 1.2.9
+            return provider.extractExistingTsvInfo(baseDir);
+        } else { // traditional
+            return provider.extractExistingXlsInfo(baseDir);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      File Ordered Map
+    //                                      ----------------
     protected Map<File, DfLReverseOutputResource> createOrderedMap() {
         return new TreeMap<File, DfLReverseOutputResource>(new Comparator<File>() {
             public int compare(File o1, File o2) {
@@ -124,44 +158,141 @@ public class DfLReverseFileOrder {
         });
     }
 
-    protected Map<String, File> prepareTranslatedXlsMap(DfLReverseExistingXlsInfo existingXlsInfo, Map<String, String> tableNameMap) {
-        final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
+    // -----------------------------------------------------
+    //                                     Existing File Map
+    //                                     -----------------
+    protected Map<String, File> prepareExistingFileMap(DfLReverseExistingFileInfo existingFileInfo, Map<String, String> tableNameMap) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // use first existing file fixedly (same as existing specification of xls) by jflute (2024/10/05)
+        // it is precondition that duplicate table definition in data files when LoadDataReverse
+        // _/_/_/_/_/_/_/_/_/_/
+        final Map<String, File> firstExistingFileMap = existingFileInfo.getTableFirstExistingFileMap();
         final Map<String, File> translatedXlsMap = StringKeyMap.createAsFlexible();
-        for (Entry<String, File> entry : existingXlsMap.entrySet()) {
-            final String tableName = entry.getKey();
-            if (tableName.startsWith("$")) {
-                final String translated = tableNameMap.get(tableName);
+        for (Entry<String, File> entry : firstExistingFileMap.entrySet()) {
+            final String tableDbName = entry.getKey(); // e.g. MEMBER, NEXT_SCHEMA_PRODUCT, nextschema.SAME_NAME
+            if (tableDbName.startsWith("$")) { // short name mark, basically xls only
+                final String translated = tableNameMap.get(tableDbName);
                 if (translated != null) {
-                    translatedXlsMap.put(translated, entry.getValue());
+                    translatedXlsMap.put(translated, entry.getValue()); // short-name resolved
                 }
             }
         }
-        translatedXlsMap.putAll(existingXlsMap);
+        translatedXlsMap.putAll(firstExistingFileMap);
         return translatedXlsMap;
     }
 
-    protected File createAddedTableXlsFile() {
-        final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
-        return new File(getReverseXlsDataDir() + "/" + getReverseFileTitle() + "-99-added-table" + fileExtension);
+    // -----------------------------------------------------
+    //                                    On-file Table Name
+    //                                    ------------------
+    protected File findExistingFileByTable(Map<String, File> existingFileMap, Table table) {
+        // existing file's table name is on-file table name which may have schema prefix
+        //  o "...-SEA.tsv"
+        //  o "...-MAIHAMA.SEA.tsv"
+        //  o "...-CHIBA.MAIHAMA.SEA.tsv"
+        final String tableDbName = table.getTableDbName();
+        File existingFile = existingFileMap.get(tableDbName); // standard first
+        if (existingFile != null) {
+            return existingFile;
+        }
+        if (tableDbName.contains(".")) { // e.g. same-name in other schema, schema driven
+            // do nothing here
+            // tableDbName: MAIHAMA.SEA should not find SEA.tsv
+            // because the TSV may be for same-name in other schema
+        } else { // simple name, find TSV with prefix for e.g. additional schema
+            if (table.hasSchema()) { // normally here
+                final UnifiedSchema unifiedSchema = table.getUnifiedSchema();
+                existingFile = existingFileMap.get(unifiedSchema.buildSchemaQualifiedName(tableDbName));
+                if (existingFile != null) { // e.g. MAIHAMA.SEA
+                    return existingFile;
+                }
+                existingFile = existingFileMap.get(unifiedSchema.buildFullQualifiedName(tableDbName));
+                if (existingFile != null) { // e.g. CHIBA.MAIHAMA.SEA
+                    return existingFile;
+                }
+            }
+        }
+        return existingFile;
     }
 
-    protected DfLReverseOutputResource createOutputResource(File xlsFile, List<Table> tableList, int sectionNo, String mainName) {
-        return new DfLReverseOutputResource(xlsFile, tableList, sectionNo, mainName);
+    // -----------------------------------------------------
+    //                                    Current Section No
+    //                                    ------------------
+    protected int extractCurrentSectionNo(File existingFile, int failoverSectionNo) {
+        final String fileName = existingFile.getName(); // e.g. cyclic_01_01-MEMBER.tsv, cyclic-data-01-MEMBER.xls
+        String sectionExp = null;
+        if (fileName.endsWith(".tsv")) {
+            final String delimiter = "_";
+            if (Srl.count(fileName, delimiter) >= 2) { // e.g. cyclic_01_01-MEMBER.tsv
+                final String rear = Srl.substringFirstRear(fileName, delimiter); // e.g. 01_01-MEMBER.tsv
+                sectionExp = Srl.substringFirstFront(rear, delimiter); // e.g. 01
+            }
+        } else if (fileName.endsWith(".xls")) {
+            final String delimiter = "-";
+            if (Srl.count(fileName, delimiter) >= 3) { // cyclic-data-01-MEMBER.xls
+                final String rear = Srl.substringFirstRear(fileName, delimiter); // e.g. data-01-MEMBER.xls
+                final String nextRear = Srl.substringFirstRear(rear, delimiter); // e.g. 01-MEMBER.xls
+                sectionExp = Srl.substringFirstFront(nextRear, delimiter); // e.g. 01
+            }
+        }
+        if (sectionExp != null && Srl.isNumberHarfAll(sectionExp)) {
+            try {
+                final Integer extracted = DfTypeUtil.toInteger(sectionExp);
+                if (extracted != null) {
+                    return extracted;
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+        return failoverSectionNo;
     }
 
-    protected void registerAddedTableIfExists(Map<File, DfLReverseOutputResource> orderedMap, List<Table> addedTableList, int sectionNo) {
-        if (!addedTableList.isEmpty()) {
-            final String mainName = extractMainName(addedTableList);
-            final File addedTableXlsFile = createAddedTableXlsFile();
-            orderedMap.put(addedTableXlsFile, createOutputResource(addedTableXlsFile, addedTableList, sectionNo, mainName));
+    // -----------------------------------------------------
+    //                                             New Table
+    //                                             ---------
+    // new table means no existing table in existing data files
+    protected void registerNewTableIfExists(Map<File, DfLReverseOutputResource> orderedMap, List<Table> newTableList, File baseDir) {
+        if (newTableList.isEmpty()) {
+            return;
+        }
+        final int newTableSectionNo = 99; // fixed
+        final String mainName = extractMainName(newTableList);
+        if (isDelimiterDataBasis()) {
+            for (Table table : newTableList) {
+                final File newFile = createNewTableDelimiterFile(table, baseDir);
+                final DfLReverseOutputResource resource = createOutputResource(newFile, table, newTableSectionNo, mainName);
+                orderedMap.put(newFile, resource);
+            }
+        } else {
+            final File newFile = createNewTableXlsFile(baseDir);
+            final DfLReverseOutputResource resource = createOutputResource(newFile, newTableList, newTableSectionNo, mainName);
+            orderedMap.put(newFile, resource);
         }
     }
 
-    protected void orderTableByExistingOrder(Map<File, DfLReverseOutputResource> orderedMap, DfLReverseExistingXlsInfo existingXlsInfo) {
-        final Map<File, List<String>> existingXlsTableListMap = existingXlsInfo.getExistingXlsTableListMap();
+    protected File createNewTableDelimiterFile(Table table, File baseDir) {
+        final String dataDir = resolvePath(baseDir);
+        final String reverseFileTitle = getReverseDelimiterFileTitle();
+        final String onfileTableName = deriveDelimiterOnfileTableName(table);
+        final String newFileKeyword = "_99_99_new_table-" + onfileTableName; // fitting with standard format
+        final String fileExtension = ".tsv"; // fixed
+        return new File(dataDir + "/" + reverseFileTitle + newFileKeyword + fileExtension);
+    }
+
+    protected File createNewTableXlsFile(File baseDir) {
+        final String dataDir = resolvePath(baseDir);
+        final String reverseFileTitle = getReverseXlsFileTitle();
+        final String newFileKeyword = "-99-new-table";
+        final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
+        return new File(dataDir + "/" + reverseFileTitle + newFileKeyword + fileExtension);
+    }
+
+    // -----------------------------------------------------
+    //                                           Table Order
+    //                                           -----------
+    protected void orderTableByExistingOrder(Map<File, DfLReverseOutputResource> orderedMap, DfLReverseExistingFileInfo existingFileInfo) {
+        final Map<File, List<String>> existingFileTableListMap = existingFileInfo.getExistingFileTableListMap();
         for (Entry<File, DfLReverseOutputResource> entry : orderedMap.entrySet()) {
-            final File existingXls = entry.getKey();
-            final List<String> tableNameList = existingXlsTableListMap.get(existingXls);
+            final File existingFile = entry.getKey();
+            final List<String> tableNameList = existingFileTableListMap.get(existingFile);
             if (tableNameList != null) {
                 final DfLReverseOutputResource resource = entry.getValue();
                 resource.acceptTableOrder(tableNameList);
@@ -169,37 +300,123 @@ public class DfLReverseFileOrder {
         }
     }
 
+    // -----------------------------------------------------
+    //                               Main Name of Table List
+    //                               -----------------------
     protected String extractMainName(List<Table> tableList) {
         return _tableOrder.extractMainName(tableList);
     }
 
-    // -----------------------------------------------------
-    //                                       Replace Reverse
-    //                                       ---------------
-    protected Map<File, DfLReverseOutputResource> toReplaceReverseOrderedMap(List<List<Table>> orderedList) {
+    // ===================================================================================
+    //                                                                     Replace Reverse
+    //                                                                     ===============
+    protected Map<File, DfLReverseOutputResource> toReplaceReverseOrderedMap(List<List<Table>> orderedList, File baseDir) {
         final Map<File, DfLReverseOutputResource> orderedMap = DfCollectionUtil.newLinkedHashMap();
         int sectionNo = 1;
-        for (List<Table> nestedList : orderedList) {
-            final String number = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));
-            final String mainName = extractMainName(nestedList);
-            final File xlsFile = new File(buildXlsFilePath(number, mainName));
-            orderedMap.put(xlsFile, createOutputResource(xlsFile, nestedList, sectionNo, mainName));
+        for (List<Table> tableList : orderedList) {
+            final String sectionExp = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));
+            final String mainName = extractMainName(tableList);
+            if (isDelimiterDataBasis()) { // @since 1.2.9
+                int sheetNumber = 1;
+                for (Table table : tableList) {
+                    final File dataFile = createOutputDelimiterFile(sectionExp, sheetNumber, table, baseDir);
+                    orderedMap.put(dataFile, createOutputResource(dataFile, table, sectionNo, mainName));
+                    ++sheetNumber;
+                }
+            } else {
+                final File dataFile = createOutputXlsFile(sectionExp, mainName, baseDir);
+                orderedMap.put(dataFile, createOutputResource(dataFile, tableList, sectionNo, mainName));
+            }
             ++sectionNo;
         }
         return orderedMap;
     }
 
-    protected String buildXlsFilePath(String number, String mainName) {
-        final String fileTitle = getReverseFileTitle();
+    // -----------------------------------------------------
+    //                                        Delimiter File
+    //                                        --------------
+    protected File createOutputDelimiterFile(String sectionExp, int sheetNumber, Table table, File baseDir) {
+        final String ext = "tsv"; // fixed
+        return new File(buildDelimiterFilePath(table, sectionExp, sheetNumber, baseDir, ext));
+    }
+
+    // copied from output handler's large data handling
+    protected String buildDelimiterFilePath(Table table, String sectionExp, int sheetNumber, File baseDir, String ext) {
+        return resolvePath(baseDir) // .../data/tsv/UTF-8
+                + "/" + (deriveDelimiterFilePrefix(sectionExp, sheetNumber) // /cyclic_01_02-
+                        + deriveDelimiterOnfileTableName(table) + "." + ext); // SEA.tsv
+    }
+
+    protected String deriveDelimiterFilePrefix(String sectionExp, int sheetNumber) {
+        final String reverseFileTitle = getReverseDelimiterFileTitle();
+        final String sheetPrefix = sheetNumber < 10 ? "0" + sheetNumber : String.valueOf(sheetNumber);
+        return reverseFileTitle + "_" + sectionExp + "_" + sheetPrefix + "-";
+    }
+
+    // -----------------------------------------------------
+    //                                              XLS File
+    //                                              --------
+    protected File createOutputXlsFile(String sectionExp, String mainName, File baseDir) {
+        final String xlsFilePath = buildXlsFilePath(sectionExp, mainName, baseDir);
+        return new File(xlsFilePath);
+    }
+
+    protected String buildXlsFilePath(String sectionExp, String mainName, File baseDir) {
+        final String fileTitle = getReverseXlsFileTitle();
         final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
-        return getReverseXlsDataDir() + "/" + fileTitle + "-" + number + "-" + mainName + fileExtension;
+        return resolvePath(baseDir) + "/" + fileTitle + "-" + sectionExp + "-" + mainName + fileExtension;
     }
 
     // ===================================================================================
-    //                                                                        Existing Xls
-    //                                                                        ============
-    protected DfLReverseExistingXlsInfo extractExistingXlsInfo(File baseDir) {
-        return new DfLReverseExistingFileProvider(_tableNameProp).extractExistingXlsInfo(baseDir);
+    //                                                         Delimiter Onfile Table Name
+    //                                                         ===========================
+    protected String deriveDelimiterOnfileTableName(Table table) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ by jflute (2025/04/28)
+        // table name on TSV is not tableDbName and is not tableSqlName
+        // if I had to say, simplar to tableSqlName as following:
+        // o directly used as insert SQL's table name by ReplaceSchema
+        // o but without quoting (because of file name restriction)
+        //
+        // and using tableDispName for human viewing (almost same as tableDbName)
+        // _/_/_/_/_/_/_/_/_/_/
+        final String tableDispName = table.getTableDispName();
+        if (table.isAdditionalSchema()) {
+            return doDeriveDelimiterOnfileTableNameOfAdditionalSchema(table, tableDispName);
+        } else { // normally here
+            return tableDispName;
+        }
+    }
+
+    protected String doDeriveDelimiterOnfileTableNameOfAdditionalSchema(Table table, String tableDispName) {
+        // basically additionalSchema table's tableDbName does not have schema prefix
+        // (except same-name table in other schema)
+        // but ReplaceSchema's TSV process cannot determine the table schema
+        // so it gives schema as SQL prefix (means executable) here
+        if (table.existsSameNameTable() || table.existsSameSchemaSameNameTable()) {
+            return tableDispName; // already has schema prefix
+        } else { // additional schema but unique table
+            if (tableDispName.contains(".")) { // may be possible? (e.g. at future), just in case
+                return tableDispName; // determina that it already has schema prefix
+            } else { // unique table so tableDbName does not have schema
+                if (table.hasSchema()) { // normally here
+                    final UnifiedSchema unifiedSchema = table.getUnifiedSchema();
+                    return unifiedSchema.buildSqlName(tableDispName);
+                } else { // e.g. no schema/catalog DBMS
+                    return tableDispName;
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     Output Resource
+    //                                                                     ===============
+    protected DfLReverseOutputResource createOutputResource(File dataFile, Table table, int sectionNo, String mainName) {
+        return new DfLReverseOutputResource(dataFile, table, sectionNo, mainName);
+    }
+
+    protected DfLReverseOutputResource createOutputResource(File dataFile, List<Table> tableList, int sectionNo, String mainName) {
+        return new DfLReverseOutputResource(dataFile, tableList, sectionNo, mainName);
     }
 
     // ===================================================================================
@@ -216,12 +433,12 @@ public class DfLReverseFileOrder {
     // -----------------------------------------------------
     //                                         File Resource
     //                                         -------------
-    protected String getReverseXlsDataDir() {
-        return getDocumentProperties().getLoadDataReverseXlsDataDir();
+    protected String getReverseDelimiterFileTitle() {
+        return getDocumentProperties().getLoadDataReverseDelimiterFileTitle();
     }
 
-    protected String getReverseFileTitle() {
-        return getDocumentProperties().getLoadDataReverseFileTitle();
+    protected String getReverseXlsFileTitle() {
+        return getDocumentProperties().getLoadDataReverseXlsFileTitle();
     }
 
     // -----------------------------------------------------
@@ -229,6 +446,20 @@ public class DfLReverseFileOrder {
     //                                          ------------
     protected boolean isOverrideExistingDataFile() {
         return getDocumentProperties().isLoadDataReverseOverrideExistingDataFile();
+    }
+
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
+    protected boolean isDelimiterDataBasis() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
+    }
+
+    // -----------------------------------------------------
+    //                         Section Table Guideline Limit
+    //                         -----------------------------
+    protected Integer getSectionTableGuidelineLimit() { // null allowed
+        return getProperties().getDocumentProperties().getLoadDataReverseSectionTableGuidelineLimit();
     }
 
     // ===================================================================================

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ public class DfSPolicyInRepsChecker {
     }
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(final String schemaXml) {
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml); // history unneeded
+        return DfSchemaXmlSerializer.createAsSimpleManagingSchema(_dataSource, schemaXml); // history unneeded
     }
 
     protected DfSchemaXmlReader createSchemaXmlReader(String schemaXml) {

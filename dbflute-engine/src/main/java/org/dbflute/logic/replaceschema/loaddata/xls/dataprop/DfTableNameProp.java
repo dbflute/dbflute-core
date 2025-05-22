@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -62,7 +63,7 @@ public class DfTableNameProp {
     // ===================================================================================
     //                                                                          Output Map
     //                                                                          ==========
-    public void outputTableNameMap(String baseDir, Map<String, Table> tableNameMap) {
+    public void outputTableNameMap(File baseDir, Map<String, Table> tableNameMap) {
         final Map<String, String> map = new LinkedHashMap<String, String>();
         for (Entry<String, Table> entry : tableNameMap.entrySet()) {
             final String sheetName = entry.getKey();
@@ -70,7 +71,7 @@ public class DfTableNameProp {
             map.put(sheetName, table.getTableSqlName());
         }
         final String mapString = new DfMapStyle().toMapString(map);
-        final File dataPropFile = new File(baseDir + "/tableNameMap.dataprop");
+        final File dataPropFile = new File(resolvePath(baseDir) + "/tableNameMap.dataprop");
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
@@ -86,5 +87,12 @@ public class DfTableNameProp {
                 } catch (IOException ignored) {}
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String resolvePath(File file) {
+        return Srl.replace(file.getPath(), "\\", "/");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,8 +134,8 @@ public class DfJdbcFacade {
                 ++count;
             }
             commitTrasactionIfNeeds(conn);
-        } catch (SQLException e) {
-            handleSQLException(currentSql, e);
+        } catch (SQLException e) { // basically except execution failure
+            handleSQLException(currentSql, e); // currentSql may be null (means failure before execution)
             return null; // unreachable
         } finally {
             rollbackTransactionIfNeeds(conn);
@@ -180,8 +180,8 @@ public class DfJdbcFacade {
 
                     final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, stringConverter);
                     handler.handle(wrapper);
-                } catch (SQLException e) {
-                    handleSQLException(currentSql, e);
+                } catch (SQLException e) { // basically except execution failure
+                    handleSQLException(currentSql, e); // currentSql may be null (means failure before execution)
                 } finally {
                     closeResultSet(rs);
                     closeStatement(st);
@@ -217,9 +217,9 @@ public class DfJdbcFacade {
                 }
             }
         }
-        if (rs == null) {
+        if (rs == null) { // execution failure
             if (latestEx != null) { // basically here
-                throw latestEx;
+                throw createSQLFailureException(currentSql, latestEx); // translate it here to show currentSql
             } else { // basically no way (executeQuery() does not return null), just in case
                 throw new IllegalStateException("Cannot make result set by the SQL: currentSql=" + currentSql);
             }

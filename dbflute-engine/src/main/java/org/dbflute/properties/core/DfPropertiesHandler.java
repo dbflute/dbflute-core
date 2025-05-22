@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ package org.dbflute.properties.core;
 
 import java.util.Properties;
 
+import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.dbflute.properties.DfAdditionalNotNullProperties;
 import org.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfAdditionalUniqueKeyProperties;
@@ -77,6 +79,17 @@ public final class DfPropertiesHandler {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                  Additional DbComment
+    //                                  --------------------
+    protected DfAdditionalDbCommentProperties _additionalDbCommentProperties;
+
+    public DfAdditionalDbCommentProperties getAdditionalDbCommentProperties(Properties prop) {
+        if (_additionalDbCommentProperties == null) {
+            _additionalDbCommentProperties = new DfAdditionalDbCommentProperties(prop);
+        }
+        return _additionalDbCommentProperties;
+    }
 
     // -----------------------------------------------------
     //                                Additional Foreign Key
@@ -88,6 +101,18 @@ public final class DfPropertiesHandler {
             _additionalForeignKeyProperties = new DfAdditionalForeignKeyProperties(prop);
         }
         return _additionalForeignKeyProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                    Additional NotNull
+    //                                    ------------------
+    protected DfAdditionalNotNullProperties _additionalNotNullProperties;
+
+    public DfAdditionalNotNullProperties getAdditionalNotNullProperties(Properties prop) {
+        if (_additionalNotNullProperties == null) {
+            _additionalNotNullProperties = new DfAdditionalNotNullProperties(prop);
+        }
+        return _additionalNotNullProperties;
     }
 
     // -----------------------------------------------------

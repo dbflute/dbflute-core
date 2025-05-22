@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2024 the original author or authors.
+## Copyright 2014-2025 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -124,6 +124,23 @@ h4 {
 }
 
 /* -------------------------------------------------
+                                    Schema Comment
+------------------------------------------------- */
+pre.schemaalias {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	color: #3F7E5E;
+	font-size: 2.0em;
+}
+
+pre.schemadescription {
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	color: #3F7E5E;
+	font-size: 1.2em;
+}
+
+/* -------------------------------------------------
                                    Database Table
 ------------------------------------------------- */
 table {
@@ -142,7 +159,7 @@ td {
 	padding:2px;
 }
 .tablecomment {
-	font-size: 0.8em;
+	font-size: 1.0em;
 	color: #3F7E5E;
 	padding:0 0 0.2em 1em;
 }
@@ -165,6 +182,14 @@ td {
 .flgcell {
 	text-align: center;
 }
+.notnullbusiness {
+	font-style: italic;
+	font-size: 0.7em;
+}
+.notnullmaybe {
+	font-style: italic;
+	font-size: 0.7em;
+}
 .flgplus {
 	font-size: 0.7em;
 }
@@ -180,10 +205,10 @@ td {
 	font-size: 0.6em;
 }
 .relcell {
-	font-size: 0.7em;
+	font-size: 0.8em;
 }
 .commentcell {
-	font-size: 0.7em;
+	font-size: 0.9em;
 	color: #3F7E5E;
 }
 .commentcellerror {
@@ -597,8 +622,20 @@ ${schemaPolicyDisplay.violationMessageHtmlPreText}
 #end
 #end
 
+#if ($database.hasSchemaAlias())
+<pre class="schemaalias">
+${database.schemaAlias}
+</pre>
+#end
+
+#if ($database.hasSchemaDescription())
+<pre class="schemadescription">
+${database.schemaDescription}
+</pre>
+#end
+
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())
-#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($needsTableAliasItem = $database.needsTableAliasItem())
 <h2>Table List</h2>
 <div class="keywordsearch">
 	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
@@ -609,7 +646,7 @@ ${schemaPolicyDisplay.violationMessageHtmlPreText}
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 		<th>Alias</th>
 #end
 		<th>Name</th>
@@ -631,7 +668,7 @@ ${schemaPolicyDisplay.violationMessageHtmlPreText}
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
 		<td class="rownumcell">${rownum}</td>
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 		<td class="aliascell">${table.alias}</td>
 #end
 		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
@@ -876,7 +913,7 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 
 // this index value depends on DBFlute settings
 // so defines it here as global for easy-to-understand
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 var NAME_INDEX = 2; // number, alias, name
 #else
 var NAME_INDEX = 1; // number, name
@@ -2646,7 +2683,7 @@ UnmappedColumnArea.prototype = {
 		var columnList = [];
 		for (var i = 0, max = trs.length; i < max; i++) {
 			// TODO check that column name column num is 6
-#if ($isAliasDelimiterInDbCommentValid)
+#if ($needsTableAliasItem)
 			columnList.push(trs[i].getElementsByTagName('td')[7].innerText);
 #else
 			columnList.push(trs[i].getElementsByTagName('td')[6].innerText);

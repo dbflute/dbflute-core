@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Title Section means detail section information as display.
  * @author jflute
  * @since 1.2.5 as split (2021/01/04 Monday at roppongi japanese)
  */
@@ -38,7 +39,7 @@ public class DfLReverseTitleSectionProvider {
     // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
-    public List<String> prepareTitleSection(List<Table> tableList) {
+    public List<String> prepareSectionInfoList(List<Table> tableList) {
         final List<String> sectionInfoList = new ArrayList<String>();
         sectionInfoList.add("...Outputting load data: tables=" + tableList.size());
         final Integer recordLimit = getRecordLimit();
@@ -48,6 +49,8 @@ public class DfLReverseTitleSectionProvider {
         sectionInfoList.add("  isReplaceSchemaDirectUse = " + isReplaceSchemaDirectUse());
         sectionInfoList.add("  isOverrideExistingDataFile = " + isOverrideExistingDataFile());
         sectionInfoList.add("  isSynchronizeOriginDate = " + isSynchronizeOriginDate());
+        sectionInfoList.add("  isDelimiterDataBasis = " + isDelimiterDataBasis());
+        sectionInfoList.add("  isIncludeAdditionalSchema = " + isIncludeAdditionalSchema());
         final Integer xlsLimit = getXlsLimit();
         if (xlsLimit != null) { // e.g. xlsLimit = 0 (all TSV mode)
             sectionInfoList.add("  xlsLimit = " + xlsLimit);
@@ -92,9 +95,23 @@ public class DfLReverseTitleSectionProvider {
     }
 
     // -----------------------------------------------------
-    //                                        Output Handler
-    //                                        --------------
+    //                                              Xls Data
+    //                                              --------
     protected Integer getXlsLimit() {
         return getDocumentProperties().getLoadDataReverseXlsLimit();
+    }
+
+    // -----------------------------------------------------
+    //                                        Delimiter Data
+    //                                        --------------
+    protected boolean isDelimiterDataBasis() {
+        return getDocumentProperties().isLoadDataReverseDelimiterDataBasis();
+    }
+
+    // -----------------------------------------------------
+    //                                     Additional Schema
+    //                                     -----------------
+    protected boolean isIncludeAdditionalSchema() {
+        return getDocumentProperties().isLoadDataReverseIncludeAdditionalSchema();
     }
 }

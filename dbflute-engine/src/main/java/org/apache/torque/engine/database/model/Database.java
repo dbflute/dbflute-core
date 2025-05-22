@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,12 +132,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
@@ -322,10 +320,7 @@ public class Database {
     }
 
     public List<Table> getTableDisplaySortedList() {
-        final Comparator<Table> tableDisplayOrderBy = getProperties().getDocumentProperties().getTableDisplayOrderBy();
-        final TreeSet<Table> tableSet = new TreeSet<Table>(tableDisplayOrderBy);
-        tableSet.addAll(getTableList());
-        return new ArrayList<Table>(tableSet);
+        return getProperties().getDocumentProperties().prepareTableDisplayOrderedList(getTableList());
     }
 
     public List<Table> getBehaviorTableList() {
@@ -2443,12 +2438,36 @@ public class Database {
     // -----------------------------------------------------
     //                                            DB Comment
     //                                            ----------
+    // already unused in template since 1.2.9 (but keep compatible just in case)
     public boolean isAliasDelimiterInDbCommentValid() {
         return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
     }
 
     public boolean isEntityJavaDocDbCommentValid() {
         return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
+    }
+
+    // used in e.g. SchemaHTML template for alias item display determination
+    public boolean needsTableAliasItem() { // e.g. may be dfprop alias only
+        return isAliasDelimiterInDbCommentValid() || getTableList().stream().anyMatch(table -> table.hasAlias());
+    }
+
+    public boolean hasSchemaAlias() {
+        final String schemaAlias = getProperties().getAdditionalDbCommentProperties().findSchemaAlias();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(schemaAlias);
+    }
+
+    public boolean hasSchemaDescription() {
+        final String schemaDescription = getProperties().getAdditionalDbCommentProperties().findSchemaDescription();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(schemaDescription);
+    }
+
+    public String getSchemaAlias() { // null allowed so use determination method before
+        return getProperties().getAdditionalDbCommentProperties().findSchemaAlias();
+    }
+
+    public String getSchemaDescription() { // null allowed so use determination method before
+        return getProperties().getAdditionalDbCommentProperties().findSchemaDescription();
     }
 
     // -----------------------------------------------------

@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2024 the original author or authors.
+## Copyright 2014-2025 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -171,14 +171,11 @@ public class ${glDBFluteConfig} {
 #if ($database.isDatabaseOracle())
 
         if (isCurrentDBDef(DBDef.Oracle)) {
-            // date formatting has two points:
-            //   o the DATE type of Oracle has seconds
-            //   o it uses a date literal of Oracle
-#if ($database.needsDateTreatedAsLocalDateTime())
-            _logDatePattern = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
-#else
-            _logDatePattern = "date $df:{yyyy-MM-dd}"; // but treated as date by your setting
-#end
+            // it uses a date literal of Oracle
+## even if needsDateTreatedAsLocalDateTime(), date pattern as timestamp is unneeded (2025/04/16)
+## because DisplaySqlBuilder determines format by property type so fixed it
+## _logDatePattern = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
+            _logDatePattern = "date $df:{yyyy-MM-dd}";
             _logTimestampPattern = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
         }
 #if ($database.isAvailableDatabaseNativeJDBC())

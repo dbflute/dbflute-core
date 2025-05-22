@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,11 @@ public class DfSplittingDfpropHandler {
     public Map<String, Object> resolveSplit(String mapName, Map<String, Object> plainDefinitionMap) {
         Map<String, Object> splitDefinitionMap = null;
         for (Entry<String, Object> entry : plainDefinitionMap.entrySet()) {
-            final String classificationName = entry.getKey();
-            if (isSplitMark(classificationName)) {
+            final String rootKey = entry.getKey();
+            if (isSplitMark(rootKey)) {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> splitMap = (Map<String, Object>) entry.getValue();
-                splitDefinitionMap = handleSplitDefinition(mapName, classificationName, splitMap);
+                splitDefinitionMap = handleSplitDefinition(mapName, rootKey, splitMap);
             }
         }
         if (splitDefinitionMap == null) {
@@ -59,11 +59,11 @@ public class DfSplittingDfpropHandler {
         }
         final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>();
         for (Entry<String, Object> entry : plainDefinitionMap.entrySet()) {
-            final String classificationName = entry.getKey();
-            if (isSplitMark(classificationName)) {
+            final String rootKey = entry.getKey();
+            if (isSplitMark(rootKey)) {
                 continue;
             }
-            resolvedMap.put(classificationName, entry.getValue());
+            resolvedMap.put(rootKey, entry.getValue());
         }
         if (splitDefinitionMap != null) {
             for (Entry<String, Object> entry : splitDefinitionMap.entrySet()) {
@@ -77,11 +77,11 @@ public class DfSplittingDfpropHandler {
         return resolvedMap;
     }
 
-    protected boolean isSplitMark(String classificationName) {
-        return classificationName.equalsIgnoreCase("$$split$$");
+    protected boolean isSplitMark(String rootKey) {
+        return rootKey.equalsIgnoreCase("$$split$$");
     }
 
-    protected Map<String, Object> handleSplitDefinition(String mapName, String classificationName, Map<?, ?> splitMap) {
+    protected Map<String, Object> handleSplitDefinition(String mapName, String rootKey, Map<?, ?> splitMap) {
         final Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
         @SuppressWarnings("unchecked")
         final Set<String> keywordSet = (Set<String>) splitMap.keySet();

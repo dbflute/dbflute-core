@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,8 +128,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
 
                 if (info.isSelectable()) { // e.g. procedure synonym
                     // set up column definition for supplement info
-                    final List<DfColumnMeta> columnMetaInfoList = getSynonymColumns(conn, synonymOwner, synonymName);
-                    info.setColumnMetaInfoList(columnMetaInfoList);
+                    final List<DfColumnMeta> columnMetaList = getSynonymColumns(conn, synonymOwner, synonymName);
+                    info.setColumnMetaList(columnMetaList);
                 }
 
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {

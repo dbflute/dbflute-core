@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected boolean _updateColumnModifiedPropertiesFragmentedAllowed; // as default of batch update
     protected boolean _compatibleBatchUpdateDefaultEveryColumn;
     protected boolean _disableCommonColumnAutoSetup;
+    protected boolean _disableOptimisticLockAutoUpdate; // since 1.2.9
 
     // small option for QueryUpdate condition
     protected boolean _nonQueryUpdateAllowed;
@@ -640,9 +641,9 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setOthers...(value);
      * member.setUpdateDatetime(updateDatetime);
      * member.setUpdateUser(updateUser);
-     * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
-     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
-     * memberBhv.varyingUpdate(member, option);
+     * memberBhv.varyingUpdate(member, op -&gt; {
+     *     op.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>());
+     * });
      * </pre>
      * @return The option of update. (NotNull: returns this)
      */
@@ -653,6 +654,31 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
 
     public boolean isCommonColumnAutoSetupDisabled() {
         return _disableCommonColumnAutoSetup;
+    }
+
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
+    /**
+     * Disable auto-update for optimistic lock column. <br>
+     * You can keep existing value of optimistic lock column in database.
+     * <pre>
+     * Member member = new Member();
+     * member.setMemberId(3);
+     * member.setOthers...(value);
+     * memberBhv.varyingUpdate(member, op -&gt; {
+     *     op.<span style="color: #CC4747">disableOptimisticLockAutoUpdate</span>());
+     * });
+     * </pre>
+     * @return The option of update. (NotNull: returns this)
+     */
+    public UpdateOption<CB> disableOptimisticLockAutoUpdate() {
+        _disableOptimisticLockAutoUpdate = true;
+        return this;
+    }
+
+    public boolean isOptimisticLockAutoUpdateDisabled() {
+        return _disableOptimisticLockAutoUpdate;
     }
 
     // ===================================================================================

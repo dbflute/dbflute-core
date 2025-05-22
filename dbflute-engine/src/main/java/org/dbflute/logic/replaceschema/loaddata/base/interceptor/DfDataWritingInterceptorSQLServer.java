@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,10 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.dbflute.DfBuildProperties;
 import org.dbflute.dbway.WayOfSQLServer;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
-import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,24 +60,19 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    public void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
-        final String tableSqlName = quoteTableNameIfNeeds(tableDbName);
+    public void processBeforeHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap) {
+        final String tableSqlName = schemaTable.buildTableSqlName();
         if (hasIdentityColumn(_dataSource, tableSqlName, columnInfoMap)) {
             turnOnIdentityInsert(_dataSource, tableSqlName);
             _identityTableSet.add(tableSqlName);
         }
     }
 
-    public void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
-        final String tableSqlName = quoteTableNameIfNeeds(tableDbName);
+    public void processFinallyHandlingTable(DfLoadedSchemaTable schemaTable, Map<String, DfColumnMeta> columnInfoMap) {
+        final String tableSqlName = schemaTable.buildTableSqlName();
         if (_identityTableSet.contains(tableSqlName)) {
             turnOffIdentityInsert(_dataSource, tableSqlName);
         }
-    }
-
-    protected String quoteTableNameIfNeeds(String tableDbName) {
-        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeedsDirectUse(tableDbName);
     }
 
     // ===================================================================================

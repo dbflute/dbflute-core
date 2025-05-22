@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.dbflute.logic.replaceschema.loaddata.base.secretary;
 
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 
 /**
  * The handler of xls data. (reading, writing)
@@ -23,5 +24,5 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
  */
 public interface DfColumnBindTypeProvider {
 
-    Class<?> provide(String tableName, DfColumnMeta columnMeta);
+    Class<?> provide(DfLoadedSchemaTable schemaTable, DfColumnMeta columnMeta);
 }

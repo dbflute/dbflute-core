@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,11 @@ import org.dbflute.util.Srl;
  */
 public class DfLReverseOriginDateSynchronizer {
 
-    public String synchronizeOriginDate(String dataDir) {
-        final String mapPath = dataDir + "/" + DfLoadingControlProp.LOADING_CONTROL_MAP_NAME;
+    // ===================================================================================
+    //                                                                         Synchronize
+    //                                                                         ===========
+    public String synchronizeOriginDate(File dataDir) {
+        final String mapPath = resolvePath(dataDir) + "/" + DfLoadingControlProp.LOADING_CONTROL_MAP_NAME;
         final File mapFile = new File(mapPath);
         if (!mapFile.exists()) {
             throwLoadingControlMapNotFoundException(mapFile);
@@ -52,7 +55,7 @@ public class DfLReverseOriginDateSynchronizer {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the loading control map (so cannot synchronize).");
         br.addItem("Advice");
-        br.addElement("The loadingControlMap.dataprop should exist in reversexls");
+        br.addElement("The loadingControlMap.dataprop should exist in reversetsv/reversexls");
         br.addElement("if synchronization of origin date is valid for LoadDataReverse.");
         br.addItem("Map File");
         br.addElement(mapFile);
@@ -60,6 +63,9 @@ public class DfLReverseOriginDateSynchronizer {
         throw new IllegalStateException(msg);
     }
 
+    // ===================================================================================
+    //                                                                   Prepare MapString
+    //                                                                   =================
     protected String prepareSynchronizedOriginDateMapString(File mapFile, StringBuilder resultSb) {
         boolean prepared = false;
         final StringBuilder sb = new StringBuilder();
@@ -166,6 +172,9 @@ public class DfLReverseOriginDateSynchronizer {
         throw new IllegalStateException(msg);
     }
 
+    // ===================================================================================
+    //                                                                           Write Map
+    //                                                                           =========
     protected void writeMapStringToLoadingControlMap(File mapFile, String mapString) {
         BufferedWriter bw = null;
         try {
@@ -192,5 +201,12 @@ public class DfLReverseOriginDateSynchronizer {
         br.addElement(mapString);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg, e);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String resolvePath(File file) {
+        return Srl.replace(file.getPath(), "\\", "/");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.List;
 import org.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
@@ -40,14 +41,14 @@ public class DfRelativeDateResolver {
     public static final String RESOLVED_PATTERN = "yyyy/MM/dd HH:mm:ss.SSS";
     private static final Date LIMIT_DATE = new HandyDate("8999/12/31").getDate();
 
-    public String resolveRelativeDate(String tableName, String columnName, String relativeDate, Date date) {
+    public String resolveRelativeDate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, Date date) {
         // addDay(1)
         // addDay(1).moveToDayJust()
         // addMonth(3).moveToMonthTerminal()
-        return doResolveRelativeDate(tableName, columnName, relativeDate, date);
+        return doResolveRelativeDate(schemaTable, columnName, relativeDate, date);
     }
 
-    public String resolveRelativeSysdate(String tableName, String columnName, String relativeDate) {
+    public String resolveRelativeSysdate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate) {
         // $sysdate
         // $sysdate.addDay(1)
         // $sysdate.addDay(1).moveToDayJust()
@@ -59,10 +60,10 @@ public class DfRelativeDateResolver {
         }
         final Date currentDate = DBFluteSystem.currentDate();
         final String calcPart = Srl.substringFirstRear(relativeDate, currentMark).trim();
-        return doResolveRelativeDate(tableName, columnName, calcPart, currentDate);
+        return doResolveRelativeDate(schemaTable, columnName, calcPart, currentDate);
     }
 
-    protected String doResolveRelativeDate(String tableName, String columnName, String relativeDate, Date date) {
+    protected String doResolveRelativeDate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, Date date) {
         final String calcPart = relativeDate.trim();
         if (calcPart.trim().length() == 0 || date.after(LIMIT_DATE)) {
             return DfTypeUtil.toString(date, RESOLVED_PATTERN);
@@ -70,14 +71,15 @@ public class DfRelativeDateResolver {
         final List<String> methodList = Srl.splitListTrimmed(Srl.trim(calcPart, "."), ".");
         HandyDate handyDate = new HandyDate(date);
         for (String methodCall : methodList) {
-            handyDate = invokeMethod(tableName, columnName, relativeDate, handyDate, methodCall);
+            handyDate = invokeMethod(schemaTable, columnName, relativeDate, handyDate, methodCall);
         }
         return DfTypeUtil.toString(handyDate.getDate(), RESOLVED_PATTERN);
     }
 
-    protected HandyDate invokeMethod(String tableName, String columnName, String relativeDate, HandyDate handyDate, String methodCall) {
+    protected HandyDate invokeMethod(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, HandyDate handyDate,
+            String methodCall) {
         if (!methodCall.contains("(") || !methodCall.endsWith(")")) {
-            throwLoadDataRelativeDateMethodArgPartNotFoundException(tableName, columnName, relativeDate);
+            throwLoadDataRelativeDateMethodArgPartNotFoundException(schemaTable, columnName, relativeDate);
         }
         final String methodName = Srl.substringFirstFront(methodCall, "(");
         final String methodArgsPart = Srl.substringFirstFront(Srl.substringFirstRear(methodCall, "("), ")");
@@ -109,12 +111,12 @@ public class DfRelativeDateResolver {
         final Class<HandyDate> handyDateType = HandyDate.class;
         final Method method = DfReflectionUtil.getPublicMethod(handyDateType, methodName, argTypes);
         if (method == null) {
-            throwLoadDataRelativeDateMethodNotFoundException(tableName, columnName, relativeDate, handyDateType, methodName, argTypes);
+            throwLoadDataRelativeDateMethodNotFoundException(schemaTable, columnName, relativeDate, handyDateType, methodName, argTypes);
         }
         try {
             handyDate = (HandyDate) DfReflectionUtil.invoke(method, handyDate, argValueList.toArray());
         } catch (ReflectionFailureException e) {
-            throwLoadDataRelativeDateInvokeFailureException(tableName, columnName, relativeDate, handyDateType, methodName, e);
+            throwLoadDataRelativeDateInvokeFailureException(schemaTable, columnName, relativeDate, handyDateType, methodName, e);
         }
         return handyDate;
     }
@@ -124,7 +126,8 @@ public class DfRelativeDateResolver {
         return Srl.isNumberHarfAll(minusRemovedStr);
     }
 
-    protected void throwLoadDataRelativeDateMethodArgPartNotFoundException(String tableName, String columnName, String relativeDate) {
+    protected void throwLoadDataRelativeDateMethodArgPartNotFoundException(DfLoadedSchemaTable tableName, String columnName,
+            String relativeDate) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the method argument part for RelativeDate on LoadData.");
         br.addItem("Advice");
@@ -142,12 +145,12 @@ public class DfRelativeDateResolver {
         throw new DfLoadDataRegistrationFailureException(msg);
     }
 
-    protected void throwLoadDataRelativeDateMethodNotFoundException(String tableName, String columnName, String relativeDate,
+    protected void throwLoadDataRelativeDateMethodNotFoundException(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate,
             Class<HandyDate> handyDateType, String methodName, Class<?>[] argTypes) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the method to invoke for RelativeDate on LoadData.");
         br.addItem("Table Name");
-        br.addElement(tableName);
+        br.addElement(schemaTable);
         br.addItem("Column Name");
         br.addElement(columnName);
         br.addItem("Relative Date");
@@ -162,12 +165,12 @@ public class DfRelativeDateResolver {
         throw new DfLoadDataRegistrationFailureException(msg);
     }
 
-    protected void throwLoadDataRelativeDateInvokeFailureException(String tableName, String columnName, String relativeDate,
+    protected void throwLoadDataRelativeDateInvokeFailureException(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate,
             Class<HandyDate> targetType, String methodName, ReflectionFailureException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to invoke the method for RelativeDate on LoadData.");
         br.addItem("Table Name");
-        br.addElement(tableName);
+        br.addElement(schemaTable);
         br.addItem("Column Name");
         br.addElement(columnName);
         br.addItem("Relative Date");
