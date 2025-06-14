@@ -88,10 +88,14 @@ public class DfSPolicyColumnThemeChecker {
         //     ; themeList = list:{ upperCaseBasis }
         // }
         define(themeMap, "upperCaseBasis", column -> Srl.isLowerCaseAny(toComparingColumnName(column)), column -> {
-            return "The column name should be on upper case basis: " + toColumnDisp(column);
+            final String actual = toComparingColumnName(column);
+            final String disp = toColumnDisp(column);
+            return "The column name should be on upper case basis: actual=" + actual + ", disp=" + disp;
         });
         define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(toComparingColumnName(column)), column -> {
-            return "The column name should be on lower case basis: " + toColumnDisp(column);
+            final String actual = toComparingColumnName(column);
+            final String disp = toColumnDisp(column);
+            return "The column name should be on lower case basis: actual=" + actual + ", disp=" + disp;
         });
         define(themeMap, "hasAlias", column -> !column.hasAlias(), column -> {
             return "The column should have column alias: " + toColumnDisp(column);
