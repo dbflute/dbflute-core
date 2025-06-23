@@ -48,11 +48,11 @@ public class DfPropFile {
     protected boolean _checkDuplicateEntry;
 
     // ===================================================================================
-    //                                                                                 Map
-    //                                                                                 ===
+    //                                                                                Map
+    //                                                                               =====
     // -----------------------------------------------------
-    //                                                  Read
-    //                                                  ----
+    //                                       Simple Read Map
+    //                                       ---------------
     /**
      * Read the map string file. <br>
      * If the type of values is various type, this method is available. <br>
@@ -177,6 +177,9 @@ public class DfPropFile {
         throw new DfPropFileReadFailureException(msg, e);
     }
 
+    // -----------------------------------------------------
+    //                                   Map as String value
+    //                                   -------------------
     /**
      * Read the map string file as string value. <br>
      * If the type of all values is string type, this method is available. <br>
@@ -215,6 +218,9 @@ public class DfPropFile {
         }
     }
 
+    // -----------------------------------------------------
+    //                               Map as StringList value
+    //                               -----------------------
     /**
      * Read the map string file as string list value. <br>
      * If the type of all values is string list type, this method is available. <br>
@@ -248,24 +254,59 @@ public class DfPropFile {
         try {
             final DfMapFile mapFile = createMapFileStructural();
             final Map<String, Object> readMap = mapFile.readMap(createInputStream(path), Object.class);
-            return convertToStringListMap(readMap);
+            return convertToStringListMap(path, readMap);
         } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
         }
     }
 
-    protected Map<String, List<String>> convertToStringListMap(Map<String, Object> readMap) {
+    protected Map<String, List<String>> convertToStringListMap(String path, Map<String, Object> readMap) {
         final Map<String, List<String>> resultMap = new LinkedHashMap<String, List<String>>();
         final Set<Entry<String, Object>> entrySet = readMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
-            @SuppressWarnings("unchecked")
-            final List<String> listValue = (List<String>) entry.getValue(); // simple downcast for now
-            resultMap.put(entry.getKey(), listValue);
+            try {
+                @SuppressWarnings("unchecked")
+                final List<String> listValue = (List<String>) entry.getValue();
+                resultMap.put(entry.getKey(), listValue);
+            } catch (ClassCastException e) {
+                throwDfPropCannotCastToListException(path, entry, e);
+                return null; // unreachable
+            }
         }
         return resultMap;
     }
 
+    protected void throwDfPropCannotCastToListException(String path, Entry<String, Object> entry, ClassCastException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Cannot cast to List in the map file.");
+        br.addItem("Advice");
+        br.addElement("Make sure your map file format.");
+        br.addElement("List expected, but different type actually");
+        br.addElement("by called reading method rule.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ; map:{");
+        br.addElement("        ; maihama = map:{ sea = land ; ... } // should be List");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    ; map:{");
+        br.addElement("        ; maihama = list:{ sea ; land ; ... } // Good");
+        br.addElement("    }");
+        br.addItem("DfProp Path");
+        br.addElement(path);
+        br.addItem("Cannot-List Value");
+        br.addElement("key: " + entry.getKey());
+        final Object value = entry.getValue();
+        br.addElement("value: " + value);
+        br.addElement("type: " + (value != null ? value.getClass().getName() : null));
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropFileReadFailureException(msg, e);
+    }
+
+    // -----------------------------------------------------
+    //                                Map as StringMap value
+    //                                ----------------------
     /**
      * Read the map string file as string map value. <br>
      * If the type of all values is string map type, this method is available. <br>
@@ -299,30 +340,62 @@ public class DfPropFile {
         try {
             final DfMapFile mapFile = createMapFileStructural();
             final Map<String, Object> readMap = mapFile.readMap(createInputStream(path), Object.class);
-            return convertToStringMapValue(readMap);
+            return convertToStringMapValue(path, readMap);
         } catch (DfMapDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
         }
     }
 
-    protected Map<String, Map<String, String>> convertToStringMapValue(Map<String, Object> readMap) {
+    protected Map<String, Map<String, String>> convertToStringMapValue(String path, Map<String, Object> readMap) {
         final Map<String, Map<String, String>> resultMap = new LinkedHashMap<String, Map<String, String>>();
         final Set<Entry<String, Object>> entrySet = readMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
-            @SuppressWarnings("unchecked")
-            final Map<String, String> stringMapValue = (Map<String, String>) entry.getValue(); // simple downcast for now 
-            resultMap.put(entry.getKey(), stringMapValue);
+            try {
+                @SuppressWarnings("unchecked")
+                final Map<String, String> stringMapValue = (Map<String, String>) entry.getValue(); // simple downcast for now 
+                resultMap.put(entry.getKey(), stringMapValue);
+            } catch (ClassCastException e) {
+                throwDfPropCannotCastToMapException(path, entry, e);
+                return null; // unreachable
+            }
         }
         return resultMap;
     }
 
+    protected void throwDfPropCannotCastToMapException(String path, Entry<String, Object> entry, ClassCastException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Cannot cast to Map in the map file.");
+        br.addItem("Advice");
+        br.addElement("Make sure your map file format.");
+        br.addElement("Map expected, but different type actually");
+        br.addElement("by called reading method rule.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ; map:{");
+        br.addElement("        ; maihama = list:{ sea ; land ; ... } // should be Map");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    ; map:{");
+        br.addElement("        ; maihama = map:{ sea = land ; ... } // Good");
+        br.addElement("    }");
+        br.addItem("DfProp Path");
+        br.addElement(path);
+        br.addItem("Cannot-Map Value");
+        br.addElement("key: " + entry.getKey());
+        final Object value = entry.getValue();
+        br.addElement("value: " + value);
+        br.addElement("type: " + (value != null ? value.getClass().getName() : null));
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropFileReadFailureException(msg, e);
+    }
+
     // ===================================================================================
-    //                                                                                List
-    //                                                                                ====
+    //                                                                               List
+    //                                                                              ======
     // -----------------------------------------------------
-    //                                                  Read
-    //                                                  ----
+    //                                      Simple Read List
+    //                                      ----------------
     /**
      * Read the list string file. <br>
      * If the type of values is various type, this method is available. <br>
@@ -361,8 +434,8 @@ public class DfPropFile {
     //                                                                              String
     //                                                                              ======
     // -----------------------------------------------------
-    //                                                  Read
-    //                                                  ----
+    //                                    Simple Read String
+    //                                    ------------------
     /**
      * Read the string file. <br>
      * A trimmed line that starts with '#' is treated as line comment.
