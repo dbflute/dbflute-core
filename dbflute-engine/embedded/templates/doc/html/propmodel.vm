@@ -231,10 +231,10 @@ ${manager.javaScriptEmbedded}
 	<p class="requestlink"><a href="#${request.requestLowerName}">${request.requestName}</a></p>
 #end
 #if ($selector.isPropertiesHtmlToSchemaHtmlLink())
-<p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
+	<p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
 #end
 #if ($selector.isPropertiesHtmlToHistoryHtmlLink())
-<p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
+	<p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
 #end
 </div>
 
