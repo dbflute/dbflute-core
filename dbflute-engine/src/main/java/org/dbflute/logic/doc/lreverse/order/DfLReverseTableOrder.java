@@ -169,7 +169,7 @@ public class DfLReverseTableOrder {
         return unregisteredTableList;
     }
 
-    private boolean determineDependingOnUnregisteredOther(ForeignKey fk, Set<String> alreadyRegisteredSet) {
+    protected boolean determineDependingOnUnregisteredOther(ForeignKey fk, Set<String> alreadyRegisteredSet) {
         if (fk.isSelfReference()) {
             return false;
         }

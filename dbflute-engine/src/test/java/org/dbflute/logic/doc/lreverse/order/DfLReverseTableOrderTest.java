@@ -12,10 +12,11 @@ import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
+ * @since 1.3.0 (2025/06/25 Wednesday at ichihara)
  */
 public class DfLReverseTableOrderTest extends EngineTestCase {
 
-    public void test_analyzeOrder_cyclic() {
+    public void test_analyzeOrder_cyclicHeadache() {
         // ## Arrange ##
         Database database = new Database() {
             @Override
@@ -24,6 +25,7 @@ public class DfLReverseTableOrderTest extends EngineTestCase {
             }
         };
         DfLReverseTableOrder tableOrder = new DfLReverseTableOrder(3);
+        tableOrder.enableFrameworkDebug();
         List<Table> tableList = newArrayList();
         Table sea = registerTable(database, tableList, "SEA");
         Table hangar = registerTable(database, tableList, "HANGAR", sea);
@@ -32,11 +34,14 @@ public class DfLReverseTableOrderTest extends EngineTestCase {
         Table showbase = registerTable(database, tableList, "SHOWBASE", land);
         registerTable(database, tableList, "ONEMAN", showbase);
 
-        Table aaaCyclic = registerTable(database, tableList, "AAA_CYCLIC");
-        Table bbbCyclic = registerTable(database, tableList, "BBB_CYCLIC", aaaCyclic);
-        registerFK(aaaCyclic, bbbCyclic);
-        registerFK(mystic, aaaCyclic);
-        registerFK(bbbCyclic, showbase);
+        Table xxxCyclic = registerTable(database, tableList, "XXX_CYCLIC");
+        Table yyyCyclic = registerTable(database, tableList, "YYY_CYCLIC", xxxCyclic);
+        Table zzzReferrer = registerTable(database, tableList, "ZZZ_REFERRER", yyyCyclic);
+        assertEquals(xxxCyclic.getName(), yyyCyclic.getForeignKeyList().get(0).getForeignTablePureName());
+        registerFK(xxxCyclic, yyyCyclic);
+        registerFK(mystic, xxxCyclic); // headache target
+        registerFK(yyyCyclic, showbase);
+        assertEquals(2, yyyCyclic.getForeignKeyList().size()); // to xxx and showbase
 
         Collections.sort(tableList, (o1, o2) -> o1.getName().compareTo(o2.getName())); // name order
         log(tableList.stream().map(table -> table.getName()).collect(Collectors.toList()));
@@ -54,9 +59,13 @@ public class DfLReverseTableOrderTest extends EngineTestCase {
             }
         }
         List<Table> flatList = sectionListList.stream().flatMap(list -> list.stream()).collect(Collectors.toList());
-        assertEquals(mystic, flatList.get(flatList.size() - 1));
+        assertEquals(mystic.getName(), flatList.get(flatList.size() - 2).getName()); // should be after xxx/yyy
+        assertEquals(zzzReferrer.getName(), flatList.get(flatList.size() - 1).getName());
     }
 
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
     private Table registerTable(Database database, List<Table> tableList, String tableName) {
         Table table = new Table();
         table.setName(tableName);
@@ -74,7 +83,7 @@ public class DfLReverseTableOrderTest extends EngineTestCase {
 
     private void registerFK(Table localTable, Table foreignTable) {
         ForeignKey fk = new ForeignKey();
-        fk.setTable(localTable);
+        fk.setName("FK_" + localTable.getName() + "_" + foreignTable.getName());
         fk.setForeignTablePureName(foreignTable.getName());
         localTable.addForeignKey(fk);
     }
