@@ -24,10 +24,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -36,15 +40,28 @@ import org.dbflute.util.Srl;
 public class DfLReverseTableOrder {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfLReverseProcess.class);
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final int _sectionTableGuidelineLimit; // not minus
+
+    protected boolean _frameworkDebug;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfLReverseTableOrder(int sectionTableGuidelineLimit) {
-        this._sectionTableGuidelineLimit = sectionTableGuidelineLimit;
+        _sectionTableGuidelineLimit = sectionTableGuidelineLimit;
+    }
+
+    public DfLReverseTableOrder enableFrameworkDebug() {
+        _frameworkDebug = true;
+        return this;
     }
 
     // ===================================================================================
@@ -68,51 +85,76 @@ public class DfLReverseTableOrder {
             allTableSet.addAll(tableList);
             unregisteredTableList = new ArrayList<Table>(allTableSet);
         }
+        int doCount = 0;
         int level = 1;
         while (true) {
             final int beforeSize = unregisteredTableList.size();
             unregisteredTableList = doAnalyzeOrder(unregisteredTableList, alreadyRegisteredSet, orderedList, level);
+            ++doCount;
             if (unregisteredTableList.isEmpty()) {
+                if (_frameworkDebug) {
+                    _log.debug("#lrev_tableOrder Happy end: doCount={}, level={}", doCount, level);
+                }
                 break; // happy end
             }
             final int afterSize = unregisteredTableList.size();
+            if (_frameworkDebug) {
+                final String tableListDisp = toTableListDisp(unregisteredTableList);
+                _log.debug("#lrev_tableOrder one analyzed: doCount={}, level={}, unreg={}", doCount, level, tableListDisp);
+            }
             if (beforeSize == afterSize) { // means it cannot analyze more
                 if (level == 1) { // level finished: next challenge, ignores additional foreign key
                     ++level;
                 } else { // level 2 finished: however unregistered tables exist 
                     orderedList.add(unregisteredTableList);
+                    if (_frameworkDebug) {
+                        final int sadlyCount = unregisteredTableList.size();
+                        _log.debug("#lrev_tableOrder Sadly end: doCount={}, level={}, sadlyCount={}", doCount, level, sadlyCount);
+                        for (Table sadlyTable : unregisteredTableList) {
+                            _log.debug("#lrev_tableOrder sadlyTable: {}", sadlyTable.getTableDbName());
+                        }
+                    }
                     break; // sadly end
                 }
             }
         }
+        if (_frameworkDebug) {
+            _log.debug("#lrev_tableOrder before grouping: flatList={}", toTableListListDisp(orderedList));
+        }
         return groupingSize(groupingCategory(orderedList));
     }
 
+    // -----------------------------------------------------
+    //                                            do Analyze
+    //                                            ----------
     /**
      * @param tableList The list of table, which may be registered. (NotNull)
      * @param alreadyRegisteredSet The (pure) name set of already registered table. (NotNull)
      * @param outputOrderedList The ordered list of table for output. (NotNull)
+     * @param level The level to determine dependencies. (NotMinus)
      * @return The list of unregistered table. (NotNull)
      */
     protected List<Table> doAnalyzeOrder(List<Table> tableList, Set<String> alreadyRegisteredSet, List<List<Table>> outputOrderedList,
-            final int level) {
+            int level) {
         final List<Table> unregisteredTableList = new ArrayList<Table>();
         final List<Table> elementList = new ArrayList<Table>();
         for (Table table : tableList) {
             final List<ForeignKey> foreignKeyList = table.getForeignKeyList();
             boolean dependsOnAny = false;
             for (ForeignKey fk : foreignKeyList) {
-                final String foreignTablePureName = fk.getForeignTablePureName();
                 if (level >= 1 && fk.hasFixedCondition()) { // from first level, ignore fixed condition
                     continue;
                 }
                 if (level >= 2 && fk.isAdditionalForeignKey()) { // from second level, ignore additional FK
                     continue;
                 }
-                if (!fk.isSelfReference() && !alreadyRegisteredSet.contains(foreignTablePureName)) {
+                if (determineDependingOnUnregisteredOther(fk, alreadyRegisteredSet)) {
                     dependsOnAny = true; // found non-registered parent table so it still depends on any 
                     break;
                 }
+            }
+            if (_frameworkDebug) {
+                _log.debug("#lrev_tableOrder level={}, table={}, dependsOnAny={}", level, table.getTableDbName(), dependsOnAny);
             }
             if (dependsOnAny) {
                 unregisteredTableList.add(table);
@@ -127,6 +169,17 @@ public class DfLReverseTableOrder {
         return unregisteredTableList;
     }
 
+    private boolean determineDependingOnUnregisteredOther(ForeignKey fk, Set<String> alreadyRegisteredSet) {
+        if (fk.isSelfReference()) {
+            return false;
+        }
+        // FK to others here
+        return !alreadyRegisteredSet.contains(fk.getForeignTablePureName()); // depends on unregistered yet
+    }
+
+    // ===================================================================================
+    //                                                                            Grouping
+    //                                                                            ========
     protected List<List<Table>> groupingCategory(List<List<Table>> outputOrderedList) {
         return doGroupingCategory(doGroupingCategory(outputOrderedList, false), true);
     }
@@ -388,6 +441,21 @@ public class DfLReverseTableOrder {
         final String firstPrefix = Srl.substringFirstFront(tableName, "_");
         final String firstRear = Srl.substringFirstRear(tableName, "_");
         return firstPrefix + "_" + Srl.substringFirstFront(firstRear, "_");
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected String toTableListDisp(List<Table> tableList) {
+        return tableList.stream().map(table -> table.getTableDbName()).collect(Collectors.toList()).toString();
+    }
+
+    protected String toTableListListDisp(List<List<Table>> tableListList) {
+        return tableListList.stream()
+                .flatMap(nestList -> nestList.stream())
+                .map(table -> table.getTableDbName())
+                .collect(Collectors.toList())
+                .toString();
     }
 
     // ===================================================================================

@@ -898,6 +898,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isIncludeAdditionalSchema", false, getLoadDataReverseMap());
     }
 
+    // -----------------------------------------------------
+    //                                      Framework Option
+    //                                      ----------------
+    public boolean isLoadDataReverseFrameworkDebug() {
+        return isProperty("isFrameworkDebug", false, getLoadDataReverseMap());
+    }
+
     // ===================================================================================
     //                                                                     SchemaSyncCheck
     //                                                                     ===============
