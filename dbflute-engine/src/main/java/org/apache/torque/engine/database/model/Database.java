@@ -400,7 +400,7 @@ public class Database {
         // mainly here
         _tableMap.put(tableDbName, table);
 
-        if (getLittleAdjustmentProperties().isAvailableSchemaDrivenTable()) { // use only when schema-driven table
+        if (isAvailableSchemaDrivenTable()) { // use only when schema-driven table
             final String pureName = Srl.substringLastRear(tableDbName, ".");
             _distinctPureNameTableMap.put(pureName, table);
         }
@@ -2049,6 +2049,10 @@ public class Database {
 
     public boolean isAvailableDatabaseDependency() {
         return getLittleAdjustmentProperties().isAvailableDatabaseDependency();
+    }
+
+    public boolean isAvailableSchemaDrivenTable() {
+        return getLittleAdjustmentProperties().isAvailableSchemaDrivenTable();
     }
 
     public boolean isUseFullTextSearchPGroongaBasic() {
