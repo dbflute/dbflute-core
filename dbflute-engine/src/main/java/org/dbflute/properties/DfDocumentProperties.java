@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1046,7 +1047,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (_propertiesHtmlMap != null) {
             return _propertiesHtmlMap;
         }
-        _propertiesHtmlMap = resolvePropertiesHtmlMap(preparePropertiesHtmlResourceMap());
+        if (isSuppressPropertiesHtmlGenerateForcedly()) { // for e.g. DBFLUTE_ENVIRONMENT_TYPE
+            _propertiesHtmlMap = new HashMap<>(); // empty means no PropertiesHTML process
+        } else { // mainly here
+            _propertiesHtmlMap = resolvePropertiesHtmlMap(preparePropertiesHtmlResourceMap());
+        }
         return _propertiesHtmlMap;
     }
 
@@ -1126,6 +1131,14 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
             _propertiesHtmlHeaderMap = DfCollectionUtil.emptyMap();
         }
         return resolvedMap;
+    }
+
+    protected boolean isSuppressPropertiesHtmlGenerateForcedly() { // closet, @since 1.3.0
+        // for e.g. DBFLUTE_ENVIRONMENT_TYPE
+        // to avoid changing links to e.g. SchemaHTML, HistoryHTML
+        // so this property is basically used in specified environment (+.dfprop)
+        // (not delete existing file, only stop overriding)
+        return isProperty("isSuppressPropertiesHtmlGenerateForcedly", false, getDocumentMap());
     }
 
     // -----------------------------------------------------

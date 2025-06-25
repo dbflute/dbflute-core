@@ -290,14 +290,33 @@ public class DfSchemaHistory {
         //   |
         //   |-project-history-maihamadb.diffmap // until 1.2.5
         // _/_/_/_/_/_/_/_/_/_/
-        final String diffDir = "schemadiff";
+        final String schemadiffDirName = buildSchemadiffDirName();
         final String diffPieceDir;
         if (Srl.contains(_historyFile, "/")) {
-            diffPieceDir = Srl.substringLastFront(_historyFile, "/") + "/" + diffDir;
+            diffPieceDir = Srl.substringLastFront(_historyFile, "/") + "/" + schemadiffDirName;
         } else { // the history file is current directory
-            diffPieceDir = "./" + diffDir;
+            diffPieceDir = "./" + schemadiffDirName;
         }
         return diffPieceDir;
+    }
+
+    protected String buildSchemadiffDirName() {
+        final String diffKeyword = "schemadiff";
+        final String pieceEnvType = getBasicProperties().getProjectSchemaHistoryDiffPieceEnvType(); // null allowed
+        final String schemadiffDirName;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(pieceEnvType)) { // for e.g. DBFLUTE_ENVIRONMENT_TYPE
+            // schema
+            //  |-schemadiff
+            //  |  |-2024
+            //  |  |-...
+            //  |-schemadiff_prod
+            //  |  |-2024
+            //  |  |-...
+            schemadiffDirName = diffKeyword + "_" + pieceEnvType;
+        } else { // mainly here
+            schemadiffDirName = diffKeyword;
+        }
+        return schemadiffDirName;
     }
 
     protected String derivePieceMiddleDirName(HandyDate diffDate) {

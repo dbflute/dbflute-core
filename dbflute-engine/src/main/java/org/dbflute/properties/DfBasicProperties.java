@@ -389,6 +389,16 @@ public final class DfBasicProperties extends DfAbstractDBFluteProperties {
         return getProperty("projectSchemaXMLEncoding", DEFAULT_projectSchemaXMLEncoding);
     }
 
+    // -----------------------------------------------------
+    //                                            Diff Piece
+    //                                            ----------
+    public String getProjectSchemaHistoryDiffPieceEnvType() { // closet, @since 1.3.0
+        return getProperty("projectSchemaHistoryDiffPieceEnvType", null);
+    }
+
+    // -----------------------------------------------------
+    //                                       Monolithic Diff
+    //                                       ---------------
     public String getProjectSchemaHistoryFile() { // closet
         return getProperty("projectSchemaHistoryFilePath", buildDefaultSchemaHistoryFilePath());
     }
