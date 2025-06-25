@@ -237,7 +237,11 @@ public class DfSchemaHistory {
         // 1. for when compatible option enabled after making pieces
         // 2. almost no problem if non piece task e.g. AlterCheck
         return diffMapFile.collectDiffMap(derivePieceBaseDirPath(), file -> {
-            return Srl.isQuotedAnything(file.getName(), getPieceFilePrefix(), getPieceFileExt());
+            if (_useDiffPiece) {
+                return Srl.isQuotedAnything(file.getName(), getPieceFilePrefix(), getPieceFileExt());
+            } else { // e.g. SchemaSyncCheck
+                return false; // fixedly ignore pieces
+            }
         }, _historyFile); // as recent order
     }
 
