@@ -16,9 +16,12 @@
 package org.dbflute.logic.doc.lreverse.order;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -68,6 +71,9 @@ public class DfLReverseTableOrder {
     //                                                                      Analyzer Order
     //                                                                      ==============
     public List<List<Table>> analyzeOrder(List<Table> tableList, List<Table> skippedTableList) {
+        if (_frameworkDebug) {
+            _log.debug("#lrev_tableOrder ...Analyzing order: tables={}, skipped={}", tableList.size(), skippedTableList.size());
+        }
         final Set<String> alreadyRegisteredSet = new HashSet<String>();
         for (Table skippedTable : skippedTableList) {
             alreadyRegisteredSet.add(skippedTable.getName()); // pure name here
@@ -89,6 +95,9 @@ public class DfLReverseTableOrder {
         int level = 1;
         while (true) {
             final int beforeSize = unregisteredTableList.size();
+            if (_frameworkDebug) {
+                _log.debug("#lrev_tableOrder ...Doing analyze: doCount={}, level={}, before={}", doCount, level, beforeSize);
+            }
             unregisteredTableList = doAnalyzeOrder(unregisteredTableList, alreadyRegisteredSet, orderedList, level);
             ++doCount;
             if (unregisteredTableList.isEmpty()) {
@@ -105,8 +114,7 @@ public class DfLReverseTableOrder {
             if (beforeSize == afterSize) { // means it cannot analyze more
                 if (level == 1) { // level finished: next challenge, ignores additional foreign key
                     ++level;
-                } else { // level 2 finished: however unregistered tables exist 
-                    orderedList.add(unregisteredTableList);
+                } else { // level 2 finished: however unregistered tables exist (cyclic?)
                     if (_frameworkDebug) {
                         final int sadlyCount = unregisteredTableList.size();
                         _log.debug("#lrev_tableOrder Sadly end: doCount={}, level={}, sadlyCount={}", doCount, level, sadlyCount);
@@ -114,6 +122,8 @@ public class DfLReverseTableOrder {
                             _log.debug("#lrev_tableOrder sadlyTable: {}", sadlyTable.getTableDbName());
                         }
                     }
+                    final List<Table> recoveredTableList = recoverSadly(unregisteredTableList);
+                    orderedList.add(recoveredTableList);
                     break; // sadly end
                 }
             }
@@ -175,6 +185,88 @@ public class DfLReverseTableOrder {
         }
         // FK to others here
         return !alreadyRegisteredSet.contains(fk.getForeignTablePureName()); // depends on unregistered yet
+    }
+
+    // -----------------------------------------------------
+    //                                         Recover Sadly
+    //                                         -------------
+    protected List<Table> recoverSadly(List<Table> unregisteredTableList) {
+        _log.debug("#lrev_tableOrder ...Recovering sadly: tables={}", unregisteredTableList.size());
+        final Map<String, Table> remainedSadlyTableMap = new LinkedHashMap<>(); // should be mutable
+        for (Table unregisteredTable : unregisteredTableList) {
+            remainedSadlyTableMap.put(unregisteredTable.getName(), unregisteredTable); // pure name here
+        }
+
+        final List<Collection<Table>> recoveredTableListList = new ArrayList<>();
+        int doCount = 0;
+        while (true) {
+            if (remainedSadlyTableMap.isEmpty()) { // recovery done
+                if (_frameworkDebug) {
+                    final long recovered = recoveredTableListList.stream().flatMap(ls -> ls.stream()).count();
+                    _log.debug("#lrev_tableOrder happy recovery: doCount={}, recovered={}", doCount, recovered);
+                }
+                break; // happy end
+            }
+            final int beforeSize = remainedSadlyTableMap.size();
+
+            if (_frameworkDebug) {
+                _log.debug("#lrev_tableOrder ...Doing recover sadly: doCount={}, before={}", doCount, beforeSize);
+            }
+            List<Table> recoveredTableList = doRecoverSadly(remainedSadlyTableMap);
+
+            recoveredTableListList.add(recoveredTableList);
+            ++doCount;
+            final int afterSize = remainedSadlyTableMap.size();
+            if (_frameworkDebug) {
+                _log.debug("#lrev_tableOrder one recovery: doCount={}, before={}, after={}", doCount, beforeSize, afterSize);
+            }
+
+            if (beforeSize == afterSize) { // no change
+                if (_frameworkDebug) {
+                    _log.debug("#lrev_tableOrder sadly recovery: doCount={}, remained={}", doCount, remainedSadlyTableMap.size());
+                }
+                recoveredTableListList.add(remainedSadlyTableMap.values()); // only cyclic?
+                break; // sadly end
+            }
+        }
+
+        // MYSTIC, ZA_REFERRER | XA_CYCLIC, YA_CYCLIC
+        // XA_CYCLIC, YA_CYCLIC | MYSTIC, ZA_REFERRER
+        Collections.reverse(recoveredTableListList);
+
+        return recoveredTableListList.stream().flatMap(ls -> ls.stream()).collect(Collectors.toList());
+    }
+
+    protected List<Table> doRecoverSadly(Map<String, Table> remainedSadlyTableMap) {
+        final List<Table> recoveredTableList = new ArrayList<>();
+        final List<Table> sadlyTableList = new ArrayList<>(remainedSadlyTableMap.values());
+        for (Table sadlyTable : sadlyTableList) {
+            final String tableName = sadlyTable.getName(); // pure name here
+
+            final List<ForeignKey> referrerList = sadlyTable.getReferrerList();
+            boolean referredByOtherSadlyTable = false;
+            for (ForeignKey referrer : referrerList) {
+                final String referrerTableName = referrer.getTable().getName(); // pure name here
+                if (tableName.equals(referrerTableName)) { // self reference
+                    continue; // not related to order determination
+                }
+                // other table here
+                final Table sadlyReferrerTable = remainedSadlyTableMap.get(referrerTableName);
+                if (sadlyReferrerTable != null) { // referred by other sadly table here
+                    referredByOtherSadlyTable = true;
+                    break;
+                }
+            }
+            if (!referredByOtherSadlyTable) { // maybe no referrer so move to the latter
+                _log.debug("#lrev_tableOrder recovered: table={}, referrers={}", tableName, referrerList.size());
+                recoveredTableList.add(sadlyTable);
+            }
+        }
+        // lazy removing to order tables refering to the same group table in the group
+        for (Table recoveredTable : recoveredTableList) {
+            remainedSadlyTableMap.remove(recoveredTable.getName()); // pure name here
+        }
+        return recoveredTableList;
     }
 
     // ===================================================================================
@@ -452,7 +544,7 @@ public class DfLReverseTableOrder {
 
     protected String toTableListListDisp(List<List<Table>> tableListList) {
         return tableListList.stream()
-                .flatMap(nestList -> nestList.stream())
+                .flatMap(ls -> ls.stream())
                 .map(table -> table.getTableDbName())
                 .collect(Collectors.toList())
                 .toString();

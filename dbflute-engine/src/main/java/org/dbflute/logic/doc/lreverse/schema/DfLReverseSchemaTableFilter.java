@@ -179,10 +179,10 @@ public class DfLReverseSchemaTableFilter {
     }
 
     // -----------------------------------------------------
-    //                                          Table Except
-    //                                          ------------
-    protected boolean isReverseTableTarget(String name) {
-        return getDocumentProperties().isLoadDataReverseTableTarget(name);
+    //                                   Table Except/Target
+    //                                   -------------------
+    protected boolean isReverseTableTarget(String tableDbName) {
+        return getDocumentProperties().isLoadDataReverseTableTarget(tableDbName);
     }
 
     // -----------------------------------------------------

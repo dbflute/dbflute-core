@@ -39,7 +39,6 @@ import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReade
 import org.dbflute.properties.assistant.document.tableorder.DfDocTableOrder;
 import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.DfCollectionUtil;
-import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -858,8 +857,8 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // -----------------------------------------------------
-    //                                     Table Except List
-    //                                     -----------------
+    //                              Table Except/Target List
+    //                              ------------------------
     protected List<String> _tableExceptList;
 
     @SuppressWarnings("unchecked")
@@ -882,13 +881,32 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return _tableExceptList;
     }
 
-    public boolean isLoadDataReverseTableTarget(String name) {
-        final List<String> targetList = DfCollectionUtil.emptyList();
-        return isTargetByHint(name, targetList, getLoadDataReverseTableExceptList());
+    protected List<String> _tableTargetList;
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getLoadDataReverseTableTargetList() { // for main schema
+        if (_tableTargetList != null) {
+            return _tableTargetList;
+        }
+        final Object tableTargetObj = getLoadDataReverseMap().get("tableTargetList"); // @since 1.3.0
+        if (tableTargetObj != null && !(tableTargetObj instanceof List<?>)) {
+            String msg = "loadDataReverseMap.tableTargetList should be list: " + tableTargetObj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        final List<String> tableTargetList;
+        if (tableTargetObj != null) {
+            tableTargetList = (List<String>) tableTargetObj;
+        } else {
+            tableTargetList = DfCollectionUtil.emptyList();
+        }
+        _tableTargetList = tableTargetList;
+        return _tableTargetList;
     }
 
-    public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
-        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    public boolean isLoadDataReverseTableTarget(String tableDbName) {
+        final List<String> tableTargetList = getLoadDataReverseTableTargetList();
+        final List<String> tableExceptList = getLoadDataReverseTableExceptList();
+        return isTargetByHint(tableDbName, tableTargetList, tableExceptList);
     }
 
     // -----------------------------------------------------
