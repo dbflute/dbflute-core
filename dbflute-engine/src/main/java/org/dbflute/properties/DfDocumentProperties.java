@@ -912,14 +912,53 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     // -----------------------------------------------------
     //                                     Additional Schema
     //                                     -----------------
-    public boolean isLoadDataReverseIncludeAdditionalSchema() { // since 1.2.9 (2025/04/27)
+    public boolean isLoadDataReverseIncludeAdditionalSchema() { // @since 1.2.9 (2025/04/27)
         return isProperty("isIncludeAdditionalSchema", false, getLoadDataReverseMap());
+    }
+
+    // -----------------------------------------------------
+    //                              Cursor Select Fetch Size
+    //                              ------------------------
+    public Integer getLoadDataReverseCursorSelectFetchSize() { // null allowed, @since 1.3.0
+        final String key = "cursorSelectFetchSize";
+        final String defaultValue = getLoadDataReverseDefaultCursorSelectFetchSize();
+        final String property = getProperty(key, defaultValue, getLoadDataReverseMap());
+        if (getBasicProperties().isDatabaseMySQL()) {
+            if (property != null && property.equals(DfLittleAdjustmentProperties.MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP)) {
+                return Integer.MIN_VALUE;
+            }
+        }
+        if (property != null) {
+            try {
+                return Integer.parseInt(property);
+            } catch (NumberFormatException e) {
+                String msg = "LoadDataReverse." + key + " should be Integer expression: property=" + property;
+                throw new DfIllegalPropertySettingException(msg, e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    protected String getLoadDataReverseDefaultCursorSelectFetchSize() { // copied from littleAdjustment
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // also MySQL is all data fetching, but MIN_VALUE has the adverse effect
+        // e.g. you cannot select in cursor callback when MIN_VALUE
+        // _/_/_/_/_/_/_/_/_/_/
+        if (prop.isDatabasePostgreSQL()) { // is all data fetching as default
+            defaultValue = "100";
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
     }
 
     // -----------------------------------------------------
     //                                      Framework Option
     //                                      ----------------
-    public boolean isLoadDataReverseFrameworkDebug() {
+    public boolean isLoadDataReverseFrameworkDebug() { // @since 1.3.0
         return isProperty("isFrameworkDebug", false, getLoadDataReverseMap());
     }
 
