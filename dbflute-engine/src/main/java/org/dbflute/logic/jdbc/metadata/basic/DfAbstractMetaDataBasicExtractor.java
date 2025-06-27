@@ -40,7 +40,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _suppressExceptTarget;
+    protected boolean _suppressExceptTarget; // for e.g. SchemaPolicyCheck, AlterCheck, SchemaSyncCheck
 
     /** The dictionary set of table name for real case name. (NullAllowed) */
     protected Map<String, String> _tableNameDictionaryMap;
@@ -103,7 +103,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public void suppressExceptTarget() {
+    public void suppressExceptTarget() { // independent from another angle
         _suppressExceptTarget = true;
     }
 

@@ -51,13 +51,13 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     /**
      * Retrieves an info of the columns composing the primary key for a given table.
      * @param metaData JDBC meta data. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableMeta The meta information of table. (NotNull)
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException When it fails to handle the SQL.
      */
-    public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
-        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
-        final String tableName = tableInfo.getTableName();
+    public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
+        final UnifiedSchema unifiedSchema = tableMeta.getUnifiedSchema();
+        final String tableName = tableMeta.getTableName();
         return getPrimaryKey(metaData, unifiedSchema, tableName);
     }
 

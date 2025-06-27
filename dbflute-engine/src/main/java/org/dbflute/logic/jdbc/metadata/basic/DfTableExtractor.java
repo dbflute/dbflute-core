@@ -44,6 +44,18 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
     private static final Logger _log = LoggerFactory.getLogger(DfTableExtractor.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The option to except tables as another angle, independent from basic except/target. (NullAllowed) */
+    protected DfAnotherAngleTableExceptor _anotherAngleTableExceptor; // for e.g. SchemaSyncCheck
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfTableExtractor() {
+    }
+
+    // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
     /**
@@ -173,14 +185,17 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
     /**
      * Is the table name out of sight?
      * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (NullAllowed)
-     * @param tableName The name of table. (NotNull)
+     * @param tableName The name of table from meta data. (NotNull)
      * @return The determination, true or false.
      */
-    public boolean isTableExcept(UnifiedSchema unifiedSchema, final String tableName) {
+    public boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName) {
         if (tableName == null) {
             throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
-        if (_suppressExceptTarget) {
+        if (determineExceptByAnotherAngle(unifiedSchema, tableName)) { // should be before suppressing
+            return true;
+        }
+        if (_suppressExceptTarget) { // should be after another angle
             return false;
         }
         final List<String> tableTargetList = getRealTableTargetList(unifiedSchema);
@@ -188,6 +203,19 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
         return !isTargetByHint(tableName, tableTargetList, tableExceptList);
     }
 
+    // -----------------------------------------------------
+    //                                         Another Angle
+    //                                         -------------
+    protected boolean determineExceptByAnotherAngle(UnifiedSchema unifiedSchema, String tableName) {
+        if (_anotherAngleTableExceptor == null) {
+            return false; // no except
+        }
+        return _anotherAngleTableExceptor.determineExcept(unifiedSchema, tableName);
+    }
+
+    // -----------------------------------------------------
+    //                                   Basic Except/Target
+    //                                   -------------------
     protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) { // extension point
         if (unifiedSchema != null) {
             final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
@@ -206,5 +234,22 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
             }
         }
         return getProperties().getDatabaseProperties().getTableTargetList();
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void enableAnotherAngleTableExceptor(DfAnotherAngleTableExceptor anotherAngleTableExceptor) {
+        _anotherAngleTableExceptor = anotherAngleTableExceptor;
+    }
+
+    public static interface DfAnotherAngleTableExceptor {
+
+        /**
+         * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (NullAllowed)
+         * @param tableName The name of table from meta data. (NotNull)
+         * @return true if the table is except.
+         */
+        boolean determineExcept(UnifiedSchema unifiedSchema, String tableName);
     }
 }

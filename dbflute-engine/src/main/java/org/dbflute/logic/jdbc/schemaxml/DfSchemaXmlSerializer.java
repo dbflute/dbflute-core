@@ -76,6 +76,7 @@ import org.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfIndexExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
+import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor.DfAnotherAngleTableExceptor;
 import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
@@ -275,12 +276,16 @@ public class DfSchemaXmlSerializer {
      * @param dataSource The data source of the database. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
      * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
+     * @param anotherAngleTableExceptor The table exceptor as another angle. (NullAllowed: but actually not null)
      * @return The new instance for the purpose. (NotNull)
      */
-    public static DfSchemaXmlSerializer createAsSchemaSync(DfSchemaSource dataSource, String schemaXml, String historyFile) {
+    public static DfSchemaXmlSerializer createAsSchemaSync(DfSchemaSource dataSource, String schemaXml, String historyFile,
+            DfAnotherAngleTableExceptor anotherAngleTableExceptor) {
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml // converting to factory
                 , historyFile != null ? () -> DfSchemaHistory.createAsMonolithic(historyFile) : null);
-        return serializer.suppressExceptTarget().suppressAdditionalSchema();
+        serializer.suppressExceptTarget().suppressAdditionalSchema();
+        serializer.enableAnotherAngleTableExcept(anotherAngleTableExceptor);
+        return serializer;
     }
 
     // -----------------------------------------------------
@@ -330,6 +335,10 @@ public class DfSchemaXmlSerializer {
     protected DfSchemaXmlSerializer keepDefinitionOrderAsPrevious() {
         _keepDefinitionOrderAsPrevious = true;
         return this;
+    }
+
+    protected void enableAnotherAngleTableExcept(DfAnotherAngleTableExceptor anotherAngleTableExceptor) {
+        _tableExtractor.enableAnotherAngleTableExceptor(anotherAngleTableExceptor); // null allowed
     }
 
     // ===================================================================================

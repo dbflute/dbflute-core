@@ -857,14 +857,14 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // -----------------------------------------------------
-    //                              Table Except/Target List
-    //                              ------------------------
-    protected List<String> _tableExceptList;
+    //                                   Table Except/Target
+    //                                   -------------------
+    protected List<String> _loadDataReverseTableExceptList;
 
     @SuppressWarnings("unchecked")
     protected List<String> getLoadDataReverseTableExceptList() { // for main schema
-        if (_tableExceptList != null) {
-            return _tableExceptList;
+        if (_loadDataReverseTableExceptList != null) {
+            return _loadDataReverseTableExceptList;
         }
         final Object tableExceptObj = getLoadDataReverseMap().get("tableExceptList");
         if (tableExceptObj != null && !(tableExceptObj instanceof List<?>)) {
@@ -877,16 +877,16 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         } else {
             tableExceptList = DfCollectionUtil.emptyList();
         }
-        _tableExceptList = tableExceptList;
-        return _tableExceptList;
+        _loadDataReverseTableExceptList = tableExceptList;
+        return _loadDataReverseTableExceptList;
     }
 
-    protected List<String> _tableTargetList;
+    protected List<String> _loadDataReverseTableTargetList;
 
     @SuppressWarnings("unchecked")
     protected List<String> getLoadDataReverseTableTargetList() { // for main schema
-        if (_tableTargetList != null) {
-            return _tableTargetList;
+        if (_loadDataReverseTableTargetList != null) {
+            return _loadDataReverseTableTargetList;
         }
         final Object tableTargetObj = getLoadDataReverseMap().get("tableTargetList"); // @since 1.3.0
         if (tableTargetObj != null && !(tableTargetObj instanceof List<?>)) {
@@ -899,8 +899,8 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         } else {
             tableTargetList = DfCollectionUtil.emptyList();
         }
-        _tableTargetList = tableTargetList;
-        return _tableTargetList;
+        _loadDataReverseTableTargetList = tableTargetList;
+        return _loadDataReverseTableTargetList;
     }
 
     public boolean isLoadDataReverseTableTarget(String tableDbName) {
@@ -996,10 +996,25 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
     }
 
+    // -----------------------------------------------------
+    //                                   SyncCheck CraftDiff
+    //                                   -------------------
     public boolean isSchemaSyncCheckSuppressCraftDiff() { // closet
         return isProperty("isSuppressCraftDiff", false, getSchemaSyncCheckMap());
     }
 
+    public String getSchemaSyncCheckCraftMetaDir() { // closet
+        if (!isCheckCraftDiff()) {
+            return null;
+        }
+        final String defaultDir = getDocumentOutputDirectory() + "/craftdiff";
+        final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
+        return Srl.replace(property, "$$DEFAULT$$", defaultDir);
+    }
+
+    // -----------------------------------------------------
+    //                                 SyncCheck Result File
+    //                                 ---------------------
     public String getSchemaSyncCheckResultFileName() { // closet
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
         final String fileName = schemaSyncCheckMap.get("resultHtmlFileName");
@@ -1014,13 +1029,36 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return outputDirectory + "/" + getSchemaSyncCheckResultFileName();
     }
 
-    public String getSchemaSyncCheckCraftMetaDir() { // closet
-        if (!isCheckCraftDiff()) {
-            return null;
+    // -----------------------------------------------------
+    //                                          Table Except
+    //                                          ------------
+    // except only here, because of coexistence with basic except/target
+    protected List<String> _schemaSyncCheckTableExceptList;
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getSchemaSyncCheckTableExceptList() {
+        if (_schemaSyncCheckTableExceptList != null) {
+            return _schemaSyncCheckTableExceptList;
         }
-        final String defaultDir = getDocumentOutputDirectory() + "/craftdiff";
-        final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
-        return Srl.replace(property, "$$DEFAULT$$", defaultDir);
+        final Object tableExceptObj = getSchemaSyncCheckMap().get("tableExceptList"); // @since 1.3.0
+        if (tableExceptObj != null && !(tableExceptObj instanceof List<?>)) {
+            String msg = "schemaSyncCheckMap.tableExceptList should be list: " + tableExceptObj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        final List<String> tableExceptList;
+        if (tableExceptObj != null) {
+            tableExceptList = (List<String>) tableExceptObj;
+        } else {
+            tableExceptList = DfCollectionUtil.emptyList();
+        }
+        _schemaSyncCheckTableExceptList = tableExceptList;
+        return _schemaSyncCheckTableExceptList;
+    }
+
+    public boolean isSchemaSyncCheckTableTarget(String tableName) {
+        final List<String> tableTargetList = DfCollectionUtil.emptyList();
+        final List<String> tableExceptList = getSchemaSyncCheckTableExceptList();
+        return isTargetByHint(tableName, tableTargetList, tableExceptList);
     }
 
     // ===================================================================================
