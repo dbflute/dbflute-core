@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
@@ -70,6 +71,11 @@ public class DfLReverseTableOrder {
     // ===================================================================================
     //                                                                      Analyzer Order
     //                                                                      ==============
+    /**
+     * @param tableList The list of analyzed target table. (NotNull)
+     * @param skippedTableList The list of already skipped table e.g. that is under common (NotNull)
+     * @return The list of list of table, order by FK order as possible. (NotNull)
+     */
     public List<List<Table>> analyzeOrder(List<Table> tableList, List<Table> skippedTableList) {
         if (_frameworkDebug) {
             _log.debug("#lrev_tableOrder ...Analyzing order: tables={}, skipped={}", tableList.size(), skippedTableList.size());
@@ -113,7 +119,7 @@ public class DfLReverseTableOrder {
             }
             if (beforeSize == afterSize) { // means it cannot analyze more
                 if (level == 1) { // level finished: next challenge, ignores additional foreign key
-                    ++level;
+                    ++level; // go to level 2
                 } else { // level 2 finished: however unregistered tables exist (cyclic?)
                     if (_frameworkDebug) {
                         final int sadlyCount = unregisteredTableList.size();
@@ -141,7 +147,7 @@ public class DfLReverseTableOrder {
      * @param tableList The list of table, which may be registered. (NotNull)
      * @param alreadyRegisteredSet The (pure) name set of already registered table. (NotNull)
      * @param outputOrderedList The ordered list of table for output. (NotNull)
-     * @param level The level to determine dependencies. (NotMinus)
+     * @param level The level to determine dependencies, changing judgement a little. (NotMinus)
      * @return The list of unregistered table. (NotNull)
      */
     protected List<Table> doAnalyzeOrder(List<Table> tableList, Set<String> alreadyRegisteredSet, List<List<Table>> outputOrderedList,
@@ -199,6 +205,7 @@ public class DfLReverseTableOrder {
 
         final List<Collection<Table>> recoveredTableListList = new ArrayList<>();
         int doCount = 0;
+        int level = 1;
         while (true) {
             if (remainedSadlyTableMap.isEmpty()) { // recovery done
                 if (_frameworkDebug) {
@@ -212,7 +219,7 @@ public class DfLReverseTableOrder {
             if (_frameworkDebug) {
                 _log.debug("#lrev_tableOrder ...Doing recover sadly: doCount={}, before={}", doCount, beforeSize);
             }
-            List<Table> recoveredTableList = doRecoverSadly(remainedSadlyTableMap);
+            List<Table> recoveredTableList = doRecoverSadly(remainedSadlyTableMap, level);
 
             recoveredTableListList.add(recoveredTableList);
             ++doCount;
@@ -222,11 +229,15 @@ public class DfLReverseTableOrder {
             }
 
             if (beforeSize == afterSize) { // no change
-                if (_frameworkDebug) {
-                    _log.debug("#lrev_tableOrder sadly recovery: doCount={}, remained={}", doCount, remainedSadlyTableMap.size());
+                if (level == 1) {
+                    ++level; // go to level 2
+                } else { // level 2 finished: cannot do anything?
+                    if (_frameworkDebug) {
+                        _log.debug("#lrev_tableOrder sadly recovery: doCount={}, remained={}", doCount, remainedSadlyTableMap.size());
+                    }
+                    recoveredTableListList.add(remainedSadlyTableMap.values()); // only cyclic?
+                    break; // sadly end
                 }
-                recoveredTableListList.add(remainedSadlyTableMap.values()); // only cyclic?
-                break; // sadly end
             }
         }
 
@@ -237,7 +248,12 @@ public class DfLReverseTableOrder {
         return recoveredTableListList.stream().flatMap(ls -> ls.stream()).collect(Collectors.toList());
     }
 
-    protected List<Table> doRecoverSadly(Map<String, Table> remainedSadlyTableMap) {
+    /**
+     * @param remainedSadlyTableMap The map of only sadly (unregistered) tables, keyed by table name. (NotNull)
+     * @param level The level to determine dependencies, changing judgement a little. (NotMinus)
+     * @return The list of recovered table, removed from sadly map. (NotNull)
+     */
+    protected List<Table> doRecoverSadly(Map<String, Table> remainedSadlyTableMap, int level) {
         final List<Table> recoveredTableList = new ArrayList<>();
         final List<Table> sadlyTableList = new ArrayList<>(remainedSadlyTableMap.values());
         for (Table sadlyTable : sadlyTableList) {
@@ -246,6 +262,12 @@ public class DfLReverseTableOrder {
             final List<ForeignKey> referrerList = sadlyTable.getReferrerList();
             boolean referredByOtherSadlyTable = false;
             for (ForeignKey referrer : referrerList) {
+                if (level >= 2) {
+                    List<Column> localColumnList = referrer.getLocalColumnList(); // referrer's columns
+                    if (localColumnList.stream().anyMatch(col -> !col.isNotNull())) { // has null-allowed FK
+                        continue; // determines by only not-null FK
+                    }
+                }
                 final String referrerTableName = referrer.getTable().getName(); // pure name here
                 if (tableName.equals(referrerTableName)) { // self reference
                     continue; // not related to order determination
