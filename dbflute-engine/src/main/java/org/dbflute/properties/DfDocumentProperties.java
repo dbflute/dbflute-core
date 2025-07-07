@@ -140,28 +140,38 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (isAliasHandling(comment)) {
             if (hasAliasDelimiter(comment)) {
                 final String delimiter = getAliasDelimiterInDbComment();
-                return comment.substring(0, comment.indexOf(delimiter)).trim();
-            } else {
+                final String candidateAlias = comment.substring(0, comment.indexOf(delimiter)).trim();
+                if (isDbCommentNumberAliasTreatedAsDescription()) {
+                    try {
+                        Integer.parseInt(candidateAlias);
+                        // maybe number classification description e.g. 1:formalized, 2:provisional, ...
+                        return null; // the candidate alias cannot be treated as alias
+                    } catch (NumberFormatException ignored) {
+                        return candidateAlias; // no problem
+                    }
+                } else { // mainly here
+                    return candidateAlias;
+                }
+            } else { // no delimiter
                 if (isDbCommentOnAliasBasis()) {
-                    // because the comment is for alias
-                    return comment != null ? comment.trim() : null;
+                    return comment != null ? comment.trim() : null; // because the comment is for alias
                 }
             }
         }
-        // alias does not exist everywhere
-        // if alias handling is not valid
-        return null;
+        return null; // alias does not exist everywhere if alias handling is not valid
     }
 
     public String extractDescriptionFromDbComment(String comment) { // comment is trimmed
         if (isAliasHandling(comment)) {
             if (hasAliasDelimiter(comment)) {
-                final String delimiter = getAliasDelimiterInDbComment();
-                return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
+                final String aliasFromDbComment = extractAliasFromDbComment(comment);
+                if (aliasFromDbComment != null) { // also comment is not null
+                    final String delimiter = getAliasDelimiterInDbComment();
+                    return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
+                }
             } else {
                 if (isDbCommentOnAliasBasis()) {
-                    // because the comment is for alias
-                    return null;
+                    return null; // because the comment is for alias
                 }
             }
         }
@@ -184,10 +194,15 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isDbCommentOnAliasBasis", false, getDocumentMap());
     }
 
+    public boolean isDbCommentNumberAliasTreatedAsDescription() { // @since 1.3.0
+        // #for_now jflute not used on Sql2Entity for now, too complex (2025/07/07)
+        return isProperty("isDbCommentNumberAliasTreatedAsDescription", false, getDocumentMap());
+    }
+
     // ===================================================================================
     //                                                            Entity JavaDoc DbComment
     //                                                            ========================
-    public boolean isEntityJavaDocDbCommentValid() { // default true since 1.0.4D
+    public boolean isEntityJavaDocDbCommentValid() { // default true @since 1.0.4D
         return isProperty("isEntityJavaDocDbCommentValid", true, getDocumentMap());
     }
 
