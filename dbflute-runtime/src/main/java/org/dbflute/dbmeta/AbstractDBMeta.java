@@ -44,6 +44,9 @@ import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.info.structural.referrer.StructuralReferrerAsManyInfo;
+import org.dbflute.dbmeta.info.structural.referrer.StructuralReferrerAsOneInfo;
+import org.dbflute.dbmeta.info.structural.referrer.StructuralReferrerInfo;
 import org.dbflute.dbmeta.property.DelegatingPropertyGateway;
 import org.dbflute.dbmeta.property.PropertyGateway;
 import org.dbflute.dbmeta.property.PropertyMethodFinder;
@@ -93,6 +96,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     private volatile Map<Integer, ForeignInfo> _foreignInfoRelationNoKeyMap;
     private volatile List<ReferrerInfo> _referrerInfoList;
     private volatile Map<String, ReferrerInfo> _referrerInfoFlexibleMap;
+    private volatile List<StructuralReferrerInfo> _structuralReferrerInfoList;
 
     // ===================================================================================
     //                                                             Resource Initialization
@@ -790,6 +794,31 @@ public abstract class AbstractDBMeta implements DBMeta {
         return doSearchMetaInfoList(columnInfoList, getReferrerInfoList(), info -> {
             return info.getLocalReferrerColumnInfoMap().keySet();
         });
+    }
+
+    /** {@inheritDoc} */
+    public List<StructuralReferrerInfo> getStructuralReferrerInfoList() {
+        if (_structuralReferrerInfoList != null) {
+            return _structuralReferrerInfoList;
+        }
+        synchronized (this) {
+            if (_structuralReferrerInfoList != null) {
+                return _structuralReferrerInfoList;
+            }
+            final List<StructuralReferrerInfo> structuralReferrerInfoList = new ArrayList<>();
+            final List<ReferrerInfo> referrerInfoList = getReferrerInfoList();
+            for (ReferrerInfo referrerInfo : referrerInfoList) {
+                structuralReferrerInfoList.add(new StructuralReferrerAsManyInfo(referrerInfo));
+            }
+            final List<ForeignInfo> foreignInfoList = getForeignInfoList();
+            for (ForeignInfo foreignInfo : foreignInfoList) {
+                if (foreignInfo.isReferrerAsOne()) {
+                    structuralReferrerInfoList.add(new StructuralReferrerAsOneInfo(foreignInfo));
+                }
+            }
+            _structuralReferrerInfoList = Collections.unmodifiableList(structuralReferrerInfoList);
+            return _structuralReferrerInfoList;
+        }
     }
 
     // -----------------------------------------------------

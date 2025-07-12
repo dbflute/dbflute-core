@@ -1290,12 +1290,12 @@ public class ForeignKey implements Constraint {
             _oneToOne = false;
             final List<Column> localColumnList = getLocalColumnList();
             final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
-            if (localColumnList.equals(localPrimaryColumnList)) {
+            if (localColumnList.equals(localPrimaryColumnList)) { // PK FK
                 _oneToOne = true;
             } else {
                 final List<Unique> uniqueList = getTable().getUniqueList();
                 for (final Unique unique : uniqueList) {
-                    if (unique.hasSameColumnSet(localColumnList)) {
+                    if (unique.hasSameColumnSet(localColumnList)) { // UQ FK
                         _oneToOne = true;
                     }
                 }

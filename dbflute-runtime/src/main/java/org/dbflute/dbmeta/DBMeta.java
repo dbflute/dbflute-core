@@ -26,6 +26,7 @@ import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.info.structural.referrer.StructuralReferrerInfo;
 import org.dbflute.dbmeta.name.TableSqlName;
 import org.dbflute.dbmeta.property.PropertyGateway;
 import org.dbflute.dbway.DBDef;
@@ -279,22 +280,28 @@ public interface DBMeta {
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ by jflute (2025/07/12)
+    // (select-logical) referrer: one-to-many referrer
+    // structural referrer: one-to-many + one-to-one referrer
+    // _/_/_/_/_/_/_/_/_/_/
     /**
-     * Does this table have the corresponding referrer relation?
+     * Does this table have the corresponding (select-logical) referrer relation? <br>
+     * The "select-logical referrer" means one-to-many referrers only. <br>
+     * Not containing one-to-one referrers, which can be joined as one.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return The determination, true or false. (NotNull)
      */
     boolean hasReferrer(String referrerPropertyName);
 
     /**
-     * Find the DB meta of referrer relation.
+     * Find the DB meta of (select-logical) referrer relation.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return The DB meta of referrer relation. (NotNull)
      */
     DBMeta findReferrerDBMeta(String referrerPropertyName);
 
     /**
-     * Find the information of referrer relation.
+     * Find the information of (select-logical) referrer relation.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return The information object of referrer relation. (NotNull)
      * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding referrer info is not found.
@@ -302,20 +309,29 @@ public interface DBMeta {
     ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
     /**
-     * Get the read-only list of referrer info. <br>
-     * Not containing one-to-one relations, one-to-many referrers only here. <br>
-     * You can get one-to-one relations as foreign info instead.
+     * Get the read-only list of (select-logical) referrer info. <br>
+     * The "select-logical referrer" means one-to-many referrers only. <br>
+     * So not containing one-to-one referrers, one-to-many referrers only here. <br>
+     * You can get one-to-one relations by getForeignInfoList() instead.
      * @return The read-only list of referrer info. (NotNull)
      */
     List<ReferrerInfo> getReferrerInfoList();
 
     /**
-     * Search referrer info by the specified columns. <br>
+     * Search (select-logical) referrer info by the specified columns. <br>
      * It returns the found info if the specified columns contain all referrer columns.
      * @param columnInfoList The list of column info as search key. (NotNull)
      * @return The read-only list of the found referrer info. (NotNull, EmptyAllowed: when not found)
      */
     List<ReferrerInfo> searchReferrerInfoList(Collection<ColumnInfo> columnInfoList);
+
+    /**
+     * Get the read-only list of structural referrer. <br>
+     * The "structural referrer" means one-to-many + one-to-one referrers. <br>
+     * For example, MEMBER's dbmeta returns PURCHASE, MEMBER_SECURITY, etc.
+     * @return The read-only list of referrer info. (NotNull)
+     */
+    List<StructuralReferrerInfo> getStructuralReferrerInfoList();
 
     // ===================================================================================
     //                                                                       Identity Info
