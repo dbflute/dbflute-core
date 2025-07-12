@@ -83,7 +83,8 @@ public interface RelationInfo {
     boolean isOneToOne();
 
     /**
-     * Does the relation is referrer?
+     * Does the relation is referrer? <br>
+     * one-to-one relations are not treated as referrer so false.
      * @return The determination, true or false.
      */
     boolean isReferrer();
@@ -95,7 +96,8 @@ public interface RelationInfo {
     boolean isCompoundKey();
 
     /**
-     * Get the relation info of reverse relation.
+     * Get the relation info of reverse relation. <br>
+     * e.g. MEMBER's purchaseList (referrer) has PURCHASE's member (foreign) as reverse.
      * @return The instance of relation info. (NullAllowed: if null, means one-way reference)
      */
     RelationInfo getReverseRelation();

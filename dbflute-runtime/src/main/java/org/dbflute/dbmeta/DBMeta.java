@@ -262,7 +262,8 @@ public interface DBMeta {
     ForeignInfo findForeignInfo(int relationNo);
 
     /**
-     * Get the read-only list of foreign info.
+     * Get the read-only list of foreign info. <br>
+     * Also containing one-to-one relations as foreign.
      * @return The read-only list of foreign info. (NotNull)
      */
     List<ForeignInfo> getForeignInfoList();
@@ -301,7 +302,9 @@ public interface DBMeta {
     ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
     /**
-     * Get the read-only list of referrer info.
+     * Get the read-only list of referrer info. <br>
+     * Not containing one-to-one relations, one-to-many referrers only here. <br>
+     * You can get one-to-one relations as foreign info instead.
      * @return The read-only list of referrer info. (NotNull)
      */
     List<ReferrerInfo> getReferrerInfoList();
