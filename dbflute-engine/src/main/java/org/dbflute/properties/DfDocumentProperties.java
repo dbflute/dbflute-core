@@ -34,6 +34,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReader;
 import org.dbflute.properties.assistant.document.tableorder.DfDocTableOrder;
@@ -886,11 +887,16 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
             String msg = "loadDataReverseMap.tableExceptList should be list: " + tableExceptObj;
             throw new DfIllegalPropertyTypeException(msg);
         }
-        final List<String> tableExceptList;
+        List<String> tableExceptList;
         if (tableExceptObj != null) {
             tableExceptList = (List<String>) tableExceptObj;
         } else {
             tableExceptList = DfCollectionUtil.emptyList();
+        }
+        if (isLoadDataReverseExceptDeprecatedTable()) {
+            final List<String> mutableList = new ArrayList<>(tableExceptList);
+            mutableList.addAll(getDeprecatedTableMap().keySet());
+            tableExceptList = mutableList;
         }
         _loadDataReverseTableExceptList = tableExceptList;
         return _loadDataReverseTableExceptList;
@@ -922,6 +928,10 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         final List<String> tableTargetList = getLoadDataReverseTableTargetList();
         final List<String> tableExceptList = getLoadDataReverseTableExceptList();
         return isTargetByHint(tableDbName, tableTargetList, tableExceptList);
+    }
+
+    public boolean isLoadDataReverseExceptDeprecatedTable() { // @since 1.3.0 (2025/07/14)
+        return isProperty("isExceptDeprecatedTable", false, getLoadDataReverseMap());
     }
 
     // -----------------------------------------------------
@@ -1393,6 +1403,73 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected String getPropertiesHtmlJavaScript() { // closet
         return getPropertiesHtmlHeaderJavaScript();
+    }
+
+    // ===================================================================================
+    //                                                                    Deprecated Table
+    //                                                                    ================
+    protected Map<String, Object> _deprecatedTableMap;
+
+    // e.g.
+    //  ; deprecatedTableMap = map:{
+    //      ; DEP_MEMBER = map:{ comment = ... }
+    //      ; DEP_PURCHASE = map:{ comment = ... }
+    //  }
+    protected Map<String, Object> getDeprecatedTableMap() { // closet, @since 1.3.0
+        if (_deprecatedTableMap != null) {
+            return _deprecatedTableMap;
+        }
+        final String key = "deprecatedTableMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>) getDocumentMap().get(key);
+        if (map != null) {
+            _deprecatedTableMap = StringKeyMap.createAsFlexibleOrdered(); // for table name
+            _deprecatedTableMap.putAll(map);
+        } else {
+            _deprecatedTableMap = DfCollectionUtil.emptyMap();
+        }
+        return _deprecatedTableMap;
+    }
+
+    public boolean isDeprecatedTable(String tableFlexibleName) {
+        return getDeprecatedTableMap().containsKey(tableFlexibleName);
+    }
+
+    public String getDeprecatedTableReasonComment(String tableFlexibleName) {
+        if (!isDeprecatedTable(tableFlexibleName)) { // no way, programming mistake
+            String msg = "This should be called after isDeprecatedTable(): " + tableFlexibleName;
+            throw new IllegalStateException(msg);
+        }
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> optionMap = (Map<String, Object>) getDeprecatedTableMap().get(tableFlexibleName);
+        if (optionMap != null) {
+            final String comment = (String) optionMap.get("comment");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+                return comment;
+            } else {
+                String msg = "The reason comment of deprecated table is required: " + tableFlexibleName;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        } else {
+            String msg = "This should be called after isDeprecatedTable(): " + tableFlexibleName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    public String getDeprecatedTableTagPrefixForSchemaHtml() {
+        return "<del class=\"deprecatedtable\">";
+    }
+
+    public String getDeprecatedTableTagSuffixForSchemaHtml() {
+        return "</del>";
+    }
+
+    public String getDeprecatedTableRelationTagPrefixForSchemaHtml() {
+        return "<del class=\"deprecatedtablerelation\">";
+    }
+
+    public String getDeprecatedTableRelationTagSuffixForSchemaHtml() {
+        return "</del>";
     }
 
     // ===================================================================================

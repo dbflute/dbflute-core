@@ -236,6 +236,13 @@ td {
 .commentdesc {
 	color: #3F7E5E;
 }
+.deprecatedtable {
+	color: #8F06F4;
+	font-size: 0.8em;
+}
+.deprecatedtablerelation {
+	color: #8F06F4;
+}
 
 /* inner table */
 table.child {
@@ -671,7 +678,9 @@ ${database.schemaDescription}
 #if ($needsTableAliasItem)
 		<td class="aliascell">${table.alias}</td>
 #end
-		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
+#set ($deprecatedTablePrefix = $table.deprecatedTableTagPrefixForSchemaHtml)
+#set ($deprecatedTableSuffix = $table.deprecatedTableTagSuffixForSchemaHtml)
+		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${deprecatedTablePrefix}${table.tableDispName}${deprecatedTableSuffix}</a></td>
 		<td class="typecell">${table.type}</td>
 #if ($hasAdditionalSchema)
 		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>

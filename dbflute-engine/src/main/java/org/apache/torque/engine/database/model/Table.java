@@ -624,7 +624,17 @@ public class Table {
             plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(getPlainComment());
         }
         final String unified = dbcommentProp.unifyTablePlainDescription(tableDbName, plainDescprition);
-        return unified != null ? unified : "";
+        String wholeComment = unified != null ? unified : "";
+        if (isDeprecatedTable()) {
+            final String deprecatedComment = getDeprecatedTableReasonComment();
+            final String deprecatedMark = "#deprecated"; // not @ to avoid javadoc effect
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(wholeComment)) {
+                wholeComment = wholeComment + "\n" + deprecatedMark + " " + deprecatedComment;
+            } else {
+                wholeComment = deprecatedMark + " " + deprecatedComment;
+            }
+        }
+        return wholeComment;
     }
 
     public String getCommentForSchemaHtml() {
@@ -694,6 +704,9 @@ public class Table {
         sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
         sb.append(", nameLength=").append(getTableDbName().length());
         sb.append(", columnCount=").append(getColumns().length);
+        if (isDeprecatedTable()) {
+            sb.append(", @deprecated reason=").append(getDeprecatedTableReasonComment());
+        }
         final DfDocumentProperties prop = getDocumentProperties();
         return " title=\"" + prop.resolveSchemaHtmlTagAttr(sb.toString()) + "\"";
     }
@@ -2785,6 +2798,54 @@ public class Table {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                    Deprecated Table
+    //                                                                    ================
+    public boolean isDeprecatedTable() {
+        return getDocumentProperties().isDeprecatedTable(getTableDbName());
+    }
+
+    // -----------------------------------------------------
+    //                                        Reason Comment
+    //                                        --------------
+    public String getDeprecatedTableReasonComment() { // null allowed
+        if (isDeprecatedTable()) {
+            final DfDocumentProperties prop = getDocumentProperties();
+            return prop.getDeprecatedTableReasonComment(getTableDbName()); // not null
+        } else { // normally here
+            return null;
+        }
+    }
+
+    public String getDeprecatedTableReasonCommentForSchemaHtml() {
+        final String comment = getDeprecatedTableReasonComment();
+        final DfDocumentProperties prop = getDocumentProperties();
+        return comment != null ? prop.resolveSchemaHtmlContent(comment) : "";
+    }
+
+    // -----------------------------------------------------
+    //                                     Tag Prefix/Suffix
+    //                                     -----------------
+    public String getDeprecatedTableTagPrefixForSchemaHtml() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        return isDeprecatedTable() ? prop.getDeprecatedTableTagPrefixForSchemaHtml() : "";
+    }
+
+    public String getDeprecatedTableTagSuffixForSchemaHtml() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        return isDeprecatedTable() ? prop.getDeprecatedTableTagSuffixForSchemaHtml() : "";
+    }
+
+    public String getDeprecatedTableRelationTagPrefixForSchemaHtml() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        return isDeprecatedTable() ? prop.getDeprecatedTableRelationTagPrefixForSchemaHtml() : "";
+    }
+
+    public String getDeprecatedTableRelationTagSuffixForSchemaHtml() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        return isDeprecatedTable() ? prop.getDeprecatedTableRelationTagSuffixForSchemaHtml() : "";
     }
 
     // ===================================================================================
