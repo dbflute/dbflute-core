@@ -81,14 +81,49 @@ public class DfSplittingDfpropHandler {
         return rootKey.equalsIgnoreCase("$$split$$");
     }
 
+    // -----------------------------------------------------
+    //                                      Split Definition
+    //                                      ----------------
     protected Map<String, Object> handleSplitDefinition(String mapName, String rootKey, Map<?, ?> splitMap) {
         final Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+
+        final boolean isUseSubDirectory;
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> headerMap = (Map<String, Object>) splitMap.get("df:header");
+        if (headerMap != null) {
+            isUseSubDirectory = determineUseSubDirectory(headerMap);
+        } else {
+            isUseSubDirectory = false; // as default
+        }
+
         @SuppressWarnings("unchecked")
         final Set<String> keywordSet = (Set<String>) splitMap.keySet();
         for (String keyword : keywordSet) {
-            final Map<String, Object> splitProp = _propertyValueHandler.getOutsideMapProp(mapName + "_" + keyword);
+            if ("df:header".equals(keyword)) {
+                continue; // already resolved
+            }
+            final String mapKey = mapName + "_" + keyword;
+            final Map<String, Object> splitProp;
+            if (isUseSubDirectory) {
+                // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+                // e.g. sub-directory style
+                //  dfprop
+                //   |- _dfsplit
+                //   |    |- additionalForeignKeyMap_sea.dfprop
+                //   |    |- additionalForeignKeyMap_land.dfprop
+                //   |
+                //   |- additionalForeignKeyMap.dfprop
+                //
+                // so the the word cannot be used as ENVIRONMENT_TYPE (maybe no problem) 
+                // _/_/_/_/_/_/_/_/_/_/
+                final String middleDir = "_dfsplit"; // fixed reserved directory
+                splitProp = _propertyValueHandler.getOutsideMapProp(mapKey, middleDir);
+            } else { // flat style
+                // e.g. ./dfprop/additionalForeignKeyMap_sea.dfprop
+                splitProp = _propertyValueHandler.getOutsideMapProp(mapKey);
+            }
             if (splitProp.isEmpty()) {
-                throwClassificationSplitDefinitionNotFoundException(mapName, keyword);
+                throwClassificationSplitDefinitionNotFoundException(mapName, keyword, isUseSubDirectory);
             }
             for (Entry<String, Object> entry : splitProp.entrySet()) {
                 final String elementName = entry.getKey();
@@ -101,7 +136,14 @@ public class DfSplittingDfpropHandler {
         return resultMap;
     }
 
-    protected void throwClassificationSplitDefinitionNotFoundException(String mapName, String keyword) {
+    protected boolean determineUseSubDirectory(final Map<String, Object> headerMap) {
+        return _propertyValueHandler.isProperty("isUseSubDirectory", false, headerMap);
+    }
+
+    // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
+    protected void throwClassificationSplitDefinitionNotFoundException(String mapName, String keyword, boolean isUseSubDirectory) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the split definition of DBFlute property.");
         br.addItem("Advice");
@@ -110,13 +152,23 @@ public class DfSplittingDfpropHandler {
         br.addElement("");
         br.addElement("For example:");
         br.addElement("    $$split$$ = map:{");
+        if (isUseSubDirectory) {
+            br.addElement("        ; df:header = map:{");
+            br.addElement("            ; isUseSubDirectory = true");
+            br.addElement("        }");
+        }
         br.addElement("        ; land = dummy");
         br.addElement("        ; sea  = dummy");
         br.addElement("    }");
         br.addElement("");
         br.addElement("The following files should exist:");
-        br.addElement("    dfprop/" + mapName + "_land.dfprop");
-        br.addElement("    dfprop/" + mapName + "_sea.dfprop");
+        if (isUseSubDirectory) {
+            br.addElement("    dfprop/_dfsplit/" + mapName + "_land.dfprop");
+            br.addElement("    dfprop/_dfsplit/" + mapName + "_sea.dfprop");
+        } else {
+            br.addElement("    dfprop/" + mapName + "_land.dfprop");
+            br.addElement("    dfprop/" + mapName + "_sea.dfprop");
+        }
         br.addItem("DBFlute Property");
         br.addElement(mapName);
         br.addItem("Split Keyword");
