@@ -320,11 +320,8 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                               Table
-    //                                                                               =====
-    // -----------------------------------------------------
-    //                                            Table Name
-    //                                            ----------
+    //                                                           Table Basic :: Table Name
+    //                                                           =========================
     /**
      * Get the pure name of the table, no prefix even if schema-driven. <br>
      * You cannot use for identity, instead you should use {@link #getTableDbName()}. <br>
@@ -403,9 +400,9 @@ public class Table {
         _existsSameSchemaSameNameTable = true;
     }
 
-    // -----------------------------------------------------
-    //                                              SQL Name
-    //                                              --------
+    // ===================================================================================
+    //                                                             Table Basic :: SQL Name
+    //                                                             =======================
     /**
      * Get the SQL name of the table, which is used in your SQL after generated world. (for templates) <br>
      * This might be quoted with fitting to template or has its schema prefix.
@@ -455,9 +452,9 @@ public class Table {
         return prop.quoteTableNameIfNeedsDirectUse(tableName);
     }
 
-    // -----------------------------------------------------
-    //                                               HTML ID
-    //                                               -------
+    // ===================================================================================
+    //                                                              Table Basic :: HTML ID
+    //                                                              ======================
     /**
      * Get the value for HTML (SchemaHTML) ID attribute of the table.
      * @return The table ID for SchemaHTML. (NotNull)
@@ -466,9 +463,9 @@ public class Table {
         return Srl.replace(getTableDbName().toLowerCase(), ".", "_");
     }
 
-    // -----------------------------------------------------
-    //                                           Custom Name
-    //                                           -----------
+    // ===================================================================================
+    //                                                          Table Basic :: Custom Name
+    //                                                          ==========================
     /**
      * Get the table name for annotation. (for S2Dao, DBFlute.NET only)
      * @return The table name for annotation. (NotNull)
@@ -477,16 +474,14 @@ public class Table {
         return getTableSqlName();
     }
 
+    // ===================================================================================
+    //                                                           Table Basic :: Alias Name
+    //                                                           =========================
     // -----------------------------------------------------
-    //                                            Alias Name
-    //                                            ----------
+    //                                        Prepared Alias
+    //                                        --------------
     public boolean hasAlias() {
         final String alias = getAlias();
-        return alias != null && alias.trim().length() > 0;
-    }
-
-    public boolean hasAliasForSchemaHtml() { // however unused? but logically needed
-        final String alias = getAliasForSchemaHtml();
         return alias != null && alias.trim().length() > 0;
     }
 
@@ -507,18 +502,43 @@ public class Table {
         return _cachedTableFacadeAlias;
     }
 
+    public String getAliasExpression() { // for expression '(alias)name'
+        return buildAliasExpression(getAlias());
+    }
+
+    // -----------------------------------------------------
+    //                                  Alias for SchemaHTML
+    //                                  --------------------
+    public boolean hasAliasForSchemaHtml() { // however unused? but logically needed
+        final String alias = getAliasForSchemaHtml();
+        return alias != null && alias.trim().length() > 0;
+    }
+
     public String getAliasForSchemaHtml() {
         if (_cachedTableSchemaHtmlAlias != null) {
             return _cachedTableSchemaHtmlAlias;
         }
-        // #for_now jflute until SchemaHTML dfalias:{} support? (2025/07/21)
-        //final String originalAlias = buildMetadataAlias();
-        final String source = buildFacadeAlias();
+        final String source = prepareSchemaHtmlUnresolvedAlias();
         final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
         _cachedTableSchemaHtmlAlias = resolved != null ? resolved : "";
         return _cachedTableSchemaHtmlAlias;
     }
 
+    public String getAliasExpressionForSchemaHtml() {
+        final String source = buildAliasExpression(prepareSchemaHtmlUnresolvedAlias());
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        return resolved != null ? resolved : "";
+    }
+
+    protected String prepareSchemaHtmlUnresolvedAlias() {
+        // #for_now jflute until SchemaHTML dfalias:{} support? (2025/07/21)
+        //final String originalAlias = buildMetadataAlias();
+        return buildFacadeAlias();
+    }
+
+    // -----------------------------------------------------
+    //                                           Build Alias
+    //                                           -----------
     protected String buildFacadeAlias() { // null allowed
         final String aliasOnDecomment = findAliasOnDecomment(); // @since 1.3.0
         if (Srl.is_NotNull_and_NotTrimmedEmpty(aliasOnDecomment)) {
@@ -534,8 +554,13 @@ public class Table {
         return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
     }
 
-    public String getAliasExpression() { // for expression '(alias)name'
-        final String alias = getAlias();
+    protected String findAliasOnDecomment() { // null allowed
+        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
+        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
+        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
+    }
+
+    protected String buildAliasExpression(String alias) {
         if (alias == null || alias.trim().length() == 0) {
             return "";
         } else {
@@ -543,27 +568,18 @@ public class Table {
         }
     }
 
-    public String getAliasExpressionForSchemaHtml() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        String alias = prop.resolveSchemaHtmlContent(getAliasExpression());
-        return alias != null ? alias : "";
-    }
-
+    // -----------------------------------------------------
+    //                                          Alias Option
+    //                                          ------------
     // used in e.g. SchemaHTML template for alias item display determination
     public boolean needsColumnAliasItem() { // e.g. may be dfprop alias only
         final boolean aliasDelimiterInDbCommentValid = getDocumentProperties().isAliasDelimiterInDbCommentValid();
         return aliasDelimiterInDbCommentValid || getColumnList().stream().anyMatch(column -> column.hasAlias());
     }
 
-    protected String findAliasOnDecomment() { // null allowed
-        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
-        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
-        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
-    }
-
-    // -----------------------------------------------------
-    //                                            Table Type
-    //                                            ----------
+    // ===================================================================================
+    //                                                           Table Basic :: Table Type
+    //                                                           =========================
     /**
      * Get the type of the Table
      */
@@ -586,9 +602,9 @@ public class Table {
         return _type != null && _type.equalsIgnoreCase("view");
     }
 
-    // -----------------------------------------------------
-    //                                          Table Schema
-    //                                          ------------
+    // ===================================================================================
+    //                                                         Table Basic :: Table Schema
+    //                                                         ===========================
     public UnifiedSchema getUnifiedSchema() {
         return _unifiedSchema;
     }
@@ -632,13 +648,16 @@ public class Table {
         return hasSchema() && getUnifiedSchema().isCatalogAdditionalSchema();
     }
 
-    // -----------------------------------------------------
-    //                                         Table Comment
-    //                                         -------------
+    // ===================================================================================
+    //                                                        Table Basic :: Table Comment
+    //                                                        ============================
     // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // basically comment means description here
     // (without alias part)
     // _/_/_/_/_/_/_/_/_/_/
+    // -----------------------------------------------------
+    //                                         Plain Comment
+    //                                         -------------
     public String getPlainComment() { // may contain its alias name
         return _plainComment;
     }
@@ -651,6 +670,9 @@ public class Table {
         _cachedTableSchemaHtmlComment = null; // me too
     }
 
+    // -----------------------------------------------------
+    //                                      Prepared Comment
+    //                                      ----------------
     public boolean hasComment() { // means resolved comment (not plain)
         final String comment = getComment();
         return comment != null && comment.trim().length() > 0;
@@ -669,6 +691,9 @@ public class Table {
         return _cachedTableFacadeComment;
     }
 
+    // -----------------------------------------------------
+    //                                Comment for SchemaHTML
+    //                                ----------------------
     public String getCommentForSchemaHtml() { // without decomment
         final String source = prepareSchemaHtmlUnresolvedComment();
         final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
@@ -692,6 +717,9 @@ public class Table {
         return _cachedTableSchemaHtmlComment;
     }
 
+    // -----------------------------------------------------
+    //                                   Comment for JavaDoc
+    //                                   -------------------
     public boolean isCommentForJavaDocValid() {
         return hasComment() && getDocumentProperties().isEntityJavaDocDbCommentValid();
     }
@@ -701,6 +729,9 @@ public class Table {
         return comment != null ? comment : "";
     }
 
+    // -----------------------------------------------------
+    //                                    Comment for DBMeta
+    //                                    ------------------
     public boolean isCommentForDBMetaValid() {
         return hasComment() && getDocumentProperties().isEntityDBMetaDbCommentValid();
     }
@@ -710,6 +741,9 @@ public class Table {
         return comment != null ? comment : "";
     }
 
+    // -----------------------------------------------------
+    //                                     Build Description
+    //                                     -----------------
     protected String buildFacadeDescription() {
         final String decommentDescription = findDescriptionOnDecomment();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(decommentDescription)) {
@@ -746,6 +780,9 @@ public class Table {
         return handler.findDecommentTableDescription(getTableDbName());
     }
 
+    // -----------------------------------------------------
+    //                                    Deprecated Comment
+    //                                    ------------------
     protected String filterDeprecatedComment(String wholeComment) {
         if (isDeprecatedTable()) {
             final String deprecatedComment = getDeprecatedTableReasonComment();
@@ -760,13 +797,16 @@ public class Table {
         return wholeComment;
     }
 
+    // -----------------------------------------------------
+    //                                 JavaDoc Determination
+    //                                 ---------------------
     public boolean isGenerateTableDetailJavaDoc() {
         return getLittleAdjustmentProperties().isGenerateTableDetailJavaDoc();
     }
 
-    // -----------------------------------------------------
-    //                                               Display
-    //                                               -------
+    // ===================================================================================
+    //                                                              Table Basic :: Display
+    //                                                              ======================
     public String getTableDispName() {
         if (isSql2EntityCustomize()) { // Sql2Entity is on the camel case basis
             return getTableDbName();
@@ -4447,7 +4487,7 @@ public class Table {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(title)) {
             final DfDocumentProperties prop = getDocumentProperties();
             title = prop.resolveSchemaHtmlContent(title);
-            return "(" + title + ")";
+            return buildAliasExpression(title);
         } else {
             return "&nbsp;";
         }
