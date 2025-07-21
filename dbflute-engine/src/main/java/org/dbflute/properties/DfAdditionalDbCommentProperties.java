@@ -178,7 +178,8 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
         if (componentMap == null) {
             return null;
         }
-        return (String) componentMap.get("alias");
+        final String additionalAlias = (String) componentMap.get("alias");
+        return additionalAlias;
     }
 
     public String findColumnAlias(String tableName, String columnName) { // null allowed: null means not defined

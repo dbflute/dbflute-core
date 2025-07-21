@@ -155,6 +155,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
+import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -495,6 +496,10 @@ public class Table {
     }
 
     protected String buildAlias(String plainComment) { // null allowed
+        final String aliasOnDecomment = findAliasOnDecomment(); // @since 1.3.0
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(aliasOnDecomment)) {
+            return aliasOnDecomment; // prior
+        }
         final String plainAlias = getDocumentProperties().extractAliasFromDbComment(plainComment);
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
@@ -512,6 +517,12 @@ public class Table {
     public boolean needsColumnAliasItem() { // e.g. may be dfprop alias only
         final boolean aliasDelimiterInDbCommentValid = getDocumentProperties().isAliasDelimiterInDbCommentValid();
         return aliasDelimiterInDbCommentValid || getColumnList().stream().anyMatch(column -> column.hasAlias());
+    }
+
+    protected String findAliasOnDecomment() { // null allowed
+        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
+        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
+        return handler.buildConflictedAliasesDisp(aliasSet);
     }
 
     // -----------------------------------------------------
@@ -618,10 +629,11 @@ public class Table {
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         final String tableDbName = getTableDbName();
         final String plainDescprition; // null allowed
+        final String plainComment = getPlainComment();
         if (dbcommentProp.hasTableDfpropAlias(tableDbName)) { // unneeded alias delimiter handling
-            plainDescprition = getPlainComment();
+            plainDescprition = plainComment;
         } else { // mainly here
-            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(getPlainComment());
+            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(plainComment);
         }
         final String unified = dbcommentProp.unifyTablePlainDescription(tableDbName, plainDescprition);
         String wholeComment = unified != null ? unified : "";

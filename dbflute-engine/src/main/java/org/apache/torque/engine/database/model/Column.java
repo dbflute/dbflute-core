@@ -139,6 +139,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -439,6 +440,10 @@ public class Column {
     }
 
     protected String buildAlias(String plainComment) { // null allowed
+        final String aliasOnDecomment = findAliasOnDecomment(); // @since 1.3.0
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(aliasOnDecomment)) {
+            return aliasOnDecomment; // prior
+        }
         final String plainAlias = getDocumentProperties().extractAliasFromDbComment(plainComment);
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
@@ -454,6 +459,19 @@ public class Column {
 
     public String getAliasSettingExpression() {
         return hasAlias() ? "\"" + getAlias() + "\"" : "null";
+    }
+
+    protected String findAliasOnDecomment() { // null allowed
+        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
+        final String tableDbName = getTable().getTableDbName();
+        String columnDbName = extracted();
+        final Set<String> aliasSet = handler.findDecommentColumnAliasSet(tableDbName, columnDbName);
+        return handler.buildConflictedAliasesDisp(aliasSet);
+    }
+
+    private String extracted() {
+        String columnDbName = getName();
+        return columnDbName;
     }
 
     // -----------------------------------------------------
