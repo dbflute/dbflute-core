@@ -91,7 +91,7 @@ public class DfDecommentAliasHandler {
     // 3. Generate task executed
     //  o the decomment alias is used on javadoc
     // _/_/_/_/_/_/_/_/
-    public String buildConflictedAliasesDisp(Set<String> aliasSet) { // null allowed if empty
+    public String buildMaybeConflictedAliasesDisp(Set<String> aliasSet) { // null allowed if empty
         return !aliasSet.isEmpty() ? aliasSet.stream().collect(Collectors.joining(" or ")) : null;
     }
 }

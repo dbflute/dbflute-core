@@ -676,7 +676,7 @@ ${database.schemaDescription}
 	<tr>
 		<td class="rownumcell">${rownum}</td>
 #if ($needsTableAliasItem)
-		<td class="aliascell">${table.alias}</td>
+		<td class="aliascell">${table.aliasForSchemaHtml}</td>
 #end
 #set ($deprecatedTablePrefix = $table.deprecatedTableTagPrefixForSchemaHtml)
 #set ($deprecatedTableSuffix = $table.deprecatedTableTagSuffixForSchemaHtml)
@@ -687,7 +687,7 @@ ${database.schemaDescription}
 #end
 		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
-		<td class="commentcell ${table.tableDbName}_comment"><pre>#if($table.hasComment())${table.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
+		<td class="commentcell ${table.tableDbName}_comment"><pre>#if($table.hasCommentForSchemaHtml())${table.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
 		<td class="subcell">${table.javaName}</td>
 #if ($database.hasTableFirstDate())
 		<td class="subcell">$table.firstDateSimpleExp</td>

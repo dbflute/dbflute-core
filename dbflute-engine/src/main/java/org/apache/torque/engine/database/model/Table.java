@@ -156,6 +156,7 @@ import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
+import org.dbflute.logic.doc.decomment.glance.DfDecommentDescriptionHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -215,6 +216,12 @@ public class Table {
     protected String _plainComment;
     protected boolean _existsSameNameTable;
     protected boolean _existsSameSchemaSameNameTable;
+
+    // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedTableFacadeAlias;
+    protected String _cachedTableFacadeComment;
+    protected String _cachedTableSchemaHtmlAlias;
+    protected String _cachedTableSchemaHtmlComment;
 
     // -----------------------------------------------------
     //                                                Column
@@ -478,29 +485,51 @@ public class Table {
         return alias != null && alias.trim().length() > 0;
     }
 
+    public boolean hasAliasForSchemaHtml() { // however unused? but logically needed
+        final String alias = getAliasForSchemaHtml();
+        return alias != null && alias.trim().length() > 0;
+    }
+
     /**
      * Get the alias of the table.
      * @return The table alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
-        if (_cachedTableAlias != null) {
-            return _cachedTableAlias;
+        if (_cachedTableFacadeAlias != null) {
+            return _cachedTableFacadeAlias;
         }
-        final String alias = buildAlias(getPlainComment());
+        final String alias = buildFacadeAlias(); // may have decomment alias
         if (alias != null) {
-            _cachedTableAlias = alias;
-            return _cachedTableAlias;
+            _cachedTableFacadeAlias = alias;
+            return _cachedTableFacadeAlias;
         }
-        _cachedTableAlias = "";
-        return _cachedTableAlias;
+        _cachedTableFacadeAlias = "";
+        return _cachedTableFacadeAlias;
     }
 
-    protected String buildAlias(String plainComment) { // null allowed
+    public String getAliasForSchemaHtml() {
+        if (_cachedTableSchemaHtmlAlias != null) {
+            return _cachedTableSchemaHtmlAlias;
+        }
+        // #for_now jflute until SchemaHTML dfalias:{} support? (2025/07/21)
+        //final String originalAlias = buildMetadataAlias();
+        final String source = buildFacadeAlias();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        _cachedTableSchemaHtmlAlias = resolved != null ? resolved : "";
+        return _cachedTableSchemaHtmlAlias;
+    }
+
+    protected String buildFacadeAlias() { // null allowed
         final String aliasOnDecomment = findAliasOnDecomment(); // @since 1.3.0
         if (Srl.is_NotNull_and_NotTrimmedEmpty(aliasOnDecomment)) {
-            return aliasOnDecomment; // prior
+            return aliasOnDecomment;
+        } else {
+            return buildMetadataAlias();
         }
-        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(plainComment);
+    }
+
+    protected String buildMetadataAlias() { // null allowed
+        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(getPlainComment());
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
     }
@@ -509,8 +538,15 @@ public class Table {
         final String alias = getAlias();
         if (alias == null || alias.trim().length() == 0) {
             return "";
+        } else {
+            return "(" + alias + ")";
         }
-        return "(" + alias + ")";
+    }
+
+    public String getAliasExpressionForSchemaHtml() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        String alias = prop.resolveSchemaHtmlContent(getAliasExpression());
+        return alias != null ? alias : "";
     }
 
     // used in e.g. SchemaHTML template for alias item display determination
@@ -522,7 +558,7 @@ public class Table {
     protected String findAliasOnDecomment() { // null allowed
         final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
         final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
-        return handler.buildConflictedAliasesDisp(aliasSet);
+        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
     }
 
     // -----------------------------------------------------
@@ -599,17 +635,20 @@ public class Table {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
-    protected String _cachedTableAlias; // for performance (e.g. SchemaPolicyCheck)
-    protected String _cachedTableComment; // me too
-
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // basically comment means description here
+    // (without alias part)
+    // _/_/_/_/_/_/_/_/_/_/
     public String getPlainComment() { // may contain its alias name
         return _plainComment;
     }
 
     protected void setPlainComment(String plainComment) { // added for clearing cache so protected
         _plainComment = plainComment;
-        _cachedTableAlias = null; // needs to clear because the value is from plain comment
-        _cachedTableComment = null; // me too
+        _cachedTableFacadeAlias = null; // needs to clear because the value is from plain comment
+        _cachedTableSchemaHtmlAlias = null; // me too
+        _cachedTableFacadeComment = null; // me too
+        _cachedTableSchemaHtmlComment = null; // me too
     }
 
     public boolean hasComment() { // means resolved comment (not plain)
@@ -617,15 +656,72 @@ public class Table {
         return comment != null && comment.trim().length() > 0;
     }
 
-    public String getComment() {
-        if (_cachedTableComment != null) {
-            return _cachedTableComment;
-        }
-        _cachedTableComment = buildDescriptionComment();
-        return _cachedTableComment;
+    public boolean hasCommentForSchemaHtml() { // means resolved comment for SchemaHTML
+        final String comment = getCommentForSchemaHtml();
+        return comment != null && comment.trim().length() > 0;
     }
 
-    protected String buildDescriptionComment() {
+    public String getComment() { // actually means also description
+        if (_cachedTableFacadeComment != null) {
+            return _cachedTableFacadeComment;
+        }
+        _cachedTableFacadeComment = buildFacadeDescription();
+        return _cachedTableFacadeComment;
+    }
+
+    public String getCommentForSchemaHtml() { // without decomment
+        if (_cachedTableSchemaHtmlComment != null) {
+            return _cachedTableSchemaHtmlComment;
+        }
+        // SchemaHTML should have pure metadata description
+        // to detect decomment conflict with database comment
+        final String source = buildMetadataDescription();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        _cachedTableSchemaHtmlComment = resolved != null ? resolved : "";
+        return _cachedTableSchemaHtmlComment;
+    }
+
+    public String getCommentForSchemaHtmlPre() {
+        final String metadataDescription = buildMetadataDescription();
+        final String comment = getDocumentProperties().resolveSchemaHtmlPreText(metadataDescription);
+        return comment != null ? comment : "";
+    }
+
+    public boolean isCommentForJavaDocValid() {
+        return hasComment() && getDocumentProperties().isEntityJavaDocDbCommentValid();
+    }
+
+    public String getCommentForJavaDoc() {
+        final String comment = getDocumentProperties().resolveJavaDocContent(getComment(), "");
+        return comment != null ? comment : "";
+    }
+
+    public boolean isCommentForDBMetaValid() {
+        return hasComment() && getDocumentProperties().isEntityDBMetaDbCommentValid();
+    }
+
+    public String getCommentForDBMeta() {
+        final String comment = getDocumentProperties().resolveDBMetaCodeSettingText(getComment());
+        return comment != null ? comment : "";
+    }
+
+    protected String buildFacadeDescription() {
+        final String decommentDescription = findDescriptionOnDecomment();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(decommentDescription)) {
+            if (decommentDescription.contains("#deprecated")) {
+                // probably the decomment is made from DB comment having deprecated information
+                // (the deprecated comment may be old but no big problem, delete the deprecate part)
+                return decommentDescription; // so use plain
+            } else {
+                // needs to add deprecated information to decomment
+                return filterDeprecatedComment(decommentDescription);
+            }
+        } else {
+            return buildMetadataDescription();
+        }
+    }
+
+    protected String buildMetadataDescription() {
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         final String tableDbName = getTableDbName();
         final String plainDescprition; // null allowed
@@ -636,51 +732,27 @@ public class Table {
             plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(plainComment);
         }
         final String unified = dbcommentProp.unifyTablePlainDescription(tableDbName, plainDescprition);
-        String wholeComment = unified != null ? unified : "";
+        final String wholeComment = unified != null ? unified : "";
+        return filterDeprecatedComment(wholeComment);
+    }
+
+    protected String findDescriptionOnDecomment() { // null allowed
+        final DfDecommentDescriptionHandler handler = new DfDecommentDescriptionHandler();
+        return handler.findDecommentTableDescription(getTableDbName());
+    }
+
+    protected String filterDeprecatedComment(String wholeComment) {
         if (isDeprecatedTable()) {
             final String deprecatedComment = getDeprecatedTableReasonComment();
             final String deprecatedMark = "#deprecated"; // not @ to avoid javadoc effect
+            final String deprecatedExp = deprecatedMark + " " + deprecatedComment;
             if (Srl.is_NotNull_and_NotTrimmedEmpty(wholeComment)) {
-                wholeComment = wholeComment + "\n" + deprecatedMark + " " + deprecatedComment;
+                wholeComment = wholeComment + "\n" + deprecatedExp;
             } else {
-                wholeComment = deprecatedMark + " " + deprecatedComment;
+                wholeComment = deprecatedExp;
             }
         }
         return wholeComment;
-    }
-
-    public String getCommentForSchemaHtml() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        String comment = prop.resolveSchemaHtmlContent(getComment());
-        return comment != null ? comment : "";
-    }
-
-    public String getCommentForSchemaHtmlPre() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveSchemaHtmlPreText(getComment());
-        return comment != null ? comment : "";
-    }
-
-    public boolean isCommentForJavaDocValid() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        return hasComment() && prop.isEntityJavaDocDbCommentValid();
-    }
-
-    public String getCommentForJavaDoc() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveJavaDocContent(getComment(), "");
-        return comment != null ? comment : "";
-    }
-
-    public boolean isCommentForDBMetaValid() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        return hasComment() && prop.isEntityDBMetaDbCommentValid();
-    }
-
-    public String getCommentForDBMeta() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveDBMetaCodeSettingText(getComment());
-        return comment != null ? comment : "";
     }
 
     public boolean isGenerateTableDetailJavaDoc() {
