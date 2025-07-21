@@ -773,25 +773,30 @@ public class Column {
     }
 
     public String getCommentForSchemaHtml() { // without decomment
+        final String source = prepareSchemaHtmlUnresolvedComment();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        return resolved != null ? resolved : "";
+    }
+
+    public String getCommentForSchemaHtmlPre() { // without decomment
+        final String source = prepareSchemaHtmlUnresolvedComment();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlPreText(source);
+        return resolved != null ? resolved : "";
+    }
+
+    protected String prepareSchemaHtmlUnresolvedComment() {
         if (_cachedColumnSchemaHtmlComment != null) {
             return _cachedColumnSchemaHtmlComment;
         }
         // SchemaHTML should have pure metadata description
         // to detect decomment conflict with database comment
-        final String source = buildMetadataDescription();
-        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
-        _cachedColumnSchemaHtmlComment = resolved != null ? resolved : "";
+        final String unresolved = buildMetadataDescription();
+        _cachedColumnSchemaHtmlComment = unresolved != null ? unresolved : "";
         return _cachedColumnSchemaHtmlComment;
     }
 
     public void setComment(String comment) { // unused? (not exists in Table.java) by jflute (2018/05/04)
         setPlainComment(comment); // setter for sync
-    }
-
-    public String getCommentForSchemaHtmlPre() {
-        final String metadataDescription = buildMetadataDescription();
-        final String comment = getDocumentProperties().resolveSchemaHtmlPreText(metadataDescription);
-        return comment != null ? comment : "";
     }
 
     public boolean isCommentForJavaDocValid() {

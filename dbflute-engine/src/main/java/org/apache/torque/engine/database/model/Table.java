@@ -670,21 +670,26 @@ public class Table {
     }
 
     public String getCommentForSchemaHtml() { // without decomment
+        final String source = prepareSchemaHtmlUnresolvedComment();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        return resolved != null ? resolved : "";
+    }
+
+    public String getCommentForSchemaHtmlPre() { // without decomment
+        final String source = prepareSchemaHtmlUnresolvedComment();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlPreText(source);
+        return resolved != null ? resolved : "";
+    }
+
+    protected String prepareSchemaHtmlUnresolvedComment() {
         if (_cachedTableSchemaHtmlComment != null) {
             return _cachedTableSchemaHtmlComment;
         }
         // SchemaHTML should have pure metadata description
         // to detect decomment conflict with database comment
-        final String source = buildMetadataDescription();
-        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
-        _cachedTableSchemaHtmlComment = resolved != null ? resolved : "";
+        final String unresolved = buildMetadataDescription();
+        _cachedTableSchemaHtmlComment = unresolved != null ? unresolved : "";
         return _cachedTableSchemaHtmlComment;
-    }
-
-    public String getCommentForSchemaHtmlPre() {
-        final String metadataDescription = buildMetadataDescription();
-        final String comment = getDocumentProperties().resolveSchemaHtmlPreText(metadataDescription);
-        return comment != null ? comment : "";
     }
 
     public boolean isCommentForJavaDocValid() {
