@@ -747,7 +747,8 @@ public class Table {
     protected String buildFacadeDescription() {
         final String decommentDescription = findDescriptionOnDecomment();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(decommentDescription)) {
-            if (decommentDescription.contains("#deprecated")) {
+            final String commentSymbol = getDocumentProperties().getDeprecatedTableCommentSymbol();
+            if (decommentDescription.contains(commentSymbol)) {
                 // probably the decomment is made from DB comment having deprecated information
                 // (the deprecated comment may be old but no big problem, delete the deprecate part)
                 return decommentDescription; // so use plain
@@ -786,8 +787,8 @@ public class Table {
     protected String filterDeprecatedComment(String wholeComment) {
         if (isDeprecatedTable()) {
             final String deprecatedComment = getDeprecatedTableReasonComment();
-            final String deprecatedMark = "#deprecated"; // not @ to avoid javadoc effect
-            final String deprecatedExp = deprecatedMark + " " + deprecatedComment;
+            final String commentSymbol = getDocumentProperties().getDeprecatedTableCommentSymbol();
+            final String deprecatedExp = commentSymbol + " " + deprecatedComment;
             if (Srl.is_NotNull_and_NotTrimmedEmpty(wholeComment)) {
                 wholeComment = wholeComment + "\n" + deprecatedExp;
             } else {

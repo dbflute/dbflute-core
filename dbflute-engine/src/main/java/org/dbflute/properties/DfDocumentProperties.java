@@ -1456,6 +1456,12 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         }
     }
 
+    public String getDeprecatedTableCommentSymbol() {
+        // not @ to avoid javadoc effect
+        // not # to avoid decomment line comment headache
+        return "+deprecated";
+    }
+
     public String getDeprecatedTableTagPrefixForSchemaHtml() {
         return "<del class=\"deprecatedtable\">";
     }
