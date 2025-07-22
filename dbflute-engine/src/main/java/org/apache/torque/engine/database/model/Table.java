@@ -754,6 +754,7 @@ public class Table {
                 return decommentDescription; // so use plain
             } else {
                 // needs to add deprecated information to decomment
+                // #hope jflute however, deprecated information cannot be added to decomment on SchemaHTML (2025/07/22)
                 return filterDeprecatedComment(decommentDescription);
             }
         } else {
