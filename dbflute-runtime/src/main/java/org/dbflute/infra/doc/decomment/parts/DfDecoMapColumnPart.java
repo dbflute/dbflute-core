@@ -24,15 +24,16 @@ import java.util.stream.Collectors;
 /**
  * @author hakiba
  * @author cabos
+ * @author jflute
  */
 public class DfDecoMapColumnPart {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String columnName;
-    protected final List<DfDecoMapMappingPart> mappingList;
-    protected final List<DfDecoMapPropertyPart> propertyList;
+    protected final String columnName; // not null
+    protected final List<DfDecoMapMappingPart> mappingList; // when renamed, not null, empty allowed
+    protected final List<DfDecoMapPropertyPart> propertyList; // plural if conflict, not null, at least one
 
     // ===================================================================================
     //                                                                           Converter
@@ -44,16 +45,21 @@ public class DfDecoMapColumnPart {
     }
 
     @SuppressWarnings("unchecked")
-    public DfDecoMapColumnPart(Map<String, Object> columnPartMap) {
+    public DfDecoMapColumnPart(Map<String, Object> columnPartMap) { // directly from dfmap file
         this.columnName = (String) columnPartMap.get("columnName");
+
         // not exists mapping list if format version is less equal 1.0
         final List<Map<String, Object>> mappingMapList =
                 (List<Map<String, Object>>) columnPartMap.getOrDefault("mappingList", Collections.emptyList());
         this.mappingList = mappingMapList.stream().map(DfDecoMapMappingPart::new).collect(Collectors.toList());
+
         final List<Map<String, Object>> propertyMapList = (List<Map<String, Object>>) columnPartMap.get("propertyList");
         this.propertyList = propertyMapList.stream().map(DfDecoMapPropertyPart::new).collect(Collectors.toList());
     }
 
+    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========
     // done cabos convertToMap()? by jflute (2017/11/11)
     public Map<String, Object> convertToMap() {
         final List<Map<String, Object>> mappingMapList =
@@ -65,6 +71,21 @@ public class DfDecoMapColumnPart {
         map.put("mappingList", mappingMapList);
         map.put("propertyList", propertyMapList);
         return map;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "columnPart:{" + columnName //
+                + ", mappings=" + toSizeExp(mappingList) //
+                + ", properties=" + toSizeExp(propertyList) //
+                + "}";
+    }
+
+    protected String toSizeExp(List<?> list) {
+        return list != null ? String.valueOf(list.size()) : "null"; // just in case
     }
 
     // ===================================================================================

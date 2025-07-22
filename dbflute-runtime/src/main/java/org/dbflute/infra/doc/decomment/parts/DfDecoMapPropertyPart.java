@@ -27,21 +27,22 @@ import org.dbflute.helper.HandyDate;
 /**
  * @author cabos
  * @author deco
+ * @author jflute
  */
 public class DfDecoMapPropertyPart {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String decomment;
-    protected final String databaseComment;
-    protected final Long commentVersion;
-    protected final List<String> authorList;
-    protected final String pieceCode;
-    protected final LocalDateTime pieceDatetime;
-    protected final String pieceOwner;
-    protected final String pieceGitBranch;
-    protected final List<String> previousPieceList;
+    protected final String decomment; // not null
+    protected final String databaseComment; // null allowed?
+    protected final Long commentVersion; // not null
+    protected final List<String> authorList; // not null, basically not empty
+    protected final String pieceCode; // not null
+    protected final LocalDateTime pieceDatetime; // not null
+    protected final String pieceOwner; // not null
+    protected final String pieceGitBranch; // null allowed?
+    protected final List<String> previousPieceList; // not null, empty allowed
 
     // ===================================================================================
     //                                                                         Constructor
@@ -59,7 +60,7 @@ public class DfDecoMapPropertyPart {
         this.previousPieceList = previousPieceList;
     }
 
-    public DfDecoMapPropertyPart(Map<String, Object> propertyMap) {
+    public DfDecoMapPropertyPart(Map<String, Object> propertyMap) { // directly from dfmap file
         this.decomment = (String) propertyMap.get("decomment");
         this.databaseComment = (String) propertyMap.get("databaseComment");
         this.commentVersion = Long.valueOf((String) propertyMap.get("commentVersion"));
@@ -70,6 +71,23 @@ public class DfDecoMapPropertyPart {
         this.pieceGitBranch = (String) propertyMap.get("pieceGitBranch");
         this.previousPieceList =
                 ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
+    }
+
+    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========
+    public Map<String, Object> convertToMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("decomment", this.decomment);
+        map.put("databaseComment", this.databaseComment);
+        map.put("commentVersion", this.commentVersion);
+        map.put("authorList", this.authorList);
+        map.put("pieceCode", this.pieceCode);
+        map.put("pieceOwner", this.pieceOwner);
+        map.put("pieceGitBranch", this.pieceGitBranch);
+        map.put("pieceDatetime", this.pieceDatetime);
+        map.put("previousPieceList", this.previousPieceList);
+        return map;
     }
 
     // ===================================================================================
@@ -109,19 +127,5 @@ public class DfDecoMapPropertyPart {
 
     public List<String> getAuthorList() {
         return Collections.unmodifiableList(authorList);
-    }
-
-    public Map<String, Object> convertToMap() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("decomment", this.decomment);
-        map.put("databaseComment", this.databaseComment);
-        map.put("commentVersion", this.commentVersion);
-        map.put("authorList", this.authorList);
-        map.put("pieceCode", this.pieceCode);
-        map.put("pieceOwner", this.pieceOwner);
-        map.put("pieceGitBranch", this.pieceGitBranch);
-        map.put("pieceDatetime", this.pieceDatetime);
-        map.put("previousPieceList", this.previousPieceList);
-        return map;
     }
 }
