@@ -1387,8 +1387,8 @@ var DecommentUtil = new function(){
 		});
 	},
 	/**
-	 * Escape newline character of text
-	 * @param {String} string - text
+	 * Escape newline character of text. (changing to real line separator)
+	 * @param {String} string - text (NotNull, EmpytAllowed)
 	 */
 	this.escapeNewlineCharacter = function (string) {
 		return string.split('<br>').join('\n');
@@ -1502,6 +1502,7 @@ function StoreClient() {
 	}
 	this.pickupStore = {
 #foreach ($table in $database.tableDisplaySortedList)
+## databaseComment is not null, empty allowed: always defined even if no comment (2025/07/25)
 ## decomment uses display name so fix later
 		#if ($velocityCount > 1), #end'${table.tableDbName}': {
 			'databaseComment': '#escape(${table.commentForSchemaHtml})'
@@ -1709,7 +1710,7 @@ function PickupTableProperty(tableDbName, json) {
 	this.tableDbName = tableDbName;
 	this.inputAuthor = null; // use when decomment server mode.
 	if (json) {
-		this.databaseComment = json.databaseComment;
+		this.databaseComment = json.databaseComment; // not null, empty allowed
 		this.isDatabaseCommentConflict = json.isDatabaseCommentConflict;
 		this.decomments = json.decomments || [];
 		this.previousPieces = json.previousPieces;
@@ -1789,13 +1790,11 @@ PickupTableProperty.prototype = {
 	},
 
 	/**
-	 * Get escaped database comment
-	 * @return {string} escaped database comment
+	 * Get escaped database comment. (e.g. changing br tag to real line separator)
+	 * @return {string} escaped database comment (NotNull, EmptyAllowed)
 	 */
 	getEscapedDatabaseComment: function() {
-		var escapedComment = "";
-		escapedComment = DecommentUtil.escapeNewlineCharacter(escapedComment);
-		return escapedComment;
+		return DecommentUtil.escapeNewlineCharacter(this.databaseComment);
 	},
 
 	/**
@@ -1862,7 +1861,7 @@ function PickupColumnProperty(tableDbName, columnName, json) {
 	this.columnName = columnName;
 	this.inputAuthor = null; // use when decomment server mode.
 	if (json) {
-		this.databaseComment = json['databaseComment'];
+		this.databaseComment = json['databaseComment']; // not null, empty allowed
 		this.isDatabaseCommentConflict = json['isDatabaseCommentConflict'];
 		this.decomments = json['decomments'] || [];
 		this.previousPieces = json['previousPieces'];
@@ -1940,13 +1939,11 @@ PickupColumnProperty.prototype = {
 	},
 
 	/**
-	 * Get escaped database comment
-	 * @return {string} escaped database comment
+	 * Get escaped database comment. (e.g. changing br tag to real line separator)
+	 * @return {string} escaped database comment (NotNull, EmptyAllowed)
 	 */
 	getEscapedDatabaseComment: function() {
-		var escapedComment = "";
-		escapedComment = DecommentUtil.escapeNewlineCharacter(escapedComment);
-		return escapedComment;
+		return DecommentUtil.escapeNewlineCharacter(this.databaseComment);
 	},
 
 	/**
