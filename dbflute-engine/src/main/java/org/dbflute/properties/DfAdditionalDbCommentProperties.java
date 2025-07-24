@@ -145,7 +145,7 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     }
 
     protected String connectPlainDescription(String dfpropDescription, String plainDescription) { // dfprop exists here
-        if (plainDescription != null) { // both
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(plainDescription)) { // both
             final String delimiter = getPlainCommentDelimiter();
             return dfpropDescription + delimiter + plainDescription; // dfprop + DB
         } else { // dfprop only

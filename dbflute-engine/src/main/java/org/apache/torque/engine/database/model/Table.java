@@ -663,7 +663,7 @@ public class Table {
     }
 
     protected void setPlainComment(String plainComment) { // added for clearing cache so protected
-        _plainComment = plainComment;
+        _plainComment = plainComment; // empty allowed if e.g. comment="" on schema xml
         _cachedTableFacadeAlias = null; // needs to clear because the value is from plain comment
         _cachedTableSchemaHtmlAlias = null; // me too
         _cachedTableFacadeComment = null; // me too
@@ -765,8 +765,8 @@ public class Table {
     protected String buildMetadataDescription() {
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         final String tableDbName = getTableDbName();
-        final String plainDescprition; // null allowed
-        final String plainComment = getPlainComment();
+        final String plainDescprition; // null or empty allowed
+        final String plainComment = getPlainComment(); // null or empty allowed
         if (dbcommentProp.hasTableDfpropAlias(tableDbName)) { // unneeded alias delimiter handling
             plainDescprition = plainComment;
         } else { // mainly here

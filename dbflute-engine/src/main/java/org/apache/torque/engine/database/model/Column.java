@@ -763,7 +763,7 @@ public class Column {
     }
 
     public void setPlainComment(String plainComment) { // can be protected? (protected in Table.java) by jflute (2018/05/04)
-        _plainComment = plainComment;
+        _plainComment = plainComment; // empty allowed if e.g. comment="" on schema xml
         _cachedColumnFacadeAlias = null; // needs to clear because the value is from plain comment
         _cachedColumnSchemaHtmlAlias = null; // me too
         _cachedColumnFacadeComment = null; // me too
@@ -864,11 +864,12 @@ public class Column {
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         final String tableDbName = getTable().getTableDbName();
         final String columnDbName = getName();
-        final String plainDescprition; // null allowed
+        final String plainDescprition; // null or empty allowed
+        final String plainComment = getPlainComment(); // null or empty allowed
         if (dbcommentProp.hasColumnDfpropAlias(tableDbName, columnDbName)) { // unneeded alias delimiter handling
-            plainDescprition = getPlainComment();
+            plainDescprition = plainComment;
         } else { // mainly here
-            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(getPlainComment());
+            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(plainComment);
         }
         final String unified = dbcommentProp.unifyColumnPlainDescription(tableDbName, columnDbName, plainDescprition);
         return unified != null ? unified : "";
