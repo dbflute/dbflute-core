@@ -1604,12 +1604,17 @@ StoreClient.prototype = {
 		var that = this;
 		Array.prototype.forEach.call(properties, function(property) {
 			if (property['databaseComment'] != null && currentDatabaseComment != null && !isDatabaseCommentConflict) {
-				var currentEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(currentDatabaseComment);
-				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']);
-
-				// true if real DB comment was changed
 				// it needs trim-comparing because piece file loses rear line separator as dfmap behavior
-				isDatabaseCommentConflict = currentEscapedDatabaseComment.trim() != previousEscapedDatabaseComment.trim();
+				// https://github.com/dbflute/dbflute-core/issues/271
+				var currentEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(currentDatabaseComment).trim();
+				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']).trim();
+
+				if (currentEscapedDatabaseComment != '') { // conflict detect when existing only
+					// true if real DB comment was changed
+					isDatabaseCommentConflict = currentEscapedDatabaseComment != previousEscapedDatabaseComment;
+				}
+				// ignore conflect when database comment is deleted because it's probably migration to decomment
+				// https://github.com/dbflute/dbflute-core/issues/272
 			}
 			var decomment = {
 				"body": property["decomment"],
@@ -1674,12 +1679,17 @@ StoreClient.prototype = {
 		var that = this;
 		Array.prototype.forEach.call(properties, function (property) {
 			if (property['databaseComment'] != null && currentDatabaseComment != null && !isDatabaseCommentConflict) {
-				var currentEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(currentDatabaseComment);
-				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']);
-
-				// true if real DB comment was changed
 				// it needs trim-comparing because piece file loses rear line separator as dfmap behavior
-				isDatabaseCommentConflict = currentEscapedDatabaseComment.trim() != previousEscapedDatabaseComment.trim();
+				// https://github.com/dbflute/dbflute-core/issues/271
+				var currentEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(currentDatabaseComment).trim();
+				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']).trim();
+
+				if (currentEscapedDatabaseComment != '') { // conflict detect when existing only
+					// true if real DB comment was changed
+					isDatabaseCommentConflict = currentEscapedDatabaseComment != previousEscapedDatabaseComment;
+				}
+				// ignore conflect when database comment is deleted because it's probably migration to decomment
+				// https://github.com/dbflute/dbflute-core/issues/272
 			}
 			var decomment = {
 				"body": property["decomment"],
