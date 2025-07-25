@@ -1608,7 +1608,8 @@ StoreClient.prototype = {
 				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']);
 
 				// true if real DB comment was changed
-				isDatabaseCommentConflict = currentEscapedDatabaseComment != previousEscapedDatabaseComment;
+				// it needs trim-comparing because piece file loses rear line separator as dfmap behavior
+				isDatabaseCommentConflict = currentEscapedDatabaseComment.trim() != previousEscapedDatabaseComment.trim();
 			}
 			var decomment = {
 				"body": property["decomment"],
@@ -1677,7 +1678,8 @@ StoreClient.prototype = {
 				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']);
 
 				// true if real DB comment was changed
-				isDatabaseCommentConflict = currentEscapedDatabaseComment != previousEscapedDatabaseComment;
+				// it needs trim-comparing because piece file loses rear line separator as dfmap behavior
+				isDatabaseCommentConflict = currentEscapedDatabaseComment.trim() != previousEscapedDatabaseComment.trim();
 			}
 			var decomment = {
 				"body": property["decomment"],
