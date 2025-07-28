@@ -127,14 +127,14 @@ public class DfSchemaSyncChecker {
     protected DfSchemaXmlSerializer serializeTargetSchema() { // as previous
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
-        targetSerializer.suppressSchemaDiff(); // same reason as main schema
+        targetSerializer.suppressSchemaNameDiff(); // same reason as main schema
         targetSerializer.serialize();
         return targetSerializer;
     }
 
     protected DfSchemaXmlSerializer serializeMainSchema() { // as next
         final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
-        mainSerializer.suppressSchemaDiff(); // because of comparison with other schema
+        mainSerializer.suppressSchemaNameDiff(); // because of comparison with other schema
         mainSerializer.serialize();
         return mainSerializer;
     }

@@ -243,6 +243,9 @@ public class DfSchemaXmlSerializer {
         final String craftMetaDir = docProp.getCoreCraftMetaDir();
         serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
         serializer.keepDefinitionOrderAsPrevious(); // to avoid getting nonsense differences in JDBC task
+        if (docProp.isSuppressCheckingSchemaNameDiff()) {
+            serializer.suppressSchemaNameDiff();
+        }
         return serializer;
     }
 
@@ -264,6 +267,10 @@ public class DfSchemaXmlSerializer {
         if (!includeAdditionalSchema) {
             serializer.suppressAdditionalSchema();
         }
+        // probably unneeded because historyFactory is null by jflute (2025/07/27)
+        //if (docProp.isCheckSchemaDiff()) {
+        //    serializer.suppressSchemaDiff();
+        //}
         return serializer;
     }
 
@@ -285,6 +292,10 @@ public class DfSchemaXmlSerializer {
                 , historyFile != null ? () -> DfSchemaHistory.createAsMonolithic(historyFile) : null);
         serializer.suppressExceptTarget().suppressAdditionalSchema();
         serializer.enableAnotherAngleTableExcept(anotherAngleTableExceptor);
+        // #for_now jflute already called by SchemaSyncCheck program, move it to here? (2025/07/27)
+        //if (docProp.isCheckSchemaDiff()) {
+        //    serializer.suppressSchemaDiff();
+        //}
         return serializer;
     }
 
@@ -301,6 +312,10 @@ public class DfSchemaXmlSerializer {
     public static DfSchemaXmlSerializer createAsSimpleManagingSchema(DfSchemaSource dataSource, String schemaXml) {
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, /*historyFactory*/null);
         serializer.suppressExceptTarget().suppressAdditionalSchema();
+        final DfDocumentProperties docProp = DfBuildProperties.getInstance().getDocumentProperties();
+        if (docProp.isSuppressCheckingSchemaNameDiff()) {
+            serializer.suppressSchemaNameDiff();
+        }
         return serializer;
     }
 
@@ -1636,8 +1651,8 @@ public class DfSchemaXmlSerializer {
     // ===================================================================================
     //                                                                         Diff Option
     //                                                                         ===========
-    public void suppressSchemaDiff() {
-        _schemaDiff.suppressSchema();
+    public void suppressSchemaNameDiff() {
+        _schemaDiff.suppressSchemaName();
     }
 
     public void enableCraftDiff(DfSchemaSource dataSource, String craftMetaDir, DfCraftDiffAssertDirection assertDirection) {
