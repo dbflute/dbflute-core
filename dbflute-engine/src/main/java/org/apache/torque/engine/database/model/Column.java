@@ -139,6 +139,8 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
+import org.dbflute.logic.doc.decomment.glance.DfDecommentDescriptionHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -195,6 +197,12 @@ public class Column {
     protected boolean _autoIncrement;
     protected String _defaultValue;
     protected String _plainComment;
+
+    // for performance (e.g. SchemaPolicyCheck)
+    protected String _cachedColumnFacadeAlias;
+    protected String _cachedColumnSchemaHtmlAlias;
+    protected String _cachedColumnFacadeComment;
+    protected String _cachedColumnSchemaHtmlComment;
 
     // -----------------------------------------------------
     //                                           Primary Key
@@ -327,11 +335,8 @@ public class Column {
     }
 
     // ===================================================================================
-    //                                                                   Column Definition
-    //                                                                   =================
-    // -----------------------------------------------------
-    //                                           Column Name
-    //                                           -----------
+    //                                                         Column Basic :: Column Name
+    //                                                         ===========================
     /**
      * Get the DB name (pure name) of the column, which can be used for identity.
      * @return The column name as String. (NotNull)
@@ -348,9 +353,9 @@ public class Column {
         _name = name;
     }
 
-    // -----------------------------------------------------
-    //                                              SQL Name
-    //                                              --------
+    // ===================================================================================
+    //                                                            Column Basic :: SQL Name
+    //                                                            ========================
     /**
      * Get the SQL name of the column, which is used in your SQL after generated world. (for templates) <br>
      * This might be quoted with fitting to template.
@@ -390,9 +395,9 @@ public class Column {
         return prop.quoteColumnNameIfNeedsDirectUse(columnName);
     }
 
-    // -----------------------------------------------------
-    //                                               HTML ID
-    //                                               -------
+    // ===================================================================================
+    //                                                             Column Basic :: HTML ID
+    //                                                             =======================
     /**
      * Get the value for HTML (SchemaHTML) ID attribute of the column. <br>
      * This contains the table's ID value.
@@ -403,9 +408,9 @@ public class Column {
         return tableId + "_" + getName().toLowerCase();
     }
 
-    // -----------------------------------------------------
-    //                                               Synonym
-    //                                               -------
+    // ===================================================================================
+    //                                                             Column Basic :: Synonym
+    //                                                             =======================
     public String getSynonym() {
         return _synonym;
     }
@@ -414,9 +419,12 @@ public class Column {
         return _synonym != null ? "\"" + _synonym + "\"" : "null";
     }
 
+    // ===================================================================================
+    //                                                               Column Basic :: Alias
+    //                                                               =====================
     // -----------------------------------------------------
-    //                                                 Alias
-    //                                                 -----
+    //                                        Prepared Alias
+    //                                        --------------
     public boolean hasAlias() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(getAlias());
     }
@@ -426,30 +434,20 @@ public class Column {
      * @return The column alias as String. (NotNull, EmptyAllowed: when no alias)
      */
     public String getAlias() {
-        if (_cachedColumnAlias != null) {
-            return _cachedColumnAlias;
+        if (_cachedColumnFacadeAlias != null) {
+            return _cachedColumnFacadeAlias;
         }
-        final String alias = buildAlias(getPlainComment());
+        final String alias = buildFacadeAlias(); // may have decomment alias
         if (alias != null) {
-            _cachedColumnAlias = alias;
-            return _cachedColumnAlias;
+            _cachedColumnFacadeAlias = alias;
+            return _cachedColumnFacadeAlias;
         }
-        _cachedColumnAlias = "";
-        return _cachedColumnAlias;
-    }
-
-    protected String buildAlias(String plainComment) { // null allowed
-        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(plainComment);
-        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
-        return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
+        _cachedColumnFacadeAlias = "";
+        return _cachedColumnFacadeAlias;
     }
 
     public String getAliasExpression() { // for expression '(alias)name'
-        final String alias = getAlias();
-        if (alias == null || alias.trim().length() == 0) {
-            return "";
-        }
-        return "(" + alias + ")";
+        return buildAliasExpression(getAlias());
     }
 
     public String getAliasSettingExpression() {
@@ -457,8 +455,71 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                               DB Type
-    //                                               -------
+    //                                  Alias for SchemaHTML
+    //                                  --------------------
+    public boolean hasAliasForSchemaHtml() { // however unused? but logically needed
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getAliasForSchemaHtml());
+    }
+
+    public String getAliasForSchemaHtml() {
+        if (_cachedColumnSchemaHtmlAlias != null) {
+            return _cachedColumnSchemaHtmlAlias;
+        }
+        final String source = prepareSchemaHtmlUnresolvedAlias();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        _cachedColumnSchemaHtmlAlias = resolved != null ? resolved : "";
+        return _cachedColumnSchemaHtmlAlias;
+    }
+
+    public String getAliasExpressionForSchemaHtml() {
+        final String source = buildAliasExpression(prepareSchemaHtmlUnresolvedAlias());
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        return resolved != null ? resolved : "";
+    }
+
+    protected String prepareSchemaHtmlUnresolvedAlias() {
+        // #for_now jflute until SchemaHTML dfalias:{} support? (2025/07/21)
+        //final String originalAlias = buildMetadataAlias();
+        return buildFacadeAlias();
+    }
+
+    // -----------------------------------------------------
+    //                                           Build Alias
+    //                                           -----------
+    protected String buildFacadeAlias() { // null allowed
+        final String aliasOnDecomment = findAliasOnDecomment(); // @since 1.3.0
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(aliasOnDecomment)) {
+            return aliasOnDecomment;
+        } else {
+            return buildMetadataAlias();
+        }
+    }
+
+    protected String buildMetadataAlias() { // null allowed
+        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(getPlainComment());
+        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
+        return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
+    }
+
+    protected String findAliasOnDecomment() { // null allowed
+        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
+        final String tableDbName = getTable().getTableDbName();
+        final String columnDbName = getName();
+        final Set<String> aliasSet = handler.findDecommentColumnAliasSet(tableDbName, columnDbName);
+        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
+    }
+
+    protected String buildAliasExpression(String alias) {
+        if (alias == null || alias.trim().length() == 0) {
+            return "";
+        } else {
+            return "(" + alias + ")";
+        }
+    }
+
+    // ===================================================================================
+    //                                                             Column Basic :: DB Type
+    //                                                             =======================
     public void setDbType(String dbType) {
         this._dbType = dbType;
     }
@@ -524,9 +585,9 @@ public class Column {
         return hasDbType() && _columnHandler.isSQLServerUniqueIdentifier(_dbType);
     }
 
-    // -----------------------------------------------------
-    //                                           Column Size
-    //                                           -----------
+    // ===================================================================================
+    //                                                         Column Basic :: Column Size
+    //                                                         ===========================
     public String getColumnSize() {
         return _columnSize;
     }
@@ -590,9 +651,9 @@ public class Column {
         return getDecimalDigitsSettingExpression();
     }
 
-    // -----------------------------------------------------
-    //                                        Date Precision
-    //                                        --------------
+    // ===================================================================================
+    //                                                      Column Basic :: Date Precision
+    //                                                      ==============================
     public Integer getDatetimePrecision() {
         return _datetimePrecision;
     }
@@ -602,9 +663,9 @@ public class Column {
         return datetimePrecision != null ? String.valueOf(datetimePrecision) : "null";
     }
 
-    // -----------------------------------------------------
-    //                                               NotNull
-    //                                               -------
+    // ===================================================================================
+    //                                                            Column Basic :: Not Null
+    //                                                            ========================
     /**
      * Return the isNotNull property of the column
      */
@@ -637,9 +698,9 @@ public class Column {
         return getAdditionalNotNullProperties().isColumnNotNullMaybe(getTable().getTableDbName(), getName());
     }
 
-    // -----------------------------------------------------
-    //                                        Auto Increment
-    //                                        --------------
+    // ===================================================================================
+    //                                                      Column Basic :: Auto Increment
+    //                                                      ==============================
     /**
      * Return auto increment/sequence string for the target database. We need to
      * pass in the props for the target database!
@@ -658,9 +719,9 @@ public class Column {
         _autoIncrement = value;
     }
 
-    // -----------------------------------------------------
-    //                                         Default Value
-    //                                         -------------
+    // ===================================================================================
+    //                                                       Column Basic :: Default Value
+    //                                                       =============================
     public void setDefaultValue(String def) {
         _defaultValue = def;
     }
@@ -687,93 +748,141 @@ public class Column {
         return "\"" + escaped + "\"";
     }
 
+    // ===================================================================================
+    //                                                      Column Basic :: Column Comment
+    //                                                      ==============================
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // basically comment means description here
+    // (without alias part)
+    // _/_/_/_/_/_/_/_/_/_/
     // -----------------------------------------------------
-    //                                        Column Comment
-    //                                        --------------
-    protected String _cachedColumnAlias; // for performance (e.g. SchemaPolicyCheck)
-    protected String _cachedColumnComment; // me too
-
+    //                                         Plain Comment
+    //                                         -------------
     public String getPlainComment() {
         return _plainComment;
     }
 
     public void setPlainComment(String plainComment) { // can be protected? (protected in Table.java) by jflute (2018/05/04)
-        _plainComment = plainComment;
-        _cachedColumnAlias = null; // needs to clear because the value is from plain comment
-        _cachedColumnComment = null; // me too
+        _plainComment = plainComment; // empty allowed if e.g. comment="" on schema xml
+        _cachedColumnFacadeAlias = null; // needs to clear because the value is from plain comment
+        _cachedColumnSchemaHtmlAlias = null; // me too
+        _cachedColumnFacadeComment = null; // me too
+        _cachedColumnSchemaHtmlComment = null; // me too
     }
 
+    // -----------------------------------------------------
+    //                                      Prepared Comment
+    //                                      ----------------
     public boolean hasComment() { // means resolved comment (not plain)
         final String comment = getComment();
         return comment != null && comment.trim().length() > 0;
     }
 
-    public String getComment() {
-        if (_cachedColumnComment != null) {
-            return _cachedColumnComment;
-        }
-        _cachedColumnComment = buildDescriptionComment();
-        return _cachedColumnComment;
+    public boolean hasCommentForSchemaHtml() { // means resolved comment for SchemaHTML
+        final String comment = getCommentForSchemaHtml();
+        return comment != null && comment.trim().length() > 0;
     }
 
-    protected String buildDescriptionComment() {
-        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
-        final String tableDbName = getTable().getTableDbName();
-        final String columnDbName = getName();
-        final String plainDescprition; // null allowed
-        if (dbcommentProp.hasColumnDfpropAlias(tableDbName, columnDbName)) { // unneeded alias delimiter handling
-            plainDescprition = getPlainComment();
-        } else { // mainly here
-            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(getPlainComment());
+    public String getComment() {
+        if (_cachedColumnFacadeComment != null) {
+            return _cachedColumnFacadeComment;
         }
-        final String unified = dbcommentProp.unifyColumnPlainDescription(tableDbName, columnDbName, plainDescprition);
-        return unified != null ? unified : "";
+        _cachedColumnFacadeComment = buildFacadeDescription();
+        return _cachedColumnFacadeComment;
     }
 
     public void setComment(String comment) { // unused? (not exists in Table.java) by jflute (2018/05/04)
         setPlainComment(comment); // setter for sync
     }
 
-    public String getCommentForSchemaHtml() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveSchemaHtmlContent(getComment());
-        return comment != null ? comment : "";
+    // -----------------------------------------------------
+    //                                Comment for SchemaHTML
+    //                                ----------------------
+    public String getCommentForSchemaHtml() { // without decomment
+        final String source = prepareSchemaHtmlUnresolvedComment();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlContent(source);
+        return resolved != null ? resolved : "";
     }
 
-    public String getCommentForSchemaHtmlPre() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveSchemaHtmlPreText(getComment());
-        return comment != null ? comment : "";
+    public String getCommentForSchemaHtmlPre() { // without decomment
+        final String source = prepareSchemaHtmlUnresolvedComment();
+        final String resolved = getDocumentProperties().resolveSchemaHtmlPreText(source);
+        return resolved != null ? resolved : "";
     }
 
+    protected String prepareSchemaHtmlUnresolvedComment() {
+        if (_cachedColumnSchemaHtmlComment != null) {
+            return _cachedColumnSchemaHtmlComment;
+        }
+        // SchemaHTML should have pure metadata description
+        // to detect decomment conflict with database comment
+        final String unresolved = buildMetadataDescription();
+        _cachedColumnSchemaHtmlComment = unresolved != null ? unresolved : "";
+        return _cachedColumnSchemaHtmlComment;
+    }
+
+    // -----------------------------------------------------
+    //                                   Comment for JavaDoc
+    //                                   -------------------
     public boolean isCommentForJavaDocValid() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        return hasComment() && prop.isEntityJavaDocDbCommentValid();
+        return hasComment() && getDocumentProperties().isEntityJavaDocDbCommentValid();
     }
 
     public String getCommentForJavaDoc() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveJavaDocContent(getComment(), "    ");
+        final String comment = getDocumentProperties().resolveJavaDocContent(getComment(), "    ");
         return comment != null ? comment : "";
     }
 
+    // -----------------------------------------------------
+    //                                    Comment for DBMeta
+    //                                    ------------------
     public boolean isCommentForDBMetaValid() {
-        final DfDocumentProperties prop = getDocumentProperties();
-        return hasComment() && prop.isEntityDBMetaDbCommentValid();
+        return hasComment() && getDocumentProperties().isEntityDBMetaDbCommentValid();
     }
 
     public String getCommentForDBMetaSettingExpression() {
         if (!isCommentForDBMetaValid()) {
             return "null";
         }
-        final DfDocumentProperties prop = getDocumentProperties();
-        final String comment = prop.resolveDBMetaCodeSettingText(getComment());
+        final String comment = getDocumentProperties().resolveDBMetaCodeSettingText(getComment());
         return comment != null ? "\"" + comment + "\"" : "null";
     }
 
     // -----------------------------------------------------
-    //                                               Display
-    //                                               -------
+    //                                     Build Description
+    //                                     -----------------
+    protected String buildFacadeDescription() {
+        final String decommentDescription = findDescriptionOnDecomment();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(decommentDescription)) {
+            return decommentDescription;
+        } else {
+            return buildMetadataDescription();
+        }
+    }
+
+    protected String buildMetadataDescription() {
+        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
+        final String tableDbName = getTable().getTableDbName();
+        final String columnDbName = getName();
+        final String plainDescprition; // null or empty allowed
+        final String plainComment = getPlainComment(); // null or empty allowed
+        if (dbcommentProp.hasColumnDfpropAlias(tableDbName, columnDbName)) { // unneeded alias delimiter handling
+            plainDescprition = plainComment;
+        } else { // mainly here
+            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(plainComment);
+        }
+        final String unified = dbcommentProp.unifyColumnPlainDescription(tableDbName, columnDbName, plainDescprition);
+        return unified != null ? unified : "";
+    }
+
+    protected String findDescriptionOnDecomment() { // null allowed
+        final DfDecommentDescriptionHandler handler = new DfDecommentDescriptionHandler();
+        return handler.findDecommentColumnDescription(getTable().getTableDbName(), getName());
+    }
+
+    // ===================================================================================
+    //                                                             Column Basic :: Display
+    //                                                             =======================
     public String getColumnDefinitionLineDisp() {
         final StringBuilder sb = new StringBuilder();
         if (isPrimaryKey()) {

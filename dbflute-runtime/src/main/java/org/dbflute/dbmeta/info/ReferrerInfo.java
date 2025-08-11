@@ -346,7 +346,17 @@ public class ReferrerInfo implements RelationInfo {
         return _oneToOne;
     }
 
-    /** {@inheritDoc} */
+    // // #for_now jflute don't have the additional FK information but you can get from reverse oinstead (2025/07/12)
+    //public boolean isAdditiionalFK() {
+    //    return ((ForeignInfo)getReverseRelation()).isAdditiionalFK();
+    //}
+
+    /**
+     * {@inheritDoc} <br>
+     * Basically not null, because referrer-only relationship (as-many) does not exist. <br>
+     * And always returns type as ForeignInfo. <br>
+     * However, check them on your code just in case.
+     */
     public RelationInfo getReverseRelation() {
         return _reversePropertyName != null ? _referrerDBMeta.findRelationInfo(_reversePropertyName) : null;
     }

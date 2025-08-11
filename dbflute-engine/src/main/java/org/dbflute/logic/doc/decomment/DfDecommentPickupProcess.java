@@ -34,7 +34,7 @@ public class DfDecommentPickupProcess {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final DfDecoMapFile _decoMapFile = new DfDecoMapFile(() -> {
+    protected final DfDecoMapFile _decoMapFile = new DfDecoMapFile(() -> {
         return DBFluteSystem.currentLocalDateTime(); // for pickupDatetime
     });
 
@@ -45,31 +45,68 @@ public class DfDecommentPickupProcess {
      * @param clientPath The directory path of the DBFlute client. (NotNull)
      * @return The pickup object for display e.g. SchemaHTML (NotNull, EmptyAllowed: no table)
      */
-    public DfDecoMapPickup pickupDecomment(String clientPath) {
+    public DfDecoMapPickup pickupDecomment(String clientPath) { // has write operation
         final List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
         final List<DfDecoMapMapping> mappingList = readMappingList(clientPath);
         final OptionalThing<DfDecoMapPickup> optPickup = readPickup(clientPath);
 
         final DfDecoMapPickup displayPickup; // basically for SchemaHTML
-        if (pieceList.isEmpty() && mappingList.isEmpty()) { // no pickup resource
-            displayPickup = optPickup.orElseGet(() -> {
-                // non-existing pickup so empty instance for SchemaHTML by jflute (2022/07/05)
-                return new DfDecoMapPickup(Collections.emptyList(), DBFluteSystem.currentLocalDateTime());
-            });
-        } else { // has any pickup resources
+        if (notExistsPickupResource(pieceList, mappingList)) {
+            displayPickup = orElseEmptyPickup(optPickup);
+        } else { // has any pickup resources, needs to merge
             final DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList, mappingList);
 
             // #thinking jflute non-serialize pickup option needed? for parallel pickup (2022/07/05)
-            if (!mergedPickup.getTableList().isEmpty()) { // not to make empty file if no decomments
-                writePickup(clientPath, mergedPickup);
-            }
-            deletePiece(clientPath);
+            migratePieceToPickup(clientPath, mergedPickup); // write operation
 
             displayPickup = mergedPickup;
         }
         return displayPickup;
     }
 
+    protected void migratePieceToPickup(String clientPath, DfDecoMapPickup mergedPickup) {
+        if (!mergedPickup.getTableList().isEmpty()) { // not to make empty file if no decomments
+            writePickup(clientPath, mergedPickup);
+        }
+        deletePiece(clientPath);
+    }
+
+    // ===================================================================================
+    //                                                                              Glance
+    //                                                                              ======
+    /**
+     * @param clientPath The directory path of the DBFlute client. (NotNull)
+     * @return The pickup object for display e.g. SchemaHTML (NotNull, EmptyAllowed: no table)
+     */
+    public DfDecoMapPickup glanceDecomment(String clientPath) { // without write operation
+        final List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
+        final List<DfDecoMapMapping> mappingList = readMappingList(clientPath);
+        final OptionalThing<DfDecoMapPickup> optPickup = readPickup(clientPath);
+
+        if (notExistsPickupResource(pieceList, mappingList)) {
+            return orElseEmptyPickup(optPickup);
+        } else { // has any pickup resources, needs to merge
+            return mergeDecoMap(optPickup, pieceList, mappingList); // no write here
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected boolean notExistsPickupResource(List<DfDecoMapPiece> pieceList, List<DfDecoMapMapping> mappingList) {
+        return pieceList.isEmpty() && mappingList.isEmpty();
+    }
+
+    protected DfDecoMapPickup orElseEmptyPickup(final OptionalThing<DfDecoMapPickup> optPickup) {
+        return optPickup.orElseGet(() -> {
+            // non-existing pickup so empty instance for SchemaHTML by jflute (2022/07/05)
+            return new DfDecoMapPickup(Collections.emptyList(), DBFluteSystem.currentLocalDateTime());
+        });
+    }
+
+    // ===================================================================================
+    //                                                                      File Operation
+    //                                                                      ==============
     // -----------------------------------------------------
     //                                                 Read
     //                                                ------
@@ -86,14 +123,6 @@ public class DfDecommentPickupProcess {
     }
 
     // -----------------------------------------------------
-    //                                                 Merge
-    //                                                 -----
-    private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList,
-            List<DfDecoMapMapping> mappingList) {
-        return _decoMapFile.merge(optPickup, pieceList, mappingList);
-    }
-
-    // -----------------------------------------------------
     //                                                Update
     //                                                ------
     private void writePickup(String clientPath, DfDecoMapPickup mergedPickup) {
@@ -102,5 +131,14 @@ public class DfDecommentPickupProcess {
 
     private void deletePiece(String clientPath) {
         _decoMapFile.deletePiece(clientPath);
+    }
+
+    // -----------------------------------------------------
+    //                                                 Merge
+    //                                                 -----
+    // actully on-memory only operation (without filesystem)
+    private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList,
+            List<DfDecoMapMapping> mappingList) {
+        return _decoMapFile.merge(optPickup, pieceList, mappingList);
     }
 }

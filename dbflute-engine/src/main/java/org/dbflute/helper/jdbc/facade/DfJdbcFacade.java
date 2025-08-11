@@ -160,7 +160,7 @@ public class DfJdbcFacade {
     //                                                Cursor
     //                                                ------
     public DfJFadCursorCallback selectCursor(List<String> trySqlList, Map<String, ValueType> columnValueTypeMap,
-            DfJFadStringConverter stringConverter) {
+            DfJFadStringConverter stringConverter, DfJFadCursorStatementSetupper statementSetupper) {
         if (trySqlList == null || trySqlList.isEmpty()) {
             throw new IllegalArgumentException("The argument 'trySqlList' should not be null and empty: " + trySqlList);
         }
@@ -173,6 +173,7 @@ public class DfJdbcFacade {
                 try {
                     conn = _dataSource.getConnection();
                     st = conn.createStatement();
+                    statementSetupper.setup(st);
 
                     final DfCurrentSqlResult result = retryableExecuteQuery(trySqlList, st);
                     currentSql = result.getCurrentSql(); // not null, keep for later SQLException
@@ -189,6 +190,11 @@ public class DfJdbcFacade {
                 }
             }
         };
+    }
+
+    public static interface DfJFadCursorStatementSetupper {
+
+        void setup(Statement st) throws SQLException;
     }
 
     // -----------------------------------------------------

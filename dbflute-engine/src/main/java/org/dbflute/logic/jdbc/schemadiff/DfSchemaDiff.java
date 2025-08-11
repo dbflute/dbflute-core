@@ -234,7 +234,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected boolean _checkDbComment; // me too
     protected boolean _ignoreViewDefault; // me too
     protected boolean _ignoreViewNotNull; // me too
-    protected boolean _suppressSchema; // basically for SchemaSyncCheck
+    protected boolean _suppressSchemaName; // basically for SchemaSyncCheck
 
     // -----------------------------------------------------
     //                                            Table Diff
@@ -539,7 +539,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processUnifiedSchema(Table next, Table previous, DfTableDiff tableDiff) {
-        if (_suppressSchema) {
+        if (_suppressSchemaName) {
             return;
         }
         diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
@@ -1300,7 +1300,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected Sequence doFindSequence(Database db, Sequence sequence) {
-        return _suppressSchema ? db.getSequenceByPureName(sequence) : db.getSequenceByUniqueName(sequence);
+        return _suppressSchemaName ? db.getSequenceByPureName(sequence) : db.getSequenceByUniqueName(sequence);
     }
 
     protected boolean isSystemSequence(String sequenceName) {
@@ -1318,7 +1318,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected String getSequenceKeyName(Sequence sequence) {
-        return _suppressSchema ? sequence.getSequenceName() : sequence.getFormalUniqueName();
+        return _suppressSchemaName ? sequence.getSequenceName() : sequence.getFormalUniqueName();
     }
 
     // ===================================================================================
@@ -1480,7 +1480,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected Procedure doFindProcedure(Database db, Procedure procedure) {
-        return _suppressSchema ? db.getProcedureByPureName(procedure) : db.getProcedureByUniqueName(procedure);
+        return _suppressSchemaName ? db.getProcedureByPureName(procedure) : db.getProcedureByUniqueName(procedure);
     }
 
     protected boolean isSameProcedureName(Procedure next, Procedure previous) {
@@ -1489,7 +1489,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     protected String getProcedureKeyName(Procedure procedure) {
         // the simple procedureName contains package name of Oracle
-        return _suppressSchema ? procedure.getProcedureName() : procedure.getProcedureUniqueName();
+        return _suppressSchemaName ? procedure.getProcedureName() : procedure.getProcedureUniqueName();
     }
 
     // ===================================================================================
@@ -1650,8 +1650,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _ignoreViewNotNull = true;
     }
 
-    public void suppressSchema() {
-        _suppressSchema = true;
+    public void suppressSchemaName() {
+        _suppressSchemaName = true;
     }
 
     public void enableCraftDiff(String craftMetaDir) {

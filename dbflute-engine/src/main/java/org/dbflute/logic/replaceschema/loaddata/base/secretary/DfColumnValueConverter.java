@@ -30,6 +30,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -93,7 +94,7 @@ public class DfColumnValueConverter {
         if (_convertValueMap == null || _convertValueMap.isEmpty()) {
             return plainValue;
         }
-        final Map<String, String> valueMapping = findConvertValueMapping(columnName, columnMetaMap);
+        final Map<String, String> valueMapping = findConvertValueMapping(schemaTable, columnName, columnMetaMap);
         if (valueMapping == null || valueMapping.isEmpty()) {
             return plainValue;
         }
@@ -174,14 +175,15 @@ public class DfColumnValueConverter {
     // ===================================================================================
     //                                                                       Value Mapping
     //                                                                       =============
-    protected Map<String, String> findConvertValueMapping(String columnName, Map<String, DfColumnMeta> columnMetaMap) {
-        final Map<String, String> allMap = findeAllColumnConvertMap();
+    protected Map<String, String> findConvertValueMapping(DfLoadedSchemaTable schemaTable, String columnName,
+            Map<String, DfColumnMeta> columnMetaMap) {
+        final Map<String, String> allMap = findAllColumnConvertMap();
         final Map<String, String> typedMap = findTypedColumnConvertMap(columnName, columnMetaMap);
-        final Map<String, String> columnMap = _convertValueMap.getOrDefault(columnName, Collections.emptyMap());
+        final Map<String, String> columnMap = findColumnMapByColumn(schemaTable, columnName);
         return inheritMap(columnMap, inheritMap(typedMap, allMap)); // should be case sensitive map
     }
 
-    protected Map<String, String> findeAllColumnConvertMap() {
+    protected Map<String, String> findAllColumnConvertMap() {
         if (_allColumnConvertMap != null) {
             return _allColumnConvertMap;
         }
@@ -210,6 +212,19 @@ public class DfColumnValueConverter {
         final Map<String, String> valueMap = _convertValueMap.getOrDefault(typedKey, Collections.emptyMap());
         _typedColumnConvertMap.put(jdbcType, valueMap);
         return _typedColumnConvertMap.get(jdbcType);
+    }
+
+    protected Map<String, String> findColumnMapByColumn(DfLoadedSchemaTable schemaTable, String columnName) {
+        // first, table.columnName e.g. MEMBER.MEMBER_NAME (pinpoint) @since 1.3.0
+        // (on-file table name is only supported for now)
+        // second, columnName e.g. MEMBER_NAME (a little abstract)
+        final String onfileTableName = schemaTable.getOnfileTableName();
+        final String tableColumnName = onfileTableName + "." + columnName;
+        Map<String, String> columnMap = _convertValueMap.get(tableColumnName);
+        if (columnMap == null) {
+            columnMap = _convertValueMap.getOrDefault(columnName, DfCollectionUtil.emptyMap());
+        }
+        return columnMap;
     }
 
     protected Map<String, String> inheritMap(Map<String, String> subMap, Map<String, String> superMap) {

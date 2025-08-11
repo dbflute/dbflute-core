@@ -236,6 +236,13 @@ td {
 .commentdesc {
 	color: #3F7E5E;
 }
+.deprecatedtable {
+	color: #8F06F4;
+	font-size: 0.8em;
+}
+.deprecatedtablerelation {
+	color: #8F06F4;
+}
 
 /* inner table */
 table.child {
@@ -669,16 +676,18 @@ ${database.schemaDescription}
 	<tr>
 		<td class="rownumcell">${rownum}</td>
 #if ($needsTableAliasItem)
-		<td class="aliascell">${table.alias}</td>
+		<td class="aliascell">${table.aliasForSchemaHtml}</td>
 #end
-		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
+#set ($deprecatedTablePrefix = $table.deprecatedTableTagPrefixForSchemaHtml)
+#set ($deprecatedTableSuffix = $table.deprecatedTableTagSuffixForSchemaHtml)
+		<td class="namecell" data-name="${table.tableDbName}"><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${deprecatedTablePrefix}${table.tableDispName}${deprecatedTableSuffix}</a></td>
 		<td class="typecell">${table.type}</td>
 #if ($hasAdditionalSchema)
 		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
 #end
 		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
-		<td class="commentcell ${table.tableDbName}_comment"><pre>#if($table.hasComment())${table.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
+		<td class="commentcell ${table.tableDbName}_comment"><pre>#if($table.hasCommentForSchemaHtml())${table.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
 		<td class="subcell">${table.javaName}</td>
 #if ($database.hasTableFirstDate())
 		<td class="subcell">$table.firstDateSimpleExp</td>
@@ -1258,9 +1267,9 @@ searcher.init();
 #macro(escape $str)$!str.replaceAll("'", "\\'").replaceAll("\n", "<br>")#end
 <script>
 
-## ===================================================================================
-##                                                                          Api Client
-##                                                                          ==========
+// ===================================================================================
+//                                                                          Api Client
+//                                                                          ==========
 /**
  * @author deco
  */
@@ -1337,9 +1346,9 @@ ApiClient.prototype = {
 	}
 }
 
-## ===================================================================================
-##                                                                      Decomment Util
-##                                                                      ==============
+// ===================================================================================
+//                                                                      Decomment Util
+//                                                                      ==============
 /**
  * @author deco
  */
@@ -1378,8 +1387,8 @@ var DecommentUtil = new function(){
 		});
 	},
 	/**
-	 * Escape newline character of text
-	 * @param {String} string - text
+	 * Escape newline character of text. (changing to real line separator)
+	 * @param {String} string - text (NotNull, EmpytAllowed)
 	 */
 	this.escapeNewlineCharacter = function (string) {
 		return string.split('<br>').join('\n');
@@ -1415,13 +1424,18 @@ var DecommentUtil = new function(){
 	}
 }
 
-## ===================================================================================
-##                                                                     Decomment Store
-##                                                                     ===============
+// ===================================================================================
+//                                                                     Decomment Store
+//                                                                     ===============
 /**
  * @author deco
  */
 function StoreClient() {
+
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+	// the pickup object as embedded in this SchemaHTML by DBFlute Engine.
+	// initialized from saved pickup file by Doc task.
+	// _/_/_/_/_/_/_/_/
 	// setup from dbflute if decomment pickup exists
 	this.embeddedPickup = {
 		'tables': [
@@ -1491,8 +1505,16 @@ function StoreClient() {
 #end
 		]
 	}
+
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+	// the stored object of pickup to display.
+	// this pickup store stores virtual pickup or embedded pickup to reflect it to HTML display.
+	// while, pickup store has current database comment as initialized values
+	// to determine database comment conflict.
+	// _/_/_/_/_/_/_/_/
 	this.pickupStore = {
 #foreach ($table in $database.tableDisplaySortedList)
+## databaseComment is not null, empty allowed: always defined even if no comment (2025/07/25)
 ## decomment uses display name so fix later
 		#if ($velocityCount > 1), #end'${table.tableDbName}': {
 			'databaseComment': '#escape(${table.commentForSchemaHtml})'
@@ -1513,10 +1535,24 @@ function StoreClient() {
 
 StoreClient.prototype = {
 	/**
-	 * Store pickup json to store
-	 * @param {Object} pickup - pickup response
+	 * Store pickup json to pickup store that used as HTML display.
+	 * @param {Object} pickup - Decomment pickup object which is virtual or embedded. (NotNull)
 	 */
-	storePickup: function (pickup) {
+	storePickup: function(pickup) {
+		// _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+		// fetchVirtualPickup() // request virtual pickup to server
+		//  or
+		// reflectEmbeddedPickup() // using embedded pickup
+		//   |-reflectPickup()  // store it and reflect to html
+		//     | 
+		//     | (storeClient) 
+		//     |-storePickup()  // store the virtual pickup to pickup store
+		//     |  |-storePickupTable()
+		//     |     |-storePickupColumn()
+		//     | 
+		//     |-table.reflectToHtml() 
+		//     |-column.reflectToHtml() 
+		// _/_/_/_/_/_/_/_/
 		var that = this;
 		Array.prototype.forEach.call(pickup["tables"], function (table) {
 			that.storePickupTable(table);
@@ -1537,10 +1573,10 @@ StoreClient.prototype = {
 	},
 
 	/**
-	 * Store table
-	 * @param {Object} table - table object of pickup response
+	 * Store table to pickup store for HTML display.
+	 * @param {Object} table - The table object of pickup response, which is virtual or embedded. (NotNull)
 	 */
-	storePickupTable: function (table) {
+	storePickupTable: function(table) {
 		// init if not exists
 		var tableName = table['tableName'];
 		if (this.pickupStore[tableName] === undefined) {
@@ -1553,21 +1589,32 @@ StoreClient.prototype = {
 			return;
 		}
 
-		// get database comment
+		// get current database comment on database from pickup store
+		// (pickup store has current database comment as initialized values)
 		var tableMap = this.pickupStore[tableName];
-		var databaseComment = tableMap['databaseComment'];
+		var currentDatabaseComment = tableMap['databaseComment'];
 
 		// setup properties to store
 		var isConflict = properties.length > 1;
-		var isDatabaseCommentConflict = false;
+		var isDatabaseCommentConflict = false; // true if real DB comment was changed 
 		var decomments = [];
 		var previousPieces = [];
 		var authors = [];
 		var commentVersion = 0;
 		var that = this;
-		Array.prototype.forEach.call(properties, function (property) {
-			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
-				isDatabaseCommentConflict = DecommentUtil.escapeNewlineCharacter(databaseComment) != DecommentUtil.escapeNewlineCharacter(property['databaseComment']);
+		Array.prototype.forEach.call(properties, function(property) {
+			if (property['databaseComment'] != null && currentDatabaseComment != null && !isDatabaseCommentConflict) {
+				// it needs trim-comparing because piece file loses rear line separator as dfmap behavior
+				// https://github.com/dbflute/dbflute-core/issues/271
+				var currentEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(currentDatabaseComment).trim();
+				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']).trim();
+
+				if (currentEscapedDatabaseComment != '') { // conflict detect when existing only
+					// true if real DB comment was changed
+					isDatabaseCommentConflict = currentEscapedDatabaseComment != previousEscapedDatabaseComment;
+				}
+				// ignore conflect when database comment is deleted because it's probably migration to decomment
+				// https://github.com/dbflute/dbflute-core/issues/272
 			}
 			var decomment = {
 				"body": property["decomment"],
@@ -1596,9 +1643,9 @@ StoreClient.prototype = {
 	},
 
 	/**
-	 * Store column
-	 * @param {string} tableDbName - table db name
-	 * @param {Object} column - column object of pickup response
+	 * Store column to pickup store for HTML display.
+	 * @param {string} tableDbName - The DB name of table of the column. (NotNull, NotEmpty)
+	 * @param {Object} column - The column object of pickup response, which is virtual or embedded (NotNull)
 	 */
 	storePickupColumn: function (tableDbName, column) {
 		var columnName = column['columnName'];
@@ -1617,21 +1664,32 @@ StoreClient.prototype = {
 			return;
 		}
 
-		// get database comment
+		// get current database comment on database from pickup store
+		// (pickup store has current database comment as initialized values)
 		var columnMap = this.pickupStore[tableDbName]['columns'][columnName];
-		var databaseComment = columnMap['databaseComment'];
+		var currentDatabaseComment = columnMap['databaseComment'];
 
 		// setup properties to store
 		var isConflict = properties.length > 1;
-		var isDatabaseCommentConflict = false;
+		var isDatabaseCommentConflict = false; // true if real DB comment was changed
 		var decomments = [];
 		var previousPieces = [];
 		var authors = [];
 		var commentVersion = 0;
 		var that = this;
 		Array.prototype.forEach.call(properties, function (property) {
-			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
-				isDatabaseCommentConflict = DecommentUtil.escapeNewlineCharacter(databaseComment) != DecommentUtil.escapeNewlineCharacter(property['databaseComment']);
+			if (property['databaseComment'] != null && currentDatabaseComment != null && !isDatabaseCommentConflict) {
+				// it needs trim-comparing because piece file loses rear line separator as dfmap behavior
+				// https://github.com/dbflute/dbflute-core/issues/271
+				var currentEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(currentDatabaseComment).trim();
+				var previousEscapedDatabaseComment = DecommentUtil.escapeNewlineCharacter(property['databaseComment']).trim();
+
+				if (currentEscapedDatabaseComment != '') { // conflict detect when existing only
+					// true if real DB comment was changed
+					isDatabaseCommentConflict = currentEscapedDatabaseComment != previousEscapedDatabaseComment;
+				}
+				// ignore conflect when database comment is deleted because it's probably migration to decomment
+				// https://github.com/dbflute/dbflute-core/issues/272
 			}
 			var decomment = {
 				"body": property["decomment"],
@@ -1693,14 +1751,14 @@ StoreClient.prototype = {
 	}
 }
 
-## ===================================================================================
-##                                                                     Decomment Table
-##                                                                     ===============
+// ===================================================================================
+//                                                                     Decomment Table
+//                                                                     ===============
 function PickupTableProperty(tableDbName, json) {
 	this.tableDbName = tableDbName;
 	this.inputAuthor = null; // use when decomment server mode.
 	if (json) {
-		this.databaseComment = json.databaseComment;
+		this.databaseComment = json.databaseComment; // not null, empty allowed
 		this.isDatabaseCommentConflict = json.isDatabaseCommentConflict;
 		this.decomments = json.decomments || [];
 		this.previousPieces = json.previousPieces;
@@ -1780,13 +1838,11 @@ PickupTableProperty.prototype = {
 	},
 
 	/**
-	 * Get escaped database comment
-	 * @return {string} escaped database comment
+	 * Get escaped database comment. (e.g. changing br tag to real line separator)
+	 * @return {string} escaped database comment (NotNull, EmptyAllowed)
 	 */
 	getEscapedDatabaseComment: function() {
-		var escapedComment = "";
-		escapedComment = DecommentUtil.escapeNewlineCharacter(escapedComment);
-		return escapedComment;
+		return DecommentUtil.escapeNewlineCharacter(this.databaseComment);
 	},
 
 	/**
@@ -1845,15 +1901,15 @@ PickupTableProperty.prototype = {
 	}
 };
 
-## ===================================================================================
-##                                                                    Decomment Column
-##                                                                    ================
+// ===================================================================================
+//                                                                    Decomment Column
+//                                                                    ================
 function PickupColumnProperty(tableDbName, columnName, json) {
 	this.tableDbName = tableDbName;
 	this.columnName = columnName;
 	this.inputAuthor = null; // use when decomment server mode.
 	if (json) {
-		this.databaseComment = json['databaseComment'];
+		this.databaseComment = json['databaseComment']; // not null, empty allowed
 		this.isDatabaseCommentConflict = json['isDatabaseCommentConflict'];
 		this.decomments = json['decomments'] || [];
 		this.previousPieces = json['previousPieces'];
@@ -1931,13 +1987,11 @@ PickupColumnProperty.prototype = {
 	},
 
 	/**
-	 * Get escaped database comment
-	 * @return {string} escaped database comment
+	 * Get escaped database comment. (e.g. changing br tag to real line separator)
+	 * @return {string} escaped database comment (NotNull, EmptyAllowed)
 	 */
 	getEscapedDatabaseComment: function() {
-		var escapedComment = "";
-		escapedComment = DecommentUtil.escapeNewlineCharacter(escapedComment);
-		return escapedComment;
+		return DecommentUtil.escapeNewlineCharacter(this.databaseComment);
 	},
 
 	/**
@@ -1993,12 +2047,81 @@ PickupColumnProperty.prototype = {
 	}
 };
 
-## ===================================================================================
-##                                                                           Decomment
-##                                                                           =========
+// ===================================================================================
+//                                                               Decomment Core Object
+//                                                               =====================
+// _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// [Decomment Initialization]
+//
+//                       +----------------------+
+//            +--------- | DBFlute Intro Server |
+//            | make     +----------------------+
+//            |                          |
+//            |                          | read
+//            |                          v
+//            v                      +----------------------------+
+//   +----------------+              |                            |
+//   | Virtual Pickup |              |    DBFlute Client          |
+//   +----------------+              |                            |
+//      |                            |   decomment-piece....dfmap | // as virtual pickup
+//      |                            |   decomment-pickup.dfmap   | // as virtual or embedded pickup
+//      |                            +----------------------------+
+//      |                                      |
+//      |      +-----------------+             |
+//      |      | Embedded Pickup | <-----------+
+//      |      +-----------------+ embedded from pickup file
+//      |                 |
+//      |                 |
+//      |                 |
+//      |                 |
+//      |                 | stored if plain HTML
+//      |                 v
+//      | stored       +--------------+ 
+//      |  if intro    |              | (has current database comment as initialized values)
+//      +------------> | Pickup Store | reflected to HTML display
+//                     |              |
+//                     +--------------+
+//                            |
+//   +--------+               |
+//   |  HTML  | <-------------+
+//   +--------+
+// _/_/_/_/_/_/_/_/
+//
+// _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// [Decomment Registration]
+// 
+//
+//                       +----------------------+
+//                  +--> | DBFlute Intro Server |
+//                  |    +----------------------+
+//                  |                    |
+//                  +--+                 | write piece
+//                     |                 v
+//                     |             +----------------------------+
+//                     |             |                            |
+//                     |             |    DBFlute Client          |
+//                     |             |                            |
+//                     |             |   decomment-piece....dfmap |
+//                     |             +----------------------------+
+//                     |                        
+//                     |
+//   +--------+        |
+//   |  HTML  |        |
+//   +--------+        | register piece
+//        |            |
+//        |   +------------------+
+//        +-- | Decomment Dialog |
+//            +------------------+
+//                     ^
+//             o       |
+//            /|\   ---+ input and OK
+//             /\
+//
+// _/_/_/_/_/_/_/_/
 /**
  * @author deco
  * @author cabos
+ * @author jflute
  */
 function Decomment() {
 	this.storeClient = new StoreClient()
@@ -2006,25 +2129,39 @@ function Decomment() {
 Decomment.prototype = {
 
 	/**
-	 * init
+	 * initialize decomment world.
 	 */
 	init: function () {
-		if (document.getElementById("intro_opening") !== null) {
+		if (document.getElementById("intro_opening") !== null) { // #intro_opening
+			// _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+			// fetchVirtualPickup() // request virtual pickup to server
+			//   |-reflectPickup()  // store it and reflect to html
+			//     | 
+			//     | (storeClient) 
+			//     |-storePickup()  // store the virtual pickup to pickup store
+			//     |  |-storePickupTable()
+			//     |     |-storePickupColumn()
+			//     | 
+			//     |-table.reflectToHtml() 
+			//     |-column.reflectToHtml() 
+			// _/_/_/_/
 			this.fetchVirtualPickup();
+
 			this.setupKeyDownEvent();
 			this.showUserNameInputIfNeed();
-		} else {
+		} else { // #plain_opening
 			this.reflectEmbeddedPickup();
 		}
 	},
 
 	/**
-	 * Fetch virtual pickup from server
+	 * Fetch virtual pickup from server and reflect the pickup to HTML display.
+	 * (The virtual pickup has saved pickup merged with saved pieces in server)
 	 */
-	fetchVirtualPickup: function () {
+	fetchVirtualPickup: function() { // entry of #intro_opening
 		var that = this;
 		new ApiClient().fetchDecomment(function(response) {
-			var decomment = JSON.parse(response);
+			var decomment = JSON.parse(response); // DecommentPickupResult of DBFlute Intro
 			that.reflectPickup(decomment);
 			that.setupSaveDecomment();
 		})
@@ -2044,23 +2181,38 @@ Decomment.prototype = {
 	},
 
 	/**
-	 * Reflect embedded pick
+	 * Reflect embedded pickup to HTML display.
 	 */
-	reflectEmbeddedPickup: function () {
+	reflectEmbeddedPickup: function () { // entry of #plain_opening
 		this.reflectPickup(this.storeClient.embeddedPickup);
 	},
 
 	/**
-	 * Reflect pickup
-	 * @param {Object} decomment - Decomment object
+	 * Reflect pickup to HTML display.
+	 * @param {Object} decomment - Decomment pickup object, which is virtual or embedded. (NotNull)
 	 */
 	reflectPickup: function (decomment) {
+		// _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+		// fetchVirtualPickup() // request virtual pickup to server
+		//  or
+		// reflectEmbeddedPickup() // using embedded pickup
+		//   |-reflectPickup()  // store it and reflect to html
+		//     | 
+		//     | (storeClient) 
+		//     |-storePickup()  // store the virtual pickup to pickup store
+		//     |  |-storePickupTable()
+		//     |     |-storePickupColumn()
+		//     | 
+		//     |-table.reflectToHtml() 
+		//     |-column.reflectToHtml() 
+		// _/_/_/_/_/_/_/_/
 		var that = this;
 		this.storeClient.unmappedTableArea.clear();
 		this.storeClient.unmappedColumnArea.clear();
 		this.storeClient.storePickup(decomment);
+
 		var pickup = this.storeClient.getDecomments()
-		Array.prototype.forEach.call(pickup, function (table) {
+		Array.prototype.forEach.call(pickup, function(table) {
 			table.reflectToHtml();
 			for (var key in table.columns) {
 				var column = table.columns[key]
@@ -2269,12 +2421,12 @@ Decomment.prototype = {
 	}
 };
 
-## ===================================================================================
-##                                                            Decomment Unmapped Table
-##                                                            ========================
-## -----------------------------------------------------
-##                          Decomment Unmapped Table Row
-##                          ----------------------------
+// ===================================================================================
+//                                                            Decomment Unmapped Table
+//                                                            ========================
+// -----------------------------------------------------
+//                          Decomment Unmapped Table Row
+//                          ----------------------------
 /**
  * @author cabos
  */
@@ -2328,9 +2480,9 @@ UnmappedTableRow.prototype = {
 	}
 }
 
-## -----------------------------------------------------
-##                         Decomment Unmapped Table Area
-##                         -----------------------------
+// -----------------------------------------------------
+//                         Decomment Unmapped Table Area
+//                         -----------------------------
 /**
  * @author cabos
  */
@@ -2506,12 +2658,12 @@ UnmappedTableArea.prototype = {
 	},
 }
 
-## ===================================================================================
-##                                                           Decomment Unmapped Column
-##                                                           =========================
-## -----------------------------------------------------
-##                         Decomment Unmapped Column Row
-##                         -----------------------------
+// ===================================================================================
+//                                                           Decomment Unmapped Column
+//                                                           =========================
+// -----------------------------------------------------
+//                         Decomment Unmapped Column Row
+//                         -----------------------------
 /**
  * @author cabos
  */
@@ -2568,9 +2720,9 @@ UnmappedColumnRow.prototype = {
 	}
 }
 
-## -----------------------------------------------------
-##                        Decomment Unmapped Column Area
-##                        ------------------------------
+// -----------------------------------------------------
+//                        Decomment Unmapped Column Area
+//                        ------------------------------
 /**
  * @author cabos
  */

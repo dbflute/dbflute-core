@@ -54,7 +54,7 @@ public class DfDecoMapPickup {
     // -----------------------------------------------------
     //                                               decoMap
     //                                               -------
-    protected final List<DfDecoMapTablePart> tableList; // not null
+    protected final List<DfDecoMapTablePart> tableList; // unique by table, not null
 
     // ===================================================================================
     //                                                                         Constructor
@@ -76,11 +76,12 @@ public class DfDecoMapPickup {
     // ===================================================================================
     //                                                                           Converter
     //                                                                           =========
+    // https://dbflute.seasar.org/data/model/intro/intro-decomment-classworld-map.png
     // map:{
     //     ; formatVersion = 1.1
     //     ; pickupDatetime = 2017-11-09T09:09:09.009
     //     ; decoMap = map:{
-    //         ; tableList = list:{
+    //         ; tableList = list:{ // unique by table
     //             ; map:{
     //                 ; tableName = MEMBER
     //                 ; mappingList = list:{}
@@ -100,7 +101,7 @@ public class DfDecoMapPickup {
     //                         ; ...
     //                     }
     //                 }
-    //                 ; columnList = list:{
+    //                 ; columnList = list:{ // unique by column
     //                     ; map:{
     //                         ; columnName = MEMBER_NAME
     //                         ; mappingList = list:{
@@ -126,6 +127,9 @@ public class DfDecoMapPickup {
     //                                 ; pieceGitBranch = master
     //                                 ; previousPieceList = list:{ JFLUTE00, CABOS000 }
     //                             }
+    //                         }
+    //                         ; map:{ // propertyList size is more than 2 if decomment conflicts exists
+    //                             ; ...
     //                         }
     //                     }
     //                     ; ... // more other columns

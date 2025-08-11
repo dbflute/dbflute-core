@@ -117,12 +117,17 @@ public class InvokingQueryAgent {
         // value, option are null allowed
 
         final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
-        if (!noArg && (value == null || "".equals(value))) {
-            if (_rootQuery.xgetSqlClause().isNullOrEmptyQueryChecked()) { // as default
-                String msg = "The conditionValue is required but null or empty: column=" + colName + " value=" + value;
-                throw new IllegalConditionBeanOperationException(msg);
-            } else { // e.g. when cb.ignoreNullOrEmptyQuery()
-                return;
+        if (!noArg && (value == null || "".equals(value))) { // means having argument but null/empty
+            // same logic as direct call, duplicate but check before reflection for performance
+            if ("".equals(value) && _rootQuery.xgetSqlClause().isEmptyStringQueryAllowed()) {
+                // no advance handling here in spite of NullOrEmptyQuery check
+            } else { // null value or not-allowed empty string
+                if (_rootQuery.xgetSqlClause().isNullOrEmptyQueryChecked()) { // as default
+                    String msg = "The conditionValue is required but null or empty: column=" + colName + " value=" + value;
+                    throw new IllegalConditionBeanOperationException(msg);
+                } else { // e.g. when cb.ignoreNullOrEmptyQuery()
+                    return; // no reflection end
+                }
             }
         }
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(colName);

@@ -14,7 +14,9 @@
 ## governing permissions and limitations under the License.
 ##
 <h2 id="${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>
-${table.aliasExpression}${table.tableDispName}
+#set ($deprecatedTablePrefix = $table.deprecatedTableTagPrefixForSchemaHtml)
+#set ($deprecatedTableSuffix = $table.deprecatedTableTagSuffixForSchemaHtml)
+${deprecatedTablePrefix}${table.aliasExpressionForSchemaHtml}${table.tableDispName}${deprecatedTableSuffix}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
 &nbsp;<span class="tableschematitle">on ${table.documentSchema}</span>
 #end
@@ -98,7 +100,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
 		<td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
 		<td class="relcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
-		<td class="commentcell"><pre>#if ($col.hasComment())${col.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
+		<td class="commentcell"><pre>#if ($col.hasCommentForSchemaHtml())${col.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
 		<td class="subcell">${col.javaBeansRulePropertyName}</td>
 		<td class="subcell">${col.javaNativeRemovedPackage}</td>
 #if ($canBeColumnNullObject)

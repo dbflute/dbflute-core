@@ -38,9 +38,11 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadStringConverter;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.dbflute.helper.jdbc.facade.DfJdbcFacade.DfJFadCursorStatementSetupper;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.s2dao.valuetype.basic.StringType;
 import org.dbflute.s2dao.valuetype.basic.TimeType;
 import org.dbflute.s2dao.valuetype.basic.TimestampType;
@@ -268,7 +270,15 @@ public class DfLReverseDataExtractor {
         final DfJFadStringConverter converter = createStringConverter();
 
         // use cursor way to avoid out of memory
-        final DfJFadCursorCallback callback = facade.selectCursor(sqlList, valueTypeMap, converter);
+        final Integer fetchSize = getDocumentProperties().getLoadDataReverseCursorSelectFetchSize();
+        final DfJFadCursorCallback callback = facade.selectCursor(sqlList, valueTypeMap, converter, new DfJFadCursorStatementSetupper() {
+            @Override
+            public void setup(Statement st) throws SQLException {
+                if (fetchSize != null) {
+                    st.setFetchSize(fetchSize);
+                }
+            }
+        });
         return new DfLReverseDataResult(callback);
     }
 
@@ -439,6 +449,10 @@ public class DfLReverseDataExtractor {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 
     // ===================================================================================

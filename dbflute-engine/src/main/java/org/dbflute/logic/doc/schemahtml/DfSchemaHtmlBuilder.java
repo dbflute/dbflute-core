@@ -70,7 +70,14 @@ public class DfSchemaHtmlBuilder {
             sb.append("<a href=\"#").append(tableId).append("\" title=\"").append(title).append("\">");
             contentName = tableDispName;
         }
-        sb.append(contentName).append("</a>");
+        if (table.isDeprecatedTable()) {
+            sb.append(table.getDeprecatedTableRelationTagPrefixForSchemaHtml());
+        }
+        sb.append(contentName);
+        if (table.isDeprecatedTable()) {
+            sb.append(table.getDeprecatedTableRelationTagSuffixForSchemaHtml());
+        }
+        sb.append("</a>");
         return sb.toString();
     }
 

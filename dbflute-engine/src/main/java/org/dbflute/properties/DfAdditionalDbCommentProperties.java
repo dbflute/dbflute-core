@@ -145,7 +145,7 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
     }
 
     protected String connectPlainDescription(String dfpropDescription, String plainDescription) { // dfprop exists here
-        if (plainDescription != null) { // both
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(plainDescription)) { // both
             final String delimiter = getPlainCommentDelimiter();
             return dfpropDescription + delimiter + plainDescription; // dfprop + DB
         } else { // dfprop only
@@ -178,7 +178,8 @@ public final class DfAdditionalDbCommentProperties extends DfAbstractDBFluteProp
         if (componentMap == null) {
             return null;
         }
-        return (String) componentMap.get("alias");
+        final String additionalAlias = (String) componentMap.get("alias");
+        return additionalAlias;
     }
 
     public String findColumnAlias(String tableName, String columnName) { // null allowed: null means not defined

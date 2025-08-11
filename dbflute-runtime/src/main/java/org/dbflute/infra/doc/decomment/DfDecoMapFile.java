@@ -846,6 +846,8 @@ public class DfDecoMapFile {
     //                                                                        MapList File
     //                                                                        ============
     protected DfMapFile createDfMapFile() {
+        // #hope jflute DBFlute Intro: should read map file ignoring line comment mark (2025/07/22)
+        // https://github.com/dbflute/dbflute-core/issues/267
         return new DfMapFile();
     }
 

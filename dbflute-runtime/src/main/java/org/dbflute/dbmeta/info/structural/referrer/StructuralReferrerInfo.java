@@ -13,18 +13,26 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.dbmeta.info;
+package org.dbflute.dbmeta.info.structural.referrer;
 
 import java.util.Map;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.dbmeta.info.ForeignInfo;
 
 /**
- * The class of relation information.
+ * The information of (structural) whole referrer. <br>
+ * The "structure-logical referrer" means one-to-many + one-to-one referrers wholly.
+ * 
+ * <p>Independent interface style for logical compatible with existing info classes.
+ * It's KUNIKU-NO-SAKU in Japanese.</p>
+ * 
  * @author jflute
+ * @since 1.3.0 (2025/07/12 Saturday at ichihara)
  */
-public interface RelationInfo {
+public interface StructuralReferrerInfo {
 
     // ===================================================================================
     //                                                                       Relation Name
@@ -48,23 +56,35 @@ public interface RelationInfo {
     //                                                                            ========
     /**
      * Get the DB meta of the local table. <br>
-     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER's one.
+     * If the relation is MEMBER from PURCHASE, this returns MEMBER's one. <br>
+     * If the relation is MEMBER from MEMBER_SECURITY, this returns MEMBER's one.
      * @return The DB meta singleton instance. (NotNull)
      */
     DBMeta getLocalDBMeta();
 
     /**
-     * Get the DB meta of the target table. <br>
-     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER_STATUS's one.
+     * Get the DB meta of the referrer table. <br>
+     * If the relation is MEMBER from PURCHASE, this returns PURCHASE's one. <br>
+     * If the relation is MEMBER from MEMBER_SECURITY, this returns MEMBER_SECURITY's one.
      * @return The DB meta singleton instance. (NotNull)
      */
-    DBMeta getTargetDBMeta();
+    DBMeta getReferrerDBMeta();
 
     /**
-     * Get the read-only map, key is a local column info, value is a target column info.
+     * Get the read-only map, key is a local column info, value is a referrer column info.
+     * If the relation is MEMBER from PURCHASE, this returns { MEMBER's PK = PURCHASE's FK }. <br>
+     * If the relation is MEMBER from MEMBER_SECURITY, this returns { MEMBER's PK = MEMBER_SECURITY's PK-FK }. <br>
      * @return The read-only map. (NotNull)
      */
-    Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
+    Map<ColumnInfo, ColumnInfo> getLocalReferrerColumnInfoMap();
+
+    /**
+     * Get the read-only map, key is a referrer column info, value is a local column info.
+     * If the relation is MEMBER from PURCHASE, this returns { PURCHASE's FK = MEMBER's PK}. <br>
+     * If the relation is MEMBER from MEMBER_SECURITY, this returns { MEMBER_SECURITY's PK-FK = MEMBER's PK }. <br>
+     * @return The read-only map. (NotNull)
+     */
+    Map<ColumnInfo, ColumnInfo> getReferrerLocalColumnInfoMap();
 
     // ===================================================================================
     //                                                              Programing Information
@@ -89,18 +109,18 @@ public interface RelationInfo {
     //                                                          Relationship Determination
     //                                                          ==========================
     /**
-     * Does the relation is one-to-one? <br>
-     * Is the FK column PK FK or UQ FK?
+     * Does the relation is one-to-one? (means referrer-as-one) <br>
+     * Is the FK column PK-FK or UQ-FK?
      * @return The determination, true or false.
      */
     boolean isOneToOne();
 
     /**
-     * Does the relation is referrer? <br>
-     * one-to-one relations are not treated as referrer so false.
+     * Does the relation is from additional foreign key? <br>
+     * Basically only simple virtual FK pattern because biz-one-t-one does not have referrer.
      * @return The determination, true or false.
      */
-    boolean isReferrer();
+    boolean isAdditionalFK();
 
     /**
      * Is the relation key compound key?
@@ -112,11 +132,13 @@ public interface RelationInfo {
     //                                                                 Reverse Information
     //                                                                 ===================
     /**
-     * Get the relation info of reverse relation. <br>
-     * e.g. MEMBER's purchaseList (referrer) has PURCHASE's member (foreign) as reverse.
-     * @return The instance of relation info. (NullAllowed: if null, means one-way reference)
+     * Get the relation info of reverse relation (fixedly as foreign). <br>
+     * e.g. MEMBER's purchaseList (referrer) has PURCHASE's member (foreign) as reverse. <br>
+     * e.g. MEMBER's memberSecurityAsOne (referrer) has MEMBER_SECURITY's member (foreign) as reverse. <br>
+     * Basically not null, because referrer-only relationship (as-many) does not exist. <br>
+     * @return The instance of relation info as foreign. (NotNull)
      */
-    RelationInfo getReverseRelation();
+    ForeignInfo getReverseForeign();
 
     // ===================================================================================
     //                                                                          Reflection

@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -714,6 +715,62 @@ public class DfPropFileTest extends RuntimeTestCase {
             fail();
         } catch (DfPropFileReadFailureException e) {
             log(e.getMessage());
+        }
+    }
+
+    public void test_readMap_cannotCastToList() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected InputStream createInputStream(String path) throws FileNotFoundException {
+                StringBuilder sb = new StringBuilder();
+                sb.append("map:{ maihama = map:{ sea = mystic } }");
+                String encoding = "UTF-8";
+                try {
+                    return new ByteArrayInputStream(sb.toString().getBytes(encoding));
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException("failed to get bytes: " + encoding, e);
+                }
+            }
+        };
+
+        // ## Act ##
+        try {
+            propFile.readMapAsStringListValue("/dummy/dummy.dfprop", null);
+            // ## Assert ##
+            fail();
+        } catch (DfPropFileReadFailureException e) {
+            String msg = e.getMessage();
+            log(msg);
+            assertContains(msg, "Cannot cast to List in the map file");
+        }
+    }
+
+    public void test_readMap_cannotCastToMap() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected InputStream createInputStream(String path) throws FileNotFoundException {
+                StringBuilder sb = new StringBuilder();
+                sb.append("map:{ maihama = list:{ sea = land } }");
+                String encoding = "UTF-8";
+                try {
+                    return new ByteArrayInputStream(sb.toString().getBytes(encoding));
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException("failed to get bytes: " + encoding, e);
+                }
+            }
+        };
+
+        // ## Act ##
+        try {
+            propFile.readMapAsStringMapValue("/dummy/dummy.dfprop", null);
+            // ## Assert ##
+            fail();
+        } catch (DfPropFileReadFailureException e) {
+            String msg = e.getMessage();
+            log(msg);
+            assertContains(msg, "Cannot cast to Map in the map file");
         }
     }
 }

@@ -276,6 +276,8 @@ public class DfSPolicyTableStatementChecker {
                 }
             }
         } else if (thenItem.equalsIgnoreCase("pk_columnName")) {
+            // #for_now jflute $$tableName$$ is unsupported yet here, use column.statement (2025/06/14)
+            // https://github.com/dbflute/dbflute-core/issues/244
             return determinePkSomethingThenValue(statement, table, violationCall, thenValue, notThenValue, pk -> toComparingColumnName(pk));
         } else if (thenItem.equalsIgnoreCase("pk_dbType") || thenItem.equalsIgnoreCase("pkDbType")) { // for compatible
             return determinePkSomethingThenValue(statement, table, violationCall, thenValue, notThenValue, pk -> pk.getDbType());

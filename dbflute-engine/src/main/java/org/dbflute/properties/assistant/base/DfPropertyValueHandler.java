@@ -244,6 +244,9 @@ public class DfPropertyValueHandler {
     // ===================================================================================
     //                                                                     Outside Handler
     //                                                                     ===============
+    // -----------------------------------------------------
+    //                                           String Prop
+    //                                           -----------
     public String getOutsideStringProp(String key) {
         final DfOutsideStringPropReader reader = createOutsideStringPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
@@ -255,10 +258,21 @@ public class DfPropertyValueHandler {
         return new DfOutsideStringPropReader();
     }
 
+    // -----------------------------------------------------
+    //                                              Map Prop
+    //                                              --------
     public Map<String, Object> getOutsideMapProp(String key) { // used by outer
+        return doGetOutsideMapProp(key, "./dfprop");
+    }
+
+    public Map<String, Object> getOutsideMapProp(String key, String middleDir) { // used by outer
+        return doGetOutsideMapProp(key, "./dfprop/" + middleDir);
+    }
+
+    protected Map<String, Object> doGetOutsideMapProp(String key, String baseDir) {
         final DfOutsideMapPropReader reader = createOutsideMapPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final String path = "./dfprop/" + propName + ".dfprop";
+        final String path = baseDir + "/" + propName + ".dfprop";
         return reader.readMap(path, getEnvironmentType());
     }
 
@@ -266,6 +280,9 @@ public class DfPropertyValueHandler {
         return new DfOutsideMapPropReader();
     }
 
+    // -----------------------------------------------------
+    //                                             List Prop
+    //                                             ---------
     public List<Object> getOutsideListProp(String key) {
         final DfOutsideListPropReader reader = createOutsideListPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");

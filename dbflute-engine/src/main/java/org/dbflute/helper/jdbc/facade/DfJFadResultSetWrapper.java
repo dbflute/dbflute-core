@@ -27,9 +27,9 @@ import org.dbflute.jdbc.ValueType;
  */
 public class DfJFadResultSetWrapper {
 
-    protected final ResultSet _rs;
-    protected final Map<String, ValueType> _columnValueTypeMap;
-    protected final DfJFadStringConverter _stringConverter;
+    protected final ResultSet _rs; // not null
+    protected final Map<String, ValueType> _columnValueTypeMap; // not null
+    protected final DfJFadStringConverter _stringConverter; // not null
 
     public DfJFadResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap, DfJFadStringConverter stringConverter) {
         _rs = rs;

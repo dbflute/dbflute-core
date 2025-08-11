@@ -64,13 +64,13 @@ public abstract class DfRepsSequenceHandlerJdbc implements DfRepsSequenceHandler
             return;
         }
         _tableMap = StringKeyMap.createAsFlexible();
-        final DfTableExtractor tableHandler = new DfTableExtractor();
+        final DfTableExtractor tableExtractor = new DfTableExtractor();
         final DatabaseMetaData metaData = conn.getMetaData();
         final List<UnifiedSchema> unifiedSchemaList = _unifiedSchemaList;
         for (UnifiedSchema unifiedSchema : unifiedSchemaList) {
             // same-name tables between different schemas are unsupported
             // so put all directly here
-            _tableMap.putAll(tableHandler.getTableMap(metaData, unifiedSchema));
+            _tableMap.putAll(tableExtractor.getTableMap(metaData, unifiedSchema));
         }
     }
 

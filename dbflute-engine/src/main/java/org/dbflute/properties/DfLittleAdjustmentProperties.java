@@ -53,7 +53,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractDBFlutePropert
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP = "Integer.MIN_VALUE";
+    public static final String MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP = "Integer.MIN_VALUE";
 
     // ===================================================================================
     //                                                                         Constructor

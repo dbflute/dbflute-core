@@ -28,6 +28,7 @@ import org.dbflute.helper.jdbc.connection.DfFittingDataSource;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
+import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor.DfAnotherAngleTableExceptor;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfDatabaseProperties;
@@ -126,14 +127,14 @@ public class DfSchemaSyncChecker {
     protected DfSchemaXmlSerializer serializeTargetSchema() { // as previous
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
-        targetSerializer.suppressSchemaDiff(); // same reason as main schema
+        targetSerializer.suppressSchemaNameDiff(); // same reason as main schema
         targetSerializer.serialize();
         return targetSerializer;
     }
 
     protected DfSchemaXmlSerializer serializeMainSchema() { // as next
         final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
-        mainSerializer.suppressSchemaDiff(); // because of comparison with other schema
+        mainSerializer.suppressSchemaNameDiff(); // because of comparison with other schema
         mainSerializer.serialize();
         return mainSerializer;
     }
@@ -192,12 +193,26 @@ public class DfSchemaSyncChecker {
 
     protected DfSchemaXmlSerializer doCreateSerializer(DfSchemaSource dataSource, String historyFile) {
         final String schemaXml = getSchemaXml();
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsSchemaSync(dataSource, schemaXml, historyFile);
+        final DfAnotherAngleTableExceptor anotherAngleTableExceptor = prepareAnotherAngleTableExceptor(); // not null
+
+        final DfSchemaXmlSerializer serializer =
+                DfSchemaXmlSerializer.createAsSchemaSync(dataSource, schemaXml, historyFile, anotherAngleTableExceptor);
+
         final String craftMetaDir = getSchemaSyncCheckCraftMetaDir();
         if (!getDocumentProperties().isSchemaSyncCheckSuppressCraftDiff()) {
             serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
         }
         return serializer;
+    }
+
+    protected DfAnotherAngleTableExceptor prepareAnotherAngleTableExceptor() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        return new DfAnotherAngleTableExceptor() {
+            @Override
+            public boolean determineExcept(UnifiedSchema unifiedSchema, String tableName) {
+                return !prop.isSchemaSyncCheckTableTarget(tableName); // not target means except
+            }
+        };
     }
 
     // ===================================================================================

@@ -399,7 +399,8 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Does the relation is from additional foreign key?
+     * Does the relation is from additional foreign key? <br>
+     * Containing simple virtual FK and biz-one-to-one (having fixed-condition).
      * @return The determination, true or false.
      */
     public boolean isAdditionalFK() {
@@ -452,7 +453,8 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Does the relation is from pure foreign key?
+     * Does the relation is from pure foreign key? <br>
+     * The "pure" means not additional FK and not referrerAsOne.
      * @return The determination, true or false.
      */
     public boolean isPureFK() { // derived property

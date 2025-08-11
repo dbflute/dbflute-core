@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,12 +34,12 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReader;
 import org.dbflute.properties.assistant.document.tableorder.DfDocTableOrder;
 import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
 import org.dbflute.util.DfCollectionUtil;
-import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -140,28 +141,38 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (isAliasHandling(comment)) {
             if (hasAliasDelimiter(comment)) {
                 final String delimiter = getAliasDelimiterInDbComment();
-                return comment.substring(0, comment.indexOf(delimiter)).trim();
-            } else {
+                final String candidateAlias = comment.substring(0, comment.indexOf(delimiter)).trim();
+                if (isDbCommentNumberAliasTreatedAsDescription()) {
+                    try {
+                        Integer.parseInt(candidateAlias);
+                        // maybe number classification description e.g. 1:formalized, 2:provisional, ...
+                        return null; // the candidate alias cannot be treated as alias
+                    } catch (NumberFormatException ignored) {
+                        return candidateAlias; // no problem
+                    }
+                } else { // mainly here
+                    return candidateAlias;
+                }
+            } else { // no delimiter
                 if (isDbCommentOnAliasBasis()) {
-                    // because the comment is for alias
-                    return comment != null ? comment.trim() : null;
+                    return comment != null ? comment.trim() : null; // because the comment is for alias
                 }
             }
         }
-        // alias does not exist everywhere
-        // if alias handling is not valid
-        return null;
+        return null; // alias does not exist everywhere if alias handling is not valid
     }
 
     public String extractDescriptionFromDbComment(String comment) { // comment is trimmed
         if (isAliasHandling(comment)) {
             if (hasAliasDelimiter(comment)) {
-                final String delimiter = getAliasDelimiterInDbComment();
-                return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
+                final String aliasFromDbComment = extractAliasFromDbComment(comment);
+                if (aliasFromDbComment != null) { // also comment is not null
+                    final String delimiter = getAliasDelimiterInDbComment();
+                    return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
+                }
             } else {
                 if (isDbCommentOnAliasBasis()) {
-                    // because the comment is for alias
-                    return null;
+                    return null; // because the comment is for alias
                 }
             }
         }
@@ -184,10 +195,15 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isDbCommentOnAliasBasis", false, getDocumentMap());
     }
 
+    public boolean isDbCommentNumberAliasTreatedAsDescription() { // @since 1.3.0
+        // #for_now jflute not used on Sql2Entity for now, too complex (2025/07/07)
+        return isProperty("isDbCommentNumberAliasTreatedAsDescription", false, getDocumentMap());
+    }
+
     // ===================================================================================
     //                                                            Entity JavaDoc DbComment
     //                                                            ========================
-    public boolean isEntityJavaDocDbCommentValid() { // default true since 1.0.4D
+    public boolean isEntityJavaDocDbCommentValid() { // default true @since 1.0.4D
         return isProperty("isEntityJavaDocDbCommentValid", true, getDocumentMap());
     }
 
@@ -453,6 +469,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     public boolean isCheckProcedureDiff() {
         return isProperty("isCheckProcedureDiff", false, getDocumentMap());
+    }
+
+    public boolean isSuppressCheckingSchemaNameDiff() { // closet @since 1.3.0
+        // https://github.com/dbflute/dbflute-core/issues/274
+        return isProperty("isSuppressCheckingSchemaNameDiff", false, getDocumentMap());
     }
 
     public boolean isIgnoreViewDefaultDiff() { // since 1.2.8 (2024/02/26)
@@ -857,44 +878,118 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
     }
 
     // -----------------------------------------------------
-    //                                     Table Except List
-    //                                     -----------------
-    protected List<String> _tableExceptList;
+    //                                   Table Except/Target
+    //                                   -------------------
+    protected List<String> _loadDataReverseTableExceptList;
 
     @SuppressWarnings("unchecked")
     protected List<String> getLoadDataReverseTableExceptList() { // for main schema
-        if (_tableExceptList != null) {
-            return _tableExceptList;
+        if (_loadDataReverseTableExceptList != null) {
+            return _loadDataReverseTableExceptList;
         }
         final Object tableExceptObj = getLoadDataReverseMap().get("tableExceptList");
         if (tableExceptObj != null && !(tableExceptObj instanceof List<?>)) {
             String msg = "loadDataReverseMap.tableExceptList should be list: " + tableExceptObj;
             throw new DfIllegalPropertyTypeException(msg);
         }
-        final List<String> tableExceptList;
+        List<String> tableExceptList;
         if (tableExceptObj != null) {
             tableExceptList = (List<String>) tableExceptObj;
         } else {
             tableExceptList = DfCollectionUtil.emptyList();
         }
-        _tableExceptList = tableExceptList;
-        return _tableExceptList;
+        if (isLoadDataReverseExceptDeprecatedTable()) {
+            final List<String> mutableList = new ArrayList<>(tableExceptList);
+            mutableList.addAll(getDeprecatedTableMap().keySet());
+            tableExceptList = mutableList;
+        }
+        _loadDataReverseTableExceptList = tableExceptList;
+        return _loadDataReverseTableExceptList;
     }
 
-    public boolean isLoadDataReverseTableTarget(String name) {
-        final List<String> targetList = DfCollectionUtil.emptyList();
-        return isTargetByHint(name, targetList, getLoadDataReverseTableExceptList());
+    protected List<String> _loadDataReverseTableTargetList;
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getLoadDataReverseTableTargetList() { // for main schema
+        if (_loadDataReverseTableTargetList != null) {
+            return _loadDataReverseTableTargetList;
+        }
+        final Object tableTargetObj = getLoadDataReverseMap().get("tableTargetList"); // @since 1.3.0
+        if (tableTargetObj != null && !(tableTargetObj instanceof List<?>)) {
+            String msg = "loadDataReverseMap.tableTargetList should be list: " + tableTargetObj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        final List<String> tableTargetList;
+        if (tableTargetObj != null) {
+            tableTargetList = (List<String>) tableTargetObj;
+        } else {
+            tableTargetList = DfCollectionUtil.emptyList();
+        }
+        _loadDataReverseTableTargetList = tableTargetList;
+        return _loadDataReverseTableTargetList;
     }
 
-    public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
-        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    public boolean isLoadDataReverseTableTarget(String tableDbName) {
+        final List<String> tableTargetList = getLoadDataReverseTableTargetList();
+        final List<String> tableExceptList = getLoadDataReverseTableExceptList();
+        return isTargetByHint(tableDbName, tableTargetList, tableExceptList);
+    }
+
+    public boolean isLoadDataReverseExceptDeprecatedTable() { // @since 1.3.0 (2025/07/14)
+        return isProperty("isExceptDeprecatedTable", false, getLoadDataReverseMap());
     }
 
     // -----------------------------------------------------
     //                                     Additional Schema
     //                                     -----------------
-    public boolean isLoadDataReverseIncludeAdditionalSchema() { // since 1.2.9 (2025/04/27)
+    public boolean isLoadDataReverseIncludeAdditionalSchema() { // @since 1.2.9 (2025/04/27)
         return isProperty("isIncludeAdditionalSchema", false, getLoadDataReverseMap());
+    }
+
+    // -----------------------------------------------------
+    //                              Cursor Select Fetch Size
+    //                              ------------------------
+    public Integer getLoadDataReverseCursorSelectFetchSize() { // null allowed, @since 1.3.0
+        final String key = "cursorSelectFetchSize";
+        final String defaultValue = getLoadDataReverseDefaultCursorSelectFetchSize();
+        final String property = getProperty(key, defaultValue, getLoadDataReverseMap());
+        if (getBasicProperties().isDatabaseMySQL()) {
+            if (property != null && property.equals(DfLittleAdjustmentProperties.MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP)) {
+                return Integer.MIN_VALUE;
+            }
+        }
+        if (property != null) {
+            try {
+                return Integer.parseInt(property);
+            } catch (NumberFormatException e) {
+                String msg = "LoadDataReverse." + key + " should be Integer expression: property=" + property;
+                throw new DfIllegalPropertySettingException(msg, e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    protected String getLoadDataReverseDefaultCursorSelectFetchSize() { // copied from littleAdjustment
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // also MySQL is all data fetching, but MIN_VALUE has the adverse effect
+        // e.g. you cannot select in cursor callback when MIN_VALUE
+        // _/_/_/_/_/_/_/_/_/_/
+        if (prop.isDatabasePostgreSQL()) { // is all data fetching as default
+            defaultValue = "100";
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
+    }
+
+    // -----------------------------------------------------
+    //                                      Framework Option
+    //                                      ----------------
+    public boolean isLoadDataReverseFrameworkDebug() { // @since 1.3.0
+        return isProperty("isFrameworkDebug", false, getLoadDataReverseMap());
     }
 
     // ===================================================================================
@@ -970,10 +1065,25 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
     }
 
+    // -----------------------------------------------------
+    //                                   SyncCheck CraftDiff
+    //                                   -------------------
     public boolean isSchemaSyncCheckSuppressCraftDiff() { // closet
         return isProperty("isSuppressCraftDiff", false, getSchemaSyncCheckMap());
     }
 
+    public String getSchemaSyncCheckCraftMetaDir() { // closet
+        if (!isCheckCraftDiff()) {
+            return null;
+        }
+        final String defaultDir = getDocumentOutputDirectory() + "/craftdiff";
+        final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
+        return Srl.replace(property, "$$DEFAULT$$", defaultDir);
+    }
+
+    // -----------------------------------------------------
+    //                                 SyncCheck Result File
+    //                                 ---------------------
     public String getSchemaSyncCheckResultFileName() { // closet
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
         final String fileName = schemaSyncCheckMap.get("resultHtmlFileName");
@@ -988,13 +1098,36 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return outputDirectory + "/" + getSchemaSyncCheckResultFileName();
     }
 
-    public String getSchemaSyncCheckCraftMetaDir() { // closet
-        if (!isCheckCraftDiff()) {
-            return null;
+    // -----------------------------------------------------
+    //                                          Table Except
+    //                                          ------------
+    // except only here, because of coexistence with basic except/target
+    protected List<String> _schemaSyncCheckTableExceptList;
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getSchemaSyncCheckTableExceptList() {
+        if (_schemaSyncCheckTableExceptList != null) {
+            return _schemaSyncCheckTableExceptList;
         }
-        final String defaultDir = getDocumentOutputDirectory() + "/craftdiff";
-        final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
-        return Srl.replace(property, "$$DEFAULT$$", defaultDir);
+        final Object tableExceptObj = getSchemaSyncCheckMap().get("tableExceptList"); // @since 1.3.0
+        if (tableExceptObj != null && !(tableExceptObj instanceof List<?>)) {
+            String msg = "schemaSyncCheckMap.tableExceptList should be list: " + tableExceptObj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        final List<String> tableExceptList;
+        if (tableExceptObj != null) {
+            tableExceptList = (List<String>) tableExceptObj;
+        } else {
+            tableExceptList = DfCollectionUtil.emptyList();
+        }
+        _schemaSyncCheckTableExceptList = tableExceptList;
+        return _schemaSyncCheckTableExceptList;
+    }
+
+    public boolean isSchemaSyncCheckTableTarget(String tableName) {
+        final List<String> tableTargetList = DfCollectionUtil.emptyList();
+        final List<String> tableExceptList = getSchemaSyncCheckTableExceptList();
+        return isTargetByHint(tableName, tableTargetList, tableExceptList);
     }
 
     // ===================================================================================
@@ -1046,7 +1179,11 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         if (_propertiesHtmlMap != null) {
             return _propertiesHtmlMap;
         }
-        _propertiesHtmlMap = resolvePropertiesHtmlMap(preparePropertiesHtmlResourceMap());
+        if (isSuppressPropertiesHtmlGenerateForcedly()) { // for e.g. DBFLUTE_ENVIRONMENT_TYPE
+            _propertiesHtmlMap = new HashMap<>(); // empty means no PropertiesHTML process
+        } else { // mainly here
+            _propertiesHtmlMap = resolvePropertiesHtmlMap(preparePropertiesHtmlResourceMap());
+        }
         return _propertiesHtmlMap;
     }
 
@@ -1126,6 +1263,14 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
             _propertiesHtmlHeaderMap = DfCollectionUtil.emptyMap();
         }
         return resolvedMap;
+    }
+
+    protected boolean isSuppressPropertiesHtmlGenerateForcedly() { // closet, @since 1.3.0
+        // for e.g. DBFLUTE_ENVIRONMENT_TYPE
+        // to avoid changing links to e.g. SchemaHTML, HistoryHTML
+        // so this property is basically used in specified environment (+.dfprop)
+        // (not delete existing file, only stop overriding)
+        return isProperty("isSuppressPropertiesHtmlGenerateForcedly", false, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -1263,6 +1408,79 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
 
     protected String getPropertiesHtmlJavaScript() { // closet
         return getPropertiesHtmlHeaderJavaScript();
+    }
+
+    // ===================================================================================
+    //                                                                    Deprecated Table
+    //                                                                    ================
+    protected Map<String, Object> _deprecatedTableMap;
+
+    // e.g.
+    //  ; deprecatedTableMap = map:{
+    //      ; DEP_MEMBER = map:{ comment = ... }
+    //      ; DEP_PURCHASE = map:{ comment = ... }
+    //  }
+    protected Map<String, Object> getDeprecatedTableMap() { // closet, @since 1.3.0
+        if (_deprecatedTableMap != null) {
+            return _deprecatedTableMap;
+        }
+        final String key = "deprecatedTableMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>) getDocumentMap().get(key);
+        if (map != null) {
+            _deprecatedTableMap = StringKeyMap.createAsFlexibleOrdered(); // for table name
+            _deprecatedTableMap.putAll(map);
+        } else {
+            _deprecatedTableMap = DfCollectionUtil.emptyMap();
+        }
+        return _deprecatedTableMap;
+    }
+
+    public boolean isDeprecatedTable(String tableFlexibleName) {
+        return getDeprecatedTableMap().containsKey(tableFlexibleName);
+    }
+
+    public String getDeprecatedTableReasonComment(String tableFlexibleName) {
+        if (!isDeprecatedTable(tableFlexibleName)) { // no way, programming mistake
+            String msg = "This should be called after isDeprecatedTable(): " + tableFlexibleName;
+            throw new IllegalStateException(msg);
+        }
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> optionMap = (Map<String, Object>) getDeprecatedTableMap().get(tableFlexibleName);
+        if (optionMap != null) {
+            final String comment = (String) optionMap.get("comment");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+                return comment;
+            } else {
+                String msg = "The reason comment of deprecated table is required: " + tableFlexibleName;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        } else {
+            String msg = "This should be called after isDeprecatedTable(): " + tableFlexibleName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    public String getDeprecatedTableCommentSymbol() {
+        // not @ to avoid javadoc effect
+        // not # to avoid decomment line comment headache
+        return "+deprecated";
+    }
+
+    public String getDeprecatedTableTagPrefixForSchemaHtml() {
+        return "<del class=\"deprecatedtable\">";
+    }
+
+    public String getDeprecatedTableTagSuffixForSchemaHtml() {
+        return "</del>";
+    }
+
+    public String getDeprecatedTableRelationTagPrefixForSchemaHtml() {
+        return "<del class=\"deprecatedtablerelation\">";
+    }
+
+    public String getDeprecatedTableRelationTagSuffixForSchemaHtml() {
+        return "</del>";
     }
 
     // ===================================================================================

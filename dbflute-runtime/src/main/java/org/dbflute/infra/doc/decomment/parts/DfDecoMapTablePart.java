@@ -32,13 +32,13 @@ public class DfDecoMapTablePart {
     //                                                                           Attribute
     //                                                                           =========
     protected final String tableName; // not null
-    protected final List<DfDecoMapMappingPart> mappingList; // not null
-    protected final List<DfDecoMapPropertyPart> propertyList; // not null
-    protected final List<DfDecoMapColumnPart> columnList; // not null
+    protected final List<DfDecoMapMappingPart> mappingList; // when renamed, not null, empty allowed
+    protected final List<DfDecoMapPropertyPart> propertyList; // plural if conflict, not null, empty allowed
+    protected final List<DfDecoMapColumnPart> columnList; // unique by column, not null, empty allowed
 
     // ===================================================================================
-    //                                                           Constructor and Converter
-    //                                                           =========================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfDecoMapTablePart(String tableName, List<DfDecoMapMappingPart> mappingList, List<DfDecoMapPropertyPart> propertyList,
             List<DfDecoMapColumnPart> columnList) {
         this.tableName = tableName;
@@ -48,18 +48,24 @@ public class DfDecoMapTablePart {
     }
 
     @SuppressWarnings("unchecked")
-    public DfDecoMapTablePart(Map<String, Object> tablePartMap) {
+    public DfDecoMapTablePart(Map<String, Object> tablePartMap) { // directly from dfmap file
         this.tableName = (String) tablePartMap.get("tableName");
+
         // not exists mapping list if format version is less equal 1.0
         final List<Map<String, Object>> mappingMapList =
                 (List<Map<String, Object>>) tablePartMap.getOrDefault("mappingList", Collections.emptyList());
         this.mappingList = mappingMapList.stream().map(DfDecoMapMappingPart::new).collect(Collectors.toList());
+
         final List<Map<String, Object>> propertyMapList = (List<Map<String, Object>>) tablePartMap.get("propertyList");
         this.propertyList = propertyMapList.stream().map(DfDecoMapPropertyPart::new).collect(Collectors.toList());
+
         final List<Map<String, Object>> columnMapList = (List<Map<String, Object>>) tablePartMap.get("columnList");
         this.columnList = columnMapList.stream().map(DfDecoMapColumnPart::new).collect(Collectors.toList());
     }
 
+    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========
     public Map<String, Object> convertPickupMap() {
         final List<Map<String, Object>> mappingMapList =
                 this.mappingList.stream().map(DfDecoMapMappingPart::convertToMap).collect(Collectors.toList());

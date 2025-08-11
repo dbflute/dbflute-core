@@ -42,11 +42,11 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableInfo,
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableMeta,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
-        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
-        final String tableName = tableInfo.getTableName();
-        if (tableInfo.isTableTypeView()) {
+        final UnifiedSchema unifiedSchema = tableMeta.getUnifiedSchema();
+        final String tableName = tableMeta.getTableName();
+        if (tableMeta.isTableTypeView()) {
             return newLinkedHashMap();
         }
         return getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
@@ -67,6 +67,9 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
         return map;
     }
 
+    // -----------------------------------------------------
+    //                                             Index Map
+    //                                             ---------
     protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
             Map<String, Map<Integer, String>> uniqueKeyMap, boolean retry) throws SQLException { // non unique only
         final Map<String, Map<Integer, String>> indexMap = newTableConstraintMap();
@@ -150,6 +153,9 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
         return indexMap;
     }
 
+    // ===================================================================================
+    //                                                                      Index MetaData
+    //                                                                      ==============
     protected ResultSet extractIndexMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
             throws SQLException {
         final boolean uniqueKeyOnly = false;
