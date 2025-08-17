@@ -42,10 +42,10 @@ public class DfClassificationJavaNameFilter {
         _nameFromToMap.put("<", "_");
         _nameFromToMap.put(">", "_");
         _nameFromToMap.put("?", "_");
-        _nameFromToMap.put("=", "_");
-        _nameFromToMap.put("-", "_");
-        _nameFromToMap.put(";", "_");
-        _nameFromToMap.put(":", "_");
+        _nameFromToMap.put("=", "_"); // @since 1.3.1
+        _nameFromToMap.put("-", "_"); // @since 1.3.1
+        _nameFromToMap.put(";", "_"); // @since 1.3.1
+        _nameFromToMap.put(":", "_"); // @since 1.3.1
         _nameFromToMap.put("\n", "_");
         _nameFromToMap.put("\t", "_");
 
@@ -59,8 +59,8 @@ public class DfClassificationJavaNameFilter {
         _nameFromToMap.put("\u3000", "_"); // full-width space
         _nameFromToMap.put("\u3001", "_"); // Japanese touten
         _nameFromToMap.put("\u3002", "_"); // Japanese kuten
-        _nameFromToMap.put("\u30fb", "_"); // Japanese chuten
-        _nameFromToMap.put("\uff01", "_"); // full-width !
+        _nameFromToMap.put("\u30fb", "_"); // Japanese chuten @since 1.3.1
+        _nameFromToMap.put("\uff01", "_"); // full-width ! @since 1.3.1
 
         // non-compilable hyphens
         _nameFromToMap.put("\u2010", "_");
