@@ -185,14 +185,14 @@ public class DfClsTableClassificationArranger {
     // -----------------------------------------------------
     //                                              SQL Mark
     //                                              --------
-    protected boolean hasSqlMark(String tableName) {
+    protected boolean hasSqlMark(String tableOrColumnName) {
         final String sqlMark = SQL_MARK;
-        return Srl.startsWithIgnoreCase(tableName, sqlMark);
+        return Srl.startsWithIgnoreCase(tableOrColumnName, sqlMark);
     }
 
-    protected String extractSqlMarkRemovedName(String name) {
+    protected String extractSqlMarkRemovedName(String tableOrColumnName) {
         final String sqlMark = SQL_MARK;
-        return Srl.substringFirstRearIgnoreCase(name, sqlMark).trim();
+        return Srl.substringFirstRearIgnoreCase(tableOrColumnName, sqlMark).trim();
     }
 
     // -----------------------------------------------------
