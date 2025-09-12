@@ -33,6 +33,7 @@ import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
+ * @author shiny
  * @author hakiba
  * @author cabos
  * @author jflute
@@ -86,6 +87,28 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
                 assertEquals("deco", memberName.getPropertyList().get(0).getPieceOwner());
             }
         }
+    }
+
+    public void test_readPieceList_preserves_hash_comments() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile(() -> currentLocalDateTime());
+        String testPieceCode = "SY555555";
+
+        // ## Act ##
+        List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
+
+        DfDecoMapPiece testPiece = pieceList.stream()
+                .filter(piece -> piece.getPieceCode().equals(testPieceCode))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Test piece not found"));
+
+        // ## Assert ##
+        String decomment = testPiece.getDecomment();
+        log("Decomment content: '{}'", decomment);
+
+        assertTrue("Should contain #sea", decomment.contains("#sea"));
+        assertTrue("Should contain #land", decomment.contains("#land"));
+        assertTrue("Should contain #piari", decomment.contains("#piari"));
     }
 
     // ===================================================================================
