@@ -37,6 +37,7 @@ import java.util.Map.Entry;
  * o trimmed lines that start with '#' is treated as line comment
  * o basically thread-safe if no changing option in progress
  * </pre>
+ * @author shiny
  * @author jflute
  * @since 1.1.8 (2018/05/05 Saturday)
  */
@@ -55,6 +56,7 @@ public class DfMapFile { // migrated MapListFile, basically keeping compatible
     protected final String _lineCommentMark;
     protected boolean _skipLineSeparator;
     protected boolean _checkDuplicateEntry;
+    protected boolean _preserveLineComments;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -83,6 +85,11 @@ public class DfMapFile { // migrated MapListFile, basically keeping compatible
 
     public DfMapFile checkDuplicateEntry() {
         _checkDuplicateEntry = true;
+        return this;
+    }
+
+    public DfMapFile preserveLineComments() {
+        _preserveLineComments = true;
         return this;
     }
 
@@ -255,7 +262,8 @@ public class DfMapFile { // migrated MapListFile, basically keeping compatible
     //                                                  ----
     /**
      * Read the string file. <br>
-     * A trimmed line that starts with '#' is treated as line comment.
+     * By default, a trimmed line that starts with '#' is treated as line comment and ignored.
+     * When preserveLineComments() is enabled, these lines are preserved in the output.
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read string. (NotNull)
      * @throws IOException When it fails to handle the IO.
@@ -289,8 +297,8 @@ public class DfMapFile { // migrated MapListFile, basically keeping compatible
                     // because the BOM character is not trimmed by trim()
                     lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
                 }
-                // if the line is comment, skip to read
-                if (lineString.trim().startsWith(lineCommentMark)) {
+                // if the line is comment, skip to read (unless preserving comments)
+                if (lineString.trim().startsWith(lineCommentMark) && !_preserveLineComments) {
                     previousLineComment = true;
                     continue;
                 }
