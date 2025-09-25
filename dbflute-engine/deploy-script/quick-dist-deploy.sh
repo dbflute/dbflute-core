@@ -1,4 +1,5 @@
 #!/bin/bash
+cd `dirname $0`
 
 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 # DBFlute Distribution and Quick Deploy
@@ -10,15 +11,10 @@
 # o the first ReplaceSchema after clone is already executed
 # _/_/_/_/_/_/_/_/_/_/
 
-# should be java8 when deploy script
-# other version branches are manually merged after that
-if [ `uname` = "Darwin" ]; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-fi
+# also to dbflute-engine directory
+. _prepare-build.sh
 
-# to dbflute-engine directory
-cd ..
-
+# quick dist and reflect
 ant -f build.xml dist
 ant -f build.xml reflect-to-test-active-dockside
 ant -f build.xml reflect-to-test-active-hangar

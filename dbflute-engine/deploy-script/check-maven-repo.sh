@@ -1,3 +1,5 @@
+#!/bin/bash
+cd `dirname $0`
 
 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 # Check of Maven Central Repository for DBFlute Runtime
@@ -7,11 +9,14 @@
 # o the dockside project are git-cloned at the next directory of dbflute-core
 # _/_/_/_/_/_/_/_/_/_/
 
+# also to dbflute-engine directory
+. _prepare-build.sh
+
 rm -R ~/.m2/repository/org/dbflute/dbflute-runtime/
 rm -R ~/.m2/repository/org/dbflute/utflute/
 
 ls
-cd ../../
+cd ../
 cd ../dbflute-test-active-dockside/
 
 # expect correct download
