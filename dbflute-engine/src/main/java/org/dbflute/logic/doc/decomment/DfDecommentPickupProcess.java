@@ -18,11 +18,13 @@ package org.dbflute.logic.doc.decomment;
 import java.util.Collections;
 import java.util.List;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.infra.doc.decomment.DfDecoMapFile;
 import org.dbflute.infra.doc.decomment.DfDecoMapMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.infra.doc.decomment.DfDecoMapPiece;
 import org.dbflute.optional.OptionalThing;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.system.DBFluteSystem;
 
 /**
@@ -56,12 +58,21 @@ public class DfDecommentPickupProcess {
         } else { // has any pickup resources, needs to merge
             final DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList, mappingList);
 
-            // #thinking jflute non-serialize pickup option needed? for parallel pickup (2022/07/05)
-            migratePieceToPickup(clientPath, mergedPickup); // write operation
+            // done jflute non-serialize pickup option needed? for parallel pickup (2022/07/05)
+            if (canMigratePieceToPickup()) { // @since 1.3.1 (2025/09/30)
+                migratePieceToPickup(clientPath, mergedPickup); // write operation
+            }
 
             displayPickup = mergedPickup;
         }
         return displayPickup;
+    }
+
+    // -----------------------------------------------------
+    //                                     Migrate to Pickup
+    //                                     -----------------
+    protected boolean canMigratePieceToPickup() {
+        return !getDocumentProperties().isSuppressDecommentPickup();
     }
 
     protected void migratePieceToPickup(String clientPath, DfDecoMapPickup mergedPickup) {
@@ -140,5 +151,16 @@ public class DfDecommentPickupProcess {
     private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList,
             List<DfDecoMapMapping> mappingList) {
         return _decoMapFile.merge(optPickup, pieceList, mappingList);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    public DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    public DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 }

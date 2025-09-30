@@ -449,6 +449,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return attrValue != null ? attrValue : defaultValue;
     }
 
+    // -----------------------------------------------------
+    //                                             decomment
+    //                                             ---------
+    public boolean isSuppressDecommentPickup() { // @since 1.3.1
+        return isProperty("isSuppressDecommentPickup", false, getDocumentMap());
+    }
+
     // ===================================================================================
     //                                                                         HistoryHtml
     //                                                                         ===========
