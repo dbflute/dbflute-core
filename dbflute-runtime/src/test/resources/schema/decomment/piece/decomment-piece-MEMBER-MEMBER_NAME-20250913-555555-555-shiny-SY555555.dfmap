@@ -5,8 +5,10 @@ map:{
     ; columnName = MEMBER_NAME
     ; targetType = COLUMN
     ; decomment = #sea
-    #land
+#land
     #piari
+     # shiny
+     # #dbflute
     ; databaseComment = sea mystic
     ; commentVersion = 1
     ; authorList = list:{ cabos ; hakiba ; deco ; jflute ; shiny }

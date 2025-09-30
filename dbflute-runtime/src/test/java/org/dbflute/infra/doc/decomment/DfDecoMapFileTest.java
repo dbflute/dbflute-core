@@ -109,6 +109,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         assertTrue("Should contain #sea", decomment.contains("#sea"));
         assertTrue("Should contain #land", decomment.contains("#land"));
         assertTrue("Should contain #piari", decomment.contains("#piari"));
+        assertTrue("Should contain # shiny", decomment.contains("# shiny"));
+        assertTrue("Should contain # #dbflute", decomment.contains("# #dbflute"));
     }
 
     // ===================================================================================
