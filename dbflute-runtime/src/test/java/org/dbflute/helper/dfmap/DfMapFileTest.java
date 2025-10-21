@@ -21,6 +21,7 @@ import java.util.Map;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
+ * @author shiny
  * @author jflute
  * @since 1.1.8 (2018/05/05 Saturday)
  */
@@ -105,6 +106,20 @@ public class DfMapFileTest extends RuntimeTestCase {
         // ## Assert ##
         log(actual);
         assertEquals("foo, \nbaz, qux", actual);
+    }
+
+    public void test_readString_lineComment_preserved() throws Exception {
+        // ## Arrange ##
+        DfMapFile file = new DfMapFile().preserveLineComments();
+        String text = "foo, \n#bar, \nbaz, qux";
+        ByteArrayInputStream ins = new ByteArrayInputStream(text.getBytes("UTF-8"));
+
+        // ## Act ##
+        String actual = file.readString(ins);
+
+        // ## Assert ##
+        log(actual);
+        assertEquals("foo, \n#bar, \nbaz, qux", actual);
     }
 
     public void test_readString_lineComment_last_removed_add_ln() throws Exception {
