@@ -25,6 +25,7 @@ import java.util.List;
 
 /**
  * @author hakiba
+ * @author shiny
  */
 public class DfHacommentPickupProcess {
 
@@ -33,14 +34,41 @@ public class DfHacommentPickupProcess {
     public DfHacoMapPickup pickupHacomment(String clientPath) {
         List<DfHacoMapPiece> pieceList = readPieceList(clientPath);
         OptionalThing<DfHacoMapPickup> optPickup = readPickup(clientPath);
-        DfHacoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList);
+
+        final DfHacoMapPickup pickUp;
+        if (pieceList.isEmpty()) { // no resources exist to pick up
+            pickUp = orElseEmptyPickup(optPickup);
+        } else { // pick up resources exists, needs to merge
+            pickUp = mergeDecoMap(optPickup, pieceList);
+            migratePieceToPickUp(clientPath, pickUp);
+        }
+        return pickUp;
+    }
+
+    // ===================================================================================
+    //                                                                      Migrate Pickup
+    //
+    protected void migratePieceToPickUp(String clientPath, DfHacoMapPickup mergedPickup) {
         if (!mergedPickup.getDiffList().isEmpty()) { // not to make empty file if no hacomments
             writePickup(clientPath, mergedPickup);
         }
         deletePiece(clientPath);
-        return mergedPickup;
     }
 
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected DfHacoMapPickup orElseEmptyPickup(OptionalThing<DfHacoMapPickup> optPickup) {
+        return optPickup.orElseGet(() -> {
+            DfHacoMapPickup pickup = new DfHacoMapPickup();
+            pickup.setPickupDatetime(DBFluteSystem.currentLocalDateTime());
+            return pickup;
+        });
+    }
+
+    // ===================================================================================
+    //                                                                      File Operation
+    //                                                                      ==============
     private List<DfHacoMapPiece> readPieceList(String clientPath) {
         return _hacoMapFile.readPieceList(clientPath);
     }
