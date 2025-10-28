@@ -54,10 +54,10 @@ public class DfHacoMapFileTest extends RuntimeTestCase {
         assertEquals(5, resultDiffList.size());
 
         List<String> expectedDiffCodes = Arrays.asList(
-            "20251015120000",
-            "20251010100000",
-            "20251012110000",
-            "20251020140000",
+            "20251015120000", //
+            "20251010100000", //
+            "20251012110000", //
+            "20251020140000", //
             "20251018130000"
         );
 
@@ -74,12 +74,12 @@ public class DfHacoMapFileTest extends RuntimeTestCase {
 
     private DfHacoMapDiffPart createDiffPart(String diffCode, String diffDate, String hacomment, String author, String pieceCode) {
         DfHacoMapPropertyPart propertyPart = new DfHacoMapPropertyPart(
-            hacomment,
-            null,
-            Arrays.asList(author),
-            pieceCode,
-            author,
-            LocalDateTime.now(),
+            hacomment,              //
+            null,                   //
+            Arrays.asList(author),  //
+            pieceCode,              //
+            author,                 //
+            LocalDateTime.now(),    //
             new ArrayList<>()
         );
         return new DfHacoMapDiffPart(diffCode, diffDate, propertyPart);

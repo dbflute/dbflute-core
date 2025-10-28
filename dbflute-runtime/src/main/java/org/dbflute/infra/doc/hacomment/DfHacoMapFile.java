@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 
 /**
  * @author hakiba
+ * @shiny
  */
 public class DfHacoMapFile {
 
@@ -357,6 +358,7 @@ public class DfHacoMapFile {
         Stream<DfHacoMapDiffPart> pickupDiffPartStream = pickupOpt.map(pickup -> pickup.getDiffList().stream()).orElse(Stream.empty());
 
         // grouping to diffPartMap (key: diffCode, value: diffPart list)
+        // preserve insertion order to avoid unnecessary diffs in the pickup file
         Map<String, List<DfHacoMapDiffPart>> diffPartMap =
                 Stream.concat(piecesDiffPartStream, pickupDiffPartStream).collect(Collectors.groupingBy(diffPart -> diffPart.diffCode, LinkedHashMap::new, Collectors.toList()));
 
