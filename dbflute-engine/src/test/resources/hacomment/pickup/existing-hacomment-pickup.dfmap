@@ -1,8 +1,0 @@
-map:{
-    ; formatVersion = 1.1
-    ; pickupDatetime = 2025-01-01T12:00:00
-    ; hacoMap = map:{
-        ; diffList = list:{
-        }
-    }
-}
