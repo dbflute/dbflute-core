@@ -48,7 +48,8 @@ import java.util.stream.Stream;
 
 /**
  * @author hakiba
- * @shiny
+ * @author shiny
+ * @author jflute
  */
 public class DfHacoMapFile {
 
