@@ -76,7 +76,7 @@ public class StatementConfig implements Serializable {
     //                                      ----------------
     /**
      * See the PreparedStatement interface of JDBC document for detail.
-     * @param queryTimeout The seconds for timeout. (NotMinus, ZeroAllowed: zero no limit)
+     * @param queryTimeout The seconds for timeout. (NullAllowed, NotMinus, ZeroAllowed: zero no limit)
      * @return this. (NotNull)
      */
     public StatementConfig queryTimeout(Integer queryTimeout) {
