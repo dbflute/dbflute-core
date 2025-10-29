@@ -292,11 +292,11 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<h3>Add Table</h3>
 	<ul class="table-content">
 #foreach ($tableDiff in $schemaDiff.addedTableDiffList)
-#if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
-		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
-#else
 #set ($deprecatedTablePrefix = $selector.buildDeprecatedTableTagPrefixForHistoryHtml(${tableDiff.lowerTableName}))
 #set ($deprecatedTableSuffix = $selector.buildDeprecatedTableTagSuffixForHistoryHtml(${tableDiff.lowerTableName}))
+#if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
+		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${deprecatedTablePrefix}${tableDiff.tableDispName}${deprecatedTableSuffix}</a></li>
+#else
 		<li>${deprecatedTablePrefix}${tableDiff.tableDispName}${deprecatedTableSuffix}</li>
 #end
 #end
