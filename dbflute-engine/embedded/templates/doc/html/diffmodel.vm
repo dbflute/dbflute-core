@@ -169,6 +169,12 @@ dl.column-content dd span {
 	color: #AA7777;
 }
 
+.deprecatedtable {
+	/* more viewable than SchemaHTML because old tables are main here */
+	color: #3F7E5E; /* comment-out color */
+	font-size: 1.0em;
+}
+
 /* -------------------------------------------------
                                   Hacomment Modal
 ------------------------------------------------- */
@@ -289,7 +295,9 @@ ${database.historyHtmlJavaScriptEmbedded}
 #if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
 		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
 #else
-		<li>${tableDiff.tableDispName}</li>
+#set ($deprecatedTablePrefix = $selector.buildDeprecatedTableTagPrefixForHistoryHtml(${tableDiff.lowerTableName}))
+#set ($deprecatedTableSuffix = $selector.buildDeprecatedTableTagSuffixForHistoryHtml(${tableDiff.lowerTableName}))
+		<li>${deprecatedTablePrefix}${tableDiff.tableDispName}${deprecatedTableSuffix}</li>
 #end
 #end
 	</ul>
@@ -298,10 +306,12 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<h3>Change Table</h3>
 	<div class="table-content">
 #foreach ($tableDiff in $schemaDiff.changedTableDiffList)
+#set ($deprecatedTablePrefix = $selector.buildDeprecatedTableTagPrefixForHistoryHtml(${tableDiff.lowerTableName}))
+#set ($deprecatedTableSuffix = $selector.buildDeprecatedTableTagSuffixForHistoryHtml(${tableDiff.lowerTableName}))
 #if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
-		<h4><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></h4>
+		<h4><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${deprecatedTablePrefix}${tableDiff.tableDispName}${deprecatedTableSuffix}</a></h4>
 #else
-		<h4>${tableDiff.tableDispName}</h4>
+		<h4>${deprecatedTablePrefix}${tableDiff.tableDispName}${deprecatedTableSuffix}</h4>
 #end
 		<div class="change-table-content">
 #foreach ($handler in $tableDiff.nextPreviousDiffList)
@@ -335,7 +345,9 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<h3>Delete Table</h3>
 	<ul class="table-content">
 #foreach ($tableDiff in $schemaDiff.deletedTableDiffList)
-		<li>${tableDiff.tableDispName}</li>
+#set ($deprecatedTablePrefix = $selector.buildDeprecatedTableTagPrefixForHistoryHtml(${tableDiff.lowerTableName}))
+#set ($deprecatedTableSuffix = $selector.buildDeprecatedTableTagSuffixForHistoryHtml(${tableDiff.lowerTableName}))
+		<li>${deprecatedTablePrefix}${tableDiff.tableDispName}${deprecatedTableSuffix}</li>
 #end
 	</ul>
 #end

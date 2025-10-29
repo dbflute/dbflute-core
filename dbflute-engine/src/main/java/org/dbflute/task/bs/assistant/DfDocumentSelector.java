@@ -310,6 +310,19 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
         return !isSuppressHistoryHtmlDiffGitBranch();
     }
 
+    // -----------------------------------------------------
+    //                                            Deprecated
+    //                                            ----------
+    public String buildDeprecatedTableTagPrefixForHistoryHtml(String tableFlexibleName) {
+        final boolean deprecatedTable = isDeprecatedTable(tableFlexibleName);
+        return deprecatedTable ? getDocumentProperties().getDeprecatedTableTagPrefixForSchemaHtml() : ""; // same as SchemaHTML
+    }
+
+    public String buildDeprecatedTableTagSuffixForHistoryHtml(String tableFlexibleName) {
+        final boolean deprecatedTable = isDeprecatedTable(tableFlexibleName);
+        return deprecatedTable ? getDocumentProperties().getDeprecatedTableTagSuffixForSchemaHtml() : ""; // same as SchemaHTML
+    }
+
     // ===================================================================================
     //                                                                     Properties HTML
     //                                                                     ===============
@@ -371,6 +384,13 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
         }
         cachedLastaDocNameList = getLastaFluteProperties().getLastaDocHtmlNameList();
         return cachedLastaDocNameList;
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected boolean isDeprecatedTable(String tableFlexibleName) {
+        return getDocumentProperties().isDeprecatedTable(tableFlexibleName);
     }
 
     // ===================================================================================

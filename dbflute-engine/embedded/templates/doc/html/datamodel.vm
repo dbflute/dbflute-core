@@ -237,11 +237,11 @@ td {
 	color: #3F7E5E;
 }
 .deprecatedtable {
-	color: #8F06F4;
+	color: #3F7E5E; /* comment-out color */
 	font-size: 0.8em;
 }
 .deprecatedtablerelation {
-	color: #8F06F4;
+	color: #3F7E5E; /* comment-out color */
 }
 
 /* inner table */
