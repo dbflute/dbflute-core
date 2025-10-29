@@ -69,6 +69,16 @@ public class DfDecommentPickupProcess {
     }
 
     // -----------------------------------------------------
+    //                                     no Piece Handling
+    //                                     -----------------
+    protected DfDecoMapPickup orElseEmptyPickup(final OptionalThing<DfDecoMapPickup> optPickup) {
+        return optPickup.orElseGet(() -> {
+            // non-existing pickup so empty instance for SchemaHTML by jflute (2022/07/05)
+            return new DfDecoMapPickup(Collections.emptyList(), DBFluteSystem.currentLocalDateTime());
+        });
+    }
+
+    // -----------------------------------------------------
     //                                     Migrate to Pickup
     //                                     -----------------
     protected boolean canMigratePieceToPickup() {
@@ -101,18 +111,8 @@ public class DfDecommentPickupProcess {
         }
     }
 
-    // ===================================================================================
-    //                                                                        Assist Logic
-    //                                                                        ============
     protected boolean notExistsPickupResource(List<DfDecoMapPiece> pieceList, List<DfDecoMapMapping> mappingList) {
         return pieceList.isEmpty() && mappingList.isEmpty();
-    }
-
-    protected DfDecoMapPickup orElseEmptyPickup(final OptionalThing<DfDecoMapPickup> optPickup) {
-        return optPickup.orElseGet(() -> {
-            // non-existing pickup so empty instance for SchemaHTML by jflute (2022/07/05)
-            return new DfDecoMapPickup(Collections.emptyList(), DBFluteSystem.currentLocalDateTime());
-        });
     }
 
     // ===================================================================================
