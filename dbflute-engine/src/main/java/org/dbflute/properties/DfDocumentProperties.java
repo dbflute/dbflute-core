@@ -1137,6 +1137,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isTargetByHint(tableName, tableTargetList, tableExceptList);
     }
 
+    // -----------------------------------------------------
+    //                                 Reverse Previous/Next
+    //                                 ---------------------
+    public boolean isSchemaSyncCheckReversePreviousNext() { // @since 1.3.1
+        return isProperty("isReversePreviousNext", false, getSchemaSyncCheckMap());
+    }
+
     // ===================================================================================
     //                                                              Table Display Order By
     //                                                              ======================

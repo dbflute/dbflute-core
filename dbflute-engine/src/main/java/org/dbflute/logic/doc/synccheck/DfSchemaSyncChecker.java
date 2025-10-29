@@ -106,25 +106,51 @@ public class DfSchemaSyncChecker {
         }
     }
 
+    // -----------------------------------------------------
+    //                                        Diff Execution
+    //                                        --------------
     protected DfSchemaXmlSerializer diffSchema() {
-        _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * *");
-        _log.info("*                               *");
-        _log.info("*    Target Schema (previous)   *");
-        _log.info("*                               *");
-        _log.info("* * * * * * * * * * * * * * * * *");
-        serializeTargetSchema(); // should be before main schema, making only schemaXml
+        if (isReversePreviousNext()) { // option @since 1.3.1
+            _log.info("");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            _log.info("*                               *");
+            _log.info("*     Main Schema (previous)    *");
+            _log.info("*                               *");
+            _log.info("*                  // reversed  *");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            serializeMainSchema();
 
-        _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * *");
-        _log.info("*                               *");
-        _log.info("*       Main Schema (next)      *");
-        _log.info("*                               *");
-        _log.info("* * * * * * * * * * * * * * * * *");
-        return serializeMainSchema(); // with diff process
+            _log.info("");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            _log.info("*                               *");
+            _log.info("*      Target Schema (next)     *");
+            _log.info("*                               *");
+            _log.info("*                  // reversed  *");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            return serializeTargetSchema(); // with diff process
+        } else { // standard, basically here
+            _log.info("");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            _log.info("*                               *");
+            _log.info("*    Target Schema (previous)   *");
+            _log.info("*                               *");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            serializeTargetSchema(); // should be before main schema, making only schemaXml
+
+            _log.info("");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            _log.info("*                               *");
+            _log.info("*       Main Schema (next)      *");
+            _log.info("*                               *");
+            _log.info("* * * * * * * * * * * * * * * * *");
+            return serializeMainSchema(); // with diff process
+        }
     }
 
-    protected DfSchemaXmlSerializer serializeTargetSchema() { // as previous
+    // -----------------------------------------------------
+    //                                             Serialize
+    //                                             ---------
+    protected DfSchemaXmlSerializer serializeTargetSchema() { // as previous (if default)
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
         targetSerializer.suppressSchemaNameDiff(); // same reason as main schema
@@ -132,7 +158,7 @@ public class DfSchemaSyncChecker {
         return targetSerializer;
     }
 
-    protected DfSchemaXmlSerializer serializeMainSchema() { // as next
+    protected DfSchemaXmlSerializer serializeMainSchema() { // as next (if default)
         final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
         mainSerializer.suppressSchemaNameDiff(); // because of comparison with other schema
         mainSerializer.serialize();
@@ -166,11 +192,19 @@ public class DfSchemaSyncChecker {
         br.addElement("You can see the details at");
         br.addElement(" '" + getResultFilePath() + "'.");
         br.addElement("");
-        br.addElement("'Previous' means the sync-check schema, defined at schemaSyncCheckMap property.");
-        br.addElement("'Next' means the main schema, defined at databaseInfoMap.dfprop.");
-        br.addElement("");
-        br.addElement("e.g. Add Table: FOO_TABLE");
-        br.addElement("create the table on the sync-check schema to synchronize with main schema.");
+        if (isReversePreviousNext()) { // option @since 1.3.1
+            br.addElement("'Previous' means the main schema, defined at databaseInfoMap.dfprop property.");
+            br.addElement("'Next' means the sync-check schema, defined at schemaSyncCheckMap property.");
+            br.addElement("");
+            br.addElement("e.g. Add Table: SEA_TABLE");
+            br.addElement("create the table on the main schema to synchronize with sync-check schema.");
+        } else {
+            br.addElement("'Previous' means the sync-check schema, defined at schemaSyncCheckMap property.");
+            br.addElement("'Next' means the main schema, defined at databaseInfoMap.dfprop.");
+            br.addElement("");
+            br.addElement("e.g. Add Table: SEA_TABLE");
+            br.addElement("create the table on the sync-check schema to synchronize with main schema.");
+        }
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaSyncCheckGhastlyTragedyException(msg);
     }
@@ -178,16 +212,33 @@ public class DfSchemaSyncChecker {
     // ===================================================================================
     //                                                                          Serializer
     //                                                                          ==========
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // "previous" has no history file
+    // "next" needs history file
+    //
+    // reverse: previous=main  , next=target // target is basis
+    // default: previous=target, next=main   //   main is basis
+    // _/_/_/_/
     protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) { // as previous
         final UnifiedSchema targetSchema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
         _log.info("SchemaSyncCheck target schema: " + targetSchema);
-        final String historyFile = /*historyFile*/null; // to make only schemaXml as target (previous)
+        final String historyFile;
+        if (isReversePreviousNext()) { // option
+            historyFile = getDiffMapFile(); // target is next here
+        } else { // standard, basically here
+            historyFile = null; // to make only schemaXml as target (previous)
+        }
         return doCreateSerializer(new DfSchemaSource(targetDs, targetSchema), historyFile);
     }
 
     protected DfSchemaXmlSerializer createMainSerializer() { // as next
         _log.info("SchemaSyncCheck main schema: " + _mainSource.getSchema());
-        final String historyFile = getDiffMapFile(); // needs to make for comparing with target (previous)
+        final String historyFile;
+        if (isReversePreviousNext()) { // option
+            historyFile = null; // main is previous here
+        } else {
+            historyFile = getDiffMapFile(); // needs to make for comparing with target (previous)
+        }
         return doCreateSerializer(_mainSource, historyFile);
     }
 
@@ -248,5 +299,9 @@ public class DfSchemaSyncChecker {
 
     protected List<File> getCraftMetaFileList(String craftMetaDir) {
         return getDocumentProperties().getCraftMetaFileList(craftMetaDir);
+    }
+
+    protected boolean isReversePreviousNext() {
+        return getDocumentProperties().isSchemaSyncCheckReversePreviousNext();
     }
 }
