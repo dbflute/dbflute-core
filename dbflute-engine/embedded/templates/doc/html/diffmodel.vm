@@ -537,6 +537,7 @@ ${database.historyHtmlJavaScriptEmbedded}
     };
     /**
      * @author hakiba
+	 * @author shiny
      */
     var HacommentUtil = new function(){
         /**

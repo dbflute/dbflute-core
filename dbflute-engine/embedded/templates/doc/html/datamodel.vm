@@ -2122,6 +2122,7 @@ PickupColumnProperty.prototype = {
  * @author deco
  * @author cabos
  * @author jflute
+ * @author shiny
  */
 function Decomment() {
 	this.storeClient = new StoreClient()
