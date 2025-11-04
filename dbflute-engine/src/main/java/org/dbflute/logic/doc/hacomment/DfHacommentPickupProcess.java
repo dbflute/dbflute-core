@@ -15,32 +15,63 @@
  */
 package org.dbflute.logic.doc.hacomment;
 
+import java.util.List;
+
 import org.dbflute.infra.doc.hacomment.DfHacoMapFile;
 import org.dbflute.infra.doc.hacomment.DfHacoMapPickup;
 import org.dbflute.infra.doc.hacomment.DfHacoMapPiece;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.system.DBFluteSystem;
 
-import java.util.List;
-
 /**
  * @author hakiba
+ * @author shiny
  */
 public class DfHacommentPickupProcess {
 
     private final DfHacoMapFile _hacoMapFile = new DfHacoMapFile(() -> DBFluteSystem.currentLocalDateTime());
 
+    // ===================================================================================
+    //                                                                             Pick up
+    //                                                                           =========
     public DfHacoMapPickup pickupHacomment(String clientPath) {
         List<DfHacoMapPiece> pieceList = readPieceList(clientPath);
         OptionalThing<DfHacoMapPickup> optPickup = readPickup(clientPath);
-        DfHacoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList);
+
+        final DfHacoMapPickup pickUp;
+        if (pieceList.isEmpty()) { // no resources exist to pick up
+            pickUp = orElseEmptyPickup(optPickup);
+        } else { // pick up resources exists, needs to merge
+            pickUp = mergeDecoMap(optPickup, pieceList);
+            migratePieceToPickUp(clientPath, pickUp);
+        }
+        return pickUp;
+    }
+
+    // -----------------------------------------------------
+    //                                     no Piece Handling
+    //                                                ------
+    protected DfHacoMapPickup orElseEmptyPickup(OptionalThing<DfHacoMapPickup> optPickup) {
+        return optPickup.orElseGet(() -> {
+            DfHacoMapPickup pickup = new DfHacoMapPickup();
+            pickup.setPickupDatetime(DBFluteSystem.currentLocalDateTime());
+            return pickup;
+        });
+    }
+
+    // -----------------------------------------------------
+    //                                     Migrate to Pickup
+    //                                                ------
+    protected void migratePieceToPickUp(String clientPath, DfHacoMapPickup mergedPickup) {
         if (!mergedPickup.getDiffList().isEmpty()) { // not to make empty file if no hacomments
             writePickup(clientPath, mergedPickup);
         }
         deletePiece(clientPath);
-        return mergedPickup;
     }
 
+    // ===================================================================================
+    //                                                                      File Operation
+    //                                                                      ==============
     private List<DfHacoMapPiece> readPieceList(String clientPath) {
         return _hacoMapFile.readPieceList(clientPath);
     }
