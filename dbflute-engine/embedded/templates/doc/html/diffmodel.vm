@@ -881,6 +881,11 @@ ${database.historyHtmlJavaScriptEmbedded}
         createSaveHacommentFunction: function (diffCode, diffMap) {
             var that = this;
             return function () {
+                // prevent modal from opening if user is selecting text (for copy/paste)
+                var selection = window.getSelection();
+                if (selection && selection.toString().length > 0) {
+                    return;
+                }
                 // get modal window element
                 var modalElement = document.getElementById("hacomment-modal");
                 modalElement.style.display = "block";

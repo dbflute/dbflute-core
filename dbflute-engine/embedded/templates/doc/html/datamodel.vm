@@ -2247,6 +2247,12 @@ Decomment.prototype = {
 		Array.prototype.forEach.call(commentTables, function (tableElement) {
 			var tableName = tableElement.getAttribute('data-name');
 			that.setupSaveTableClickEvent(tableName, tableElement);
+			// add click handler to table title (h2) to enable insert/edit decomment
+			// this enables users to insert decomment when table is comment is empty
+			var titleElement = tableElement.previousElementSibling;
+			if (titleElement && titleElement.tagName === 'H2') {
+				that.setupSaveTableClickEvent(tableName, titleElement);
+			}
 		});
 	},
 
@@ -2290,6 +2296,11 @@ Decomment.prototype = {
 	createSaveDecommentFunction: function (commentProperty) {
 		var that = this;
  		return function () {
+			// prevent modal from opening if user is selecting text (for copy/paste)
+			var selection = window.getSelection();
+			if (selection && selection.toString().length > 0) {
+				return;
+			}
 	 		var modalElement = document.getElementById("decomment-modal");
 			modalElement.style.display = "block";
 
