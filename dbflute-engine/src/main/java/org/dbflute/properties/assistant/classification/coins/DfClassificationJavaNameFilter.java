@@ -31,21 +31,30 @@ public class DfClassificationJavaNameFilter {
         _nameFromToMap.put("%", "_PERCENT_");
         _nameFromToMap.put("&", "_AND_");
         _nameFromToMap.put("'", "");
+
         _nameFromToMap.put("(", "_");
         _nameFromToMap.put(")", "_");
+        _nameFromToMap.put("{", "_"); // @since 1.3.1
+        _nameFromToMap.put("}", "_"); // @since 1.3.1
+        _nameFromToMap.put("[", "_"); // @since 1.3.1
+        _nameFromToMap.put("]", "_"); // @since 1.3.1
+
         _nameFromToMap.put("@", "_");
         _nameFromToMap.put("+", "_");
         _nameFromToMap.put("*", "_");
         _nameFromToMap.put(",", "_");
         _nameFromToMap.put(".", "_");
         _nameFromToMap.put("/", "_");
+
         _nameFromToMap.put("<", "_");
         _nameFromToMap.put(">", "_");
+
         _nameFromToMap.put("?", "_");
         _nameFromToMap.put("=", "_"); // @since 1.3.1
         _nameFromToMap.put("-", "_"); // @since 1.3.1
         _nameFromToMap.put(";", "_"); // @since 1.3.1
         _nameFromToMap.put(":", "_"); // @since 1.3.1
+
         _nameFromToMap.put("\n", "_");
         _nameFromToMap.put("\t", "_");
 
