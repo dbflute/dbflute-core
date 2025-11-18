@@ -1444,6 +1444,29 @@ var DecommentUtil = new function(){
 	 */
 	this.isDecommentServer = function() {
 		return document.getElementById("decomment_server") != null;
+	},
+	/**
+	 * Extract alias from dfalias:{} marker in decomment
+	 * @param {string} decomment - decomment text
+	 * @returns {string} extracted alias (empty if not found)
+	 */
+	this.extractAlias = function(decomment) {
+		if (!decomment) {
+			return '';
+		}
+		var match = decomment.match(/dfalias:\s*\{\s*([^}]*)\s*\}/);
+		return match ? match[1].trim() : '';
+	},
+	/**
+	 * Remove dfalias:{} marker from decomment
+	 * @param {string} decomment - decomment text
+	 * @returns {string} decomment without dfalias marker
+	 */
+	this.removeAliasFromDecomment = function(decomment) {
+		if (!decomment) {
+			return '';
+		}
+		return decomment.replace(/dfalias:\s*\{[^}]*\}\s*\n?/g, '').trim();
 	}
 }
 
@@ -1829,6 +1852,74 @@ PickupTableProperty.prototype = {
 				element.className += " commentcellerror"
 			}
 		});
+
+		this.updateTableTitleAlias();
+		this.updateTableListAlias();
+	},
+
+	/**
+	 * Update table title (h2) with alias from decomment
+	 */
+	updateTableTitleAlias: function() {
+		if (this.decomments.length === 0) {
+			return;
+		}
+
+		var decommentBody = this.decomments[0].body || "";
+		var aliasFromDecomment = DecommentUtil.extractAlias(decommentBody);
+		// When there is no alias in the decomment, do nothing
+		if (!aliasFromDecomment) {
+			return;
+		}
+
+		// find the h2 title element
+		var h2Element = document.getElementById(this.tableDbName.toLowerCase());
+		if (!h2Element || !h2Element.childNodes[0]) {
+			return;
+		}
+
+		var firstTextNode = h2Element.childNodes[0];
+		var currentText = firstTextNode.nodeValue;
+		// remove all existing alias patterns at the beginning (handles multiple aliases with spaces between)
+		var tableNamePart = currentText.replace(/^(\s*\([^)]+\)\s*)+/, '');
+
+		// update with new alias
+		firstTextNode.nodeValue = '(' + aliasFromDecomment + ')' + tableNamePart;
+	},
+
+	/**
+	 * Update table list alias cell with alias from decomment
+	 */
+	updateTableListAlias: function() {
+		if (this.decomments.length === 0) {
+			return;
+		}
+
+		var decommentBody = this.decomments[0].body || "";
+		var aliasFromDecomment = DecommentUtil.extractAlias(decommentBody);
+
+		// When there is no alias in the decomment, do nothing
+		if (!aliasFromDecomment) {
+			return;
+		}
+
+		// find the table list row by table name
+		var tableListBody = document.getElementById('table-list-body');
+		if (!tableListBody) {
+			return;
+		}
+
+		var rows = tableListBody.querySelectorAll('tr');
+		for (var i = 0; i < rows.length; i++) {
+			var nameCell = rows[i].querySelector('td[data-name="' + this.tableDbName + '"]');
+			if (nameCell) {
+				var aliasCell = rows[i].querySelector('.aliascell');
+				if (aliasCell) {
+					aliasCell.innerText = aliasFromDecomment;
+				}
+				break;
+			}
+		}
 	},
 
 	/**
@@ -1860,7 +1951,9 @@ PickupTableProperty.prototype = {
 		var commentCount = this.decomments.length;
 		for (key in this.decomments) {
 			var decomment = this.decomments[key];
-			displayComment += decomment.body
+			// strip dfalias:{} from display
+			var cleanBody = DecommentUtil.removeAliasFromDecomment(decomment.body);
+			displayComment += cleanBody;
 			if (this.isConflict() && decomment.pieceGitBranch) {
 				displayComment += '\n=======' + decomment.pieceGitBranch + ' (' + decomment.pieceOwner + ')';
 				if (key < commentCount - 1) {
@@ -2020,6 +2113,53 @@ PickupColumnProperty.prototype = {
 		if (this.isConflict()) {
 			element.className += " commentcellerror"
 		}
+
+		this.updateColumnAliasCell();
+	},
+
+	/**
+	 * Update alias cell in the table with alias from decomment
+	 */
+	updateColumnAliasCell: function() {
+		if (this.decomments.length === 0) {
+			return;
+		}
+
+		var decommentBody = this.decomments[0].body || "";
+		var aliasFromDecomment = DecommentUtil.extractAlias(decommentBody);
+
+		if (!aliasFromDecomment) {
+			return;
+		}
+
+		// find the alias cell
+		var columnId = this.tableDbName + "_" + this.columnName;
+		columnId = columnId.toLowerCase();
+		var columnElement = document.getElementById(columnId);
+
+		var row = columnElement.parentElement;
+		var table = row.parentElement.parentElement;
+		var headerRow = table.querySelector('thead tr');
+
+		// find which column index has "Alias" header
+		var headers = headerRow.querySelectorAll('th');
+		var aliasColumnIndex = -1;
+		for (var i = 0; i < headers.length; i++) {
+			if (headers[i].innerText.trim() === 'Alias') {
+				aliasColumnIndex = i;
+				break;
+			}
+		}
+
+		if (aliasColumnIndex === -1) {
+			return; // no alias column in this table
+		}
+
+		// update the alias cell with decomment alias
+		var cells = row.querySelectorAll('td');
+		if (aliasColumnIndex < cells.length) {
+			cells[aliasColumnIndex].innerText = aliasFromDecomment;
+		}
 	},
 
 	/**
@@ -2052,7 +2192,9 @@ PickupColumnProperty.prototype = {
 		var commentCount = this.decomments.length;
 		for (key in this.decomments) {
 			var decomment = this.decomments[key];
-			displayComment += decomment.body
+			// strip dfalias:{} from display
+			var cleanBody = DecommentUtil.removeAliasFromDecomment(decomment.body);
+			displayComment += cleanBody;
 			if (this.isConflict() && decomment.pieceGitBranch) {
 				displayComment += '\n=======' + decomment.pieceGitBranch + ' (' + decomment.pieceOwner + ')';
 				if (key < commentCount - 1) {
@@ -2390,13 +2532,16 @@ Decomment.prototype = {
 
 			var inputElement = document.getElementById("decomment-input");
 			var previousWholeComment = commentProperty.getDisplayHtmlComment();
-			inputElement.value = previousWholeComment;
+
+			// Clean comment without dfalias:{} in textarea
+			var cleanComment = DecommentUtil.removeAliasFromDecomment(previousWholeComment);
+			inputElement.value = cleanComment;
 			inputElement.focus();
 
-			// populate alias input with current displayed alias
+			// populate alias input
 			var aliasInputElement = document.getElementById("decomment-alias-input");
-			var currentAlias = commentProperty.getCurrentDisplayedAlias();
-			aliasInputElement.value = currentAlias;
+			var previousAlias = commentProperty.getCurrentDisplayedAlias();
+			aliasInputElement.value = previousAlias;
 
 			document.getElementById("decomment-close").onclick = function () {
 				modalElement.style.display = "none";
@@ -2404,6 +2549,8 @@ Decomment.prototype = {
 
 			document.getElementById("decomment-ok").onclick = function () {
 				var decomment = inputElement.value;
+				var aliasFromInput = aliasInputElement.value.trim();
+
 				if (DecommentUtil.isDecommentServer() && that.isUserNameEmpty()) {
 					alert('Input your user name.');
 					return;
@@ -2412,12 +2559,16 @@ Decomment.prototype = {
 					alert('Still conflicting. please resolve.')
 					return;
 				}
-				if (!that.isCommentChanged(previousWholeComment, decomment)) {
+				if (!that.isCommentChanged(previousWholeComment, decomment) && !that.isAliasChanged(previousAlias, aliasFromInput)) {
 					modalElement.style.display = "none";
 					return;
 				}
 				decomment = DecommentUtil.escapeInputText(decomment);
 				decomment = DecommentUtil.deleteUnnecessaryWhitespace(decomment);
+				decomment = DecommentUtil.removeAliasFromDecomment(decomment);
+
+				decomment = 'dfalias:{' + aliasFromInput + '}\n' + decomment;
+
 				commentProperty.decomments = [{'body': decomment}]
 				commentProperty.inputAuthor = that.getUserName();
 				var params = commentProperty.toRequestParams()
@@ -2516,6 +2667,16 @@ Decomment.prototype = {
 			return previousWholeComment.trim() !== decomment.trim();
 		}
 		return decomment.trim().length != 0;
+	},
+
+	/**
+	 * Check change alias
+	 * @param {string} previousAlias - previous alias
+	 * @param {string} currentAlias - current alias
+	 * @returns {Boolean} is changed
+	 */
+	isAliasChanged: function (previousAlias, currentAlias) {
+		return previousAlias !== currentAlias;
 	}
 };
 
