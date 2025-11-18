@@ -435,6 +435,25 @@ pre.spolicyviodisp {
 	margin-top: 10px;
 	font-size: 12px;
 }
+.decomment-alias-input-area {
+	margin-top: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.decomment-alias-label {
+	font-size: 12px;
+	color: #222277;
+	white-space: nowrap;
+}
+.decomment-alias-input {
+	flex: 1;
+	max-width: 300px;
+	padding: 5px;
+	font-size: 12px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+}
 .decommentmodal-ok-area {
 	text-align: right;
 	margin: 0em 1em 0em 0em
@@ -906,6 +925,10 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
 		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
 		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
+		<div class="decomment-alias-input-area">
+			<label for="decomment-alias-input" class="decomment-alias-label">Alias:</label>
+			<input type="text" id="decomment-alias-input" class="decomment-alias-input"/>
+		</div>
 		<div id="decomment-user-input" class="decomment-user-input"><input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/><span class="decomment-user-name-desc">*required (saved in cookie)</span></div>
 		<div class="decommentmodal-ok-area"><button id="decomment-ok" class="decommentmodal-ok-btn">OK</button></div>
 	</div>
@@ -1776,6 +1799,21 @@ function PickupTableProperty(tableDbName, json) {
 PickupTableProperty.prototype = {
 
 	/**
+	 * Get current alias displayed in HTML (from table title h2)
+	 * @return {string} current alias (empty if not found)
+	 */
+	getCurrentDisplayedAlias: function() {
+		var h2Element = document.getElementById(this.tableDbName.toLowerCase());
+		if (!h2Element) {
+			return "";
+		}
+		// extract alias from h2 title - format is "(alias)TableName" when there is an alias
+		var titleText = h2Element.innerText || h2Element.textContent;
+		var aliasMatch = titleText.match(/^\(([^)]+)\)/);
+		return aliasMatch ? aliasMatch[1].trim() : "";
+	},
+
+	/**
 	 * Reflect new comment to html
 	 */
 	reflectToHtml: function () {
@@ -1921,6 +1959,49 @@ function PickupColumnProperty(tableDbName, columnName, json) {
 }
 
 PickupColumnProperty.prototype = {
+
+	/**
+	 * Get current alias displayed in HTML (from column alias cell)
+	 * @return {string} current alias (empty if not found)
+	 */
+	getCurrentDisplayedAlias: function() {
+		var columnId = this.tableDbName + "_" + this.columnName;
+		columnId = columnId.toLowerCase();
+		var columnElement = document.getElementById(columnId);
+		if (!columnElement) {
+			return "";
+		}
+
+		// find the table and header to locate alias column index
+		var row = columnElement.parentElement;
+		var table = row.parentElement.parentElement; // tbody -> table
+		var headerRow = table.querySelector('thead tr');
+		if (!headerRow) {
+			return "";
+		}
+
+		// find which column index has "Alias" header
+		var headers = headerRow.querySelectorAll('th');
+		var aliasColumnIndex = -1;
+		for (var i = 0; i < headers.length; i++) {
+			if (headers[i].innerText.trim() === 'Alias') {
+				aliasColumnIndex = i;
+				break;
+			}
+		}
+
+		if (aliasColumnIndex === -1) {
+			return ""; // no alias column in this table
+		}
+
+		// get the cell at the same index in the current row
+		var cells = row.querySelectorAll('td');
+		if (aliasColumnIndex < cells.length) {
+			return cells[aliasColumnIndex].innerText.trim();
+		}
+
+		return "";
+	},
 
 	/**
 	 * Reflect new comment to html
@@ -2311,6 +2392,11 @@ Decomment.prototype = {
 			var previousWholeComment = commentProperty.getDisplayHtmlComment();
 			inputElement.value = previousWholeComment;
 			inputElement.focus();
+
+			// populate alias input with current displayed alias
+			var aliasInputElement = document.getElementById("decomment-alias-input");
+			var currentAlias = commentProperty.getCurrentDisplayedAlias();
+			aliasInputElement.value = currentAlias;
 
 			document.getElementById("decomment-close").onclick = function () {
 				modalElement.style.display = "none";
