@@ -1446,7 +1446,7 @@ var DecommentUtil = new function(){
 		return document.getElementById("decomment_server") != null;
 	},
 	/**
-	 * Extract alias from dfalias:{} marker in decomment
+	 * Extract alias from dfalias:{} or shalias:{} marker in decomment
 	 * @param {string} decomment - decomment text
 	 * @returns {string} extracted alias (empty if not found)
 	 */
@@ -1454,19 +1454,19 @@ var DecommentUtil = new function(){
 		if (!decomment) {
 			return '';
 		}
-		var match = decomment.match(/dfalias:\s*\{\s*([^}]*)\s*\}/);
+		var match = decomment.match(/(?:dfalias|shalias):\s*\{\s*([^}]*)\s*\}/);
 		return match ? match[1].trim() : '';
 	},
 	/**
-	 * Remove dfalias:{} marker from decomment
+	 * Remove dfalias:{} or shalias:{} marker from decomment
 	 * @param {string} decomment - decomment text
-	 * @returns {string} decomment without dfalias marker
+	 * @returns {string} decomment without alias marker
 	 */
 	this.removeAliasFromDecomment = function(decomment) {
 		if (!decomment) {
 			return '';
 		}
-		return decomment.replace(/dfalias:\s*\{[^}]*\}\s*\n?/g, '').trim();
+		return decomment.replace(/(?:dfalias|shalias):\s*\{[^}]*\}\s*\n?/g, '').trim();
 	}
 }
 
@@ -1951,7 +1951,7 @@ PickupTableProperty.prototype = {
 		var commentCount = this.decomments.length;
 		for (key in this.decomments) {
 			var decomment = this.decomments[key];
-			// strip dfalias:{} from display
+			// strip dfalias:{} or shalias:{} from display
 			var cleanBody = DecommentUtil.removeAliasFromDecomment(decomment.body);
 			displayComment += cleanBody;
 			if (this.isConflict() && decomment.pieceGitBranch) {
@@ -2192,7 +2192,7 @@ PickupColumnProperty.prototype = {
 		var commentCount = this.decomments.length;
 		for (key in this.decomments) {
 			var decomment = this.decomments[key];
-			// strip dfalias:{} from display
+			// strip dfalias:{} or shalias:{} from display
 			var cleanBody = DecommentUtil.removeAliasFromDecomment(decomment.body);
 			displayComment += cleanBody;
 			if (this.isConflict() && decomment.pieceGitBranch) {
@@ -2533,7 +2533,7 @@ Decomment.prototype = {
 			var inputElement = document.getElementById("decomment-input");
 			var previousWholeComment = commentProperty.getDisplayHtmlComment();
 
-			// Clean comment without dfalias:{} in textarea
+			// Clean comment without dfalias:{} or shalias:{} in textarea
 			var cleanComment = DecommentUtil.removeAliasFromDecomment(previousWholeComment);
 			inputElement.value = cleanComment;
 			inputElement.focus();
@@ -2567,7 +2567,7 @@ Decomment.prototype = {
 				decomment = DecommentUtil.deleteUnnecessaryWhitespace(decomment);
 				decomment = DecommentUtil.removeAliasFromDecomment(decomment);
 
-				decomment = 'dfalias:{' + aliasFromInput + '}\n' + decomment;
+				decomment = 'shalias:{' + aliasFromInput + '}\n' + decomment;
 
 				commentProperty.decomments = [{'body': decomment}]
 				commentProperty.inputAuthor = that.getUserName();
