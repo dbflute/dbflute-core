@@ -289,12 +289,16 @@ public class Table {
      * @return Should be the table excepted?
      */
     public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
-        _name = attrib.getValue("name"); // table name
+        final String onXmlTableName = attrib.getValue("name");
+        setName(onXmlTableName); // may be switched
         _type = attrib.getValue("type"); // TABLE, VIEW, SYNONYM...
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, _name)) {
+
+        // reading-filter is from xml loader (caller) so on-xml table name may be expected
+        if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, onXmlTableName)) {
             return false;
         }
+
         setPlainComment(attrib.getValue("comment")); // setter for sync
         _javaName = attrib.getValue("javaName");
         return true;
@@ -337,7 +341,9 @@ public class Table {
      * @param name The table name as String. (NotNull)
      */
     public void setName(String name) {
-        this._name = name;
+        // from meta-data table name to generate table name here
+        // basically (and very almost) same, but concept difference
+        _name = getDatabaseProperties().switchGenerateTableName(name);
     }
 
     /**

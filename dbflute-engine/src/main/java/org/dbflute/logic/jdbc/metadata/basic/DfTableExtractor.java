@@ -88,7 +88,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
                 // (other methods are used only when an item can be trust)
                 // - - - - - - - - - -/
 
-                final String tableName = rs.getString("TABLE_NAME");
+                final String tableName = rs.getString("TABLE_NAME"); // not null (expected)
                 final String tableType = rs.getString("TABLE_TYPE");
                 final String tableCatalog;
                 {
