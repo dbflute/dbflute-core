@@ -684,6 +684,31 @@ public final class DfDatabaseProperties extends DfAbstractDBFluteProperties {
     }
 
     // ===================================================================================
+    //                                                                 Table Name Switcher
+    //                                                                 ===================
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // not metaData, but generate here
+    // because probably JDBC cannot handle switched name (2025/12/02)
+    // _/_/_/_/_/_/_/_/
+    public String switchGenerateTableName(String plainTableName) {
+        final Map<String, Object> switchingMap = getGenerateTableNameSwitchingMap();
+        if (switchingMap.isEmpty()) { // no option
+            return plainTableName; // no filter
+        }
+        final String switched = (String) switchingMap.get(plainTableName);
+        if (Srl.is_Null_or_TrimmedEmpty(switched)) { // not found
+            return plainTableName; // no filter
+        }
+        return switched; // right here
+    }
+
+    protected Map<String, Object> getGenerateTableNameSwitchingMap() { // closet, @since 1.3.1 (2025/12/02)
+        // e.g. map:{ spring_session = SPRING_SESSION }
+        // case sensitive table name key here for pinpoint adjustment
+        return getVairousStringKeyMap("generateTableNameSwitchingMap"); // two-edged sword
+    }
+
+    // ===================================================================================
     //                                                                   VariousMap Helper
     //                                                                   =================
     @SuppressWarnings("unchecked")
