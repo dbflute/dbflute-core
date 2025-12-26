@@ -919,11 +919,11 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
 </p>
 
-<!-- Only used by dbflute intro http://dbflute.seasar.org/ja/manual/function/helper/intro/index.html -->
+<!-- Only used by dbflute intro http://dbflute.seasar.org/ja/manual/function/generator/intro/index.html -->
 <div id="decomment-modal" class="decommentmodal">
 	<div class="decommentmodalcontent">
 		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
-		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
+		<p>Input the new comment of <span id="decomment-modal-column-info"></span></p>
 		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
 		<div class="decomment-alias-input-area">
 			<label for="decomment-alias-input" class="decomment-alias-label">Alias:</label>
