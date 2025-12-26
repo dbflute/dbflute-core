@@ -158,6 +158,7 @@ import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentDescriptionHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.dbflute.logic.doc.schemahtml.alias.DfSchemaHtmlAliasBasicFacade;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -560,12 +561,6 @@ public class Table {
         return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
     }
 
-    protected String findAliasOnDecomment() { // null allowed
-        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
-        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
-        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
-    }
-
     protected String buildAliasExpression(String alias) {
         if (alias == null || alias.trim().length() == 0) {
             return "";
@@ -575,12 +570,25 @@ public class Table {
     }
 
     // -----------------------------------------------------
+    //                                               shalias
+    //                                               -------
+    protected String findAliasOnDecomment() { // means shalias, null allowed
+        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
+        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
+        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
+    }
+
+    public boolean hasAliasOnDecomment() { // means shalias, for whole determination
+        return findAliasOnDecomment() != null;
+    }
+
+    // -----------------------------------------------------
     //                                          Alias Option
     //                                          ------------
-    // used in e.g. SchemaHTML template for alias item display determination
-    public boolean needsColumnAliasItem() { // e.g. may be dfprop alias only
-        final boolean aliasDelimiterInDbCommentValid = getDocumentProperties().isAliasDelimiterInDbCommentValid();
-        return aliasDelimiterInDbCommentValid || getColumnList().stream().anyMatch(column -> column.hasAlias());
+    public boolean needsColumnAliasItem() { // used in e.g. SchemaHTML template
+        final List<Table> tableList = getDatabase().getTableList();
+        final List<Column> columnList = getColumnList();
+        return new DfSchemaHtmlAliasBasicFacade().needsTableDetailColumnAlias(tableList, columnList);
     }
 
     // ===================================================================================

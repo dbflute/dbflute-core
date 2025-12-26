@@ -501,6 +501,17 @@ public class Column {
         return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
     }
 
+    protected String buildAliasExpression(String alias) {
+        if (alias == null || alias.trim().length() == 0) {
+            return "";
+        } else {
+            return "(" + alias + ")";
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               shalias
+    //                                               -------
     protected String findAliasOnDecomment() { // null allowed
         final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
         final String tableDbName = getTable().getTableDbName();
@@ -509,12 +520,8 @@ public class Column {
         return handler.buildMaybeConflictedAliasesDisp(aliasSet);
     }
 
-    protected String buildAliasExpression(String alias) {
-        if (alias == null || alias.trim().length() == 0) {
-            return "";
-        } else {
-            return "(" + alias + ")";
-        }
+    public boolean hasAliasOnDecomment() { // means shalias, for whole determination
+        return findAliasOnDecomment() != null;
     }
 
     // ===================================================================================
