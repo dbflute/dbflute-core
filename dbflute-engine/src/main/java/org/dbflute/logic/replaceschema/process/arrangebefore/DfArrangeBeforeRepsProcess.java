@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.tools.ant.util.FileUtils;
+import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.process.ProcessResult;
 import org.dbflute.helper.process.SystemScript;
@@ -52,28 +53,27 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     //                                                                             =======
     public void arrangeBeforeReps() {
         final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
-        final Map<String, String> copyMap = prop.getArrangeBeforeRepsCopyMap();
-        if (!copyMap.isEmpty()) {
-            _log.info("...Arranging resource files for ReplaceSchema");
+        processCopy(prop);
+        processFilterText(prop); // @since 1.3.1 (2025/12/27)
+        processScript(prop);
+    }
+
+    // ===================================================================================
+    //                                                                         Copy (File)
+    //                                                                         ===========
+    protected void processCopy(DfReplaceSchemaProperties prop) {
+        final Map<String, String> copyMap = prop.getArrangeBeforeRepsReady().getCopyMap();
+        if (copyMap.isEmpty()) {
+            return;
         }
+        _log.info("...Arranging copy files for ReplaceSchema");
         for (Entry<String, String> entry : copyMap.entrySet()) {
             final String src = entry.getKey();
             final String dest = entry.getValue();
             arrangeCopy(src, dest);
         }
-        final Map<String, String> scriptMap = prop.getArrangeBeforeRepsScriptMap();
-        if (!scriptMap.isEmpty()) {
-            _log.info("...Arranging by script files for ReplaceSchema");
-        }
-        for (Entry<String, String> entry : scriptMap.entrySet()) {
-            final String path = entry.getKey();
-            arrangeScript(path);
-        }
     }
 
-    // ===================================================================================
-    //                                                                                Copy
-    //                                                                                ====
     protected void arrangeCopy(String src, String dest) {
         boolean cleanOption = false;
         if (dest.contains("df:clean")) {
@@ -261,13 +261,77 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     }
 
     // ===================================================================================
+    //                                                                         Filter Text
+    //                                                                         ===========
+    protected void processFilterText(DfReplaceSchemaProperties prop) { // @since 1.3.1 (2025/12/27)
+        replaceLinely(prop);
+        replaceWholly(prop);
+    }
+
+    protected void replaceLinely(DfReplaceSchemaProperties prop) {
+        final Map<String, Object> linelyMap = prop.getArrangeBeforeRepsReady().getFilterTextReplaceLinelyMap();
+        if (linelyMap.isEmpty()) {
+            return;
+        }
+        _log.info("...Arranging filter texts as replaceLinely for ReplaceSchema");
+        for (Entry<String, Object> entry : linelyMap.entrySet()) {
+            final String filePath = entry.getKey();
+            @SuppressWarnings("unchecked")
+            final Map<String, String> replaceMap = (Map<String, String>) entry.getValue();
+            if (replaceMap != null && !replaceMap.isEmpty()) {
+                _log.info("  Filter text " + filePath + " replaced linely by " + replaceMap);
+                final FileTextIO fileTextIO = prepareFileTextIO();
+                fileTextIO.rewriteFilteringLine(filePath, line -> {
+                    return Srl.replaceBy(line, replaceMap);
+                });
+            }
+        }
+    }
+
+    protected void replaceWholly(DfReplaceSchemaProperties prop) {
+        final Map<String, Object> whollyMap = prop.getArrangeBeforeRepsReady().getFilterTextReplaceWhollyMap();
+        if (whollyMap.isEmpty()) {
+            return;
+        }
+        _log.info("...Arranging filter texts as replaceWholly for ReplaceSchema");
+        for (Entry<String, Object> entry : whollyMap.entrySet()) {
+            final String filePath = entry.getKey();
+            @SuppressWarnings("unchecked")
+            final Map<String, String> replaceMap = (Map<String, String>) entry.getValue();
+            if (replaceMap != null && !replaceMap.isEmpty()) {
+                _log.info("  Filter text " + filePath + " replaced wholly by " + replaceMap);
+                final FileTextIO fileTextIO = prepareFileTextIO();
+                fileTextIO.rewriteFilteringWhole(filePath, whole -> {
+                    return Srl.replaceBy(whole, replaceMap);
+                });
+            }
+        }
+    }
+
+    protected FileTextIO prepareFileTextIO() {
+        return new FileTextIO().encodeAsUTF8(); // encoding fixedly
+    }
+
+    // ===================================================================================
     //                                                                              Script
     //                                                                              ======
+    protected void processScript(DfReplaceSchemaProperties prop) {
+        final Map<String, Object> scriptMap = prop.getArrangeBeforeRepsReady().getScriptMap();
+        if (scriptMap.isEmpty()) {
+            return;
+        }
+        _log.info("...Arranging by script files for ReplaceSchema");
+        for (Entry<String, Object> entry : scriptMap.entrySet()) {
+            final String path = entry.getKey();
+            arrangeScript(path);
+        }
+    }
+
     protected void arrangeScript(String path) {
         final SystemScript script = new SystemScript();
         final String baseDir = Srl.substringLastFront(path, "/");
         final String scriptName = Srl.substringLastRear(path, "/");
-        _log.info("...Executing the script: " + path);
+        _log.info("  Execute script " + path);
         final ProcessResult processResult;
         try {
             processResult = script.execute(new File(baseDir), scriptName);

@@ -35,6 +35,7 @@ import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
 import org.dbflute.infra.reps.DfRepsSchemaSqlDir;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
+import org.dbflute.logic.replaceschema.process.arrangebefore.DfArrangeBeforeRepsReady;
 import org.dbflute.properties.assistant.base.dispatch.DfOutsideFileVariableInfo;
 import org.dbflute.properties.assistant.database.DfConnectionProperties;
 import org.dbflute.properties.assistant.reps.DfConventionalTakeAssertMap;
@@ -749,11 +750,19 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
     // #        ; $$SrcDir$$/data/common/xls/*.xls = ./playsql/data/common/xls
     // #        ; $$SrcDir$$/data/ut/xls/*.xls = ./playsql/data/ut/xls df:clean
     // #    }
+    // #    ; filterText = map:{
+    // #        ; replaceWholly = map:{
+    // #            ; ./playsql/replace-schema-10-basic.sql = map:{
+    // #                ; ORDER INT = `ORDER` INT
+    // #            }
+    // #        }
+    // #    }
     // #    ; script = map:{
     // #        ; ../maven-install.sh = dummy
     // #    }
     // #}
     protected Map<String, Map<String, Object>> _arrangeBeforeRepsMap;
+    protected DfArrangeBeforeRepsReady _arrangeBeforeRepsReady; // @since 1.3.1
 
     protected Map<String, Map<String, Object>> getArrangeBeforeRepsMap() {
         if (_arrangeBeforeRepsMap != null) {
@@ -765,63 +774,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractDBFluteProperties
         } else {
             @SuppressWarnings("unchecked")
             final Map<String, Map<String, Object>> arrangeMap = (Map<String, Map<String, Object>>) obj;
-            checkArrangeUnsupportedManupulation(arrangeMap);
             _arrangeBeforeRepsMap = arrangeMap;
         }
         return _arrangeBeforeRepsMap;
     }
 
-    protected void checkArrangeUnsupportedManupulation(Map<String, Map<String, Object>> arrangeMap) {
-        if (arrangeMap.size() >= 4) { // may support other manipulations
-            String msg = "The arrangeBeforeReps supports only 'define' and 'copy' and 'script' now: " + arrangeMap.keySet();
-            throw new DfIllegalPropertySettingException(msg);
+    public DfArrangeBeforeRepsReady getArrangeBeforeRepsReady() { // as facade
+        if (_arrangeBeforeRepsReady != null) {
+            return _arrangeBeforeRepsReady;
         }
-    }
-
-    protected Map<String, String> getArrangeBeforeRepsDefineMap() {
-        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
-        final Map<String, Object> elementMap = repsMap.get("define");
-        if (elementMap == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        final Map<String, String> defineMap = new LinkedHashMap<String, String>();
-        for (Entry<String, Object> entry : elementMap.entrySet()) {
-            defineMap.put(entry.getKey(), (String) entry.getValue());
-        }
-        return defineMap;
-    }
-
-    public Map<String, String> getArrangeBeforeRepsCopyMap() {
-        final Map<String, String> defineMap = getArrangeBeforeRepsDefineMap();
-        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
-        final Map<String, Object> elementMap = repsMap.get("copy");
-        if (elementMap == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        final Map<String, String> copyMap = new LinkedHashMap<String, String>();
-        for (Entry<String, Object> entry : elementMap.entrySet()) {
-            final String key = Srl.replaceBy(entry.getKey(), defineMap);
-            final String value = Srl.replaceBy((String) entry.getValue(), defineMap);
-            copyMap.put(key, value);
-        }
-        return copyMap;
-    }
-
-    public Map<String, String> getArrangeBeforeRepsScriptMap() {
-        final Map<String, String> defineMap = getArrangeBeforeRepsDefineMap();
-        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
-        final Map<String, Object> elementMap = repsMap.get("script");
-        if (elementMap == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        final Map<String, String> scriptMap = new LinkedHashMap<String, String>();
-        for (Entry<String, Object> entry : elementMap.entrySet()) {
-            final String key = Srl.replaceBy(entry.getKey(), defineMap);
-            // value is dummy for now
-            //final String value = Srl.replaceBy((String) entry.getValue(), defineMap);
-            scriptMap.put(key, (String) entry.getValue());
-        }
-        return scriptMap;
+        _arrangeBeforeRepsReady = new DfArrangeBeforeRepsReady(getArrangeBeforeRepsMap());
+        return _arrangeBeforeRepsReady;
     }
 
     // ===================================================================================
