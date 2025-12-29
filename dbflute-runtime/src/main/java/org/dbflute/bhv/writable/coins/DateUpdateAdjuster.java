@@ -21,10 +21,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -45,10 +47,12 @@ public class DateUpdateAdjuster { // may be used in velocity template
         }
         final DBMeta dbmeta = entity.asDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+
         final boolean createdBySelect = entity.createdBySelect();
         if (createdBySelect) {
             entity.clearMarkAsSelect(); // to avoid non-specified column check
         }
+        final Set<String> originalSnapshotModifiedProperties = keepOriginalSnapshotModifiedProperties(entity);
         try {
             for (ColumnInfo columnInfo : columnInfoList) {
                 if (columnInfo.isObjectNativeTypeDate()) {
@@ -64,9 +68,13 @@ public class DateUpdateAdjuster { // may be used in velocity template
             if (createdBySelect) {
                 entity.markAsSelect(); // restore
             }
+            restoreModifiedProperties(entity, originalSnapshotModifiedProperties);
         }
     }
 
+    // -----------------------------------------------------
+    //                                        Truncate Logic
+    //                                        --------------
     /**
      * @param columnInfo The object of column information. (NotNull)
      * @param value The target value which may be date-time. (NotNull)
@@ -93,5 +101,20 @@ public class DateUpdateAdjuster { // may be used in velocity template
             }
         }
         return value;
+    }
+
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    protected Set<String> keepOriginalSnapshotModifiedProperties(Entity entity) {
+        // wrap to avoid clearing mutable set by restoring process's clear
+        return DfCollectionUtil.newLinkedHashSet(entity.mymodifiedProperties());
+    }
+
+    protected void restoreModifiedProperties(Entity entity, Set<String> originalSnapshotModifiedProperties) {
+        entity.clearModifiedInfo();
+        for (String modifiedProperty : originalSnapshotModifiedProperties) {
+            entity.mymodifyProperty(modifiedProperty); // restore @since 1.3.1
+        }
     }
 }
