@@ -169,7 +169,6 @@ import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfDatabaseProperties;
@@ -181,6 +180,7 @@ import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
+import org.dbflute.properties.assistant.bhvfilter.DfBhvFilterColumnArranger;
 import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
 import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSpecifyBatchColumnMap;
@@ -4330,36 +4330,8 @@ public class Table {
         if (_behaviorFilterBeforeInsertColumnList != null) {
             return _behaviorFilterBeforeInsertColumnList;
         }
-        final DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        final Map<String, Object> map = prop.getBeforeInsertMap();
-        final Set<String> columnNameSet = map.keySet();
-        _behaviorFilterBeforeInsertColumnList = new ArrayList<Column>();
-        final Set<String> commonColumnNameSet = new HashSet<String>();
-        if (hasAllCommonColumn()) {
-            final List<Column> commonColumnList = getCommonColumnList();
-            for (Column commonColumn : commonColumnList) {
-                commonColumnNameSet.add(commonColumn.getName());
-            }
-        }
-        for (String columnName : columnNameSet) {
-            Column column = getColumn(columnName);
-            if (column != null && !commonColumnNameSet.contains(columnName)) {
-                _behaviorFilterBeforeInsertColumnList.add(column);
-                String expression = (String) map.get(columnName);
-                if (expression == null || expression.trim().length() == 0) {
-                    String msg = "The value expression was not found in beforeInsertMap: column=" + column;
-                    throw new IllegalStateException(msg);
-                }
-                column.setBehaviorFilterBeforeInsertColumnExpression(expression);
-            }
-        }
+        _behaviorFilterBeforeInsertColumnList = new DfBhvFilterColumnArranger().arrangeBeforeInsertColumnList(this);
         return _behaviorFilterBeforeInsertColumnList;
-    }
-
-    public String getBehaviorFilterBeforeInsertColumnExpression(String columName) {
-        DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        Map<String, Object> map = prop.getBeforeInsertMap();
-        return (String) map.get(columName);
     }
 
     protected List<Column> _behaviorFilterBeforeUpdateColumnList;
@@ -4372,29 +4344,7 @@ public class Table {
         if (_behaviorFilterBeforeUpdateColumnList != null) {
             return _behaviorFilterBeforeUpdateColumnList;
         }
-        DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        Map<String, Object> map = prop.getBeforeUpdateMap();
-        Set<String> columnNameSet = map.keySet();
-        _behaviorFilterBeforeUpdateColumnList = new ArrayList<Column>();
-        Set<String> commonColumnNameSet = new HashSet<String>();
-        if (hasAllCommonColumn()) {
-            List<Column> commonColumnList = getCommonColumnList();
-            for (Column commonColumn : commonColumnList) {
-                commonColumnNameSet.add(commonColumn.getName());
-            }
-        }
-        for (String columnName : columnNameSet) {
-            Column column = getColumn(columnName);
-            if (column != null && !commonColumnNameSet.contains(columnName)) {
-                _behaviorFilterBeforeUpdateColumnList.add(column);
-                String expression = (String) map.get(columnName);
-                if (expression == null || expression.trim().length() == 0) {
-                    String msg = "The value expression was not found in beforeUpdateMap: column=" + column;
-                    throw new IllegalStateException(msg);
-                }
-                column.setBehaviorFilterBeforeUpdateColumnExpression(expression);
-            }
-        }
+        _behaviorFilterBeforeUpdateColumnList = new DfBhvFilterColumnArranger().arrangeBeforeUpdateColumnList(this);
         return _behaviorFilterBeforeUpdateColumnList;
     }
 

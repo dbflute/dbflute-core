@@ -1944,51 +1944,46 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doOutsideSql();
     }
 #end
-#if ($table.isDatetimePrecisionTruncationOfUpdatedEntity())
+#if ($table.hasBehaviorFilterBeforeColumn() || $table.isDatetimePrecisionTruncationOfUpdatedEntity())
+## may be only-one-side empty override but no big problem so no case here
 
     // ===================================================================================
     //                                                           Framework Filter Override
     //                                                           =========================
     @Override
-    protected void frameworkFilterEntityOfInsert(Entity entity, org.dbflute.optional.OptionalThing<InsertOption<? extends ConditionBean>> option) {
-        super.frameworkFilterEntityOfInsert(entity, option);
-        new DateUpdateAdjuster().truncatePrecisionOfEntityProperty(entity);
-    }
-#if ($table.isWritable())
-
-    @Override
-    protected void frameworkFilterEntityOfUpdate(Entity entity, org.dbflute.optional.OptionalThing<UpdateOption<? extends ConditionBean>> option) {
-        super.frameworkFilterEntityOfUpdate(entity, option);
-        new DateUpdateAdjuster().truncatePrecisionOfEntityProperty(entity);
-    }
-#end
-#end
-#if ($table.hasBehaviorFilterBeforeColumn())
-
-    // ===================================================================================
-    //                                                                     Filter Override
-    //                                                                     ===============
+    protected void frameworkFilterEntityOfInsert(Entity tgt, org.dbflute.optional.OptionalThing<InsertOption<? extends ConditionBean>> op) {
+        super.frameworkFilterEntityOfInsert(tgt, op);
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
-    @Override
-    protected void filterEntityOfInsert(Entity tgt, org.dbflute.optional.OptionalThing<InsertOption<? extends ConditionBean>> op) {
-        super.filterEntityOfInsert(tgt, op);
-        ${myExtendedObjectClassName} et = downcast(tgt);
+        ${myExtendedObjectClassName} entity = downcast(tgt);
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
-        et.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
+        entity.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
+#end
+#end
+#if ($table.isDatetimePrecisionTruncationOfUpdatedEntity())
+        xcreateDateUpdateAdjuster().truncatePrecisionOfEntityProperty(tgt);
 #end
     }
-#end
 #if ($table.isWritable())
-#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+
     @Override
-    protected void filterEntityOfUpdate(Entity tgt, org.dbflute.optional.OptionalThing<UpdateOption<? extends ConditionBean>> op) {
-        super.filterEntityOfUpdate(tgt, op);
-        ${myExtendedObjectClassName} et = downcast(tgt);
+    protected void frameworkFilterEntityOfUpdate(Entity tgt, org.dbflute.optional.OptionalThing<UpdateOption<? extends ConditionBean>> op) {
+        super.frameworkFilterEntityOfUpdate(tgt, op);
+#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+        ${myExtendedObjectClassName} entity = downcast(tgt);
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
-        et.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
+        entity.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
+#end
+#end
+#if ($table.isDatetimePrecisionTruncationOfUpdatedEntity())
+        xcreateDateUpdateAdjuster().truncatePrecisionOfEntityProperty(tgt);
 #end
     }
 #end
+#if ($table.isDatetimePrecisionTruncationOfUpdatedEntity())
+
+    protected DateUpdateAdjuster xcreateDateUpdateAdjuster() {
+        return new DateUpdateAdjuster();
+    }
 #end
 #end
 
