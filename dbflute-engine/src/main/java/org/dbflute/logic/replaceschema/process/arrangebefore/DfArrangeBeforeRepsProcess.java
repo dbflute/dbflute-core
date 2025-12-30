@@ -18,6 +18,7 @@ package org.dbflute.logic.replaceschema.process.arrangebefore;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,6 +48,12 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfArrangeBeforeRepsProcess.class);
+
+    // -----------------------------------------------------
+    //                                           Filter Text
+    //                                           -----------
+    protected static final String KEY_REPLACE_THEME_OPTION = "df:themeOptionList";
+    protected static final String THEME_USE_CONTROL_CHAR_EXP = "useControlCharExp";
 
     // ===================================================================================
     //                                                                             Process
@@ -277,12 +284,13 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         for (Entry<String, Object> entry : linelyMap.entrySet()) {
             final String filePath = entry.getKey();
             @SuppressWarnings("unchecked")
-            final Map<String, String> replaceMap = (Map<String, String>) entry.getValue();
+            final Map<String, Object> replaceMap = (Map<String, Object>) entry.getValue();
             if (replaceMap != null && !replaceMap.isEmpty()) {
                 _log.info("  Filter text " + filePath + " replaced linely by " + replaceMap);
                 final FileTextIO fileTextIO = prepareFileTextIO();
+                final Map<String, String> fromToMap = prepareReplaceFromToMap(replaceMap);
                 fileTextIO.rewriteFilteringLine(filePath, line -> {
-                    return Srl.replaceBy(line, replaceMap);
+                    return Srl.replaceBy(line, fromToMap);
                 });
             }
         }
@@ -297,12 +305,13 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         for (Entry<String, Object> entry : whollyMap.entrySet()) {
             final String filePath = entry.getKey();
             @SuppressWarnings("unchecked")
-            final Map<String, String> replaceMap = (Map<String, String>) entry.getValue();
+            final Map<String, Object> replaceMap = (Map<String, Object>) entry.getValue();
             if (replaceMap != null && !replaceMap.isEmpty()) {
                 _log.info("  Filter text " + filePath + " replaced wholly by " + replaceMap);
                 final FileTextIO fileTextIO = prepareFileTextIO();
+                final Map<String, String> fromToMap = prepareReplaceFromToMap(replaceMap);
                 fileTextIO.rewriteFilteringWhole(filePath, whole -> {
-                    return Srl.replaceBy(whole, replaceMap);
+                    return Srl.replaceBy(whole, fromToMap);
                 });
             }
         }
@@ -310,6 +319,48 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
 
     protected FileTextIO prepareFileTextIO() {
         return new FileTextIO().encodeAsUTF8(); // encoding fixedly
+    }
+
+    // -----------------------------------------------------
+    //                                            FromTo Map
+    //                                            ----------
+    protected Map<String, String> prepareReplaceFromToMap(Map<String, Object> replaceMap) {
+        final Map<String, String> fromToMap = new LinkedHashMap<>();
+        final boolean useControlCharExp = isUseControlCharExp(replaceMap);
+        for (Entry<String, Object> replaceEntry : replaceMap.entrySet()) {
+            String fromExp = replaceEntry.getKey();
+            if (KEY_REPLACE_THEME_OPTION.equals(fromExp)) {
+                continue;
+            }
+            String toExp = (String) replaceEntry.getValue();
+
+            if (useControlCharExp) { // expression to actual character
+                fromExp = convertControlCharExpToActualChar(fromExp);
+                toExp = convertControlCharExpToActualChar(toExp);
+            }
+            fromToMap.put(fromExp, toExp);
+        }
+        return fromToMap;
+    }
+
+    // -----------------------------------------------------
+    //                                          Theme Option
+    //                                          ------------
+    protected boolean isUseControlCharExp(Map<String, Object> replaceMap) {
+        boolean useControlCharExp = false;
+        @SuppressWarnings("unchecked")
+        final List<String> themeOptionList = (List<String>) replaceMap.get(KEY_REPLACE_THEME_OPTION);
+        if (themeOptionList != null) {
+            useControlCharExp = themeOptionList.contains(THEME_USE_CONTROL_CHAR_EXP);
+        }
+        return useControlCharExp;
+    }
+
+    protected String convertControlCharExpToActualChar(String toExp) {
+        toExp = Srl.replace(toExp, "\\r", "\r");
+        toExp = Srl.replace(toExp, "\\n", "\n");
+        toExp = Srl.replace(toExp, "\\t", "\t");
+        return toExp;
     }
 
     // ===================================================================================

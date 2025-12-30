@@ -106,9 +106,9 @@ public class DfArrangeBeforeRepsReady {
                 final Map<String, Object> replaceLinelyNewMap = new LinkedHashMap<String, Object>();
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> replaceLinelyPlainMap = (Map<String, Object>) rootEntry.getValue();
-                for (Entry<String, Object> replaceWhollyEntry : replaceLinelyPlainMap.entrySet()) {
-                    final String filteredPath = filterDefinePath(replaceWhollyEntry.getKey());
-                    replaceLinelyNewMap.put(filteredPath, replaceWhollyEntry.getValue());
+                for (Entry<String, Object> replaceLinelyEntry : replaceLinelyPlainMap.entrySet()) {
+                    final String filteredPath = filterDefinePath(replaceLinelyEntry.getKey());
+                    replaceLinelyNewMap.put(filteredPath, replaceLinelyEntry.getValue());
                 }
                 filterTextNewMap.put(key, Collections.unmodifiableMap(replaceLinelyNewMap));
             } else if (KEY_FILTER_TEXT_REPLACE_WHOLLY.equals(key)) {
