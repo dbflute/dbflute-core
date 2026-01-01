@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ package org.dbflute.logic.replaceschema.process.arrangebefore;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.tools.ant.util.FileUtils;
+import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.process.ProcessResult;
 import org.dbflute.helper.process.SystemScript;
@@ -47,33 +49,38 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfArrangeBeforeRepsProcess.class);
 
+    // -----------------------------------------------------
+    //                                           Filter Text
+    //                                           -----------
+    protected static final String KEY_REPLACE_THEME_OPTION = "df:themeOptionList";
+    protected static final String THEME_USE_CONTROL_CHAR_EXP = "useControlCharExp";
+
     // ===================================================================================
     //                                                                             Process
     //                                                                             =======
     public void arrangeBeforeReps() {
         final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
-        final Map<String, String> copyMap = prop.getArrangeBeforeRepsCopyMap();
-        if (!copyMap.isEmpty()) {
-            _log.info("...Arranging resource files for ReplaceSchema");
+        processCopy(prop);
+        processFilterText(prop); // @since 1.3.1 (2025/12/27)
+        processScript(prop);
+    }
+
+    // ===================================================================================
+    //                                                                         Copy (File)
+    //                                                                         ===========
+    protected void processCopy(DfReplaceSchemaProperties prop) {
+        final Map<String, String> copyMap = prop.getArrangeBeforeRepsReady().getCopyMap();
+        if (copyMap.isEmpty()) {
+            return;
         }
+        _log.info("...Arranging copy files for ReplaceSchema");
         for (Entry<String, String> entry : copyMap.entrySet()) {
             final String src = entry.getKey();
             final String dest = entry.getValue();
             arrangeCopy(src, dest);
         }
-        final Map<String, String> scriptMap = prop.getArrangeBeforeRepsScriptMap();
-        if (!scriptMap.isEmpty()) {
-            _log.info("...Arranging by script files for ReplaceSchema");
-        }
-        for (Entry<String, String> entry : scriptMap.entrySet()) {
-            final String path = entry.getKey();
-            arrangeScript(path);
-        }
     }
 
-    // ===================================================================================
-    //                                                                                Copy
-    //                                                                                ====
     protected void arrangeCopy(String src, String dest) {
         boolean cleanOption = false;
         if (dest.contains("df:clean")) {
@@ -261,13 +268,121 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
     }
 
     // ===================================================================================
+    //                                                                         Filter Text
+    //                                                                         ===========
+    protected void processFilterText(DfReplaceSchemaProperties prop) { // @since 1.3.1 (2025/12/27)
+        replaceLinely(prop);
+        replaceWholly(prop);
+    }
+
+    protected void replaceLinely(DfReplaceSchemaProperties prop) {
+        final Map<String, Object> linelyMap = prop.getArrangeBeforeRepsReady().getFilterTextReplaceLinelyMap();
+        if (linelyMap.isEmpty()) {
+            return;
+        }
+        _log.info("...Arranging filter texts as replaceLinely for ReplaceSchema");
+        for (Entry<String, Object> entry : linelyMap.entrySet()) {
+            final String filePath = entry.getKey();
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> replaceMap = (Map<String, Object>) entry.getValue();
+            if (replaceMap != null && !replaceMap.isEmpty()) {
+                _log.info("  Filter text " + filePath + " replaced linely by " + replaceMap);
+                final FileTextIO fileTextIO = prepareFileTextIO();
+                final Map<String, String> fromToMap = prepareReplaceFromToMap(replaceMap);
+                fileTextIO.rewriteFilteringLine(filePath, line -> {
+                    return Srl.replaceBy(line, fromToMap);
+                });
+            }
+        }
+    }
+
+    protected void replaceWholly(DfReplaceSchemaProperties prop) {
+        final Map<String, Object> whollyMap = prop.getArrangeBeforeRepsReady().getFilterTextReplaceWhollyMap();
+        if (whollyMap.isEmpty()) {
+            return;
+        }
+        _log.info("...Arranging filter texts as replaceWholly for ReplaceSchema");
+        for (Entry<String, Object> entry : whollyMap.entrySet()) {
+            final String filePath = entry.getKey();
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> replaceMap = (Map<String, Object>) entry.getValue();
+            if (replaceMap != null && !replaceMap.isEmpty()) {
+                _log.info("  Filter text " + filePath + " replaced wholly by " + replaceMap);
+                final FileTextIO fileTextIO = prepareFileTextIO();
+                final Map<String, String> fromToMap = prepareReplaceFromToMap(replaceMap);
+                fileTextIO.rewriteFilteringWhole(filePath, whole -> {
+                    return Srl.replaceBy(whole, fromToMap);
+                });
+            }
+        }
+    }
+
+    protected FileTextIO prepareFileTextIO() {
+        return new FileTextIO().encodeAsUTF8(); // encoding fixedly
+    }
+
+    // -----------------------------------------------------
+    //                                            FromTo Map
+    //                                            ----------
+    protected Map<String, String> prepareReplaceFromToMap(Map<String, Object> replaceMap) {
+        final Map<String, String> fromToMap = new LinkedHashMap<>();
+        final boolean useControlCharExp = isUseControlCharExp(replaceMap);
+        for (Entry<String, Object> replaceEntry : replaceMap.entrySet()) {
+            String fromExp = replaceEntry.getKey();
+            if (KEY_REPLACE_THEME_OPTION.equals(fromExp)) {
+                continue;
+            }
+            String toExp = (String) replaceEntry.getValue();
+
+            if (useControlCharExp) { // expression to actual character
+                fromExp = convertControlCharExpToActualChar(fromExp);
+                toExp = convertControlCharExpToActualChar(toExp);
+            }
+            fromToMap.put(fromExp, toExp);
+        }
+        return fromToMap;
+    }
+
+    // -----------------------------------------------------
+    //                                          Theme Option
+    //                                          ------------
+    protected boolean isUseControlCharExp(Map<String, Object> replaceMap) {
+        boolean useControlCharExp = false;
+        @SuppressWarnings("unchecked")
+        final List<String> themeOptionList = (List<String>) replaceMap.get(KEY_REPLACE_THEME_OPTION);
+        if (themeOptionList != null) {
+            useControlCharExp = themeOptionList.contains(THEME_USE_CONTROL_CHAR_EXP);
+        }
+        return useControlCharExp;
+    }
+
+    protected String convertControlCharExpToActualChar(String toExp) {
+        toExp = Srl.replace(toExp, "\\r", "\r");
+        toExp = Srl.replace(toExp, "\\n", "\n");
+        toExp = Srl.replace(toExp, "\\t", "\t");
+        return toExp;
+    }
+
+    // ===================================================================================
     //                                                                              Script
     //                                                                              ======
+    protected void processScript(DfReplaceSchemaProperties prop) {
+        final Map<String, Object> scriptMap = prop.getArrangeBeforeRepsReady().getScriptMap();
+        if (scriptMap.isEmpty()) {
+            return;
+        }
+        _log.info("...Arranging by script files for ReplaceSchema");
+        for (Entry<String, Object> entry : scriptMap.entrySet()) {
+            final String path = entry.getKey();
+            arrangeScript(path);
+        }
+    }
+
     protected void arrangeScript(String path) {
         final SystemScript script = new SystemScript();
         final String baseDir = Srl.substringLastFront(path, "/");
         final String scriptName = Srl.substringLastRear(path, "/");
-        _log.info("...Executing the script: " + path);
+        _log.info("  Execute script " + path);
         final ProcessResult processResult;
         try {
             processResult = script.execute(new File(baseDir), scriptName);

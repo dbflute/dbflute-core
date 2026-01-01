@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,17 +31,30 @@ public class DfClassificationJavaNameFilter {
         _nameFromToMap.put("%", "_PERCENT_");
         _nameFromToMap.put("&", "_AND_");
         _nameFromToMap.put("'", "");
+
         _nameFromToMap.put("(", "_");
         _nameFromToMap.put(")", "_");
+        _nameFromToMap.put("{", "_"); // @since 1.3.1
+        _nameFromToMap.put("}", "_"); // @since 1.3.1
+        _nameFromToMap.put("[", "_"); // @since 1.3.1
+        _nameFromToMap.put("]", "_"); // @since 1.3.1
+
         _nameFromToMap.put("@", "_");
         _nameFromToMap.put("+", "_");
         _nameFromToMap.put("*", "_");
         _nameFromToMap.put(",", "_");
         _nameFromToMap.put(".", "_");
         _nameFromToMap.put("/", "_");
+
         _nameFromToMap.put("<", "_");
         _nameFromToMap.put(">", "_");
+
         _nameFromToMap.put("?", "_");
+        _nameFromToMap.put("=", "_"); // @since 1.3.1
+        _nameFromToMap.put("-", "_"); // @since 1.3.1
+        _nameFromToMap.put(";", "_"); // @since 1.3.1
+        _nameFromToMap.put(":", "_"); // @since 1.3.1
+
         _nameFromToMap.put("\n", "_");
         _nameFromToMap.put("\t", "_");
 
@@ -55,6 +68,8 @@ public class DfClassificationJavaNameFilter {
         _nameFromToMap.put("\u3000", "_"); // full-width space
         _nameFromToMap.put("\u3001", "_"); // Japanese touten
         _nameFromToMap.put("\u3002", "_"); // Japanese kuten
+        _nameFromToMap.put("\u30fb", "_"); // Japanese chuten @since 1.3.1
+        _nameFromToMap.put("\uff01", "_"); // full-width ! @since 1.3.1
 
         // non-compilable hyphens
         _nameFromToMap.put("\u2010", "_");

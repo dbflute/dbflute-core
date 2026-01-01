@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ package org.dbflute.logic.doc.decomment;
 import java.util.Collections;
 import java.util.List;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.infra.doc.decomment.DfDecoMapFile;
 import org.dbflute.infra.doc.decomment.DfDecoMapMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.infra.doc.decomment.DfDecoMapPiece;
 import org.dbflute.optional.OptionalThing;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.system.DBFluteSystem;
 
 /**
@@ -56,12 +58,31 @@ public class DfDecommentPickupProcess {
         } else { // has any pickup resources, needs to merge
             final DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList, mappingList);
 
-            // #thinking jflute non-serialize pickup option needed? for parallel pickup (2022/07/05)
-            migratePieceToPickup(clientPath, mergedPickup); // write operation
+            // done jflute non-serialize pickup option needed? for parallel pickup (2022/07/05)
+            if (canMigratePieceToPickup()) { // @since 1.3.1 (2025/09/30)
+                migratePieceToPickup(clientPath, mergedPickup); // write operation
+            }
 
             displayPickup = mergedPickup;
         }
         return displayPickup;
+    }
+
+    // -----------------------------------------------------
+    //                                     no Piece Handling
+    //                                     -----------------
+    protected DfDecoMapPickup orElseEmptyPickup(final OptionalThing<DfDecoMapPickup> optPickup) {
+        return optPickup.orElseGet(() -> {
+            // non-existing pickup so empty instance for SchemaHTML by jflute (2022/07/05)
+            return new DfDecoMapPickup(Collections.emptyList(), DBFluteSystem.currentLocalDateTime());
+        });
+    }
+
+    // -----------------------------------------------------
+    //                                     Migrate to Pickup
+    //                                     -----------------
+    protected boolean canMigratePieceToPickup() {
+        return !getDocumentProperties().isSuppressDecommentPickup();
     }
 
     protected void migratePieceToPickup(String clientPath, DfDecoMapPickup mergedPickup) {
@@ -90,18 +111,8 @@ public class DfDecommentPickupProcess {
         }
     }
 
-    // ===================================================================================
-    //                                                                        Assist Logic
-    //                                                                        ============
     protected boolean notExistsPickupResource(List<DfDecoMapPiece> pieceList, List<DfDecoMapMapping> mappingList) {
         return pieceList.isEmpty() && mappingList.isEmpty();
-    }
-
-    protected DfDecoMapPickup orElseEmptyPickup(final OptionalThing<DfDecoMapPickup> optPickup) {
-        return optPickup.orElseGet(() -> {
-            // non-existing pickup so empty instance for SchemaHTML by jflute (2022/07/05)
-            return new DfDecoMapPickup(Collections.emptyList(), DBFluteSystem.currentLocalDateTime());
-        });
     }
 
     // ===================================================================================
@@ -140,5 +151,16 @@ public class DfDecommentPickupProcess {
     private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList,
             List<DfDecoMapMapping> mappingList) {
         return _decoMapFile.merge(optPickup, pieceList, mappingList);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    public DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    public DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 }

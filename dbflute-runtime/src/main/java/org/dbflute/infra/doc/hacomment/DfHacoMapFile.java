@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -47,6 +48,8 @@ import java.util.stream.Stream;
 
 /**
  * @author hakiba
+ * @author shiny
+ * @author jflute
  */
 public class DfHacoMapFile {
 
@@ -356,8 +359,9 @@ public class DfHacoMapFile {
         Stream<DfHacoMapDiffPart> pickupDiffPartStream = pickupOpt.map(pickup -> pickup.getDiffList().stream()).orElse(Stream.empty());
 
         // grouping to diffPartMap (key: diffCode, value: diffPart list)
+        // preserve insertion order to avoid unnecessary diffs in the pickup file
         Map<String, List<DfHacoMapDiffPart>> diffPartMap =
-                Stream.concat(piecesDiffPartStream, pickupDiffPartStream).collect(Collectors.groupingBy(diffPart -> diffPart.diffCode));
+                Stream.concat(piecesDiffPartStream, pickupDiffPartStream).collect(Collectors.groupingBy(diffPart -> diffPart.diffCode, LinkedHashMap::new, Collectors.toList()));
 
         // filter merged property by piece code
         List<DfHacoMapDiffPart> filteredDiffPartList = diffPartMap.entrySet().stream().map(diffPartEntry -> {

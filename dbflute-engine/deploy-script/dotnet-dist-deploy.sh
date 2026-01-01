@@ -1,8 +1,7 @@
 #!/bin/bash
+cd `dirname $0`
 
-if [ `uname` = "Darwin" ]; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-fi
+# also to dbflute-engine directory
+. _prepare-build.sh
 
-cd ..
 ant -f buildnet.xml dist

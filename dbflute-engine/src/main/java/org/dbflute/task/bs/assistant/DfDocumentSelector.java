@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,6 +310,19 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
         return !isSuppressHistoryHtmlDiffGitBranch();
     }
 
+    // -----------------------------------------------------
+    //                                            Deprecated
+    //                                            ----------
+    public String buildDeprecatedTableTagPrefixForHistoryHtml(String tableFlexibleName) {
+        final boolean deprecatedTable = isDeprecatedTable(tableFlexibleName);
+        return deprecatedTable ? getDocumentProperties().getDeprecatedTableTagPrefixForSchemaHtml() : ""; // same as SchemaHTML
+    }
+
+    public String buildDeprecatedTableTagSuffixForHistoryHtml(String tableFlexibleName) {
+        final boolean deprecatedTable = isDeprecatedTable(tableFlexibleName);
+        return deprecatedTable ? getDocumentProperties().getDeprecatedTableTagSuffixForSchemaHtml() : ""; // same as SchemaHTML
+    }
+
     // ===================================================================================
     //                                                                     Properties HTML
     //                                                                     ===============
@@ -371,6 +384,13 @@ public class DfDocumentSelector { // also has document supplement resources e.g.
         }
         cachedLastaDocNameList = getLastaFluteProperties().getLastaDocHtmlNameList();
         return cachedLastaDocNameList;
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected boolean isDeprecatedTable(String tableFlexibleName) {
+        return getDocumentProperties().isDeprecatedTable(tableFlexibleName);
     }
 
     // ===================================================================================

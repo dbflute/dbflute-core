@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,34 +42,39 @@ public class DfDecommentAliasHandler {
     public Set<String> findDecommentTableAliasSet(String tableDbName) { // not null, empty allowed
         final DfDecommentGlancePickup glancePickup = DfDecommentGlancePickup.getInstance();
         final String unifiedDecomment = glancePickup.findUnifiedTableDecomment(tableDbName);
-        return doFindDecommentAliasSet(unifiedDecomment);
+        return extractDecommentAliasSet(unifiedDecomment);
     }
 
     public Set<String> findDecommentColumnAliasSet(String tableDbName, String columnDbName) { // not null, empty allowed
         final DfDecommentGlancePickup glancePickup = DfDecommentGlancePickup.getInstance();
         final String unifiedDecomment = glancePickup.findUnifiedColumnDecomment(tableDbName, columnDbName);
-        return doFindDecommentAliasSet(unifiedDecomment);
+        return extractDecommentAliasSet(unifiedDecomment);
     }
 
-    protected Set<String> doFindDecommentAliasSet(String unifiedDecomment) {
+    protected Set<String> extractDecommentAliasSet(String unifiedDecomment) {
         if (Srl.is_Null_or_TrimmedEmpty(unifiedDecomment)) { // no decomment for the table
             return DfCollectionUtil.emptySet(); // not found
         }
+        final Set<String> aliasSet = DfCollectionUtil.newLinkedHashSet();
+        aliasSet.addAll(doExtractDecommentAliasSet(unifiedDecomment, "shalias:{")); // new name
+        aliasSet.addAll(doExtractDecommentAliasSet(unifiedDecomment, "dfalias:{")); // for compatible
+        return Collections.unmodifiableSet(aliasSet);
+    }
 
+    protected Set<String> doExtractDecommentAliasSet(String unifiedDecomment, String aliasBeginMark) {
         // conflicted decomments may have each aliases
-        final String aliasBeginMark = "dfalias:{";
         final String aliasEndMark = "}";
-        final List<ScopeInfo> scopeList = Srl.extractScopeList(unifiedDecomment, aliasBeginMark, aliasEndMark); // not null
+        List<ScopeInfo> scopeList = Srl.extractScopeList(unifiedDecomment, aliasBeginMark, aliasEndMark);
         if (scopeList.isEmpty()) {
-            return DfCollectionUtil.emptySet(); // not found
+            return DfCollectionUtil.emptySet();
         }
 
         // using set to avoid same alias, conflicted decomments may have same alias
         final Set<String> aliasSet = DfCollectionUtil.newLinkedHashSet();
         for (ScopeInfo scopeInfo : scopeList) {
             final String content = scopeInfo.getContent(); // not null
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(content)) { // except e.g. dfalias:{}
-                aliasSet.add(content.trim()); // e.g. dfalias:{ sea } => "sea"
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(content)) { // except e.g. shalias:{}
+                aliasSet.add(content.trim()); // e.g. shalias:{ sea } => "sea"
             }
         }
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+cd `dirname $0`
 
 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 # DBFlute Distribution and OpenSource DB Deploy
@@ -10,14 +11,8 @@
 # o target projects are git-cloned at the next directory of dbflute-core 
 # _/_/_/_/_/_/_/_/_/_/
 
-# should be java8 when deploy script
-# other version branches are manually merged after that
-if [ `uname` = "Darwin" ]; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-fi
-
-# to dbflute-engine directory
-cd ..
+# also to dbflute-engine directory
+. _prepare-build.sh
 
 ant -f build.xml dist
 ant -f build.xml reflect-to-test-active-dockside

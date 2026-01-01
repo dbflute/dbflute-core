@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,6 +158,7 @@ import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentDescriptionHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.dbflute.logic.doc.schemahtml.alias.DfSchemaHtmlAliasBasicFacade;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -168,7 +169,6 @@ import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfDatabaseProperties;
@@ -180,6 +180,7 @@ import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
+import org.dbflute.properties.assistant.bhvfilter.DfBhvFilterColumnArranger;
 import org.dbflute.properties.assistant.database.DfAdditionalSchemaInfo;
 import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSelectByPKUQMap;
 import org.dbflute.properties.assistant.littleadjust.DfDeprecatedSpecifyBatchColumnMap;
@@ -289,12 +290,16 @@ public class Table {
      * @return Should be the table excepted?
      */
     public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
-        _name = attrib.getValue("name"); // table name
+        final String onXmlTableName = attrib.getValue("name");
+        setName(onXmlTableName); // may be switched
         _type = attrib.getValue("type"); // TABLE, VIEW, SYNONYM...
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, _name)) {
+
+        // reading-filter is from xml loader (caller) so on-xml table name may be expected
+        if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, onXmlTableName)) {
             return false;
         }
+
         setPlainComment(attrib.getValue("comment")); // setter for sync
         _javaName = attrib.getValue("javaName");
         return true;
@@ -337,7 +342,9 @@ public class Table {
      * @param name The table name as String. (NotNull)
      */
     public void setName(String name) {
-        this._name = name;
+        // from meta-data table name to generate table name here
+        // basically (and very almost) same, but concept difference
+        _name = getDatabaseProperties().switchGenerateTableName(name);
     }
 
     /**
@@ -554,12 +561,6 @@ public class Table {
         return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
     }
 
-    protected String findAliasOnDecomment() { // null allowed
-        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
-        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
-        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
-    }
-
     protected String buildAliasExpression(String alias) {
         if (alias == null || alias.trim().length() == 0) {
             return "";
@@ -569,12 +570,25 @@ public class Table {
     }
 
     // -----------------------------------------------------
+    //                                               shalias
+    //                                               -------
+    protected String findAliasOnDecomment() { // means shalias, null allowed
+        final DfDecommentAliasHandler handler = new DfDecommentAliasHandler();
+        final Set<String> aliasSet = handler.findDecommentTableAliasSet(getTableDbName());
+        return handler.buildMaybeConflictedAliasesDisp(aliasSet);
+    }
+
+    public boolean hasAliasOnDecomment() { // means shalias, for whole determination
+        return findAliasOnDecomment() != null;
+    }
+
+    // -----------------------------------------------------
     //                                          Alias Option
     //                                          ------------
-    // used in e.g. SchemaHTML template for alias item display determination
-    public boolean needsColumnAliasItem() { // e.g. may be dfprop alias only
-        final boolean aliasDelimiterInDbCommentValid = getDocumentProperties().isAliasDelimiterInDbCommentValid();
-        return aliasDelimiterInDbCommentValid || getColumnList().stream().anyMatch(column -> column.hasAlias());
+    public boolean needsColumnAliasItem() { // used in e.g. SchemaHTML template
+        final List<Table> tableList = getDatabase().getTableList();
+        final List<Column> columnList = getColumnList();
+        return new DfSchemaHtmlAliasBasicFacade().needsTableDetailColumnAlias(tableList, columnList);
     }
 
     // ===================================================================================
@@ -4316,36 +4330,8 @@ public class Table {
         if (_behaviorFilterBeforeInsertColumnList != null) {
             return _behaviorFilterBeforeInsertColumnList;
         }
-        final DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        final Map<String, Object> map = prop.getBeforeInsertMap();
-        final Set<String> columnNameSet = map.keySet();
-        _behaviorFilterBeforeInsertColumnList = new ArrayList<Column>();
-        final Set<String> commonColumnNameSet = new HashSet<String>();
-        if (hasAllCommonColumn()) {
-            final List<Column> commonColumnList = getCommonColumnList();
-            for (Column commonColumn : commonColumnList) {
-                commonColumnNameSet.add(commonColumn.getName());
-            }
-        }
-        for (String columnName : columnNameSet) {
-            Column column = getColumn(columnName);
-            if (column != null && !commonColumnNameSet.contains(columnName)) {
-                _behaviorFilterBeforeInsertColumnList.add(column);
-                String expression = (String) map.get(columnName);
-                if (expression == null || expression.trim().length() == 0) {
-                    String msg = "The value expression was not found in beforeInsertMap: column=" + column;
-                    throw new IllegalStateException(msg);
-                }
-                column.setBehaviorFilterBeforeInsertColumnExpression(expression);
-            }
-        }
+        _behaviorFilterBeforeInsertColumnList = new DfBhvFilterColumnArranger().arrangeBeforeInsertColumnList(this);
         return _behaviorFilterBeforeInsertColumnList;
-    }
-
-    public String getBehaviorFilterBeforeInsertColumnExpression(String columName) {
-        DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        Map<String, Object> map = prop.getBeforeInsertMap();
-        return (String) map.get(columName);
     }
 
     protected List<Column> _behaviorFilterBeforeUpdateColumnList;
@@ -4358,29 +4344,7 @@ public class Table {
         if (_behaviorFilterBeforeUpdateColumnList != null) {
             return _behaviorFilterBeforeUpdateColumnList;
         }
-        DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        Map<String, Object> map = prop.getBeforeUpdateMap();
-        Set<String> columnNameSet = map.keySet();
-        _behaviorFilterBeforeUpdateColumnList = new ArrayList<Column>();
-        Set<String> commonColumnNameSet = new HashSet<String>();
-        if (hasAllCommonColumn()) {
-            List<Column> commonColumnList = getCommonColumnList();
-            for (Column commonColumn : commonColumnList) {
-                commonColumnNameSet.add(commonColumn.getName());
-            }
-        }
-        for (String columnName : columnNameSet) {
-            Column column = getColumn(columnName);
-            if (column != null && !commonColumnNameSet.contains(columnName)) {
-                _behaviorFilterBeforeUpdateColumnList.add(column);
-                String expression = (String) map.get(columnName);
-                if (expression == null || expression.trim().length() == 0) {
-                    String msg = "The value expression was not found in beforeUpdateMap: column=" + column;
-                    throw new IllegalStateException(msg);
-                }
-                column.setBehaviorFilterBeforeUpdateColumnExpression(expression);
-            }
-        }
+        _behaviorFilterBeforeUpdateColumnList = new DfBhvFilterColumnArranger().arrangeBeforeUpdateColumnList(this);
         return _behaviorFilterBeforeUpdateColumnList;
     }
 

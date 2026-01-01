@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -681,6 +681,31 @@ public final class DfDatabaseProperties extends DfAbstractDBFluteProperties {
         //  SQLServer: case insensitive
         // - - - - - - - - - -/
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                 Table Name Switcher
+    //                                                                 ===================
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // not metaData, but generate here
+    // because probably JDBC cannot handle switched name (2025/12/02)
+    // _/_/_/_/_/_/_/_/
+    public String switchGenerateTableName(String plainTableName) {
+        final Map<String, Object> switchingMap = getGenerateTableNameSwitchingMap();
+        if (switchingMap.isEmpty()) { // no option
+            return plainTableName; // no filter
+        }
+        final String switched = (String) switchingMap.get(plainTableName);
+        if (Srl.is_Null_or_TrimmedEmpty(switched)) { // not found
+            return plainTableName; // no filter
+        }
+        return switched; // right here
+    }
+
+    protected Map<String, Object> getGenerateTableNameSwitchingMap() { // closet, @since 1.3.1 (2025/12/02)
+        // e.g. map:{ spring_session = SPRING_SESSION }
+        // case sensitive table name key here for pinpoint adjustment
+        return getVairousStringKeyMap("generateTableNameSwitchingMap"); // two-edged sword
     }
 
     // ===================================================================================

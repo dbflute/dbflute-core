@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,6 +447,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         }
         final String attrValue = (String) elementMap.get(attrName);
         return attrValue != null ? attrValue : defaultValue;
+    }
+
+    // -----------------------------------------------------
+    //                                             decomment
+    //                                             ---------
+    public boolean isSuppressDecommentPickup() { // @since 1.3.1
+        return isProperty("isSuppressDecommentPickup", false, getDocumentMap());
     }
 
     // ===================================================================================
@@ -1128,6 +1135,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         final List<String> tableTargetList = DfCollectionUtil.emptyList();
         final List<String> tableExceptList = getSchemaSyncCheckTableExceptList();
         return isTargetByHint(tableName, tableTargetList, tableExceptList);
+    }
+
+    // -----------------------------------------------------
+    //                                 Reverse Previous/Next
+    //                                 ---------------------
+    public boolean isSchemaSyncCheckReversePreviousNext() { // @since 1.3.1
+        return isProperty("isReversePreviousNext", false, getSchemaSyncCheckMap());
     }
 
     // ===================================================================================
