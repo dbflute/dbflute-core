@@ -120,6 +120,8 @@ public class DfSPolicyColumnStatementChecker {
                     throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
                 }
                 return clsName != null && clsName.equalsIgnoreCase(policyClsName);
+            } else if ("commonColumn".equalsIgnoreCase(ifValue)) { // @since 1.3.2
+                return column.isCommonColumn() == !notIfValue;
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
@@ -231,6 +233,10 @@ public class DfSPolicyColumnStatementChecker {
                 throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
             } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
                 result.violate(policy, "The column should be classification of " + policyClsName + ": " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("commonColumn")) { // @since 1.3.2
+            if (!column.isCommonColumn() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be commonColumn: " + toColumnDisp(column));
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
@@ -355,6 +361,11 @@ public class DfSPolicyColumnStatementChecker {
                     throwSchemaPolicyCheckIllegalThenNotThemeException(statement, "classification(...)");
                 } else if (clsName == null || !clsName.equalsIgnoreCase(policyClsName)) {
                     return violationCall.apply(String.valueOf(false));
+                }
+            } else if ("commonColumn".equalsIgnoreCase(thenValue)) { // @since 1.3.2
+                final boolean determination = column.isCommonColumn();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
                 }
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-value: " + thenValue);
