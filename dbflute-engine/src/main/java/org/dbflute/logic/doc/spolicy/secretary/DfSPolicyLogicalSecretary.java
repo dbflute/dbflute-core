@@ -298,6 +298,9 @@ public class DfSPolicyLogicalSecretary {
             sb.append("(").append(column.getColumnSize()).append(")");
         }
         sb.append(" ").append(column.isNotNull() ? "(NotNull)" : "(NullAllowed)");
+        if (column.hasDefaultValue()) {
+            sb.append(" default ").append(column.getDefaultValue());
+        }
         if (column.hasComment()) {
             sb.append(" // ").append(Srl.cut(column.getComment(), 10, "..."));
         }

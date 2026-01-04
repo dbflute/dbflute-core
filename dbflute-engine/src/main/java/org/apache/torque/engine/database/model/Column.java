@@ -734,10 +734,12 @@ public class Column {
     }
 
     public boolean hasDefaultValue() {
+        // #for_now jflute case of default '' is not treated by DBFlute now (2026/01/05)
         return _defaultValue != null && _defaultValue.trim().length() > 0;
     }
 
     public boolean hasDefaultValueExceptAutoIncrement() {
+        // case of identity=sequence+default e.g. PostgreSQL, H2 Database
         return !isIdentityOrSequence() && hasDefaultValue();
     }
 

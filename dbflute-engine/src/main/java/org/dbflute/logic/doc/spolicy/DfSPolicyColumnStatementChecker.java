@@ -122,6 +122,8 @@ public class DfSPolicyColumnStatementChecker {
                 return clsName != null && clsName.equalsIgnoreCase(policyClsName);
             } else if ("commonColumn".equalsIgnoreCase(ifValue)) { // @since 1.3.2
                 return column.isCommonColumn() == !notIfValue;
+            } else if ("hasDefaultValue".equalsIgnoreCase(ifValue)) { // @since 1.3.2
+                return column.hasDefaultValue() == !notIfValue;
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-value: " + ifValue);
             }
@@ -141,13 +143,17 @@ public class DfSPolicyColumnStatementChecker {
                 return isHitExp(statement, column.getDbType(), ifValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("size")) { // if size is ...
-            if (column.hasColumnSize()) { // just in case
+            if (column.hasColumnSize()) {
                 return isHitExp(statement, column.getColumnSize(), ifValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("dbType_with_size")) { // e.g. if dbType_with_size is char(3)
             if (column.hasDbType() && column.hasColumnSize()) { // just in case
                 final String exp = toComparingDbTypeWithSize(column);
                 return isHitExp(statement, exp, ifValue) == !notIfValue;
+            }
+        } else if (ifItem.equalsIgnoreCase("defaultValue")) { // if defaultValue is ... @since 1.3.2
+            if (column.hasDefaultValue()) {
+                return isHitExp(statement, column.getDefaultValue(), ifValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
             return determineFirstDate(statement, ifValue, notIfValue, column);
@@ -237,6 +243,10 @@ public class DfSPolicyColumnStatementChecker {
         } else if (thenTheme.equalsIgnoreCase("commonColumn")) { // @since 1.3.2
             if (!column.isCommonColumn() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be commonColumn: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("hasDefaultValue")) { // @since 1.3.2
+            if (!column.hasDefaultValue() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "have default value: " + toColumnDisp(column));
             }
         } else if (thenTheme.equalsIgnoreCase("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(toComparingColumnName(column)) == !notThenClause) {
@@ -367,6 +377,11 @@ public class DfSPolicyColumnStatementChecker {
                 if (!determination == !notThenValue) {
                     return violationCall.apply(String.valueOf(determination));
                 }
+            } else if ("hasDefaultValue".equalsIgnoreCase(thenValue)) { // @since 1.3.2
+                final boolean determination = column.hasDefaultValue();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
             } else {
                 throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-value: " + thenValue);
             }
@@ -394,7 +409,7 @@ public class DfSPolicyColumnStatementChecker {
                 return violationCall.apply(dbType);
             }
         } else if (thenItem.equalsIgnoreCase("size")) { // e.g. size is 200
-            final String size = column.getColumnSize(); // String expression #for_now
+            final String size = column.getColumnSize();
             if (!isHitExp(statement, size, thenValue) == !notThenValue) {
                 return violationCall.apply(size);
             }
@@ -402,6 +417,11 @@ public class DfSPolicyColumnStatementChecker {
             final String dbTypeWithSize = toComparingDbTypeWithSize(column);
             if (!isHitExp(statement, dbTypeWithSize, thenValue) == !notThenValue) {
                 return violationCall.apply(dbTypeWithSize);
+            }
+        } else if (thenItem.equalsIgnoreCase("defaultValue")) { // e.g. defaultValue is 0, @since 1.3.2
+            final String defaultValue = column.getDefaultValue();
+            if (!isHitExp(statement, defaultValue, thenValue) == !notThenValue) {
+                return violationCall.apply(defaultValue);
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             final String comment = column.getComment();
