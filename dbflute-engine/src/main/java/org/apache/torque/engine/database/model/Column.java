@@ -503,7 +503,7 @@ public class Column {
         final Date columnFirstDate = findFirstDate().orElse(null); // extractor needs nullable
         final String plainAlias = _aliasFromDbCommentExtractor.extractColumnAlias(plainComment, columnFirstDate, () -> {
             return getTable().findFirstDate().orElse(null); // me too
-        });
+        }, getTable().getTableDbName(), getName());
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
     }
@@ -888,7 +888,7 @@ public class Column {
             final Date columnFirstDate = findFirstDate().orElse(null); // extractor needs nullable
             plainDescprition = _aliasFromDbCommentExtractor.extractColumnDescription(plainComment, columnFirstDate, () -> {
                 return getTable().findFirstDate().orElse(null); // me too
-            });
+            }, getTable().getTableDbName(), getName());
         }
         final String unified = dbcommentProp.unifyColumnPlainDescription(tableDbName, columnDbName, plainDescprition);
         return unified != null ? unified : "";

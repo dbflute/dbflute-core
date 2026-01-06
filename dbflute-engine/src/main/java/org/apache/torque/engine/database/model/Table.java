@@ -559,10 +559,11 @@ public class Table {
     }
 
     protected String buildMetadataAlias() { // null allowed
+        final String plainComment = getPlainComment();
         final Date tableFirstDate = findFirstDate().orElse(null); // extractor needs nullable
-        final String plainAlias = _aliasFromDbCommentExtractor.extractTableAlias(getPlainComment(), tableFirstDate);
-        final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
-        return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
+        final String tableDbName = getTableDbName(); // for forced judge
+        final String plainAlias = _aliasFromDbCommentExtractor.extractTableAlias(plainComment, tableFirstDate, tableDbName);
+        return getAdditionalDbCommentProperties().chooseTablePlainAlias(tableDbName, plainAlias);
     }
 
     protected String buildAliasExpression(String alias) {
@@ -789,7 +790,7 @@ public class Table {
             plainDescprition = plainComment;
         } else { // mainly here
             final Date tableFirstDate = findFirstDate().orElse(null); // extractor needs nullable
-            return _aliasFromDbCommentExtractor.extractTableDescription(plainComment, tableFirstDate);
+            return _aliasFromDbCommentExtractor.extractTableDescription(plainComment, tableFirstDate, tableDbName);
         }
         final String unified = dbcommentProp.unifyTablePlainDescription(tableDbName, plainDescprition);
         final String wholeComment = unified != null ? unified : "";

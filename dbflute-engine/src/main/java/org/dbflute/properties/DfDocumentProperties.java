@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -148,22 +149,13 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return isProperty("isDbCommentOnAliasBasis", false, getDocumentMap());
     }
 
-    public OptionalThing<Date> getAliasBasisIfFirstDateAfter() {
-        final String plainExp = (String) getDbCommentOnAliasBasisOptionMap().get("aliasBasisIfFirstDateAfter");
-        return OptionalThing.ofNullable(plainExp, () -> {
-            throw new IllegalStateException("Not found the aliasBasisIfFirstDateAfter.");
-        }).map(strExp -> {
-            try {
-                return new HandyDate(strExp).getDate();
-            } catch (ParseDateExpressionFailureException e) {
-                String msg = "The aliasBasisIfFirstDateAfter should be date: prop=" + strExp;
-                throw new DfIllegalPropertyTypeException(msg, e);
-            }
-        });
-    }
-
     // ; dbCommentOnAliasBasisOptionMap = map:{
     //     ; aliasBasisIfFirstDateAfter = 2026/01/06
+    //     ; forcedAliasBasisTableList = list:{.MEMBER ; PRODUCT }
+    //     ; forcedAliasBasisColumnListMap = map:{
+    //         ; MEMBER = list:{ MEMBER_NAME ; BIRTHDATE }
+    //         ; PRODUCT = list:{ $$ALL$$ }
+    //     }
     // }
     protected Map<String, Object> _dbCommentOnAliasBasicOptionMap;
 
@@ -180,6 +172,79 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
             _dbCommentOnAliasBasicOptionMap = DEFAULT_EMPTY_MAP;
         }
         return _dbCommentOnAliasBasicOptionMap;
+    }
+
+    // ; dbCommentOnAliasBasisOptionMap = map:{
+    //     ; aliasBasisIfFirstDateAfter = 2026/01/06
+    // }
+    public OptionalThing<Date> getAliasBasisIfFirstDateAfter() {
+        final String plainExp = (String) getDbCommentOnAliasBasisOptionMap().get("aliasBasisIfFirstDateAfter");
+        return OptionalThing.ofNullable(plainExp, () -> {
+            throw new IllegalStateException("Not found the aliasBasisIfFirstDateAfter.");
+        }).map(strExp -> {
+            try {
+                return new HandyDate(strExp).getDate();
+            } catch (ParseDateExpressionFailureException e) {
+                String msg = "The aliasBasisIfFirstDateAfter should be date: prop=" + strExp;
+                throw new DfIllegalPropertyTypeException(msg, e);
+            }
+        });
+    }
+
+    // ; dbCommentOnAliasBasisOptionMap = map:{
+    //     ; aliasBasisIfFirstDateAfter = 2026/01/06
+    //     ; forcedAliasBasisTableList = list:{ MEMBER ; PRODUCT }
+    // }
+    public boolean isForcedAliasBasisTable(String tableDbName) { // means table's alias
+        return isTargetByHint(tableDbName, getForcedAliasBasisTableList(), Collections.emptyList());
+    }
+
+    protected List<String> getForcedAliasBasisTableList() { // direct so no cache
+        @SuppressWarnings("unchecked")
+        final List<String> plainList = (List<String>) getDbCommentOnAliasBasisOptionMap().get("forcedAliasBasisTableList");
+        return plainList != null ? plainList : Collections.emptyList();
+    }
+
+    // ; dbCommentOnAliasBasisOptionMap = map:{
+    //     ; aliasBasisIfFirstDateAfter = 2026/01/06
+    //     ; forcedAliasBasisColumnListMap = map:{
+    //         ; MEMBER = list:{ MEMBER_NAME ; BIRTHDATE }
+    //         ; PRODUCT = list:{ $$ALL$$ }
+    //     }
+    // }
+    public boolean isForcedAliasBasisColumn(String tableDbName, String columnDbName) {
+        final Map<String, List<String>> aliasBasisColumnListMap = getForcedAliasBasisColumnListMap();
+        final List<String> columnList = aliasBasisColumnListMap.get(tableDbName);
+        if (columnList != null) {
+            if (columnList.contains("$$ALL$$")) { // joker
+                return true; // other elements are unrelated
+            } else {
+                return isTargetByHint(columnDbName, columnList, Collections.emptyList());
+            }
+        } else {
+            return false;
+        }
+    }
+
+    protected Map<String, List<String>> _forcedAliasBasisColumnListMap;
+
+    protected Map<String, List<String>> getForcedAliasBasisColumnListMap() {
+        if (_forcedAliasBasisColumnListMap != null) {
+            return _forcedAliasBasisColumnListMap;
+        }
+        final Map<String, List<String>> workingMap;
+        @SuppressWarnings("unchecked")
+        final Map<String, List<String>> plainMap =
+                (Map<String, List<String>>) getDbCommentOnAliasBasisOptionMap().get("forcedAliasBasisColumnListMap");
+        if (plainMap != null) {
+            final StringKeyMap<List<String>> insensitiveMap = StringKeyMap.createAsCaseInsensitive();
+            insensitiveMap.putAll(plainMap);
+            workingMap = insensitiveMap; // fitting with isTargetByHint() for now
+        } else {
+            workingMap = Collections.emptyMap();
+        }
+        _forcedAliasBasisColumnListMap = workingMap;
+        return _forcedAliasBasisColumnListMap;
     }
 
     // -----------------------------------------------------
