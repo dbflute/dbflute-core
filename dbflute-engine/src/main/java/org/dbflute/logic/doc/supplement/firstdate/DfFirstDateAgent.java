@@ -31,12 +31,13 @@ import org.dbflute.optional.OptionalThing;
  * @author jflute
  * @since 1.1.8 (2018/5/6 Sunday at bay maihama)
  */
-public class DfFirstDateAgent {
+public class DfFirstDateAgent { // from SchemaDiff
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final Supplier<List<DfSchemaDiff>> _schemaDiffListSupplier;
+    protected final DfFirstDateDeterminer _firstDateDeterminer = new DfFirstDateDeterminer();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -65,34 +66,21 @@ public class DfFirstDateAgent {
     //                                                                           Targeting
     //                                                                           =========
     // e.g. firstDate is after:2018/05/03
-    public boolean isTableFirstDateAfter(String tableDbName, Date targetDate) {
+    public boolean isTableFirstDateAfter(String tableDbName, Date targetAfterDate) {
         final Map<String, Date> tableFirstDateMap = getTableFirstDateMap();
         final Date firstDate = tableFirstDateMap.get(tableDbName); // may have time part
-        if (firstDate != null) {
-            // e.g.
-            //  2018/05/03 12:34:56, 2018/05/03 00:00:00 => false
-            //  2018/05/04 00:00:00, 2018/05/03 00:00:00 => true
-            return isAfterWithoutTimepart(firstDate, targetDate);
-        } else { // no new difference
-            return true; // treated as new table
-        }
+        return _firstDateDeterminer.determineTableFirstDateAfter(firstDate, targetAfterDate);
     }
 
-    public boolean isColumnFirstDateAfter(String tableDbName, String columnDbName, Date targetDate) {
+    public boolean isColumnFirstDateAfter(String tableDbName, String columnDbName, Date targetAfterDate) {
         final Map<String, Date> columnFirstDateMap = getColumnFirstDateMap();
         final String columnKey = generateColumnKey(tableDbName, columnDbName);
-        final Date columnFirstDate = columnFirstDateMap.get(columnKey); // may have time part
-        if (columnFirstDate != null) {
-            return isAfterWithoutTimepart(columnFirstDate, targetDate);
-        } else { // no new difference, means that it may be in new table difference
+        final Date columnFirstDate = columnFirstDateMap.get(columnKey); // may have time part, null allowed
+
+        return _firstDateDeterminer.determineColumnFirstDateAfter(columnFirstDate, () -> {
             final Map<String, Date> tableFirstDateMap = getTableFirstDateMap();
-            final Date tableFirstDate = tableFirstDateMap.get(tableDbName); // may have time part
-            if (tableFirstDate != null) { // so use table first date
-                return isAfterWithoutTimepart(tableFirstDate, targetDate);
-            } else {
-                return true; // treated as new column
-            }
-        }
+            return tableFirstDateMap.get(tableDbName); // may have time part, null allowed
+        }, targetAfterDate);
     }
 
     protected boolean isAfterWithoutTimepart(Date firstDate, Date targetDate) {

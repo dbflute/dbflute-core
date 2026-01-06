@@ -158,6 +158,7 @@ import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentDescriptionHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.dbflute.logic.doc.schemahtml.alias.DfAliasFromDbCommentExtractor;
 import org.dbflute.logic.doc.schemahtml.alias.DfSchemaHtmlAliasBasicFacade;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -199,6 +200,8 @@ public class Table {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(Table.class);
+
+    protected static final DfAliasFromDbCommentExtractor _aliasFromDbCommentExtractor = new DfAliasFromDbCommentExtractor();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -556,7 +559,8 @@ public class Table {
     }
 
     protected String buildMetadataAlias() { // null allowed
-        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(getPlainComment());
+        final Date tableFirstDate = findFirstDate().orElse(null); // extractor needs nullable
+        final String plainAlias = _aliasFromDbCommentExtractor.extractTableAlias(getPlainComment(), tableFirstDate);
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         return dbcommentProp.chooseTablePlainAlias(getTableDbName(), plainAlias);
     }
@@ -784,7 +788,8 @@ public class Table {
         if (dbcommentProp.hasTableDfpropAlias(tableDbName)) { // unneeded alias delimiter handling
             plainDescprition = plainComment;
         } else { // mainly here
-            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(plainComment);
+            final Date tableFirstDate = findFirstDate().orElse(null); // extractor needs nullable
+            return _aliasFromDbCommentExtractor.extractTableDescription(plainComment, tableFirstDate);
         }
         final String unified = dbcommentProp.unifyTablePlainDescription(tableDbName, plainDescprition);
         final String wholeComment = unified != null ? unified : "";

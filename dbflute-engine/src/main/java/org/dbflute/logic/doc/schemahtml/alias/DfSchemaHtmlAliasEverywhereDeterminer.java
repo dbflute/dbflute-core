@@ -23,7 +23,7 @@ import org.dbflute.properties.DfDocumentProperties;
 
 /**
  * @author jflute
- * @since 1.3.1 (2012/12/23 Tuesday at ichihara)
+ * @since 1.3.1 (2025/12/23 Tuesday at ichihara)
  */
 public class DfSchemaHtmlAliasEverywhereDeterminer {
 

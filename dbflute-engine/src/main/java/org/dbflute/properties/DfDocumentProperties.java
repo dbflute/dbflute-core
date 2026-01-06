@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,11 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
+import org.dbflute.exception.ParseDateExpressionFailureException;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.properties.assistant.document.stylesheet.DfDocStyleSheetReader;
 import org.dbflute.properties.assistant.document.tableorder.DfDocTableOrder;
 import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
@@ -137,64 +141,50 @@ public final class DfDocumentProperties extends DfAbstractDBFluteProperties {
         return value;
     }
 
-    public String extractAliasFromDbComment(String comment) { // alias is trimmed
-        if (isAliasHandling(comment)) {
-            if (hasAliasDelimiter(comment)) {
-                final String delimiter = getAliasDelimiterInDbComment();
-                final String candidateAlias = comment.substring(0, comment.indexOf(delimiter)).trim();
-                if (isDbCommentNumberAliasTreatedAsDescription()) {
-                    try {
-                        Integer.parseInt(candidateAlias);
-                        // maybe number classification description e.g. 1:formalized, 2:provisional, ...
-                        return null; // the candidate alias cannot be treated as alias
-                    } catch (NumberFormatException ignored) {
-                        return candidateAlias; // no problem
-                    }
-                } else { // mainly here
-                    return candidateAlias;
-                }
-            } else { // no delimiter
-                if (isDbCommentOnAliasBasis()) {
-                    return comment != null ? comment.trim() : null; // because the comment is for alias
-                }
-            }
-        }
-        return null; // alias does not exist everywhere if alias handling is not valid
-    }
-
-    public String extractDescriptionFromDbComment(String comment) { // comment is trimmed
-        if (isAliasHandling(comment)) {
-            if (hasAliasDelimiter(comment)) {
-                final String aliasFromDbComment = extractAliasFromDbComment(comment);
-                if (aliasFromDbComment != null) { // also comment is not null
-                    final String delimiter = getAliasDelimiterInDbComment();
-                    return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
-                }
-            } else {
-                if (isDbCommentOnAliasBasis()) {
-                    return null; // because the comment is for alias
-                }
-            }
-        }
-        return comment != null ? comment.trim() : null;
-    }
-
-    protected boolean isAliasHandling(String comment) {
-        if (comment == null || comment.trim().length() == 0) {
-            return false;
-        }
-        return isAliasDelimiterInDbCommentValid();
-    }
-
-    protected boolean hasAliasDelimiter(String comment) {
-        final String delimiter = getAliasDelimiterInDbComment();
-        return comment.contains(delimiter);
-    }
-
+    // -----------------------------------------------------
+    //                             DB Comment on Alias basic
+    //                             -------------------------
     public boolean isDbCommentOnAliasBasis() {
         return isProperty("isDbCommentOnAliasBasis", false, getDocumentMap());
     }
 
+    public OptionalThing<Date> getAliasBasisIfFirstDateAfter() {
+        final String plainExp = (String) getDbCommentOnAliasBasisOptionMap().get("aliasBasisIfFirstDateAfter");
+        return OptionalThing.ofNullable(plainExp, () -> {
+            throw new IllegalStateException("Not found the aliasBasisIfFirstDateAfter.");
+        }).map(strExp -> {
+            try {
+                return new HandyDate(strExp).getDate();
+            } catch (ParseDateExpressionFailureException e) {
+                String msg = "The aliasBasisIfFirstDateAfter should be date: prop=" + strExp;
+                throw new DfIllegalPropertyTypeException(msg, e);
+            }
+        });
+    }
+
+    // ; dbCommentOnAliasBasisOptionMap = map:{
+    //     ; aliasBasisIfFirstDateAfter = 2026/01/06
+    // }
+    protected Map<String, Object> _dbCommentOnAliasBasicOptionMap;
+
+    protected Map<String, Object> getDbCommentOnAliasBasisOptionMap() { // @since 1.3.2
+        if (_dbCommentOnAliasBasicOptionMap != null) {
+            return _dbCommentOnAliasBasicOptionMap;
+        }
+        final String key = "dbCommentOnAliasBasisOptionMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> dbCommentOnAliasBasisOptionMap = (Map<String, Object>) getDocumentMap().get(key);
+        if (dbCommentOnAliasBasisOptionMap != null) {
+            _dbCommentOnAliasBasicOptionMap = dbCommentOnAliasBasisOptionMap;
+        } else {
+            _dbCommentOnAliasBasicOptionMap = DEFAULT_EMPTY_MAP;
+        }
+        return _dbCommentOnAliasBasicOptionMap;
+    }
+
+    // -----------------------------------------------------
+    //                                Alias Small Adjustment
+    //                                ----------------------
     public boolean isDbCommentNumberAliasTreatedAsDescription() { // @since 1.3.0
         // #for_now jflute not used on Sql2Entity for now, too complex (2025/07/07)
         return isProperty("isDbCommentNumberAliasTreatedAsDescription", false, getDocumentMap());

@@ -142,6 +142,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentAliasHandler;
 import org.dbflute.logic.doc.decomment.glance.DfDecommentDescriptionHandler;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.dbflute.logic.doc.schemahtml.alias.DfAliasFromDbCommentExtractor;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
@@ -173,9 +174,11 @@ public class Column {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final DfColumnExtractor _columnHandler = new DfColumnExtractor();
     protected static final String INDEX_PLUS = "+";
     protected static final String HTML_INDEX_PLUS = "<span class=\"flgplus\">+</span>";
+
+    protected static final DfColumnExtractor _columnHandler = new DfColumnExtractor();
+    protected static final DfAliasFromDbCommentExtractor _aliasFromDbCommentExtractor = new DfAliasFromDbCommentExtractor();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -496,7 +499,11 @@ public class Column {
     }
 
     protected String buildMetadataAlias() { // null allowed
-        final String plainAlias = getDocumentProperties().extractAliasFromDbComment(getPlainComment());
+        final String plainComment = getPlainComment();
+        final Date columnFirstDate = findFirstDate().orElse(null); // extractor needs nullable
+        final String plainAlias = _aliasFromDbCommentExtractor.extractColumnAlias(plainComment, columnFirstDate, () -> {
+            return getTable().findFirstDate().orElse(null); // me too
+        });
         final DfAdditionalDbCommentProperties dbcommentProp = getAdditionalDbCommentProperties();
         return dbcommentProp.chooseColumnPlainAlias(getTable().getTableDbName(), getName(), plainAlias);
     }
@@ -878,7 +885,10 @@ public class Column {
         if (dbcommentProp.hasColumnDfpropAlias(tableDbName, columnDbName)) { // unneeded alias delimiter handling
             plainDescprition = plainComment;
         } else { // mainly here
-            plainDescprition = getDocumentProperties().extractDescriptionFromDbComment(plainComment);
+            final Date columnFirstDate = findFirstDate().orElse(null); // extractor needs nullable
+            plainDescprition = _aliasFromDbCommentExtractor.extractColumnDescription(plainComment, columnFirstDate, () -> {
+                return getTable().findFirstDate().orElse(null); // me too
+            });
         }
         final String unified = dbcommentProp.unifyColumnPlainDescription(tableDbName, columnDbName, plainDescprition);
         return unified != null ? unified : "";
@@ -2152,7 +2162,11 @@ public class Column {
 
     public OptionalThing<Date> findFirstDate() {
         final Table table = getTable();
-        return table.getDatabase().getFirstDateAgent().flatMap(agent -> {
+        final Database database = table.getDatabase();
+        if (database == null) { // e.g. Sql2Entity table object
+            return OptionalThing.empty();
+        }
+        return database.getFirstDateAgent().flatMap(agent -> {
             return agent.findColumnFirstDate(table.getTableDbName(), getName());
         });
     }

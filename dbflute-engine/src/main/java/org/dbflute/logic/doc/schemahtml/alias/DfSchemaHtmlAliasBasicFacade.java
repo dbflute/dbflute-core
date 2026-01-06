@@ -22,7 +22,7 @@ import org.apache.torque.engine.database.model.Table;
 
 /**
  * @author jflute
- * @since 1.3.1 (2012/12/26 Friday at ichihara)
+ * @since 1.3.1 (2025/12/26 Friday at ichihara)
  */
 public class DfSchemaHtmlAliasBasicFacade {
 
