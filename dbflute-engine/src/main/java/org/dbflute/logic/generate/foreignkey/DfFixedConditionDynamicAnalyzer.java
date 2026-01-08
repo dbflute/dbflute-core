@@ -202,7 +202,7 @@ public class DfFixedConditionDynamicAnalyzer {
         if (code != null) {
             return code;
         }
-        throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(classificationTop, elementName);
+        throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(peace, parameterType, classificationTop, elementName);
         return null; // unreachable
     }
 
@@ -256,20 +256,28 @@ public class DfFixedConditionDynamicAnalyzer {
         throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
     }
 
-    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(DfClassificationTop classificationTop,
-            String elementName) {
+    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(String peace, String parameterType,
+            DfClassificationTop classificationTop, String elementName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the classification element in fixed condition.");
         br.addItem("Foreign Key");
         br.addElement(_foreignKey.getName());
+        br.addItem("embeddedComment");
+        br.addElement(peace);
+        br.addItem("parameterType");
+        br.addElement(parameterType);
         br.addItem("Classification Name");
         br.addElement(classificationTop.getClassificationName());
         br.addItem("NotFound Element");
         br.addElement(elementName);
         br.addItem("Defined Element");
         final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
-        for (DfClassificationElement element : elementList) {
-            br.addElement(element);
+        if (!elementList.isEmpty()) {
+            for (DfClassificationElement element : elementList) {
+                br.addElement(element);
+            }
+        } else { // empty
+            br.addElement("*empty: no element from classificationTop");
         }
         final String msg = br.buildExceptionMessage();
         throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);

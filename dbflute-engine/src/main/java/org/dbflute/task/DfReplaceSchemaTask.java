@@ -27,6 +27,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.dbflute.exception.DfCreateSchemaFailureException;
+import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.dbflute.exception.DfTakeFinallyFailureException;
 import org.dbflute.exception.SQLFailureException;
@@ -238,6 +239,43 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     protected void processReplaceSchema() {
         final boolean dataOnly = isUseRepsAsDataManager();
         executeCoreProcess(getPlaySqlDir(), new DfRepsCoreProcessSelector().dataOnly(dataOnly));
+        if (canSchemaPolicyCheck()) {
+            // needs to initialize additionalForeignKey so should be after all processes
+            // https://github.com/dbflute/dbflute-core/issues/313
+            checkSchemaPolicyInRepsIfNeeds(); // pure ReplaceSchema only here
+        }
+    }
+
+    protected boolean canSchemaPolicyCheck() {
+        // failure no check because it may have low priority failure
+        return _replaceSchemaFinalInfo != null && !_replaceSchemaFinalInfo.hasFailure();
+    }
+
+    // -----------------------------------------------------
+    //                                         Schema Policy
+    //                                         -------------
+    protected void checkSchemaPolicyInRepsIfNeeds() {
+        final long before = System.currentTimeMillis(); // no-if to be simple
+        final DfSPolicyInRepsChecker checker = new DfSPolicyInRepsChecker(getDataSource(), _documentSelector);
+        final boolean executed;
+        try {
+            executed = checker.checkSchemaPolicyInRepsIfNeeds();
+        } catch (DfSchemaPolicyCheckViolationException e) {
+            _takeFinallyFinalInfo.addDetailMessage("(Schema Policy) - *violation");
+            throw e;
+        }
+        if (executed) {
+            final long after = System.currentTimeMillis();
+            final long preformanceMillis = after - before;
+            final Long originalMillis = _takeFinallyFinalInfo.getProcessPerformanceMillis();
+            if (originalMillis != null) {
+                // because schema policy process is treated as take-finally process in display
+                // (hard to move schema policy process to take-finally process so adjust it by logging logic)
+                _takeFinallyFinalInfo.setProcessPerformanceMillis(originalMillis + preformanceMillis);
+            }
+            final String performanceView = DfTraceViewUtil.convertToPerformanceView(preformanceMillis);
+            _takeFinallyFinalInfo.addDetailMessage("(Schema Policy) - " + performanceView);
+        }
     }
 
     // ===================================================================================
@@ -311,11 +349,6 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         if (breakCause != null) { // high priority exception
             throw breakCause;
         }
-        if (!_createSchemaFinalInfo.isFailure()) { // because it may have low priority failure
-            if (!previous) { // because previous is immutable
-                checkSchemaPolicyInRepsIfNeeds();
-            }
-        }
     }
 
     protected DfCreateSchemaProcess createCreateSchemaProcess(String sqlRootDir) {
@@ -333,24 +366,6 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
                 setupDataSource();
             }
         };
-    }
-
-    protected void checkSchemaPolicyInRepsIfNeeds() {
-        final long before = System.currentTimeMillis(); // no-if to be simple
-        final DfSPolicyInRepsChecker checker = new DfSPolicyInRepsChecker(getDataSource(), _documentSelector);
-        final boolean executed = checker.checkSchemaPolicyInRepsIfNeeds();
-        if (executed) {
-            final long after = System.currentTimeMillis();
-            final long preformanceMillis = after - before;
-            final Long originalMillis = _createSchemaFinalInfo.getProcessPerformanceMillis();
-            if (originalMillis != null) {
-                // because schema policy process is treated as create schema process in display
-                // (hard to move schema policy process to create schema process so adjust it by logging logic)
-                _createSchemaFinalInfo.setProcessPerformanceMillis(originalMillis + preformanceMillis);
-            }
-            final String performanceView = DfTraceViewUtil.convertToPerformanceView(preformanceMillis);
-            _createSchemaFinalInfo.addDetailMessage("(Schema Policy) - " + performanceView);
-        }
     }
 
     // -----------------------------------------------------

@@ -20,6 +20,7 @@ import java.io.File;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
 import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
@@ -70,6 +71,10 @@ public class DfSPolicyInRepsChecker {
     // ===================================================================================
     //                                                                               Check
     //                                                                               =====
+    /**
+     * @return Is the check executed? (not related to violation)
+     * @throws DfSchemaPolicyCheckViolationException When at least one violation exists.
+     */
     public boolean checkSchemaPolicyInRepsIfNeeds() { // returns check executed or not
         final DfReplaceSchemaProperties repsProp = getReplaceSchemaProperties();
         if (!repsProp.isCheckSchemaPolicyInReps()) {
@@ -116,8 +121,10 @@ public class DfSPolicyInRepsChecker {
     }
 
     protected void initializeSupplementaryMetaData(Database database) {
-        // #thinking jflute fixedCondition's classification failure, needs to analyze deeply (2019/05/08)
-        //database.initializeSupplementaryMetaData();
+        // done jflute fixedCondition's classification failure, needs to analyze deeply (2019/05/08)
+        // check should be after load-data of table classification (2026/01/09)
+        // https://github.com/dbflute/dbflute-core/issues/313
+        database.initializeSupplementaryMetaData();
         database.initializeClassificationDeployment(); // only this since old days
     }
 
