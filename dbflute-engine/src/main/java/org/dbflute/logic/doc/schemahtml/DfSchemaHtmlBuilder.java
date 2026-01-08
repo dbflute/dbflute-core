@@ -15,8 +15,11 @@
  */
 package org.dbflute.logic.doc.schemahtml;
 
+import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
 
@@ -26,12 +29,41 @@ import org.dbflute.util.Srl;
  */
 public class DfSchemaHtmlBuilder {
 
-    protected DfDocumentProperties _documentProperties;
-
-    public DfSchemaHtmlBuilder(DfDocumentProperties documentProperties) {
-        _documentProperties = documentProperties;
+    // ===================================================================================
+    //                                                                    Table List Title
+    //                                                                    ================
+    public String buildTableListTitle(Database database) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("mainSchema=").append(getDatabaseProperties().getDatabaseSchema().getCatalogSchema());
+        sb.append(", tableCount=").append(database.getTableList().size());
+        final long columnCountAll = database.getTableList().stream().flatMap(table -> {
+            return table.getColumnList().stream();
+        }).count();
+        sb.append(", columnCountAll=").append(columnCountAll);
+        return " title=\"" + resolveTitle(sb.toString()) + "\"";
     }
 
+    // ===================================================================================
+    //                                                                         Table Title
+    //                                                                         ===========
+    public String buildTableTitle(Table table) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("type=").append(table.getType());
+        if (table.isAdditionalSchema()) {
+            sb.append(", schema=").append(table.getDocumentSchema());
+        }
+        sb.append(", primaryKey={").append(table.getPrimaryKeyNameCommaString()).append("}");
+        sb.append(", nameLength=").append(table.getTableDbName().length());
+        sb.append(", columnCount=").append(table.getColumns().length);
+        if (table.isDeprecatedTable()) {
+            sb.append(", @deprecated reason=").append(table.getDeprecatedTableReasonComment());
+        }
+        return " title=\"" + resolveTitle(sb.toString()) + "\"";
+    }
+
+    // ===================================================================================
+    //                                                                  Related Table Link
+    //                                                                  ==================
     public String buildRelatedTableLink(ForeignKey fk, Table table, String delimiter) {
         final String tableDispName = table.getTableDispName();
         final String tableId = table.getTableIdForSchemaHtml();
@@ -81,7 +113,25 @@ public class DfSchemaHtmlBuilder {
         return sb.toString();
     }
 
+    // ===================================================================================
+    //                                                                        Escape Logic
+    //                                                                        ============
     protected String resolveTitle(String title) {
-        return _documentProperties.resolveSchemaHtmlTagAttr(title);
+        return getDocumentProperties().resolveSchemaHtmlTagAttr(title);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 }

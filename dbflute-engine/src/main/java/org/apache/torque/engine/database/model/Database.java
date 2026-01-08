@@ -152,6 +152,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
 import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.logic.doc.arrqy.DfArrangeQueryTable;
+import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataArrangeQuery;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlDataProcedure;
 import org.dbflute.logic.doc.schemahtml.alias.DfSchemaHtmlAliasBasicFacade;
@@ -2477,6 +2478,10 @@ public class Database {
     // -----------------------------------------------------
     //                                            SchemaHtml
     //                                            ----------
+    public String getSchemaHtmlTableListTitle() {
+        return new DfSchemaHtmlBuilder().buildTableListTitle(this);
+    }
+
     public boolean isSchemaHtmlArrangeQueryValid() {
         if (getProperties().getDocumentProperties().isSuppressSchemaHtmlArrangeQuery()) {
             return false;

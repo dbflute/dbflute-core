@@ -1136,8 +1136,7 @@ public class Column {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // mainly for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getDocumentProperties();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
         final String delimiter = ",<br>";
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         final int size = foreignKeyList.size();
@@ -1402,8 +1401,7 @@ public class Column {
         if (_referrerList == null) {
             _referrerList = new ArrayList<ForeignKey>(5);
         }
-        final DfDocumentProperties prop = getDocumentProperties();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
         final String delimiter = ",<br>";
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrerList) {

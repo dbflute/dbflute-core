@@ -847,19 +847,7 @@ public class Table {
     }
 
     public String getTitleForSchemaHtml() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("type=").append(_type);
-        if (isAdditionalSchema()) {
-            sb.append(", schema=").append(getDocumentSchema());
-        }
-        sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
-        sb.append(", nameLength=").append(getTableDbName().length());
-        sb.append(", columnCount=").append(getColumns().length);
-        if (isDeprecatedTable()) {
-            sb.append(", @deprecated reason=").append(getDeprecatedTableReasonComment());
-        }
-        final DfDocumentProperties prop = getDocumentProperties();
-        return " title=\"" + prop.resolveSchemaHtmlTagAttr(sb.toString()) + "\"";
+        return new DfSchemaHtmlBuilder().buildTableTitle(this);
     }
 
     // ===================================================================================
@@ -1487,8 +1475,7 @@ public class Table {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getDocumentProperties();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
         final String delimiter = ", ";
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         final int size = foreignKeyList.size();
@@ -2071,8 +2058,7 @@ public class Table {
 
     public String getReferrerTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getDocumentProperties();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
         final String delimiter = ", ";
         final List<ForeignKey> referrerList = getReferrerList();
         final int size = referrerList.size();

@@ -662,7 +662,7 @@ ${database.schemaDescription}
 
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())
 #set ($needsTableAliasItem = $database.needsTableAliasItem())
-<h2>Table List</h2>
+<h2${database.schemaHtmlTableListTitle}>Table List</h2>
 <div class="keywordsearch">
 	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
 	<ul id="suggestion-list" class="suggestionarea"></ul>
