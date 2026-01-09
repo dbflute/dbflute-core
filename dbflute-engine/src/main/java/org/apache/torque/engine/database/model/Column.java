@@ -752,11 +752,18 @@ public class Column {
         return !isIdentityOrSequence() && hasDefaultValue();
     }
 
-    public String getDefaultValue() {
+    public String getDefaultValue() { // null allowed, empty allowed
         return _defaultValue;
     }
 
-    public String getDefaultValueSettingExpression() {
+    public String getDefaultValueForSchemaHtml() {
+        if ("".equals(_defaultValue)) { // is rare special patch
+            return "(empty string)"; // empty expression for now
+        }
+        return _defaultValue;
+    }
+
+    public String getDefaultValueSettingExpression() { // for e.g. DBMeta implementation
         final String defaultValue = getDefaultValue();
         if (defaultValue == null) {
             return "null";

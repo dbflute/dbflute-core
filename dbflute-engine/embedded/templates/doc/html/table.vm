@@ -95,7 +95,7 @@ ${deprecatedTablePrefix}${table.aliasExpressionForSchemaHtml}${table.tableDispNa
 		<td class="typecell">${col.dbTypeExpression}</td>
 		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
 #if ($hasDefaultValue)
-		<td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
+		<td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValueForSchemaHtml}#else &nbsp;#end</td>
 #end
 		<td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
 		<td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
