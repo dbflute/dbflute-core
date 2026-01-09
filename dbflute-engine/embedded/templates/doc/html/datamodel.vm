@@ -2753,19 +2753,6 @@ Decomment.prototype = {
 	},
 
 	/**
-	 * Get table ID for SchemaHTML (same logic as server-side)
-	 * @param {string} tableName - The table name
-	 * @return {string} table ID for HTML
-	 */
-	getTableIdForSchemaHtml: function(tableName) {
-		var normalized = tableName.toLowerCase();
-		if (normalized.indexOf('.') !== -1) {
-			normalized = normalized.replace(/\./g, '_');
-		}
-		return normalized;
-	},
-
-	/**
 	 * Check if alias column exists and notify if missing
 	 * @param {Object} params - Request params containing targetType, tableName, etc.
 	 */
@@ -2801,6 +2788,19 @@ Decomment.prototype = {
 		if (!hasAliasColumn) {
 			NotificationHandler.show(message);
 		}
+	},
+
+	/**
+	 * Get table ID for SchemaHTML (same logic as server-side)
+	 * @param {string} tableName - The table name
+	 * @return {string} table ID for HTML
+	 */
+	getTableIdForSchemaHtml: function(tableName) {
+		var normalized = tableName.toLowerCase();
+		if (normalized.indexOf('.') !== -1) {
+			normalized = normalized.replace(/\./g, '_');
+		}
+		return normalized;
 	},
 
 	/**
