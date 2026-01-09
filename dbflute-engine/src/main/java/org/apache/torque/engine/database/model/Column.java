@@ -1081,14 +1081,32 @@ public class Column {
     //                                                                         ===========
     /**
      * Utility method to determine if this column is a foreign key.
+     * @return true if FK column.
      */
     public boolean isForeignKey() {
         return (getForeignKey() != null);
     }
 
     /**
+     * @return true if additional FK column.
+     */
+    public boolean isAdditionalForeignKey() { // @since 1.3.2
+        final ForeignKey fk = getForeignKey();
+        return fk != null && fk.isAdditionalForeignKey();
+    }
+
+    /**
+     * @return true if real FK column.
+     */
+    public boolean isRealForeignKey() { // @since 1.3.2
+        final ForeignKey fk = getForeignKey();
+        return fk != null && !fk.isAdditionalForeignKey(); // means real
+    }
+
+    /**
      * Determine if this column is a foreign key that refers to the
      * same table as another foreign key column in this table.
+     * @return true if multiple FK column.
      */
     public boolean isMultipleFK() {
         final ForeignKey fk = getForeignKey();

@@ -107,6 +107,10 @@ public class DfSPolicyColumnStatementChecker {
                 return (column.isPrimaryKey() && !column.isTwoOrMoreColumnPrimaryKey()) == !notIfValue;
             } else if ("fk".equalsIgnoreCase(ifValue)) {
                 return column.isForeignKey() == !notIfValue;
+            } else if ("additionalFK".equalsIgnoreCase(ifValue)) { // @since 1.3.2
+                return column.isAdditionalForeignKey() == !notIfValue;
+            } else if ("realFK".equalsIgnoreCase(ifValue)) { // @since 1.3.2
+                return column.isRealForeignKey() == !notIfValue;
             } else if ("unique".equalsIgnoreCase(ifValue)) {
                 return column.isUnique() == !notIfValue;
             } else if ("index".equalsIgnoreCase(ifValue)) {
@@ -219,6 +223,14 @@ public class DfSPolicyColumnStatementChecker {
         } else if (thenTheme.equalsIgnoreCase("fk")) {
             if (!column.isForeignKey() == !notThenClause) {
                 result.violate(policy, "The column should " + notOr + "be foreign key: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("additionalFK")) { // @since 1.3.2
+            if (!column.isAdditionalForeignKey() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be additional foreign key: " + toColumnDisp(column));
+            }
+        } else if (thenTheme.equalsIgnoreCase("realFK")) { // @since 1.3.2
+            if (!column.isRealForeignKey() == !notThenClause) {
+                result.violate(policy, "The column should " + notOr + "be real foreign key: " + toColumnDisp(column));
             }
         } else if (thenTheme.equalsIgnoreCase("unique")) {
             if (!column.isUnique() == !notThenClause) {
@@ -346,6 +358,16 @@ public class DfSPolicyColumnStatementChecker {
                 }
             } else if ("fk".equalsIgnoreCase(thenValue)) {
                 final boolean determination = column.isForeignKey();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("additionalFK".equalsIgnoreCase(thenValue)) { // @since 1.3.2
+                final boolean determination = column.isAdditionalForeignKey();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("realFK".equalsIgnoreCase(thenValue)) { // @since 1.3.2
+                final boolean determination = column.isRealForeignKey();
                 if (!determination == !notThenValue) {
                     return violationCall.apply(String.valueOf(determination));
                 }
