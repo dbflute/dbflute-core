@@ -1530,7 +1530,7 @@ var DecommentUtil = new function(){
  * @author shiny
  */
 var NotificationHandler = new function() {
-	var AUTO_HIDE_DELAY = 5000; // 5 seconds
+	var AUTO_HIDE_DELAY = 10000; // 10 seconds
 	var hideTimeout = null;
 
 	/**
