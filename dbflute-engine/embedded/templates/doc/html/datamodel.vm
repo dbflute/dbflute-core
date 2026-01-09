@@ -2689,7 +2689,7 @@ Decomment.prototype = {
 
 					// Show notification if alias saved but column doesn't exist
 					if (shouldCheckAliasColumn) {
-						that.checkAndNotifyMissingAliasColumn();
+						that.checkAndNotifyMissingAliasColumn(params);
 					}
 				});
 				modalElement.style.display = "none";
@@ -2753,19 +2753,53 @@ Decomment.prototype = {
 	},
 
 	/**
-	 * Check if alias column exists in table list and notify if missing
+	 * Get table ID for SchemaHTML (same logic as server-side)
+	 * @param {string} tableName - The table name
+	 * @return {string} table ID for HTML
 	 */
-	checkAndNotifyMissingAliasColumn: function() {
-		var tableListBody = document.getElementById('table-list-body');
-		if (!tableListBody) {
-			return;
+	getTableIdForSchemaHtml: function(tableName) {
+		var normalized = tableName.toLowerCase();
+		if (normalized.indexOf('.') !== -1) {
+			normalized = normalized.replace(/\./g, '_');
+		}
+		return normalized;
+	},
+
+	/**
+	 * Check if alias column exists and notify if missing
+	 * @param {Object} params - Request params containing targetType, tableName, etc.
+	 */
+	checkAndNotifyMissingAliasColumn: function(params) {
+		var hasAliasColumn = false;
+		var message = '';
+
+		if (params.targetType === 'TABLE') {
+			var tableListBody = document.getElementById('table-list-body');
+			if (!tableListBody) {
+				return;
+			}
+			hasAliasColumn = tableListBody.querySelector('.aliascell') !== null;
+			message = 'Alias saved! Please run the Doc task to display the alias column in the table list.';
+		} else if (params.targetType === 'COLUMN') {
+			var tableId = this.getTableIdForSchemaHtml(params.tableName);
+			var tableHeading = document.getElementById(tableId);
+			if (!tableHeading) {
+				return;
+			}
+
+			var sibling = tableHeading.nextElementSibling;
+			while (sibling) {
+				if (sibling.tagName === 'TABLE') {
+					hasAliasColumn = sibling.querySelector('.aliascell') !== null;
+					break;
+				}
+				sibling = sibling.nextElementSibling;
+			}
+			message = 'Alias saved! Please run the Doc task to display the alias column in table ' + params.tableName + '.';
 		}
 
-		var hasAliasColumn = tableListBody.querySelector('.aliascell') !== null;
 		if (!hasAliasColumn) {
-			NotificationHandler.show(
-				'Alias saved! Please run the Doc task to display the alias column in the table list.'
-			);
+			NotificationHandler.show(message);
 		}
 	},
 
