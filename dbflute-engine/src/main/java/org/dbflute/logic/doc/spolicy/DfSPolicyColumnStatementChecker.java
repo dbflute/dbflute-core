@@ -560,7 +560,7 @@ public class DfSPolicyColumnStatementChecker {
 
     protected String analyzeSpecifiedClsName(String clsPart, DfSPolicyStatement statement) {
         final Matcher matcher = clsPattern.matcher(clsPart);
-        if (!matcher.find()) { // e.g. classification[MemberStatus], classificationnnn (not simple "classification" by previous else-if)
+        if (!matcher.find()) { // e.g. classification(MemberStatus), classificationnnn (not simple "classification" by previous else-if)
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + clsPart);
         }
         return matcher.group(1);
