@@ -189,18 +189,22 @@ public class DfSPolicyLogicalSecretary {
         return determineHitBy(statement, exp, hint);
     }
 
-    protected boolean determineHitBy(DfSPolicyStatement statement, String name, String hint) { // hint is e.g. prefix:MEMBER
-        if (name == null) {
+    protected boolean determineHitBy(DfSPolicyStatement statement, String exp, String hint) { // hint is e.g. prefix:MEMBER
+        if (exp == null) {
             return false;
         }
         if ("$$ALL$$".equalsIgnoreCase(hint)) { // e.g. tableName is $$ALL$$
             return true;
         }
-        checkUnknownVariable(statement, name, hint); // should be after $$ALL$$ process
+        checkUnknownVariable(statement, exp, hint); // should be after $$ALL$$ process
+
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // #for_now jflute flexible determination even if not name, e.g. dbType, defaultValue (2026/01/09)
+        // _/_/_/_/_/_/_/_/
         if (hint.contains(" and ")) { // e.g. tableName is prefix:MEMBER and suffix:_HISTORY
             final List<String> elementHintList = Srl.splitListTrimmed(hint, " and ");
             for (String elementHint : elementHintList) {
-                if (!DfNameHintUtil.isHitByTheHint(name, elementHint)) {
+                if (!DfNameHintUtil.isHitByTheHint(exp, elementHint)) {
                     return false;
                 }
             }
@@ -208,13 +212,13 @@ public class DfSPolicyLogicalSecretary {
         } else if (hint.contains(" or ")) { // e.g. tableName is prefix:MEMBER or suffix:_HISTORY
             final List<String> elementHintList = Srl.splitListTrimmed(hint, " or ");
             for (String elementHint : elementHintList) {
-                if (DfNameHintUtil.isHitByTheHint(name, elementHint)) {
+                if (DfNameHintUtil.isHitByTheHint(exp, elementHint)) {
                     return true;
                 }
             }
             return false;
         } else {
-            return DfNameHintUtil.isHitByTheHint(name, hint);
+            return DfNameHintUtil.isHitByTheHint(exp, hint);
         }
     }
 
@@ -299,7 +303,9 @@ public class DfSPolicyLogicalSecretary {
         }
         sb.append(" ").append(column.isNotNull() ? "(NotNull)" : "(NullAllowed)");
         if (column.hasDefaultValue()) {
-            sb.append(" default ").append(column.getDefaultValue());
+            final String defaultValue = column.getDefaultValue();
+            final String defaultExp = "".equals(defaultValue) ? "''" : defaultValue; // e.g. default ''
+            sb.append(" default ").append(defaultExp);
         }
         if (column.hasComment()) {
             sb.append(" // ").append(Srl.cut(column.getComment(), 10, "..."));

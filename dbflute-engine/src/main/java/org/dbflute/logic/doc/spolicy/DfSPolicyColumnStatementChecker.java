@@ -157,7 +157,8 @@ public class DfSPolicyColumnStatementChecker {
             }
         } else if (ifItem.equalsIgnoreCase("defaultValue")) { // if defaultValue is ... @since 1.3.2
             if (column.hasDefaultValue()) {
-                return isHitExp(statement, column.getDefaultValue(), ifValue) == !notIfValue;
+                final String filteredIfValue = filterDefaultValueComparingValue(ifValue);
+                return isHitExp(statement, column.getDefaultValue(), filteredIfValue) == !notIfValue;
             }
         } else if (ifItem.equalsIgnoreCase("firstDate")) { // if firstDate is after:2018/05/03
             return determineFirstDate(statement, ifValue, notIfValue, column);
@@ -442,7 +443,8 @@ public class DfSPolicyColumnStatementChecker {
             }
         } else if (thenItem.equalsIgnoreCase("defaultValue")) { // e.g. defaultValue is 0, @since 1.3.2
             final String defaultValue = column.getDefaultValue();
-            if (!isHitExp(statement, defaultValue, thenValue) == !notThenValue) {
+            final String filteredThenValue = filterDefaultValueComparingValue(thenValue);
+            if (!isHitExp(statement, defaultValue, filteredThenValue) == !notThenValue) {
                 return violationCall.apply(defaultValue);
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
@@ -564,6 +566,14 @@ public class DfSPolicyColumnStatementChecker {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Broken classification statement: " + clsPart);
         }
         return matcher.group(1);
+    }
+
+    protected String filterDefaultValueComparingValue(String comparingValue) {
+        if ("$$emptyString$$".equals(comparingValue)) { // is rare special patch
+            return "";
+        } else {
+            return comparingValue;
+        }
     }
 
     // ===================================================================================

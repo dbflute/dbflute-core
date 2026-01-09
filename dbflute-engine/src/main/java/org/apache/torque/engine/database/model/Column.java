@@ -741,8 +741,10 @@ public class Column {
     }
 
     public boolean hasDefaultValue() {
-        // #for_now jflute case of default '' is not treated by DBFlute now (2026/01/05)
-        return _defaultValue != null && _defaultValue.trim().length() > 0;
+        // done jflute case of default '' is not treated by DBFlute now (2026/01/05)
+        // then default="" on SchemaXML and this variable is empty string here
+        //return _defaultValue != null && _defaultValue.trim().length() > 0;
+        return _defaultValue != null;
     }
 
     public boolean hasDefaultValueExceptAutoIncrement() {
