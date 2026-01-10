@@ -2517,13 +2517,13 @@ public final class DfTypeUtil {
      * <p>millis and nanos handling: same as toLocalDateTime(String)</p>
      * <pre>
      * millisecond: (same as SimpleDateFormat's ".SSS", reverse from DateTimeFormatter's ".SSS")
-     * 2026/01/11 03:16:32.8     => 2026/01/11 03:16:32.008
-     * 2026/01/11 03:16:32.88    => 2026/01/11 03:16:32.088
-     * 2026/01/11 03:16:32.888   => 2026/01/11 03:16:32.888
+     * 2026/01/11 03:16:32.8     :: 2026/01/11 03:16:32.008
+     * 2026/01/11 03:16:32.88    :: 2026/01/11 03:16:32.088
+     * 2026/01/11 03:16:32.888   :: 2026/01/11 03:16:32.888
      * 
      * nanosecond: (original way of DBFLute, reverse from DateTimeFormatter's ".n")
-     * 2026/01/11 03:16:32.8888  => 2026/01/11 03:16:32.8888
-     * 2026/01/11 03:16:32.88888 => 2026/01/11 03:16:32.88888
+     * 2026/01/11 03:16:32.8888  :: 2026/01/11 03:16:32.8888
+     * 2026/01/11 03:16:32.88888 :: 2026/01/11 03:16:32.88888
      * </pre>
      * 
      * @param obj The parsed object. (NullAllowed: if null or empty, returns null)
