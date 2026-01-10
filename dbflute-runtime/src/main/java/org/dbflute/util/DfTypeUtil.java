@@ -95,13 +95,13 @@ public final class DfTypeUtil {
         // *the value of millisecond may depend on JDK implementation
     }
 
-    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+    protected static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
             'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
 
-    private static final char PAD = '=';
+    protected static final char PAD = '=';
 
-    private static final byte[] DECODE_TABLE = new byte[128];
+    protected static final byte[] DECODE_TABLE = new byte[128];
     static {
         for (int i = 0; i < DECODE_TABLE.length; i++) {
             DECODE_TABLE[i] = Byte.MAX_VALUE;
@@ -161,6 +161,8 @@ public final class DfTypeUtil {
             return doConvertToStringLocalDate((LocalDate) obj, pattern);
         } else if (obj instanceof LocalDateTime) {
             return doConvertToStringLocalDateTime((LocalDateTime) obj, pattern);
+        } else if (obj instanceof ZonedDateTime) { // @since 1.3.2
+            return doConvertToStringZonedDateTime((ZonedDateTime) obj, pattern);
         } else if (obj instanceof LocalTime) {
             return doConvertToStringLocalTime((LocalTime) obj, pattern);
         } else if (obj instanceof Time) {
@@ -180,8 +182,8 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                        Specified Type
-    //                                        --------------
+    //                                toString() Number Type
+    //                                ----------------------
     /**
      * Convert the number to the instance that is string by the pattern.
      * @param number The parsed number to be string. (NullAllowed: if null, returns null)
@@ -200,6 +202,9 @@ public final class DfTypeUtil {
         return value.toString();
     }
 
+    // -----------------------------------------------------
+    //                                  toString() Date Type
+    //                                  --------------------
     /**
      * Convert the local date to the instance that is string by the pattern.
      * @param date The parsed local date to be string. (NullAllowed: if null, returns null)
@@ -228,6 +233,22 @@ public final class DfTypeUtil {
     }
 
     protected static String doConvertToStringLocalDateTime(LocalDateTime value, String pattern) {
+        final String realPattern = pattern != null ? pattern : DEFAULT_TIMESTAMP_PATTERN; // only millisecond (not nanosecond) as default
+        return value.format(DateTimeFormatter.ofPattern(realPattern, chooseRealLocale(null)));
+    }
+
+    /**
+     * Convert the zoned date-time to the instance that is string by the pattern.
+     * @param date The parsed zoned date-time to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as zoned date-time. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringDate(ZonedDateTime date, String pattern) { // @since 1.3.2
+        assertPatternNotNull("toStringDate()", pattern);
+        return date != null ? doConvertToStringZonedDateTime(date, pattern) : null;
+    }
+
+    protected static String doConvertToStringZonedDateTime(ZonedDateTime value, String pattern) {
         final String realPattern = pattern != null ? pattern : DEFAULT_TIMESTAMP_PATTERN; // only millisecond (not nanosecond) as default
         return value.format(DateTimeFormatter.ofPattern(realPattern, chooseRealLocale(null)));
     }
@@ -265,6 +286,9 @@ public final class DfTypeUtil {
         return doCreateDateFormat(realPattern, timeZone, locale, false).format(value);
     }
 
+    // -----------------------------------------------------
+    //                                 toString() StackTrace
+    //                                 ---------------------
     public static String toStringStackTrace(Throwable cause) {
         StringWriter sw = null;
         try {
@@ -1106,15 +1130,16 @@ public final class DfTypeUtil {
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDateTime.of(). and millisecond handling is following:</p>
      * 
+     * <p>millis and nanos handling: same as toTimestamp(String)</p>
      * <pre>
-     * e.g. millisecond and nanosecond handling
-     *  "2014/10/28 12:34:56.789" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789000000)
-     *  "2014/10/28 12:34:56.7" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 007000000)
-     *  "2014/10/28 12:34:56.78" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 078000000)
-     *  "2014/10/28 12:34:56.7891" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789100000)
-     *  "2014/10/28 12:34:56.789123" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123000)
+     *  "2014/10/28 12:34:56.7"         :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 007000000)
+     *  "2014/10/28 12:34:56.78"        :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 078000000)
+     *  "2014/10/28 12:34:56.789"       :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789000000)
+     *  "2014/10/28 12:34:56.7891"      :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789100000)
+     *  "2014/10/28 12:34:56.789123"    :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123000)
      *  "2014/10/28 12:34:56.789123456" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123456)
      * </pre>
+     * 
      * @param obj The object to be converted. (NullAllowed: if null or empty, returns null)
      * @return The local date-time. (NullAllowed: when the argument is null or empty)
      * @throws ParseDateException When it failed to parse the string to date.
@@ -1125,24 +1150,6 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date-time for the default time-zone. <br>
-     * This method uses the specified date pattern if the object is string type. 
-     * 
-     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
-     * Then the time-zone is not used in conversion. It uses LocalDateTime.parse().</p>
-     * 
-     * @param obj The object to be converted. (NullAllowed: if null or empty, returns null)
-     * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @return The local date-time. (NullAllowed: when the argument is null or empty)
-     * @throws ParseDateException When it failed to parse the string to date.
-     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
-     */
-    public static LocalDateTime toLocalDateTime(Object obj, String pattern) {
-        assertPatternNotNull("toLocalDateTime()", pattern);
-        return doConvertToLocalDateTime(obj, (TimeZone) null, pattern, (Locale) null);
-    }
-
-    /**
      * Convert the object to the instance that is date-time for the specified time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type. <br>
@@ -1150,15 +1157,8 @@ public final class DfTypeUtil {
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDateTime.of(). and millisecond handling is following:</p>
      * 
-     * <pre>
-     * e.g. millisecond and nanosecond handling
-     *  "2014/10/28 12:34:56.789" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789000000)
-     *  "2014/10/28 12:34:56.7" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 007000000)
-     *  "2014/10/28 12:34:56.78" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 078000000)
-     *  "2014/10/28 12:34:56.7891" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789100000)
-     *  "2014/10/28 12:34:56.789123" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123000)
-     *  "2014/10/28 12:34:56.789123456" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123456)
-     * </pre>
+     * <p>millis and nanos handling: same as toLocalDateTime(String) as overload method</p>
+     * 
      * @param obj The object to be converted. (NullAllowed: if null or empty, returns null)
      * @param timeZone The time-zone for the local date-time. (NotNull)
      * @return The local date-time. (NullAllowed: when the argument is null or empty)
@@ -1168,6 +1168,24 @@ public final class DfTypeUtil {
     public static LocalDateTime toLocalDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDateTime()", timeZone);
         return doConvertToLocalDateTime(obj, timeZone, (String) null, (Locale) null);
+    }
+
+    /**
+     * Convert the object to the instance that is date-time for the default time-zone. <br>
+     * This method uses the specified date pattern if the object is string type. 
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDateTime.parse().</p>
+     *
+     * @param obj The object to be converted. (NullAllowed: if null or empty, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @return The local date-time. (NullAllowed: when the argument is null or empty)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalDateTime toLocalDateTime(Object obj, String pattern) {
+        assertPatternNotNull("toLocalDateTime()", pattern);
+        return doConvertToLocalDateTime(obj, (TimeZone) null, pattern, (Locale) null);
     }
 
     /**
@@ -1446,6 +1464,9 @@ public final class DfTypeUtil {
     }
 
     protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
+        if (obj instanceof Timestamp) { // to keep nanos, @since 1.3.2
+            return (Date) obj;
+        }
         return toDate(obj, timeZone); // java.sql.Date does not support toInstant() so to pure date
     }
 
@@ -1634,7 +1655,8 @@ public final class DfTypeUtil {
             final Date paramDate = (Date) obj;
             if (Date.class.equals(paramDate.getClass())) { // pure date
                 return paramDate;
-            } else { // sub class (Date is not final class)
+            } else { // sub class (Date is not final class) e.g. java.sql.Timestamp
+                // nanos are lossed if timestamp here, Date cannot have nanos (2026/01/10)
                 return new Date(paramDate.getTime()); // returns copied pure date
             }
         } else if (obj instanceof Calendar) {
@@ -1684,7 +1706,7 @@ public final class DfTypeUtil {
     protected static String filterDateStringValueFlexibly(final String pureStr //
             , boolean includeTime // HH:mm:ss
             , boolean includeMillis // .SSS
-            , boolean keepMillisMore) { // .SSS...
+            , boolean keepMillisMore) { // .nnn...
         String value = pureStr;
         value = value.trim();
 
@@ -2491,6 +2513,19 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
+     * 
+     * <p>millis and nanos handling: same as toLocalDateTime(String)</p>
+     * <pre>
+     * millisecond: (same as SimpleDateFormat's ".SSS", reverse from DateTimeFormatter's ".SSS")
+     * 2026/01/11 03:16:32.8     => 2026/01/11 03:16:32.008
+     * 2026/01/11 03:16:32.88    => 2026/01/11 03:16:32.088
+     * 2026/01/11 03:16:32.888   => 2026/01/11 03:16:32.888
+     * 
+     * nanosecond: (original way of DBFLute, reverse from DateTimeFormatter's ".n")
+     * 2026/01/11 03:16:32.8888  => 2026/01/11 03:16:32.8888
+     * 2026/01/11 03:16:32.88888 => 2026/01/11 03:16:32.88888
+     * </pre>
+     * 
      * @param obj The parsed object. (NullAllowed: if null or empty, returns null)
      * @return The instance of time-stamp. (NullAllowed: if the value is null or empty, it returns null.)
      * @throws ParseTimestampException When it failed to parse the string to time-stamp.
@@ -2506,6 +2541,9 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
+     * 
+     * <p>millis and nanos handling: same as toTimestamp(String) as overload method</p>
+     * 
      * @param obj The parsed object. (NullAllowed: if null or empty, returns null)
      * @param timeZone The time-zone to parse the string expression. (NotNull)
      * @return The instance of time-stamp. (NullAllowed: if the value is null or empty, it returns null.)
@@ -2601,31 +2639,72 @@ public final class DfTypeUtil {
         }
     }
 
-    protected static Timestamp doParseStringAsTimestamp(String str, TimeZone timeZone, String pattern, Locale locale) {
-        if (str == null || str.trim().length() == 0) {
+    protected static Timestamp doParseStringAsTimestamp(String originalExp, TimeZone timeZone, String pattern, Locale locale) {
+        if (originalExp == null || originalExp.trim().length() == 0) {
             return null;
         }
+        String parsedExp = originalExp;
+        Integer separatedNanos = null;
         boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            str = filterTimestampStringValueFlexibly(str);
-            strict = !str.startsWith("-"); // not BC
+            parsedExp = filterTimestampStringValueFlexibly(parsedExp);
+            strict = !parsedExp.startsWith("-"); // not BC
             pattern = DEFAULT_TIMESTAMP_PATTERN;
+
+            // separating nanos, no pattern case only (if pattern exists, too complex) @since 1.3.2
+            if (parsedExp.contains(".")) { // basically true, e.g. 2026/01/10 15:59:23.123456879
+                final String nanosExp = Srl.substringLastRear(parsedExp, "."); // may be e.g. 123456879
+                if (Srl.isNumberHarfAll(nanosExp)) { // yes nanos (will be changed by zoned handling at future?)
+                    if (nanosExp.length() >= 4) { // treated as nanos
+                        final String dummyMillis = ".000"; // to parse
+                        parsedExp = Srl.substringLastFront(parsedExp, ".") + dummyMillis;
+
+                        // different from DateTimeFormatter nanos handling:
+                        // DateTimeFormatter's pattern ".n" :: .1238 => .000001238, .12388 => .000012388
+                        // this no pattern flexible parsing :: .1238 => .123800000, .12388 => .123880000
+                        // to keep compatible, previous behavior e.g. .1238 => .123, next e.g. .1238 => .123
+                        // (to avoid, prevous e.g. .1238 => .123, next e.g. .1238 => .00001238)
+                        // P.S. same as toLocalDateTime() (I noticed later)
+                        final int nanosLength = 9; // fixedly, human rule
+                        final String cutExp = Srl.cut(nanosExp, nanosLength); // e.g. 1234567891 => 123456789
+                        final String rfilledNanosExp = Srl.rfill(cutExp, nanosLength, '0'); // e.g. 1234 to 123400000
+                        separatedNanos = Integer.valueOf(rfilledNanosExp); // to set to timestamp
+                    }
+                    // else (nanosExp.length() <= 3) then millis so no separation (keep existing SimpleDateFormat logic)
+                    // SimpleDateFormat's  ".SSS": .8 => .008, .88 => .088, .888 => .888
+                    // DateTimeFormatter's ".SSS": .8 => .800, .88 => .880, .888 => .888
+                    // (...nothing I can do)
+                }
+                // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+                // after all, << millisecond basis + additional nanos expression >>
+                // .8 => .008, .88 => .088, .888 => .888, .8888 => .8888, .88888 => .88888, ...
+                //
+                // as a result, reverse from DateTimeFormatter's both ".SSS" and ".n"
+                // (...I can't help it)
+                // _/_/_/_/_/_/_/_/
+            }
         } else {
             strict = true;
         }
         final DateFormat df = doCreateDateFormat(pattern, timeZone, locale, strict);
         try {
-            return new Timestamp(df.parse(str).getTime());
+            final Timestamp timestamp = new Timestamp(df.parse(parsedExp).getTime());
+            if (separatedNanos != null) { // then parsed expression does not have nanos
+                timestamp.setNanos(separatedNanos); // so add later
+            }
+            return timestamp;
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(str); // no exception means illegal date
+                df.parse(parsedExp); // no exception means illegal date
                 String msg = "The timestamp expression is out of calendar:";
-                msg = msg + " string=" + str + " pattern=" + pattern;
+                msg = msg + " originalExp=" + originalExp + " pattern=" + pattern;
+                msg = msg + " parsedExp=" + parsedExp + " separatedNanos=" + separatedNanos;
                 throw new ParseTimestampOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to timestamp:";
-                msg = msg + " string=" + str + " pattern=" + pattern;
+                msg = msg + " originalExp=" + originalExp + " pattern=" + pattern;
+                msg = msg + " parsedExp=" + parsedExp + " separatedNanos=" + separatedNanos;
                 throw new ParseTimestampException(msg, e);
             }
         }
@@ -2636,7 +2715,9 @@ public final class DfTypeUtil {
         try {
             final boolean includeTime = true; // off course
             final boolean includeMilli = true; // off course
-            final boolean keepMillisMore = false; // time-stamp cannot use nanosecond
+            // mistake (2026/01/10)
+            //final boolean keepMillisMore = false; // time-stamp cannot use nanosecond
+            final boolean keepMillisMore = true; // time-stamp can use nanosecond
             str = filterDateStringValueFlexibly(str, includeTime, includeMilli, keepMillisMore); // based on date way
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the timestamp as number:";

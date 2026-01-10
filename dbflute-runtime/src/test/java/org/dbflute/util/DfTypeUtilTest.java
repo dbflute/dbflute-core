@@ -46,6 +46,7 @@ import static org.dbflute.util.DfTypeUtil.toSqlDate;
 import static org.dbflute.util.DfTypeUtil.toStringDate;
 import static org.dbflute.util.DfTypeUtil.toTime;
 import static org.dbflute.util.DfTypeUtil.toTimestamp;
+import static org.dbflute.util.DfTypeUtil.toZonedDateTime;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -57,6 +58,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -142,8 +144,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2014-10-28 12:34:56.789", DfTypeUtil.toString(toLocalDateTime("2014/10/28 12:34:56.789999")));
         assertEquals("12:34:56", DfTypeUtil.toString(toLocalTime("2014/10/28 12:34:56.789")));
 
-        assertEquals("789999", DfTypeUtil.toString(toLocalDateTime("2014/10/28 12:34:56.789999"), "SSSSSS"));
-        assertEquals("12:34:56.789999999", DfTypeUtil.toString(toLocalTime("12:34:56.789999999"), "HH:mm:ss.SSSSSSSSS"));
+        assertEquals("789999", toS(toLocalDateTime("2014/10/28 12:34:56.789999"), "SSSSSS"));
+        assertEquals("12:34:56.789999999", toS(toLocalTime("12:34:56.789999999"), "HH:mm:ss.SSSSSSSSS"));
     }
 
     // -----------------------------------------------------
@@ -339,6 +341,11 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         //assertEquals(GregorianCalendar.AD, toCalendar(after).get(Calendar.ERA));
     }
 
+    public void test_toLocalDate_fromTimestamp_nanos() {
+        assertEquals("2026/01/10", toS(toLocalDate(toTimestamp("2026-01-10 14:47:23.123456789")), "yyyy/MM/dd"));
+        assertEquals("2026/01/10", toS(toLocalDate(toTimestamp("2026-01-10 23:59:59.999999999")), "yyyy/MM/dd"));
+    }
+
     // -----------------------------------------------------
     //                                        Local DateTime
     //                                        --------------
@@ -450,6 +457,41 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         }
     }
 
+    public void test_toLocalDateTime_fromTimestamp_nanos() {
+        Timestamp timestamp = toTimestamp("2026-01-10 14:47:23.123456789");
+        assertEquals(123456789, timestamp.getNanos());
+        String stampPattern = "yyyy/MM/dd HH:mm:ss.nnnnnnnnn";
+
+        // done jflute truncated microseconds, hope to keep nanos (2026/01/10)
+        //assertEquals("2026/01/10 14:47:23.123000000", toStringDate(toLocalDateTime(timestamp), stampPattern));
+        assertEquals("2026/01/10 14:47:23.123456789", toStringDate(toLocalDateTime(timestamp), stampPattern));
+    }
+
+    // -----------------------------------------------------
+    //                                        Zoned DateTime
+    //                                        --------------
+    public void test_toZonedDateTime_fromUtilDate_timeZone() {
+        TimeZone gmt3Hour = TimeZone.getTimeZone("GMT+3");
+        Date pureDate = toDate("2026-01-10 15:10:56.789", gmt3Hour);
+        ZonedDateTime zonedDateTime = toZonedDateTime(pureDate, gmt3Hour);
+
+        assertEquals("2026-01-10T15:10:56.789+03:00[GMT+03:00]", zonedDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        assertEquals("2026/01/10 15:10:56.789GMT+03:00", toStringDate(zonedDateTime, "yyyy/MM/dd HH:mm:ss.SSS[VV]"));
+
+        assertEquals("2026-01-10 15:10:56.789", DfTypeUtil.toString(zonedDateTime));
+        assertEquals("2026/01/10 15:10:56.789GMT+03:00", toStringDate(zonedDateTime, "yyyy/MM/dd HH:mm:ss.SSS[VV]"));
+    }
+
+    public void test_toZonedDateTime_fromTimestamp_nanos() {
+        Timestamp timestamp = toTimestamp("2026-01-10 14:47:23.123456789");
+        String stampPattern = "yyyy/MM/dd HH:mm:ss.nnnnnnnnn";
+        TimeZone jpZone = TimeZone.getTimeZone("JAPAN");
+
+        // done jflute truncated microseconds, hope to keep nanos (2026/01/10)
+        //assertEquals("2026/01/10 05:47:23.123000000", toStringDate(toZonedDateTime(timestamp, jpZone), stampPattern));
+        assertEquals("2026/01/10 05:47:23.123456789", toStringDate(toZonedDateTime(timestamp, jpZone), stampPattern));
+    }
+
     // -----------------------------------------------------
     //                                            Local Time
     //                                            ----------
@@ -458,6 +500,14 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         Date pureDate = toDate("2009-12-13 12:34:56.123", gmt3Hour);
         LocalTime localDate = toLocalTime(pureDate, gmt3Hour);
         assertEquals("12:34:56.123", localDate.format(DateTimeFormatter.ISO_TIME));
+    }
+
+    public void test_toLocalTime_fromTimestamp_nanos() {
+        // done jflute truncated microseconds, hope to keep nanos (2026/01/10)
+        //assertEquals("123000000", toStringDate(toLocalTime(toTimestamp("2026-01-10 14:47:23.123456789")), "SSSSSSSSS"));
+        //assertEquals("999000000", toStringDate(toLocalTime(toTimestamp("2026-01-10 23:59:59.999999999")), "SSSSSSSSS"));
+        assertEquals("123456789", toStringDate(toLocalTime(toTimestamp("2026-01-10 14:47:23.123456789")), "SSSSSSSSS"));
+        assertEquals("999999999", toStringDate(toLocalTime(toTimestamp("2026-01-10 23:59:59.999999999")), "SSSSSSSSS"));
     }
 
     public void test_toLocalTime_fromStringDate_basic() {
@@ -469,8 +519,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     // ===================================================================================
-    //                                                                          (util)Date
-    //                                                                          ==========
+    //                                                                  Classic (util)Date
+    //                                                                  ==================
     public void test_toDate_sameClass() {
         // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -1085,10 +1135,10 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2008/12/30 12:34:56.000", df.format(date));
     }
 
-    // -----------------------------------------------------
-    //                                             Timestamp
-    //                                             ---------
-    public void test_1mp_various() {
+    // ===================================================================================
+    //                                                                   Classic Timestamp
+    //                                                                   =================
+    public void test_toTimestamp_basic() {
         // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
@@ -1101,7 +1151,11 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2008/12/30 00:00:00.000", df.format(toTimestamp("date 20081230")));
         assertEquals("2008/12/30 00:00:00.000", df.format(toTimestamp("2008/12/30")));
         assertEquals("2008/12/30 12:34:56.000", df.format(toTimestamp("2008/12/30 12:34:56")));
+        assertEquals("2008/12/30 12:34:56.008", df.format(toTimestamp("2008/12/30 12:34:56.8")));
+        assertEquals("2008/12/30 12:34:56.085", df.format(toTimestamp("2008/12/30 12:34:56.85")));
         assertEquals("2008/12/30 12:34:56.789", df.format(toTimestamp("2008/12/30 12:34:56.789")));
+        assertEquals("2008/12/30 12:34:56.123", df.format(toTimestamp("2008/12/30 12:34:56.12388")));
+        assertEquals("2008/12/30 12:34:56.123", df.format(toTimestamp("2008/12/30 12:34:56.123888888")));
         assertEquals("2008/12/30 00:00:00.000", df.format(toTimestamp("2008-12-30")));
         assertEquals("2008/12/30 12:34:56.000", df.format(toTimestamp("2008-12-30 12:34:56")));
         assertEquals("2008/12/30 12:34:56.789", df.format(toTimestamp("2008-12-30 12:34:56.789")));
@@ -1124,6 +1178,24 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertNotSame(java.util.Date.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.sql.Date.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
         assertEquals(java.sql.Timestamp.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
+
+        // nanos (@since 1.3.2)
+        assertEquals(123888888, toTimestamp("2008/12/30 12:34:56.123888888").getNanos());
+        assertEquals(123888880, toTimestamp("2008/12/30 12:34:56.12388888").getNanos());
+        assertEquals(123888800, toTimestamp("2008/12/30 12:34:56.1238888").getNanos());
+        assertEquals(123888000, toTimestamp("2008/12/30 12:34:56.123888").getNanos());
+        assertEquals(123880000, toTimestamp("2008/12/30 12:34:56.12388").getNanos());
+        assertEquals(123800000, toTimestamp("2008/12/30 12:34:56.1238").getNanos());
+        assertEquals(123000000, toTimestamp("2008/12/30 12:34:56.123").getNanos());
+        assertEquals(12000000, toTimestamp("2008/12/30 12:34:56.12").getNanos());
+        assertEquals(1000000, toTimestamp("2008/12/30 12:34:56.1").getNanos());
+        assertEquals(1000000, toTimestamp("2008/12/30 12:34:56.001").getNanos());
+        assertEquals(100000, toTimestamp("2008/12/30 12:34:56.0001").getNanos());
+        assertEquals(0, toTimestamp("2008/12/30 12:34:56.0").getNanos());
+        assertEquals(0, toTimestamp("2008/12/30 12:34:56.000000000").getNanos());
+        assertEquals(100000000, toTimestamp("2008/12/30 12:34:56.100000000").getNanos());
+        assertEquals(100000000, toTimestamp("2008/12/30 12:34:56.10000000").getNanos());
+        assertEquals(123888888, toTimestamp("2008/12/30 12:34:56.1238888889").getNanos());
     }
 
     public void test_toTimestamp_various_BC() {
@@ -1255,9 +1327,9 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     }
 
-    // -----------------------------------------------------
-    //                                                  Time
-    //                                                  ----
+    // ===================================================================================
+    //                                                                        Classic Time
+    //                                                                        ============
     public void test_toTime_timestamp() {
         // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
@@ -1297,9 +1369,9 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("12:34:56.000", fullDf.format(DfTypeUtil.toTime("12:34:56.789")));
     }
 
-    // -----------------------------------------------------
-    //                                              SQL Date
-    //                                              --------
+    // ===================================================================================
+    //                                                                   Classic (sql)Date
+    //                                                                   =================
     public void test_toSqlDate_basic() {
         assertNull(DfTypeUtil.toSqlDate(null));
         assertNull(DfTypeUtil.toSqlDate(""));
@@ -1353,9 +1425,9 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
     }
 
-    // -----------------------------------------------------
-    //                                               Boolean
-    //                                               -------
+    // ===================================================================================
+    //                                                                             Boolean
+    //                                                                             =======
     public void test_toBoolean_basic() {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toBoolean(null));
@@ -1363,9 +1435,9 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertFalse(DfTypeUtil.toBoolean("false"));
     }
 
-    // -----------------------------------------------------
-    //                                                Binary
-    //                                                ------
+    // ===================================================================================
+    //                                                                              Binary
+    //                                                                              ======
     public void test_toBinary_basic() {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toBinary(null));
@@ -1420,5 +1492,13 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     //                                                                         ===========
     protected void log(Object msg) {
         _logger.log(getClass().getName(), Level.DEBUG, msg, null);
+    }
+
+    protected String toS(Object obj) {
+        return DfTypeUtil.toString(obj);
+    }
+
+    protected String toS(Object obj, String pattern) {
+        return DfTypeUtil.toString(obj, pattern);
     }
 }
