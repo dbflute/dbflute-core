@@ -178,6 +178,7 @@ import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
+import org.dbflute.properties.DfOptimisticLockProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
@@ -3565,7 +3566,11 @@ public class Table {
      * @return The determination, true or false.
      */
     public boolean isUseVersionNo() {
-        final String versionNoColumnName = getProperties().getOptimisticLockProperties().getVersionNoFieldName();
+        final DfOptimisticLockProperties optimisticLockProp = getProperties().getOptimisticLockProperties();
+        final String versionNoColumnName = optimisticLockProp.findVersionNoFieldName(getTableDbName());
+        if (versionNoColumnName == null) { // not found by the table name e.g. tableExcept
+            return false;
+        }
         final Column column = getColumn(versionNoColumnName);
         if (column == null) {
             return false;
@@ -3577,7 +3582,11 @@ public class Table {
         if (!isUseVersionNo()) {
             return null;
         }
-        final String versionNoColumnName = getProperties().getOptimisticLockProperties().getVersionNoFieldName();
+        final DfOptimisticLockProperties optimisticLockProp = getProperties().getOptimisticLockProperties();
+        final String versionNoColumnName = optimisticLockProp.findVersionNoFieldName(getTableDbName());
+        if (versionNoColumnName == null) { // not found by the table name e.g. tableExcept
+            return null;
+        }
         return getColumn(versionNoColumnName);
     }
 

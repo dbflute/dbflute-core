@@ -113,7 +113,7 @@ public final class DfOptimisticLockProperties extends DfAbstractDBFlutePropertie
         if (Srl.is_NotNull_and_NotTrimmedEmpty(updateDateFieldName)) {
             return updateDateFieldName;
         }
-        final String versionNoFieldName = doGetVersionNoFieldName(""); // as no default
+        final String versionNoFieldName = getVersionNoFieldName(""); // as no default
         if (Srl.is_NotNull_and_NotTrimmedEmpty(versionNoFieldName)) {
             return versionNoFieldName;
         }
@@ -123,28 +123,52 @@ public final class DfOptimisticLockProperties extends DfAbstractDBFlutePropertie
     // ===================================================================================
     //                                                                          Field Name
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                           Update Date
+    //                                           -----------
     public String getUpdateDateFieldName() {
         return doGetUpdateDateFieldName("");
     }
 
     protected String doGetUpdateDateFieldName(String defaultValue) {
-        return getProperty("updateDateFieldName", defaultValue);
+        return getProperty("updateDateFieldName", defaultValue, getOptimisticLockMap());
     }
 
-    public String getVersionNoFieldName() {
-        return doGetVersionNoFieldName("version_no");
+    // -----------------------------------------------------
+    //                                            Version No
+    //                                            ----------
+    public String findVersionNoFieldName(String tableDbName) { // null allowed: e.g. tableExcept
+        // next step
+        //final List<String> versionNoTableExceptList = getVersionNoTableExceptList();
+        //if (!versionNoTableExceptList.isEmpty()) {
+        //    if (isTargetByHint(tableDbName, DfCollectionUtil.emptyList(), versionNoTableExceptList)) { // except
+        //        return null; // no versionNo table forcedly
+        //    }
+        //}
+        final String defaultValue = "version_no"; // fixedly, as default of DBFlute
+        return getVersionNoFieldName(defaultValue);
     }
 
-    protected String doGetVersionNoFieldName(String defaultValue) {
-        return getProperty("versionNoFieldName", defaultValue);
+    protected String getVersionNoFieldName(String defaultValue) {
+        return getProperty("versionNoFieldName", defaultValue, getOptimisticLockMap());
     }
 
-    public boolean isOptimisticLockColumn(String columnName) {
+    // next step
+    //protected List<String> getVersionNoTableExceptList() { // not null, empty allowed
+    //    @SuppressWarnings("unchecked")
+    //    final List<String> versionNoTableExceptList = (List<String>) getOptimisticLockMap().get("versionNoTableExceptList");
+    //    return versionNoTableExceptList != null ? versionNoTableExceptList : DfCollectionUtil.emptyList();
+    //}
+
+    // -----------------------------------------------------
+    //                                   Whole Determination
+    //                                   -------------------
+    public boolean isOptimisticLockColumn(String tableDbName, String columnName) {
         final String updateDate = getUpdateDateFieldName();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(updateDate) && updateDate.equalsIgnoreCase(columnName)) {
             return true;
         }
-        final String versionNo = getVersionNoFieldName();
+        final String versionNo = findVersionNoFieldName(tableDbName);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(versionNo) && versionNo.equalsIgnoreCase(columnName)) {
             return true;
         }

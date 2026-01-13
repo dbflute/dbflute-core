@@ -270,7 +270,7 @@ public class DfCraftDiffAssertProvider {
             if (commonColumnProp.isCommonColumn(columnName)) {
                 continue;
             }
-            if (optimisticLockProp.isOptimisticLockColumn(columnName)) {
+            if (optimisticLockProp.isOptimisticLockColumn(tableName, columnName)) {
                 continue;
             }
             if (exceptColumnSet.contains(columnName)) {
