@@ -16,7 +16,9 @@
 package org.dbflute.properties;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.function.Function;
 
 import org.dbflute.util.DfStringUtil;
 
@@ -87,6 +89,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractDBFlutePropertie
             } else {
                 _beforeInsertMap = newLinkedHashMap();
             }
+            mergeUnevenCommonColumnIfNeeds(_beforeInsertMap, prop -> prop.getBeforeInsertMap());
             filterCommonColumnSetupValue(_beforeInsertMap);
         }
         return _beforeInsertMap;
@@ -129,6 +132,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractDBFlutePropertie
             } else {
                 _beforeUpdateMap = newLinkedHashMap();
             }
+            mergeUnevenCommonColumnIfNeeds(_beforeUpdateMap, prop -> prop.getBeforeUpdateMap());
             filterCommonColumnSetupValue(_beforeUpdateMap);
         }
         return _beforeUpdateMap;
@@ -192,6 +196,26 @@ public final class DfBehaviorFilterProperties extends DfAbstractDBFlutePropertie
     public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
         final Map<String, Object> map = getBeforeDeleteMap();
         return (String) map.get(columnName);
+    }
+
+    // ===================================================================================
+    //                                                                 Uneven CommonColumn
+    //                                                                 ===================
+    protected void mergeUnevenCommonColumnIfNeeds(Map<String, Object> originalMap,
+            Function<DfCommonColumnProperties, Map<String, Object>> mergedFromMapProvider) { // @since 1.3.2
+        final DfCommonColumnProperties commonColumnProp = getCommonColumnProperties();
+        if (!commonColumnProp.isUnevenCommonColumnRecognized()) {
+            return; // basically here
+        }
+        final Map<String, Object> mergedFromMap = mergedFromMapProvider.apply(commonColumnProp);
+        for (Entry<String, Object> entry : mergedFromMap.entrySet()) {
+            // extends CommonColumn settings here
+            // real common column is except in filter logic so no problem of duplicate 
+            final String columnName = entry.getKey();
+            if (!originalMap.containsKey(columnName)) { // existings in behavior filter are prior
+                originalMap.put(columnName, entry.getValue());
+            }
+        }
     }
 
     // ===================================================================================

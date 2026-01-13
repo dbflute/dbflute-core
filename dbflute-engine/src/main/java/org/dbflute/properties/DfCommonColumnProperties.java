@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.properties.assistant.base.DfTableListProvider;
@@ -94,6 +95,17 @@ public final class DfCommonColumnProperties extends DfAbstractDBFluteProperties 
             _commonColumnNameList = new ArrayList<String>(commonColumnMap.keySet());
         }
         return _commonColumnNameList;
+    }
+
+    protected Set<String> _commonColumnNameSet;
+
+    public Set<String> getCommonColumnNameSet() {
+        if (_commonColumnNameSet == null) {
+            final Map<String, String> commonColumnMap = getCommonColumnMap();
+            _commonColumnNameSet = StringSet.createAsFlexibleOrdered();
+            _commonColumnNameSet.addAll(commonColumnMap.keySet());
+        }
+        return _commonColumnNameSet;
     }
 
     // -----------------------------------------------------
@@ -453,5 +465,23 @@ public final class DfCommonColumnProperties extends DfAbstractDBFluteProperties 
 
     protected CommonColumnSetupResource newCommonColumnSetupResource() {
         return new CommonColumnSetupResource(COMMON_COLUMN_SETUP_RESOURCE_VARIABLE_PREFIX);
+    }
+
+    // ===================================================================================
+    //                                                                 Uneven CommonColumn
+    //                                                                 ===================
+    protected Boolean _unevenCommonColumnRecognized;
+
+    public boolean isUnevenCommonColumnRecognized() {
+        if (_unevenCommonColumnRecognized != null) {
+            return _unevenCommonColumnRecognized;
+        }
+        getCommonColumnMap(); // For initialization of commonColumnMap.
+        if (_commonColumnTopMap != null) { // basically true
+            _unevenCommonColumnRecognized = isProperty("isUnevenCommonColumnRecognized", false, _commonColumnTopMap);
+        } else { // no way, just in case
+            _unevenCommonColumnRecognized = false;
+        }
+        return _unevenCommonColumnRecognized;
     }
 }

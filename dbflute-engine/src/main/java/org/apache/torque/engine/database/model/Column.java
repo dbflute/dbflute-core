@@ -153,6 +153,7 @@ import org.dbflute.properties.DfAdditionalDbCommentProperties;
 import org.dbflute.properties.DfAdditionalNotNullProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
+import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
@@ -2926,6 +2927,18 @@ public class Column {
         return _commonColumn;
     }
 
+    public boolean isUnevenCommonColumnIfRecognized() { // @since 1.3.2
+        if (getTable().hasAllCommonColumn()) {
+            return false; // common column but not uneven
+        }
+        final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
+        if (prop.isUnevenCommonColumnRecognized()) {
+            return prop.getCommonColumnNameSet().contains(getName());
+        } else { // basically here
+            return false; // normal column
+        }
+    }
+
     // ===================================================================================
     //                                                                     Optimistic Lock
     //                                                                     ===============
@@ -3154,14 +3167,14 @@ public class Column {
     // ===================================================================================
     //                                                                           CSS Class
     //                                                                           =========
-    public boolean hasSchemaHtmlColumnNameCssClass() {
-        return isCommonColumn() || isVersionNo() || isUpdateDate();
+    public boolean hasSchemaHtmlColumnNameCssClass() { // unused?
+        return isCommonColumn() || isUnevenCommonColumnIfRecognized() || isVersionNo() || isUpdateDate();
     }
 
     public String getSchemaHtmlColumnNameCssClass() {
         final String delimiter = " ";
         final StringBuilder sb = new StringBuilder();
-        if (isCommonColumn()) {
+        if (isCommonColumn() || isUnevenCommonColumnIfRecognized()) {
             sb.append("comcolcell");
         }
         if (isVersionNo() || isUpdateDate()) {

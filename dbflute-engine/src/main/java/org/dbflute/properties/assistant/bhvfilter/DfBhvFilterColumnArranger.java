@@ -25,6 +25,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBehaviorFilterProperties;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -37,21 +38,18 @@ public class DfBhvFilterColumnArranger {
     //                                                                       =============
     public List<Column> arrangeBeforeInsertColumnList(Table table) {
         final DfBehaviorFilterProperties prop = getBehaviorFilterProperties();
-        final Map<String, Object> map = prop.getBeforeInsertMap();
-        final Set<String> columnNameSet = map.keySet();
-        final List<Column> insertColumnList = new ArrayList<Column>();
-        final Set<String> commonColumnNameSet = new HashSet<String>();
-        if (table.hasAllCommonColumn()) {
-            final List<Column> commonColumnList = table.getCommonColumnList();
-            for (Column commonColumn : commonColumnList) {
-                commonColumnNameSet.add(commonColumn.getName());
-            }
+        final Map<String, Object> beforeInsertMap = prop.getBeforeInsertMap();
+        if (beforeInsertMap.isEmpty()) {
+            return DfCollectionUtil.emptyList();
         }
+        final Set<String> columnNameSet = beforeInsertMap.keySet();
+        final List<Column> insertColumnList = new ArrayList<Column>();
+        final Set<String> commonColumnNameSet = prepareTableCommonColumnNameSet(table);
         for (String columnName : columnNameSet) {
             final Column column = table.getColumn(columnName);
             if (column != null && !commonColumnNameSet.contains(columnName)) {
                 insertColumnList.add(column);
-                final String expression = (String) map.get(columnName);
+                final String expression = (String) beforeInsertMap.get(columnName);
                 if (expression == null || expression.trim().length() == 0) {
                     String msg = "The value expression was not found in beforeInsertMap: column=" + column;
                     throw new IllegalStateException(msg);
@@ -67,21 +65,18 @@ public class DfBhvFilterColumnArranger {
     //                                                                       =============
     public List<Column> arrangeBeforeUpdateColumnList(Table table) {
         final DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        final Map<String, Object> map = prop.getBeforeUpdateMap();
-        final Set<String> columnNameSet = map.keySet();
-        final List<Column> updateColumnList = new ArrayList<Column>();
-        final Set<String> commonColumnNameSet = new HashSet<String>();
-        if (table.hasAllCommonColumn()) {
-            final List<Column> commonColumnList = table.getCommonColumnList();
-            for (Column commonColumn : commonColumnList) {
-                commonColumnNameSet.add(commonColumn.getName());
-            }
+        final Map<String, Object> beforeUpdateMap = prop.getBeforeUpdateMap();
+        if (beforeUpdateMap.isEmpty()) {
+            return DfCollectionUtil.emptyList();
         }
+        final Set<String> columnNameSet = beforeUpdateMap.keySet();
+        final List<Column> updateColumnList = new ArrayList<Column>();
+        final Set<String> commonColumnNameSet = prepareTableCommonColumnNameSet(table);
         for (String columnName : columnNameSet) {
             final Column column = table.getColumn(columnName);
             if (column != null && !commonColumnNameSet.contains(columnName)) {
                 updateColumnList.add(column);
-                String expression = (String) map.get(columnName);
+                String expression = (String) beforeUpdateMap.get(columnName);
                 if (expression == null || expression.trim().length() == 0) {
                     String msg = "The value expression was not found in beforeUpdateMap: column=" + column;
                     throw new IllegalStateException(msg);
@@ -90,6 +85,20 @@ public class DfBhvFilterColumnArranger {
             }
         }
         return updateColumnList;
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected Set<String> prepareTableCommonColumnNameSet(Table table) {
+        final Set<String> commonColumnNameSet = new HashSet<String>();
+        if (table.hasAllCommonColumn()) {
+            final List<Column> commonColumnList = table.getCommonColumnList();
+            for (Column commonColumn : commonColumnList) {
+                commonColumnNameSet.add(commonColumn.getName());
+            }
+        }
+        return commonColumnNameSet;
     }
 
     // ===================================================================================
