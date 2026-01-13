@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.base.DfTableListProvider;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -138,13 +139,9 @@ public final class DfOptimisticLockProperties extends DfAbstractDBFlutePropertie
     //                                            Version No
     //                                            ----------
     public String findVersionNoFieldName(String tableDbName) { // null allowed: e.g. tableExcept
-        // next step
-        //final List<String> versionNoTableExceptList = getVersionNoTableExceptList();
-        //if (!versionNoTableExceptList.isEmpty()) {
-        //    if (isTargetByHint(tableDbName, DfCollectionUtil.emptyList(), versionNoTableExceptList)) { // except
-        //        return null; // no versionNo table forcedly
-        //    }
-        //}
+        if (isVersionNoTableExcept(tableDbName)) {
+            return null; // no versionNo table forcedly
+        }
         final String defaultValue = "version_no"; // fixedly, as default of DBFlute
         return getVersionNoFieldName(defaultValue);
     }
@@ -153,12 +150,21 @@ public final class DfOptimisticLockProperties extends DfAbstractDBFlutePropertie
         return getProperty("versionNoFieldName", defaultValue, getOptimisticLockMap());
     }
 
-    // next step
-    //protected List<String> getVersionNoTableExceptList() { // not null, empty allowed
-    //    @SuppressWarnings("unchecked")
-    //    final List<String> versionNoTableExceptList = (List<String>) getOptimisticLockMap().get("versionNoTableExceptList");
-    //    return versionNoTableExceptList != null ? versionNoTableExceptList : DfCollectionUtil.emptyList();
-    //}
+    protected boolean isVersionNoTableExcept(String tableDbName) {
+        final List<String> versionNoTableExceptList = getVersionNoTableExceptList();
+        if (!versionNoTableExceptList.isEmpty()) {
+            if (!isTargetByHint(tableDbName, DfCollectionUtil.emptyList(), versionNoTableExceptList)) { // means except
+                return true; // no versionNo table forcedly
+            }
+        }
+        return false;
+    }
+
+    protected List<String> getVersionNoTableExceptList() { // not null, empty allowed, @since 1.3.2
+        @SuppressWarnings("unchecked")
+        final List<String> versionNoTableExceptList = (List<String>) getOptimisticLockMap().get("versionNoTableExceptList");
+        return versionNoTableExceptList != null ? versionNoTableExceptList : DfCollectionUtil.emptyList();
+    }
 
     // -----------------------------------------------------
     //                                   Whole Determination
