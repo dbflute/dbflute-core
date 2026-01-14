@@ -16,7 +16,6 @@
 package org.dbflute.properties.assistant.bhvfilter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +23,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.StringSet;
 import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.util.DfCollectionUtil;
 
@@ -91,7 +91,7 @@ public class DfBhvFilterColumnArranger {
     //                                                                        Assist Logic
     //                                                                        ============
     protected Set<String> prepareTableCommonColumnNameSet(Table table) {
-        final Set<String> commonColumnNameSet = new HashSet<String>();
+        final Set<String> commonColumnNameSet = StringSet.createAsFlexibleOrdered();
         if (table.hasAllCommonColumn()) {
             final List<Column> commonColumnList = table.getCommonColumnList();
             for (Column commonColumn : commonColumnList) {

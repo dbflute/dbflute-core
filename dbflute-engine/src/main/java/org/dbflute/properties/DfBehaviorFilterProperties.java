@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.function.Function;
 
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfStringUtil;
 
 /**
@@ -207,12 +208,14 @@ public final class DfBehaviorFilterProperties extends DfAbstractDBFlutePropertie
         if (!commonColumnProp.isUnevenCommonColumnRecognized()) {
             return; // basically here
         }
+        final Map<String, Object> searchOriginalMap = StringKeyMap.createAsFlexibleOrdered();
+        searchOriginalMap.putAll(originalMap); // because originalMap may be sensitive
         final Map<String, Object> mergedFromMap = mergedFromMapProvider.apply(commonColumnProp);
         for (Entry<String, Object> entry : mergedFromMap.entrySet()) {
             // extends CommonColumn settings here
             // real common column is except in filter logic so no problem of duplicate 
             final String columnName = entry.getKey();
-            if (!originalMap.containsKey(columnName)) { // existings in behavior filter are prior
+            if (!searchOriginalMap.containsKey(columnName)) { // existings in behavior filter are prior
                 originalMap.put(columnName, entry.getValue());
             }
         }
