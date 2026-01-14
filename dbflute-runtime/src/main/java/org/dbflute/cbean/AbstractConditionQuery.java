@@ -1585,26 +1585,46 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             registerMyselfInScope(subQuery, subQueryPropertyName);
             return;
         }
-        final String relatedColumnDbName;
-        {
-            subQuery.xgetSqlClause().getSpecifiedColumnInfoAsOne();
-            final String specifiedDbName = subQuery.xgetSqlClause().getSpecifiedColumnDbNameAsOne();
-            if (specifiedDbName != null) {
-                relatedColumnDbName = specifiedDbName;
-            } else { // as default
-                // this function is only allowed when only-one PK
-                final PrimaryInfo primaryInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryInfo();
-                final ColumnInfo primaryColumnInfo = primaryInfo.getFirstColumn();
-                relatedColumnDbName = primaryColumnInfo.getColumnDbName();
-            }
-        }
+        final String relatedColumnDbName = xderiveMyselfExistsRelatedColumnDbName(subQuery);
         registerExistsReferrer(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
+    }
+
+    protected void registerMyselfNotExists(ConditionQuery subQuery, String subQueryPropertyName) { // @since 1.3.2
+        if (subQuery.xgetSqlClause().isUseInScopeSubQueryForExistsReferrer()) {
+            registerMyselfNotInScope(subQuery, subQueryPropertyName);
+            return;
+        }
+        final String relatedColumnDbName = xderiveMyselfExistsRelatedColumnDbName(subQuery);
+        registerNotExistsReferrer(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
+    }
+
+    protected String xderiveMyselfExistsRelatedColumnDbName(ConditionQuery subQuery) {
+        final String relatedColumnDbName;
+        subQuery.xgetSqlClause().getSpecifiedColumnInfoAsOne();
+        final String specifiedDbName = subQuery.xgetSqlClause().getSpecifiedColumnDbNameAsOne();
+        if (specifiedDbName != null) {
+            relatedColumnDbName = specifiedDbName;
+        } else { // as default
+            // this function is only allowed when only-one PK
+            final PrimaryInfo primaryInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryInfo();
+            final ColumnInfo primaryColumnInfo = primaryInfo.getFirstColumn();
+            relatedColumnDbName = primaryColumnInfo.getColumnDbName();
+        }
+        return relatedColumnDbName;
     }
 
     // ===================================================================================
     //                                                                       MyselfInScope
     //                                                                       =============
     protected void registerMyselfInScope(ConditionQuery subQuery, String subQueryPropertyName) {
+        doRegisterMyselfInScope(subQuery, subQueryPropertyName, /*notInScope*/false);
+    }
+
+    protected void registerMyselfNotInScope(ConditionQuery subQuery, String subQueryPropertyName) {
+        doRegisterMyselfInScope(subQuery, subQueryPropertyName, /*notInScope*/true);
+    }
+
+    protected void doRegisterMyselfInScope(ConditionQuery subQuery, String subQueryPropertyName, boolean notInScope) {
         final String relatedColumnDbName;
         {
             final String specifiedDbName = subQuery.xgetSqlClause().getSpecifiedColumnDbNameAsOne();
@@ -1617,7 +1637,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
-        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null, false);
+        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null, notInScope);
     }
 
     // ===================================================================================
