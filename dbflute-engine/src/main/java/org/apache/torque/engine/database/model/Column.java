@@ -580,6 +580,10 @@ public class Column {
         return hasDbType() && _columnHandler.isMySQLDatetime(_dbType);
     }
 
+    public boolean isDbTypeMySQLTime() { // as pinpoint
+        return hasDbType() && _columnHandler.isMySQLTime(_dbType);
+    }
+
     public boolean isDbTypePostgreSQLSerialFamily() { // as pinpoint
         return hasDbType() && _columnHandler.isPostgreSQLSerialFamily(_dbType);
     }
@@ -657,6 +661,30 @@ public class Column {
         return columnSize != null ? String.valueOf(columnSize) : "null";
     }
 
+    public String getColumnSizeForSchemaHtml() { // @since 1.3.2
+        final String columnSize = getColumnSize();
+        if (columnSize != null) {
+            String suffixExp = ""; // as default
+            if (needsColumnSizeDatetimePrecisionSupplement()) { // depends on DBMS 
+                // at least datetime here, columnSize is e.g. "19" (MySQL), "11, 3" (Oracle)
+                if (!columnSize.contains(",")) { // just in case, may depend on JDBC version
+                    final Integer datetimePrecision = getDatetimePrecision();
+                    if (datetimePrecision != null) { // e.g. 3 in MySQL DATETIME(3)
+                        suffixExp = ", " + datetimePrecision; // e.g. 19[, 3]
+                    }
+                }
+            }
+            return columnSize + suffixExp;
+        } else {
+            return "";
+        }
+    }
+
+    protected boolean needsColumnSizeDatetimePrecisionSupplement() {
+        // on-demand way, MySQL for now (2026/01/14)
+        return isDbTypeMySQLDatetime() || isDbTypeMySQLTime();
+    }
+
     public String getDecimalDigitsSettingExpression() {
         final Integer decimalDigits = getDecimalDigits();
         return decimalDigits != null ? String.valueOf(decimalDigits) : "null";
@@ -676,6 +704,11 @@ public class Column {
     public String getDatetimePrecisionSettingExpression() {
         final Integer datetimePrecision = getDatetimePrecision();
         return datetimePrecision != null ? String.valueOf(datetimePrecision) : "null";
+    }
+
+    protected String getDatetimePrecisionSuffixExp() {
+        final Integer precisionValue = getDatetimePrecision();
+        return precisionValue != null ? "(" + precisionValue + ")" : "";
     }
 
     // ===================================================================================
@@ -1773,7 +1806,7 @@ public class Column {
     //                                             JDBC Type
     //                                             ---------
     public void setJdbcType(String jdbcType) {
-        this._jdbcType = jdbcType;
+        _jdbcType = jdbcType;
     }
 
     public String getJdbcType() {
@@ -1802,6 +1835,10 @@ public class Column {
 
     public boolean isJdbcTypeBlob() { // as pinpoint
         return TypeMap.isJdbcTypeBlob(getJdbcType());
+    }
+
+    public boolean isJdbcTypeConceptDateFamily() { // as concept
+        return isJdbcTypeDate() || isJdbcTypeTimestamp() || isJdbcTypeTime();
     }
 
     // -----------------------------------------------------

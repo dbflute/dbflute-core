@@ -321,6 +321,10 @@ public class DfJdbcTypeMapper {
         return _resource.isDbmsMySQL() && matchIgnoreCase(dbTypeName, "datetime");
     }
 
+    public boolean isMySQLTime(final String dbTypeName) {
+        return _resource.isDbmsMySQL() && matchIgnoreCase(dbTypeName, "time");
+    }
+
     public boolean isPostgreSQLSerialFamily(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && matchIgnoreCase(dbTypeName, "serial", "smallserial", "bigserial");
     }

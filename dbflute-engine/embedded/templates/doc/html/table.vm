@@ -93,7 +93,7 @@ ${deprecatedTablePrefix}${table.aliasExpressionForSchemaHtml}${table.tableDispNa
 #end
 		<td class="${col.schemaHtmlColumnNameCssClass} columnnamecell" id="${col.columnIdForSchemaHtml}">${col.name}</td>
 		<td class="typecell">${col.dbTypeExpression}</td>
-		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
+		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSizeForSchemaHtml} #else &nbsp;#end</td>
 #if ($hasDefaultValue)
 		<td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValueForSchemaHtml}#else &nbsp;#end</td>
 #end
