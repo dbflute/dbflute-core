@@ -801,6 +801,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             final DfColumnDiff columnDiff = DfColumnDiff.createChanged(next.getName());
             processDbType(next, previous, columnDiff);
             processColumnSize(next, previous, columnDiff);
+            processDatetimePrecision(next, previous, columnDiff); // @since 1.3.2
             processDefaultValue(next, previous, columnDiff);
             processNotNull(next, previous, columnDiff);
             processAutoIncrement(next, previous, columnDiff);
@@ -833,6 +834,29 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 diff.setColumnSizeDiff(nextPreviousDiff);
             }
         });
+    }
+
+    protected void processDatetimePrecision(Column next, Column previous, DfColumnDiff columnDiff) { // @since 1.3.2
+        if (!isDatetimePrecisionNeededDbms()) {
+            return;
+        }
+        diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+            public String provide(Column obj) {
+                final Integer precision = obj.getDatetimePrecision();
+                return precision != null ? precision.toString() : null;
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setDatetimePrecisionDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected boolean isDatetimePrecisionNeededDbms() {
+        // DBFlute Engine: AlterCheck on MySQL, diff datetime precision e.g. DATETIME(3)
+        // https://github.com/dbflute/dbflute-core/issues/323
+        // (basically other DBMSs have datetime precision on columnSize)
+        return isDatabaseMySQL();
     }
 
     protected void processDefaultValue(Column next, Column previous, DfColumnDiff columnDiff) {

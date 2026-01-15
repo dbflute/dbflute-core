@@ -40,6 +40,7 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
     //                                             ---------
     protected DfNextPreviousDiff _dbTypeDiff;
     protected DfNextPreviousDiff _columnSizeDiff;
+    protected DfNextPreviousDiff _datetimePrecisionDiff; // @since 1.3.2
     protected DfNextPreviousDiff _defaultValueDiff;
     protected DfNextPreviousDiff _notNullDiff;
     protected DfNextPreviousDiff _autoIncrementDiff;
@@ -79,6 +80,23 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
 
             public void restore(Map<String, Object> columnDiffMap) {
                 _columnSizeDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
+            public String titleName() {
+                return "Precision"; // short name to avoid display design headache
+            }
+
+            public String propertyName() {
+                return "datetimePrecisionDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _datetimePrecisionDiff;
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _datetimePrecisionDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandlerBase() {
@@ -318,6 +336,18 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
 
     public void setColumnSizeDiff(DfNextPreviousDiff columnSizeDiff) {
         _columnSizeDiff = columnSizeDiff;
+    }
+
+    public boolean hasDatetimePrecisionDiff() {
+        return _datetimePrecisionDiff != null;
+    }
+
+    public DfNextPreviousDiff getDatetimePrecisionDiff() {
+        return _datetimePrecisionDiff;
+    }
+
+    public void setDatetimePrecisionDiff(DfNextPreviousDiff datetimePrecisionDiff) {
+        _datetimePrecisionDiff = datetimePrecisionDiff;
     }
 
     public boolean hasDefaultValueDiff() {

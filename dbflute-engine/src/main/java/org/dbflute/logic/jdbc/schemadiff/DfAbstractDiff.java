@@ -111,13 +111,13 @@ public abstract class DfAbstractDiff {
     }
 
     protected static interface NextPreviousDiffer<OBJECT, DIFF, TYPE> {
-        TYPE provide(OBJECT obj);
+        TYPE provide(OBJECT obj); // returns null allowed
 
-        boolean isMatch(TYPE next, TYPE previous);
+        boolean isMatch(TYPE next, TYPE previous); // accepts null allowed
 
         void diff(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
 
-        String disp(TYPE obj, boolean next);
+        String disp(TYPE obj, boolean next); // accepts null allowed
     }
 
     protected abstract class StringNextPreviousDiffer<OBJECT, DIFF> implements NextPreviousDiffer<OBJECT, DIFF, String> {
@@ -157,7 +157,7 @@ public abstract class DfAbstractDiff {
     }
 
     public static interface NextPreviousHandler { // accessed from Velocity template
-        String titleName();
+        String titleName(); // for e.g. HistoryHTML, AlterCheck
 
         String propertyName();
 
