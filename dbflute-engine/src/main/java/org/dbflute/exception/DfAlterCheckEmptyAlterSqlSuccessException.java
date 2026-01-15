@@ -19,6 +19,9 @@ package org.dbflute.exception;
  * @author jflute
  */
 public class DfAlterCheckEmptyAlterSqlSuccessException extends RuntimeException {
+    // named DfAlterCheckEmptyAlterSqlSuccessException is very important class (2026/01/16)
+    // because applicatino may judge empty success by the class name
+    // so don't rename this class !!!
 
     private static final long serialVersionUID = 1L;
 
