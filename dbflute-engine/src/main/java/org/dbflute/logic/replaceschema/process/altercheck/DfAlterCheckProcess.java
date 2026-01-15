@@ -563,9 +563,7 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("No DB change. (no difference but empty AlterDDL)");
         br.addItem("Advice");
-        // attention: "unneccessary" on this message is very important
-        // because application infra may use the word (2026/01/15)
-        br.addElement("This is unneccessary success.");
+        br.addElement("This is unnecessary success.");
         br.addElement("You should check after changing schema.");
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckEmptyAlterSqlSuccessException(msg);
