@@ -2766,7 +2766,7 @@ Decomment.prototype = {
 				return;
 			}
 			hasAliasColumn = tableListBody.querySelector('.aliascell') !== null;
-			message = 'Alias saved! Please run the Doc task to display the alias column in the table list.';
+			message = 'Alias saved! Please run the Doc task to display the alias column (alias display area) in the table list.';
 		} else if (params.targetType === 'COLUMN') {
 			var tableId = this.getTableIdForSchemaHtml(params.tableName);
 			var tableHeading = document.getElementById(tableId);
@@ -2782,7 +2782,7 @@ Decomment.prototype = {
 				}
 				sibling = sibling.nextElementSibling;
 			}
-			message = 'Alias saved! Please run the Doc task to display the alias column in table ' + params.tableName + '.';
+			message = 'Alias saved! Please run the Doc task to display the alias column (alias display area) in table ' + params.tableName + '.';
 		}
 
 		if (!hasAliasColumn) {
