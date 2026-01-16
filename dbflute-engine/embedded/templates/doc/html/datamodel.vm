@@ -507,6 +507,52 @@ pre.spolicyviodisp {
 	margin-left: 0.5em;
 	color: #222277;
 }
+
+/* -------------------------------------------------
+                            Notification Banner
+------------------------------------------------- */
+.notificationbanner {
+	display: none;
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 1000;
+	max-width: 400px;
+}
+.notificationbannercontent {
+	position: relative;
+	padding: 15px;
+	background-color: #709dff;
+	border: 1px solid #5a7fcf;
+	border-radius: 4px;
+	color: #ffffff;
+}
+.notificationbannercontent p {
+	margin: 0;
+	padding-right: 20px;
+	font-size: 14px;
+	color: #ffffff;
+}
+.notificationbanner-close-btn {
+	position: absolute;
+	padding: 0;
+	right: 10px;
+	top: 5px;
+	cursor: pointer;
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 50%;
+	background-color: transparent;
+	color: #ffffff;
+	font-size: 14px;
+	line-height: 24px;
+	text-align: center;
+	transition: box-shadow .15s ease-in-out;
+}
+.notificationbanner-close-btn:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+}
 	</style>
 #if ($isStyleSheetInheritable && $database.isSchemaHtmlStyleSheetEmbedded())
 	<style type="text/css">
@@ -931,6 +977,13 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 		</div>
 		<div id="decomment-user-input" class="decomment-user-input"><input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/><span class="decomment-user-name-desc">*required (saved in cookie)</span></div>
 		<div class="decommentmodal-ok-area"><button id="decomment-ok" class="decommentmodal-ok-btn">OK</button></div>
+	</div>
+</div>
+<!-- Notification Banner for informational messages -->
+<div id="notification-banner" class="notificationbanner">
+	<div class="notificationbannercontent">
+		<div id="notification-close" class="notificationbanner-close-btn"><span>×</span></div>
+		<p id="notification-message"></p>
 	</div>
 </div>
 <script>
@@ -1468,6 +1521,62 @@ var DecommentUtil = new function(){
 		}
 		return decomment.replace(/(?:dfalias|shalias):\s*\{[^}]*\}\s*\n?/g, '').trim();
 	}
+}
+
+// ===================================================================================
+//                                                              Notification Handler
+//                                                              ====================
+/**
+ * @author shiny
+ */
+var NotificationHandler = new function() {
+	var AUTO_HIDE_DELAY = 10000; // 10 seconds
+	var hideTimeout = null;
+
+	/**
+	 * Show notification banner with message
+	 * @param {string} message - The message to display (NotNull)
+	 */
+	this.show = function(message) {
+		var bannerElement = document.getElementById('notification-banner');
+		var messageElement = document.getElementById('notification-message');
+
+		if (!bannerElement || !messageElement) {
+			return;
+		}
+
+		if (hideTimeout) {
+			clearTimeout(hideTimeout);
+		}
+
+		messageElement.innerText = message;
+		bannerElement.style.display = 'block';
+
+		var closeBtn = document.getElementById('notification-close');
+		if (closeBtn) {
+			closeBtn.onclick = function() {
+				NotificationHandler.hide();
+			};
+		}
+
+		hideTimeout = setTimeout(function() {
+			NotificationHandler.hide();
+		}, AUTO_HIDE_DELAY);
+	};
+
+	/**
+	 * Hide notification banner
+	 */
+	this.hide = function() {
+		var bannerElement = document.getElementById('notification-banner');
+		if (bannerElement) {
+			bannerElement.style.display = 'none';
+		}
+		if (hideTimeout) {
+			clearTimeout(hideTimeout);
+			hideTimeout = null;
+		}
+	};
 }
 
 // ===================================================================================
@@ -2572,9 +2681,16 @@ Decomment.prototype = {
 				commentProperty.decomments = [{'body': decomment}]
 				commentProperty.inputAuthor = that.getUserName();
 				var params = commentProperty.toRequestParams()
+				var shouldCheckAliasColumn = aliasFromInput && aliasFromInput.length > 0;
+
 				new ApiClient().saveDecomment(params, function () {
 					that.fetchVirtualPickup();
 					that.hideUserNameInput();
+
+					// Show notification if alias saved but column doesn't exist
+					if (shouldCheckAliasColumn) {
+						that.checkAndNotifyMissingAliasColumn(params);
+					}
 				});
 				modalElement.style.display = "none";
 			};
@@ -2634,6 +2750,57 @@ Decomment.prototype = {
 				modalElement.style.display = "none";
 			}
 		}
+	},
+
+	/**
+	 * Check if alias column exists and notify if missing
+	 * @param {Object} params - Request params containing targetType, tableName, etc.
+	 */
+	checkAndNotifyMissingAliasColumn: function(params) {
+		var hasAliasColumn = false;
+		var message = '';
+
+		if (params.targetType === 'TABLE') {
+			var tableListBody = document.getElementById('table-list-body');
+			if (!tableListBody) {
+				return;
+			}
+			hasAliasColumn = tableListBody.querySelector('.aliascell') !== null;
+			message = 'Alias saved! Please run the Doc task to display the alias column (alias display area) in the table list.';
+		} else if (params.targetType === 'COLUMN') {
+			var tableId = this.getTableIdForSchemaHtml(params.tableName);
+			var tableHeading = document.getElementById(tableId);
+			if (!tableHeading) {
+				return;
+			}
+
+			var sibling = tableHeading.nextElementSibling;
+			while (sibling) {
+				if (sibling.tagName === 'TABLE') {
+					hasAliasColumn = sibling.querySelector('.aliascell') !== null;
+					break;
+				}
+				sibling = sibling.nextElementSibling;
+			}
+			message = 'Alias saved! Please run the Doc task to display the alias column (alias display area) in table ' + params.tableName + '.';
+		}
+
+		if (!hasAliasColumn) {
+			NotificationHandler.show(message);
+		}
+	},
+
+	/**
+	 * Get table ID for SchemaHTML (same logic as server-side)
+	 * @param {string} tableName - The table name
+	 * @return {string} table ID for HTML
+	 */
+	getTableIdForSchemaHtml: function(tableName) {
+		var normalized = tableName.toLowerCase();
+		if (normalized.indexOf('.') !== -1) {
+			normalized = normalized.replace(/\./g, '_');
+		}
+		return normalized;
 	},
 
 	/**
