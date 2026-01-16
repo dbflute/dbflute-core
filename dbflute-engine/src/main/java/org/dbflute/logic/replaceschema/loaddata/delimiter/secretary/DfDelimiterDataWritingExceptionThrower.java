@@ -100,7 +100,7 @@ public class DfDelimiterDataWritingExceptionThrower {
             }
         }
         final Map<String, StringProcessor> stringProcessorMap = stringProcessorCacheMap.get(onfileTableName);
-        if (bindTypeMap != null) {
+        if (stringProcessorMap != null) {
             br.addItem("String Processor");
             final Set<Entry<String, StringProcessor>> entrySet = stringProcessorMap.entrySet();
             for (Entry<String, StringProcessor> entry : entrySet) {
