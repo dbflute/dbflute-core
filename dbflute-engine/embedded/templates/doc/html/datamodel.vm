@@ -1339,6 +1339,26 @@ Incremental.prototype.util = {
 
 var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
 searcher.init();
+
+// ===================================================================================
+//                                                              Search Keyboard Shortcut
+//                                                              ========================
+// Keyboard shortcut to focus search: Shift+Cmd+,
+document.addEventListener('keydown', function(e) {
+	// Skip if user is already typing in an input/textarea
+	if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+		return;
+	}
+
+	if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === ',') {
+		e.preventDefault();
+		var searchField = document.getElementById('incremental-search-field');
+		if (searchField) {
+			searchField.focus();
+			searchField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+	}
+});
 </script>
 #macro(escape $str)$!str.replaceAll("'", "\\'").replaceAll("\n", "<br>")#end
 <script>
