@@ -28,6 +28,7 @@ import java.util.Date;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.dateadj.DfDateAdjustmentPreparer;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 
@@ -108,7 +109,7 @@ public class DfLReverseOriginDateSynchronizer {
     }
 
     protected boolean handleOriginDateSyncLine(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
-        final String keyOriginDate = DfLoadingControlProp.KEY_ORIGIN_DATE;
+        final String keyOriginDate = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
         boolean handled = false;
         if (!line.trim().startsWith("#") && line.contains(keyOriginDate)) {
             final String frontStr = Srl.substringFirstFront(line, keyOriginDate);
@@ -137,7 +138,7 @@ public class DfLReverseOriginDateSynchronizer {
     }
 
     protected void throwLoadingControlMapOriginDateParseFailureException(File mapFile, String line) {
-        final String keyOriginDate = DfLoadingControlProp.KEY_ORIGIN_DATE;
+        final String keyOriginDate = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the origin date of loading control map.");
         br.addItem("Advice");

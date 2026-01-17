@@ -1209,8 +1209,9 @@ public abstract class DfAbsractDataWriter {
 
     protected void resolveRelativeDate(String dataDirectory, DfLoadedSchemaTable schemaTable, Map<String, Object> columnValueMap,
             Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet, int rowNumber) {
-        _loadingControlProp.resolveRelativeDate(dataDirectory, schemaTable, columnValueMap, columnMetaMap, sysdateColumnSet,
-                createBindTypeProvider(), rowNumber);
+        final DfColumnBindTypeProvider bindTypeProvider = createBindTypeProvider();
+        _loadingControlProp.resolveRelativeDate(dataDirectory, schemaTable, bindTypeProvider // base
+                , columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber); // row column
     }
 
     protected DfColumnBindTypeProvider createBindTypeProvider() {

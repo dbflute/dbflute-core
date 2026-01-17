@@ -16,11 +16,8 @@
 package org.dbflute.logic.replaceschema.loaddata.base.dataprop;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,22 +26,20 @@ import java.util.Set;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfLoadDataRegistrationFailureException;
-import org.dbflute.exception.ParseDateExpressionFailureException;
-import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.dateadj.DfDateAdjustmentPreparer;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.dateadj.DfDateAdjustmentRowExecutor;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfRelativeDateResolver;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.DfDelimiterDataResultInfo;
 import org.dbflute.logic.replaceschema.loaddata.delimiter.line.DfDelimiterDataFirstLineInfo;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
-import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfTypeUtil;
-import org.dbflute.util.DfTypeUtil.ParseDateException;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,20 +54,35 @@ public class DfLoadingControlProp {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfLoadingControlProp.class);
+
     public static final String LOADING_CONTROL_MAP_NAME = "loadingControlMap.dataprop";
     public static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
     public static final String PROP_LARGE_TEXT_FILE_MAP = "largeTextFileMap";
-    public static final String KEY_ORIGIN_DATE = "df:originDate";
-    public static final String KEY_MILLIS_COLUMN_LIST = "df:millisColumnList";
-    protected static final String KEY_ALL_MARK = "$$ALL$$";
-    protected static final String KEY_DISTANCE_YEARS = "df:distanceYears";
-    protected static final String KEY_DISTANCE_MONTHS = "df:distanceMonths";
-    protected static final String KEY_DISTANCE_DAYS = "df:distanceDays";
+
+    // -----------------------------------------------------
+    //                                       Date Adjustment
+    //                                       ---------------
+    protected static final String KEY_ORIGIN_DATE = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
+    protected static final String KEY_MILLIS_COLUMN_LIST = DfDateAdjustmentPreparer.KEY_MILLIS_COLUMN_LIST;
+    protected static final String KEY_DATE_ADJ_ALL_MARK = DfDateAdjustmentPreparer.KEY_ALL_MARK;
+    protected static final String KEY_DISTANCE_YEARS = DfDateAdjustmentPreparer.KEY_DISTANCE_YEARS;
+    protected static final String KEY_DISTANCE_MONTHS = DfDateAdjustmentPreparer.KEY_DISTANCE_MONTHS;
+    protected static final String KEY_DISTANCE_DAYS = DfDateAdjustmentPreparer.KEY_DISTANCE_DAYS;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                       .dataprop Cache
+    //                                       ---------------
     protected final Map<String, Map<String, Object>> _loadingControlMapMap = DfCollectionUtil.newLinkedHashMap();
+
+    // -----------------------------------------------------
+    //                                         Assist Object
+    //                                         -------------
+    protected final DfDateAdjustmentPreparer _dateAdjustmentPreparer = new DfDateAdjustmentPreparer();
+
+    // instance recycle between rows
     protected final DfRelativeDateResolver _relativeDateResolver = new DfRelativeDateResolver();
 
     // ===================================================================================
@@ -233,301 +243,12 @@ public class DfLoadingControlProp {
     // ===================================================================================
     //                                                                     Date Adjustment
     //                                                                     ===============
-    public void resolveRelativeDate(String dataDirectory, DfLoadedSchemaTable schemaTable, Map<String, Object> columnValueMap,
-            Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet, DfColumnBindTypeProvider bindTypeProvider,
-            int rowNumber) { // was born at LUXA
-        if (!hasDateAdjustment(dataDirectory, schemaTable)) {
-            return;
-        }
-        final Map<String, Object> resolvedMap = new HashMap<String, Object>();
-        for (Entry<String, Object> entry : columnValueMap.entrySet()) {
-            final String columnName = entry.getKey();
-            if (isSysdateColumn(sysdateColumnSet, columnName)) { // keep sysdate as default value
-                continue;
-            }
-            final Object value = entry.getValue();
-            if (value == null) {
-                continue;
-            }
-            if (!isDateAdjustmentAllowedValueType(value)) { // out of target type
-                continue;
-            }
-            if (!hasDateAdjustmentExp(dataDirectory, schemaTable, columnName)) { // no-adjustment column
-                continue;
-            }
-            final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
-            final Class<?> bindType = bindTypeProvider.provide(schemaTable, columnMeta);
-            if (bindType == null) { // unknown column type
-                continue;
-            }
-            if (!isDateAdjustmentAllowedBindType(dataDirectory, schemaTable, columnName, bindType)) { // cannot be date
-                continue;
-            }
-            final String dateExp = toAdjustedResourceDateExp(schemaTable, columnName, bindType, value);
-            if (dateExp == null) { // e.g. wrong value
-                continue;
-            }
-            final String adjusted = adjustDateIfNeeds(dataDirectory, schemaTable, columnName, dateExp, rowNumber);
-            resolvedMap.put(columnName, convertAdjustedValueToDateType(schemaTable, columnName, bindType, adjusted));
-        }
-        for (Entry<String, Object> entry : resolvedMap.entrySet()) { // to keep original map instance
-            columnValueMap.put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    protected boolean hasDateAdjustment(String dataDirectory, DfLoadedSchemaTable schemaTable) { // first check (for performance)
-        final Map<String, Object> adjustmentMap = getDateAdjustmentMap(dataDirectory);
-        if (adjustmentMap == null) {
-            return false;
-        }
-        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ by jflute (2025/04/28)
-        // matching with on-file table name in dataprop
-        // if schema prefix on file name, also table name in dataprop should have it
-        // _/_/_/_/_/_/_/_/_/_/
-        final String onfileTableName = schemaTable.getOnfileTableName();
-        return adjustmentMap.containsKey(onfileTableName) || adjustmentMap.containsKey(KEY_ALL_MARK);
-    }
-
-    protected boolean isSysdateColumn(Set<String> sysdateColumnSet, String columnName) {
-        return sysdateColumnSet != null && sysdateColumnSet.contains(columnName);
-    }
-
-    protected boolean isDateAdjustmentAllowedValueType(Object value) {
-        return (value instanceof java.util.Date && !(value instanceof Time)) // util.Date and sql.Timestamp
-                || isDateAdjustmentMillisColumnAllowedNumberValueType(value) // for millisecond column
-                || value instanceof String; // date or millisecond column
-    }
-
-    protected boolean isDateAdjustmentMillisColumnAllowedNumberValueType(Object value) {
-        // Long is just fit, Integer is just in case, but POI returns actually BigDecimal
-        return value instanceof Long || value instanceof Integer || value instanceof BigDecimal;
-    }
-
-    protected boolean hasDateAdjustmentExp(String dataDirectory, DfLoadedSchemaTable schemaTable, String columnName) { // second check
-        return getDateAdjustmentExp(dataDirectory, schemaTable, columnName) != null;
-    }
-
-    protected boolean isDateAdjustmentAllowedBindType(String dataDirectory, DfLoadedSchemaTable schemaTable, String columnName,
-            Class<?> bindType) {
-        if (isDateStampType(bindType)) {
-            return true; // util.Date and sql.Timestamp
-        }
-        if (Long.class.isAssignableFrom(bindType)) {
-            final Map<String, Object> dateAdjustmentMap = getDateAdjustmentMap(dataDirectory);
-            if (dateAdjustmentMap != null) { // not null but just in case
-                @SuppressWarnings("unchecked")
-                final List<String> millisColumn = (List<String>) dateAdjustmentMap.get(KEY_MILLIS_COLUMN_LIST);
-                if (millisColumn != null) {
-                    final List<String> emptyList = DfCollectionUtil.emptyList();
-                    if (DfNameHintUtil.isTargetByHint(columnName, millisColumn, emptyList)) {
-                        return true; // millisecond column
-                    }
-                }
-            }
-        }
-        if (isDateAdjustmentPinpointColumn(dataDirectory, schemaTable, columnName)) {
-            // cannot be date adjustment column but specified as pinpoint
-            throwLoadingControlDateAdjustmentColumnCannotDateException(dataDirectory, schemaTable, columnName, bindType);
-        }
-        return false;
-    }
-
-    protected void throwLoadingControlDateAdjustmentColumnCannotDateException(String dataDirectory, DfLoadedSchemaTable schemaTable,
-            String columnName, Class<?> bindType) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Found the column that cannot be date adjustment column.");
-        br.addItem("Advice");
-        br.addElement("The column cannot be date adjustment column");
-        br.addElement("but specified as pinpoint in your loadingControlMap.dataprop.");
-        br.addItem("Data Directory");
-        br.addElement(dataDirectory);
-        br.addItem("Table Name");
-        br.addElement(schemaTable);
-        br.addItem("Column Name");
-        br.addElement(columnName);
-        br.addItem("Bind Type");
-        br.addElement(bindType);
-        final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataRegistrationFailureException(msg);
-    }
-
-    protected String toAdjustedResourceDateExp(DfLoadedSchemaTable schemaTable, String columnName, Class<?> bindType, Object value) {
-        final String resolvedPattern = DfRelativeDateResolver.RESOLVED_PATTERN;
-        if (isDateStampType(bindType)) {
-            if (value instanceof java.util.Date) { // not contains time (already checked)
-                return DfTypeUtil.toString(value, resolvedPattern);
-            } else if (isDateAdjustmentMillisColumnAllowedNumberValueType(value)) {
-                return null; // will be exception when insert anyhow so do nothing here
-            } else if (value instanceof String) {
-                final String strValue = ((String) value).trim();
-                if (strValue.startsWith(DfRelativeDateResolver.CURRENT_MARK)) { // resolved later
-                    return null;
-                }
-                if (strValue.equals("sysdate")) { // basically no way (might be default value!?)
-                    return null;
-                }
-                final java.util.Date parsedDate;
-                try {
-                    parsedDate = DfTypeUtil.toDate(value);
-                } catch (ParseDateException ignored) { // wrong value for date type
-                    return null; // will be exception when insert anyhow so do nothing here
-                }
-                return DfTypeUtil.toString(parsedDate, resolvedPattern);
-            }
-        }
-        if (Long.class.isAssignableFrom(bindType)) {
-            if (value instanceof java.util.Date) { // not contains time (already checked)
-                return DfTypeUtil.toString(value, resolvedPattern);
-            } else if (value instanceof Long) {
-                return DfTypeUtil.toString(new java.util.Date((Long) value), resolvedPattern);
-            } else { // basically e.g. Integer, BigDecimal, String (not others, already checked)
-                try {
-                    final Long parsedLong = DfTypeUtil.toLong(value);
-                    return DfTypeUtil.toString(new java.util.Date(parsedLong), resolvedPattern);
-                } catch (NumberFormatException ignored) { // wrong value for millisecond type
-                    try {
-                        final java.util.Date parsedDate = DfTypeUtil.toDate(value);
-                        return DfTypeUtil.toString(parsedDate, resolvedPattern);
-                    } catch (ParseDateException andIgnored) { // wrong value for date type
-                        return null; // will be exception when insert anyhow so do nothing here
-                    }
-                }
-            }
-        }
-        // no way (already checked)
-        throw new IllegalStateException("Unknown bind type: " + bindType + " for " + schemaTable + "." + columnName);
-    }
-
-    protected Object convertAdjustedValueToDateType(DfLoadedSchemaTable schemaTable, String columnName, Class<?> bindType,
-            String adjusted) {
-        if (isDateStampType(bindType)) {
-            return adjusted; // converted later (when registration)
-        } else if (Long.class.isAssignableFrom(bindType)) {
-            return new HandyDate(adjusted).getDate().getTime();
-        }
-        // no way (already checked)
-        throw new IllegalStateException("Unknown bind type: " + bindType + " for " + schemaTable + "." + columnName);
-    }
-
-    protected boolean isDateStampType(Class<?> bindType) {
-        return java.util.Date.class.isAssignableFrom(bindType) && !Time.class.isAssignableFrom(bindType);
-    }
-
-    // -----------------------------------------------------
-    //                                           Adjust Date
-    //                                           -----------
-    protected String adjustDateIfNeeds(String dataDirectory, DfLoadedSchemaTable schemaTable, String columnName, String dateExp,
-            int rowNumber) {
-        if (dateExp == null || dateExp.trim().length() == 0) { // basically no way (already checked)
-            return dateExp;
-        }
-        final Map<String, Object> dateAdjustmentMap = getDateAdjustmentMap(dataDirectory);
-        if (dateAdjustmentMap == null) { // basically no way (already checked)
-            return dateExp;
-        }
-        final String adjustmentExp = getDateAdjustmentExp(dataDirectory, schemaTable, columnName);
-        if (adjustmentExp == null || adjustmentExp.trim().length() == 0) { // basically no way (already checked)
-            return dateExp;
-        }
-        final java.util.Date date;
-        try {
-            date = new HandyDate(dateExp).getDate();
-        } catch (ParseDateExpressionFailureException e) { // basically no way (already checked)
-            throwLoadingControlColumnValueParseFailureException(adjustmentExp, dataDirectory, schemaTable, columnName, dateExp, rowNumber,
-                    e);
-            return null; // unreachable
-        }
-        final String filteredExp = filterAdjustmentExp(dateAdjustmentMap, adjustmentExp);
-        return _relativeDateResolver.resolveRelativeDate(schemaTable, columnName, filteredExp, date);
-    }
-
-    protected void throwLoadingControlColumnValueParseFailureException(String adjustmentExp, String dataDirectory,
-            DfLoadedSchemaTable schemaTable, String columnName, String value, int rowNumber, ParseDateExpressionFailureException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to parse the value of the column for date adjustment.");
-        br.addItem("Adjustment Expression");
-        br.addElement(adjustmentExp);
-        br.addItem("Data Directory");
-        br.addElement(dataDirectory);
-        br.addItem("Table Name");
-        br.addElement(schemaTable);
-        br.addItem("Column Name");
-        br.addElement(columnName);
-        br.addItem("Column Value");
-        br.addElement(value);
-        br.addItem("Row Number");
-        br.addElement(rowNumber);
-        final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataRegistrationFailureException(msg, e);
-    }
-
-    protected String filterAdjustmentExp(Map<String, Object> dateAdjustmentMap, String adjustmentExp) {
-        String filtered = adjustmentExp;
-        final Integer years = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_YEARS);
-        if (years != null) {
-            filtered = Srl.replace(filtered, "addYear($distance)", "addYear(" + years + ")");
-            filtered = Srl.replace(filtered, "$distanceYears", years.toString());
-        }
-        final Integer months = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_MONTHS);
-        if (months != null) {
-            filtered = Srl.replace(filtered, "addMonth($distance)", "addMonth(" + months + ")");
-            filtered = Srl.replace(filtered, "$distanceMonths", months.toString());
-        }
-        final Integer days = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_DAYS);
-        if (days != null) {
-            filtered = Srl.replace(filtered, "addDay($distance)", "addDay(" + days + ")");
-            filtered = Srl.replace(filtered, "$distanceDays", days.toString());
-        }
-        return filtered;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected String getDateAdjustmentExp(String dataDirectory, DfLoadedSchemaTable schemaTable, String columnName) {
-        final Map<String, Object> dateAdjustmentMap = getDateAdjustmentMap(dataDirectory);
-        if (dateAdjustmentMap == null) {
-            return null;
-        }
-        final String onfileTableName = schemaTable.getOnfileTableName();
-        Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(onfileTableName);
-        final String foundExp = findAdjustmentExp(schemaTable, columnName, columnMap);
-        if (foundExp != null) {
-            return foundExp;
-        }
-        columnMap = (Map<String, String>) dateAdjustmentMap.get(KEY_ALL_MARK);
-        return findAdjustmentExp(schemaTable, columnName, columnMap);
-    }
-
-    protected String findAdjustmentExp(DfLoadedSchemaTable schemaTable, String columnName, Map<String, String> columnMap) {
-        if (columnMap != null) {
-            final String exp = columnMap.get(columnName);
-            if (exp != null) {
-                return exp;
-            }
-            return columnMap.get(KEY_ALL_MARK);
-        }
-        return null;
-    }
-
-    protected boolean isDateAdjustmentPinpointColumn(String dataDirectory, DfLoadedSchemaTable schemaTable, String columnName) {
-        final Map<String, Object> dateAdjustmentMap = getDateAdjustmentMap(dataDirectory);
-        if (dateAdjustmentMap == null) {
-            return false;
-        }
-        final String onfileTableName = schemaTable.getOnfileTableName();
-        @SuppressWarnings("unchecked")
-        final Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(onfileTableName);
-        if (columnMap != null && columnMap.get(columnName) != null) {
-            return true;
-        }
-        @SuppressWarnings("unchecked")
-        final Map<String, String> allTableColumnMap = (Map<String, String>) dateAdjustmentMap.get(KEY_ALL_MARK);
-        return allTableColumnMap != null && allTableColumnMap.get(columnName) != null;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> getDateAdjustmentMap(String dataDirectory) {
-        final Map<String, Object> loadingControlMap = findLoadingControlMap(dataDirectory);
-        return (Map<String, Object>) loadingControlMap.get(PROP_DATE_ADJUSTMENT_MAP);
+    public void resolveRelativeDate(String dataDirectory, DfLoadedSchemaTable schemaTable, DfColumnBindTypeProvider bindTypeProvider,
+            Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet, int rowNumber) { // was born at LUXA
+        final DfDateAdjustmentRowExecutor executor = new DfDateAdjustmentRowExecutor(dataDirectory, schemaTable, dir -> {
+            return findLoadingControlMap(dir);
+        }, bindTypeProvider, _relativeDateResolver);
+        executor.executeDateAdjustment(columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
     }
 
     // ===================================================================================
@@ -582,100 +303,52 @@ public class DfLoadingControlProp {
     // ===================================================================================
     //                                                                 Loading Control Map
     //                                                                 ===================
-    protected Map<String, Object> findLoadingControlMap(String dataDirectory) {
+    protected Map<String, Object> findLoadingControlMap(String dataDirectory) { // not null, empty allowed
         final Map<String, Object> cachedMap = _loadingControlMapMap.get(dataDirectory);
         if (cachedMap != null) {
             return cachedMap;
         }
         final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         final String path = dataDirectory + "/" + LOADING_CONTROL_MAP_NAME;
-        final Map<String, Object> resultMap = reader.readMap(path);
+        final Map<String, Object> datapropPlainMap = reader.readMap(path); // empty allowed if not found
         final Map<String, Object> analyzedMap = new LinkedHashMap<String, Object>();
-        if (resultMap != null && !resultMap.isEmpty()) {
-            analyzeLoadingControlMap(dataDirectory, resultMap, analyzedMap);
+        if (datapropPlainMap != null && !datapropPlainMap.isEmpty()) {
+            analyzeLoadingControlMap(dataDirectory, datapropPlainMap, analyzedMap);
         }
         _loadingControlMapMap.put(dataDirectory, analyzedMap);
         return _loadingControlMapMap.get(dataDirectory);
     }
 
-    protected void analyzeLoadingControlMap(String dataDirectory, Map<String, Object> resultMap, Map<String, Object> analyzedMap) {
+    protected void analyzeLoadingControlMap(String dataDirectory, Map<String, Object> datapropPlainMap, Map<String, Object> analyzedMap) {
         if (_log.isInfoEnabled()) {
             _log.info("...Analyzing loadingControlMap:");
         }
-        for (Entry<String, Object> entry : resultMap.entrySet()) {
-            final String key = entry.getKey();
-            final Object value = entry.getValue();
-            if (PROP_DATE_ADJUSTMENT_MAP.equals(key)) {
-                analyzeDateAdjustmentMap(dataDirectory, analyzedMap, key, value);
-            } else if (PROP_LARGE_TEXT_FILE_MAP.equals(key)) {
-                analyzeLargeTextFileMap(dataDirectory, analyzedMap, key, value);
+        for (Entry<String, Object> datapropPlainEntry : datapropPlainMap.entrySet()) {
+            final String datapropPlainKey = datapropPlainEntry.getKey();
+            final Object datapropPlainValue = datapropPlainEntry.getValue();
+            if (PROP_DATE_ADJUSTMENT_MAP.equals(datapropPlainKey)) {
+                analyzeDateAdjustmentMap(dataDirectory, analyzedMap, datapropPlainKey, datapropPlainValue);
+            } else if (PROP_LARGE_TEXT_FILE_MAP.equals(datapropPlainKey)) {
+                analyzeLargeTextFileMap(dataDirectory, analyzedMap, datapropPlainKey, datapropPlainValue);
             } else {
-                analyzedMap.put(key, value);
+                analyzedMap.put(datapropPlainKey, datapropPlainValue);
             }
         }
         showLoadingControlMap(analyzedMap);
     }
 
-    protected void analyzeDateAdjustmentMap(String dataDirectory, Map<String, Object> analyzedMap, String key, Object value) {
-        // ; df:originDate = 2013/03/09
-        // ; $$ALL$$ = addDay($distance)
-        // ; MEMBER = map:{
-        //     ; BIRTHDATE = addDay(6)
-        // }
-        final Map<String, Object> flTableMap = StringKeyMap.createAsFlexibleOrdered();
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> elementTableMap = (Map<String, Object>) value;
-        for (Entry<String, Object> elementTableEntry : elementTableMap.entrySet()) {
-            final String tableName = elementTableEntry.getKey();
-            final Object elementTableValue = elementTableEntry.getValue();
-            final Object registeredTableValue;
-            if (elementTableValue != null) {
-                if (KEY_ORIGIN_DATE.equalsIgnoreCase(tableName)) {
-                    final String originExp = elementTableValue.toString();
-                    final HandyDate originDate;
-                    try {
-                        originDate = new HandyDate(originExp);
-                    } catch (ParseDateExpressionFailureException e) {
-                        throwLoadingControlOriginDateParseFailureException(dataDirectory, originExp, e);
-                        return; // unreachable
-                    }
-                    final java.util.Date currentDate = DBFluteSystem.currentDate();
-                    registeredTableValue = originDate.getDate();
-                    flTableMap.put(KEY_DISTANCE_YEARS, originDate.calculateCalendarDistanceYears(currentDate));
-                    flTableMap.put(KEY_DISTANCE_MONTHS, originDate.calculateCalendarDistanceMonths(currentDate));
-                    flTableMap.put(KEY_DISTANCE_DAYS, originDate.calculateCalendarDistanceDays(currentDate));
-                } else if (KEY_MILLIS_COLUMN_LIST.equalsIgnoreCase(tableName)) {
-                    registeredTableValue = elementTableValue; // not need filter
-                } else {
-                    @SuppressWarnings("unchecked")
-                    final Map<String, Object> elementColumnMap = (Map<String, Object>) elementTableValue;
-                    final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexibleOrdered();
-                    flColumnMap.putAll(elementColumnMap);
-                    registeredTableValue = flColumnMap;
-                }
-            } else {
-                registeredTableValue = null;
-            }
-            flTableMap.put(tableName, registeredTableValue);
-        }
-        analyzedMap.put(key, flTableMap);
+    // -----------------------------------------------------
+    //                                       Date Adjustment
+    //                                       ---------------
+    protected void analyzeDateAdjustmentMap(String dataDirectory, Map<String, Object> analyzedMap, String datapropPlainKey,
+            Object datapropPlainValue) {
+        final Map<String, Object> dateAdjustmentMap = _dateAdjustmentPreparer.prepareDateAdjustmentMap(dataDirectory, datapropPlainValue);
+        analyzedMap.put(datapropPlainKey, dateAdjustmentMap);
     }
 
-    protected void throwLoadingControlOriginDateParseFailureException(String dataDirectory, String value,
-            ParseDateExpressionFailureException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to parse the value of the origin date.");
-        br.addItem("Advcei");
-        br.addElement("Make sure your origin date in the loadingControlMap.dataprop.");
-        br.addElement("The date expression should be e.g. 'yyyy/MM/dd HH:mm:ss.SSS'.");
-        br.addItem("Data Directory");
-        br.addElement(dataDirectory);
-        br.addItem("Column Value");
-        br.addElement(value);
-        final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataRegistrationFailureException(msg, e);
-    }
-
+    // -----------------------------------------------------
+    //                                       Large Text File
+    //                                       ---------------
     protected void analyzeLargeTextFileMap(String dataDirectory, Map<String, Object> analyzedMap, String key, Object value) {
         // ; $$ALL$$ = list:{suffix:_TEXT}
         // ; MEMBER = list:{MEMBER_NAME}
@@ -690,6 +363,9 @@ public class DfLoadingControlProp {
         analyzedMap.put(key, flTableMap);
     }
 
+    // -----------------------------------------------------
+    //                                      Logging Analyzed
+    //                                      ----------------
     protected void showLoadingControlMap(Map<String, Object> analyzedMap) {
         if (!_log.isInfoEnabled()) {
             return;
