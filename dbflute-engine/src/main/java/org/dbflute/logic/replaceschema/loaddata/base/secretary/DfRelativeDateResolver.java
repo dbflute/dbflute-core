@@ -41,11 +41,11 @@ public class DfRelativeDateResolver {
     public static final String RESOLVED_PATTERN = "yyyy/MM/dd HH:mm:ss.SSS";
     private static final Date LIMIT_DATE = new HandyDate("8999/12/31").getDate();
 
-    public String resolveRelativeDate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, Date date) {
+    public String resolveRelativeDate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, Date resourceDate) {
         // addDay(1)
         // addDay(1).moveToDayJust()
         // addMonth(3).moveToMonthTerminal()
-        return doResolveRelativeDate(schemaTable, columnName, relativeDate, date);
+        return doResolveRelativeDate(schemaTable, columnName, relativeDate, resourceDate);
     }
 
     public String resolveRelativeSysdate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate) {
@@ -63,13 +63,13 @@ public class DfRelativeDateResolver {
         return doResolveRelativeDate(schemaTable, columnName, calcPart, currentDate);
     }
 
-    protected String doResolveRelativeDate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, Date date) {
+    protected String doResolveRelativeDate(DfLoadedSchemaTable schemaTable, String columnName, String relativeDate, Date resourceDate) {
         final String calcPart = relativeDate.trim();
-        if (calcPart.trim().length() == 0 || date.after(LIMIT_DATE)) {
-            return DfTypeUtil.toString(date, RESOLVED_PATTERN);
+        if (calcPart.trim().length() == 0 || resourceDate.after(LIMIT_DATE)) {
+            return DfTypeUtil.toString(resourceDate, RESOLVED_PATTERN);
         }
         final List<String> methodList = Srl.splitListTrimmed(Srl.trim(calcPart, "."), ".");
-        HandyDate handyDate = new HandyDate(date);
+        HandyDate handyDate = new HandyDate(resourceDate);
         for (String methodCall : methodList) {
             handyDate = invokeMethod(schemaTable, columnName, relativeDate, handyDate, methodCall);
         }
