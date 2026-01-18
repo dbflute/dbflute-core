@@ -108,7 +108,31 @@ public class DfLReverseOriginDateSynchronizer {
         throw new IllegalStateException(msg, e);
     }
 
+    protected void throwSynchronizedOriginDateNotFoundException(File mapFile, String mapString) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the origin date in loading control map (so cannot synchronize).");
+        br.addItem("Advice");
+        br.addElement("The origin date in the loadingControlMap.dataprop should exist");
+        br.addElement("if synchronization of origin date is valid for LoadDataReverse.");
+        br.addItem("Map File");
+        br.addElement(mapFile);
+        br.addItem("Map String");
+        br.addElement(mapString);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                     OriginDate Line
+    //                                                                     ===============
     protected boolean handleOriginDateSyncLine(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
+        return filterOriginDateAsRoot(mapFile, sb, line, resultSb);
+    }
+
+    // -----------------------------------------------------
+    //                                    OriginDate as Root
+    //                                    ------------------
+    protected boolean filterOriginDateAsRoot(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
         final String keyOriginDate = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
         boolean handled = false;
         if (!line.trim().startsWith("#") && line.contains(keyOriginDate)) {
@@ -124,8 +148,7 @@ public class DfLReverseOriginDateSynchronizer {
                 throwLoadingControlMapOriginDateParseFailureException(mapFile, line);
             }
             // can be synchronized here
-            final Date currentDate = DBFluteSystem.currentDate();
-            final String newDateExp = new HandyDate(currentDate).toDisp("yyyy/MM/dd");
+            final String newDateExp = prepareNewOriginDateExp();
             sb.append(frontStr).append(keyOriginDate).append(" = ").append(newDateExp);
             sb.append(lastRearStr);
             handled = true;
@@ -159,18 +182,12 @@ public class DfLReverseOriginDateSynchronizer {
         throw new IllegalStateException(msg);
     }
 
-    protected void throwSynchronizedOriginDateNotFoundException(File mapFile, String mapString) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the origin date in loading control map (so cannot synchronize).");
-        br.addItem("Advice");
-        br.addElement("The origin date in the loadingControlMap.dataprop should exist");
-        br.addElement("if synchronization of origin date is valid for LoadDataReverse.");
-        br.addItem("Map File");
-        br.addElement(mapFile);
-        br.addItem("Map String");
-        br.addElement(mapString);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+    // -----------------------------------------------------
+    //                                        New OriginDate
+    //                                        --------------
+    protected String prepareNewOriginDateExp() {
+        final Date currentDate = DBFluteSystem.currentDate();
+        return new HandyDate(currentDate).toDisp("yyyy/MM/dd");
     }
 
     // ===================================================================================
