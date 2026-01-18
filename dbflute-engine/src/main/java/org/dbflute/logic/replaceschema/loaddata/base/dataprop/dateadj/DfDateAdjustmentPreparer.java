@@ -92,7 +92,7 @@ public class DfDateAdjustmentPreparer {
         } else if (KEY_MILLIS_COLUMN_LIST.equalsIgnoreCase(rootLayerKey)) { // e.g. df:millisColumnList = list:{ LOGIN_MILLIS }
             filteredValue = handleMillisColumnList(dataDirectory, rootLayerValue);
         } else { // e.g. ; MEMBER = map:{ BIRTHDATE = addDay(6) }
-            filteredValue = handleTableColumnAdjustmentExp(dataDirectory, rootLayerValue);
+            filteredValue = handleColumnAdjustmentExp(dataDirectory, rootLayerValue);
         }
         return filteredValue;
     }
@@ -145,9 +145,12 @@ public class DfDateAdjustmentPreparer {
     // ===================================================================================
     //                                                               Adjustment Expression
     //                                                               =====================
-    protected Object handleTableColumnAdjustmentExp(String dataDirectory, Object rootLayerValue) {
+    protected Object handleColumnAdjustmentExp(String dataDirectory, Object rootLayerValue) {
+        // e.g. map:{ BIRTHDATE = addDay(6) }
         @SuppressWarnings("unchecked")
         final Map<String, Object> elementColumnMap = (Map<String, Object>) rootLayerValue;
+
+        // to be flexible as column name key
         final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexibleOrdered();
         flColumnMap.putAll(elementColumnMap);
         return flColumnMap;
