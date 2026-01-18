@@ -42,8 +42,8 @@ public class DfDateAdjustmentPreparer {
     public static final String KEY_DISTANCE_DAYS = "df:distanceDays";
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
+    //                                                                             Prepare
+    //                                                                             =======
     public Map<String, Object> prepareDateAdjustmentMap(String dataDirectory, Object datapropPlainValue) {
         // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // ; df:originDate = 2013/03/09
@@ -75,37 +75,49 @@ public class DfDateAdjustmentPreparer {
             final Object rootLayerValue = plainDateAdjEntry.getValue(); // variety as key
             final Object filteredValue;
             if (rootLayerValue != null) {
-                if (KEY_ORIGIN_DATE.equalsIgnoreCase(rootLayerKey)) { // e.g. df:originDate = 2026/01/16
-                    final String originExp = rootLayerValue.toString();
-                    final HandyDate originDate;
-                    try {
-                        originDate = new HandyDate(originExp);
-                    } catch (ParseDateExpressionFailureException e) {
-                        throwLoadingControlOriginDateParseFailureException(dataDirectory, originExp, e);
-                        return null; // unreachable
-                    }
-                    final java.util.Date currentDate = DBFluteSystem.currentDate();
-                    filteredValue = originDate.getDate();
-
-                    // derive distances in advance
-                    flexibleDateAdjMap.put(KEY_DISTANCE_YEARS, originDate.calculateCalendarDistanceYears(currentDate));
-                    flexibleDateAdjMap.put(KEY_DISTANCE_MONTHS, originDate.calculateCalendarDistanceMonths(currentDate));
-                    flexibleDateAdjMap.put(KEY_DISTANCE_DAYS, originDate.calculateCalendarDistanceDays(currentDate));
-                } else if (KEY_MILLIS_COLUMN_LIST.equalsIgnoreCase(rootLayerKey)) {
-                    filteredValue = rootLayerValue; // not need filter
-                } else {
-                    @SuppressWarnings("unchecked")
-                    final Map<String, Object> elementColumnMap = (Map<String, Object>) rootLayerValue;
-                    final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexibleOrdered();
-                    flColumnMap.putAll(elementColumnMap);
-                    filteredValue = flColumnMap;
-                }
+                filteredValue = resolveRootLayerValue(dataDirectory, flexibleDateAdjMap, rootLayerKey, rootLayerValue);
             } else {
                 filteredValue = null;
             }
             flexibleDateAdjMap.put(rootLayerKey, filteredValue);
         }
         return flexibleDateAdjMap;
+    }
+
+    protected Object resolveRootLayerValue(String dataDirectory, Map<String, Object> flexibleDateAdjMap //
+            , String rootLayerKey, Object rootLayerValue) { // value is not null here
+        final Object filteredValue;
+        if (KEY_ORIGIN_DATE.equalsIgnoreCase(rootLayerKey)) { // e.g. df:originDate = 2026/01/16
+            filteredValue = handleOriginDate(dataDirectory, rootLayerValue, flexibleDateAdjMap);
+        } else if (KEY_MILLIS_COLUMN_LIST.equalsIgnoreCase(rootLayerKey)) { // e.g. df:millisColumnList = list:{ LOGIN_MILLIS }
+            filteredValue = handleMillisColumnList(dataDirectory, rootLayerValue);
+        } else { // e.g. ; MEMBER = map:{ BIRTHDATE = addDay(6) }
+            filteredValue = handleTableColumnAdjustmentExp(dataDirectory, rootLayerValue);
+        }
+        return filteredValue;
+    }
+
+    // ===================================================================================
+    //                                                                         Origin Date
+    //                                                                         ===========
+    protected java.util.Date handleOriginDate(String dataDirectory, Object rootLayerValue, Map<String, Object> flexibleDateAdjMap) {
+        final String originExp = rootLayerValue.toString();
+        final HandyDate originDate;
+        try {
+            originDate = new HandyDate(originExp);
+        } catch (ParseDateExpressionFailureException e) {
+            throwLoadingControlOriginDateParseFailureException(dataDirectory, originExp, e);
+            return null; // unreachable
+        }
+        final java.util.Date filteredValue = originDate.getDate();
+
+        // derive distances in advance (pre-calculation)
+        final java.util.Date currentDate = DBFluteSystem.currentDate();
+        flexibleDateAdjMap.put(KEY_DISTANCE_YEARS, originDate.calculateCalendarDistanceYears(currentDate));
+        flexibleDateAdjMap.put(KEY_DISTANCE_MONTHS, originDate.calculateCalendarDistanceMonths(currentDate));
+        flexibleDateAdjMap.put(KEY_DISTANCE_DAYS, originDate.calculateCalendarDistanceDays(currentDate));
+
+        return filteredValue;
     }
 
     protected void throwLoadingControlOriginDateParseFailureException(String dataDirectory, String value,
@@ -121,5 +133,23 @@ public class DfDateAdjustmentPreparer {
         br.addElement(value);
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg, e);
+    }
+
+    // ===================================================================================
+    //                                                                       Millis Column
+    //                                                                       =============
+    protected Object handleMillisColumnList(String dataDirectory, Object rootLayerValue) {
+        return rootLayerValue; // not need filter
+    }
+
+    // ===================================================================================
+    //                                                               Adjustment Expression
+    //                                                               =====================
+    protected Object handleTableColumnAdjustmentExp(String dataDirectory, Object rootLayerValue) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> elementColumnMap = (Map<String, Object>) rootLayerValue;
+        final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexibleOrdered();
+        flColumnMap.putAll(elementColumnMap);
+        return flColumnMap;
     }
 }

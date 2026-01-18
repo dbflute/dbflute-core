@@ -325,7 +325,10 @@ public class DfDateAdjustmentRowExecutor {
     //                                                                     Filter Distance
     //                                                                     ===============
     protected String filterDistanceOnAdjustmentExp(String adjustmentExp, Map<String, Object> dateAdjustmentMap) {
-        String filtered = adjustmentExp;
+        return doFilterNormalDistance(dateAdjustmentMap, adjustmentExp);
+    }
+
+    protected String doFilterNormalDistance(Map<String, Object> dateAdjustmentMap, String filtered) {
         final Integer years = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_YEARS);
         if (years != null) {
             filtered = Srl.replace(filtered, "addYear($distance)", "addYear(" + years + ")");
