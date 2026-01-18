@@ -325,21 +325,21 @@ public class DfDateAdjustmentRowExecutor {
     //                                                                     Filter Distance
     //                                                                     ===============
     protected String filterDistanceOnAdjustmentExp(String adjustmentExp, Map<String, Object> dateAdjustmentMap) {
-        return doFilterNormalDistance(dateAdjustmentMap, adjustmentExp);
+        final Integer years = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_YEARS); // null allowed
+        final Integer months = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_MONTHS); // me too
+        final Integer days = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_DAYS); // me too
+        return evaluateDistance(years, months, days, adjustmentExp);
     }
 
-    protected String doFilterNormalDistance(Map<String, Object> dateAdjustmentMap, String filtered) {
-        final Integer years = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_YEARS);
+    protected String evaluateDistance(Integer years, Integer months, Integer days, String filtered) {
         if (years != null) {
             filtered = Srl.replace(filtered, "addYear($distance)", "addYear(" + years + ")");
             filtered = Srl.replace(filtered, "$distanceYears", years.toString());
         }
-        final Integer months = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_MONTHS);
         if (months != null) {
             filtered = Srl.replace(filtered, "addMonth($distance)", "addMonth(" + months + ")");
             filtered = Srl.replace(filtered, "$distanceMonths", months.toString());
         }
-        final Integer days = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_DAYS);
         if (days != null) {
             filtered = Srl.replace(filtered, "addDay($distance)", "addDay(" + days + ")");
             filtered = Srl.replace(filtered, "$distanceDays", days.toString());
