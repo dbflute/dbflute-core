@@ -31,13 +31,13 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.base.DfLoadedSchemaTable;
 import org.dbflute.logic.replaceschema.loaddata.base.dataprop.DfLoadingControlProp;
+import org.dbflute.logic.replaceschema.loaddata.base.dataprop.dateadj.origindate.DfDateAdjustmentOriginDateDistanceFilter;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.base.secretary.DfRelativeDateResolver;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.DfTypeUtil.ParseDateException;
-import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -93,7 +93,7 @@ public class DfDateAdjustmentRowExecutor {
             if (isSysdateColumn(sysdateColumnSet, columnName)) { // keep sysdate as default value
                 continue;
             }
-            final Object columnValue = entry.getValue();
+            final Object columnValue = entry.getValue(); // may be string basis
             if (columnValue == null) {
                 continue;
             }
@@ -119,7 +119,7 @@ public class DfDateAdjustmentRowExecutor {
             // _/_/_/_/_/_/_/_/_/_/
             //  Adjust Date here !
             // _/_/_/_/
-            final String adjustedDateExp = adjustDateIfNeeds(columnName, resourceDateExp, rowNumber);
+            final String adjustedDateExp = adjustDateIfNeeds(columnValueMap, columnMetaMap, columnName, resourceDateExp, rowNumber);
 
             final Object finalDate = convertAdjustedValueToDateType(columnName, bindType, adjustedDateExp);
             resolvedMap.put(columnName, finalDate);
@@ -278,7 +278,8 @@ public class DfDateAdjustmentRowExecutor {
     // ===================================================================================
     //                                                                         Adjust Date
     //                                                                         ===========
-    protected String adjustDateIfNeeds(String columnName, String resourceDateExp, int rowNumber) {
+    protected String adjustDateIfNeeds(Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap, String columnName,
+            String resourceDateExp, int rowNumber) {
         if (resourceDateExp == null || resourceDateExp.trim().length() == 0) { // basically no way (already checked)
             return resourceDateExp;
         }
@@ -297,7 +298,8 @@ public class DfDateAdjustmentRowExecutor {
             throwLoadingControlColumnValueParseFailureException(adjustmentExp, columnName, resourceDateExp, rowNumber, e);
             return null; // unreachable
         }
-        final String filteredExp = filterDistanceOnAdjustmentExp(adjustmentExp, dateAdjustmentMap);
+        final String filteredExp = filterDistanceOnAdjustmentExp(columnValueMap, columnMetaMap //
+                , columnName, adjustmentExp, dateAdjustmentMap);
         return _relativeDateResolver.resolveRelativeDate(_schemaTable, columnName, filteredExp, resourceDate);
     }
 
@@ -324,27 +326,15 @@ public class DfDateAdjustmentRowExecutor {
     // ===================================================================================
     //                                                                     Filter Distance
     //                                                                     ===============
-    protected String filterDistanceOnAdjustmentExp(String adjustmentExp, Map<String, Object> dateAdjustmentMap) {
-        final Integer years = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_YEARS); // null allowed
-        final Integer months = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_MONTHS); // me too
-        final Integer days = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_DAYS); // me too
-        return evaluateDistance(years, months, days, adjustmentExp);
+    protected String filterDistanceOnAdjustmentExp(Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap,
+            String columnName, String adjustmentExp, Map<String, Object> dateAdjustmentMap) {
+        final DfDateAdjustmentOriginDateDistanceFilter distanceFilter = createOriginDateDistanceFilter(columnValueMap, columnMetaMap);
+        return distanceFilter.filterDistanceOnAdjustmentExp(columnName, adjustmentExp, dateAdjustmentMap);
     }
 
-    protected String evaluateDistance(Integer years, Integer months, Integer days, String filtered) {
-        if (years != null) {
-            filtered = Srl.replace(filtered, "addYear($distance)", "addYear(" + years + ")");
-            filtered = Srl.replace(filtered, "$distanceYears", years.toString());
-        }
-        if (months != null) {
-            filtered = Srl.replace(filtered, "addMonth($distance)", "addMonth(" + months + ")");
-            filtered = Srl.replace(filtered, "$distanceMonths", months.toString());
-        }
-        if (days != null) {
-            filtered = Srl.replace(filtered, "addDay($distance)", "addDay(" + days + ")");
-            filtered = Srl.replace(filtered, "$distanceDays", days.toString());
-        }
-        return filtered;
+    protected DfDateAdjustmentOriginDateDistanceFilter createOriginDateDistanceFilter(Map<String, Object> columnValueMap,
+            Map<String, DfColumnMeta> columnMetaMap) {
+        return new DfDateAdjustmentOriginDateDistanceFilter(_dataDirectory, _schemaTable, columnValueMap, columnMetaMap);
     }
 
     // ===================================================================================

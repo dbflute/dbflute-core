@@ -462,6 +462,9 @@ public class TypeMap {
         return defValue;
     }
 
+    // -----------------------------------------------------
+    //                                      JDBC Type String
+    //                                      ----------------
     public static boolean isJdbcTypeChar(String jdbcType) {
         return CHAR.equals(jdbcType);
     }
@@ -470,6 +473,16 @@ public class TypeMap {
         return CLOB.equals(jdbcType);
     }
 
+    // -----------------------------------------------------
+    //                                      JDBC Type Number
+    //                                      ----------------
+    public static boolean isJdbcTypeIntegerFamily(String jdbcType) { // except decimal
+        return TINYINT.equals(jdbcType) || SMALLINT.equals(jdbcType) || INTEGER.equals(jdbcType) || BIGINT.equals(jdbcType);
+    }
+
+    // -----------------------------------------------------
+    //                                    JDBC Type DateTime
+    //                                    ------------------
     public static boolean isJdbcTypeDate(String jdbcType) {
         return DATE.equals(jdbcType);
     }
@@ -482,6 +495,17 @@ public class TypeMap {
         return TIME.equals(jdbcType);
     }
 
+    public static boolean isJdbcTypeDatePartFamily(String jdbcType) { // except time
+        return DATE.equals(jdbcType) || TIMESTAMP.equals(jdbcType);
+    }
+
+    public static boolean isJdbcTypeTimePartFamily(String jdbcType) { // except date
+        return TIMESTAMP.equals(jdbcType) || TIME.equals(jdbcType);
+    }
+
+    // -----------------------------------------------------
+    //                                       JDBC Type Other
+    //                                       ---------------
     public static boolean isJdbcTypeBlob(String jdbcType) {
         return BLOB.equals(jdbcType);
     }

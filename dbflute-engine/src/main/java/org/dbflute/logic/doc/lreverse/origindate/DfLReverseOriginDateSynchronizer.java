@@ -126,6 +126,7 @@ public class DfLReverseOriginDateSynchronizer {
     //                                                                     OriginDate Line
     //                                                                     ===============
     protected boolean handleOriginDateSyncLine(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
+        // TODO jflute myOriginDate (2026/01/21)
         return filterOriginDateAsRoot(mapFile, sb, line, resultSb);
     }
 

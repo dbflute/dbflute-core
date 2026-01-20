@@ -15,6 +15,8 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.base.dataprop.dateadj;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,8 +24,11 @@ import org.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.dbflute.exception.ParseDateExpressionFailureException;
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.dfmap.DfMapStyle;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -92,7 +97,7 @@ public class DfDateAdjustmentPreparer {
         } else if (KEY_MILLIS_COLUMN_LIST.equalsIgnoreCase(rootLayerKey)) { // e.g. df:millisColumnList = list:{ LOGIN_MILLIS }
             filteredValue = handleMillisColumnList(dataDirectory, rootLayerValue);
         } else { // e.g. ; MEMBER = map:{ BIRTHDATE = addDay(6) }
-            filteredValue = handleColumnAdjustmentExp(dataDirectory, rootLayerValue);
+            filteredValue = handleColumnAdjustmentExp(dataDirectory, rootLayerKey, rootLayerValue);
         }
         return filteredValue;
     }
@@ -120,7 +125,7 @@ public class DfDateAdjustmentPreparer {
         return filteredValue;
     }
 
-    protected void throwLoadingControlOriginDateParseFailureException(String dataDirectory, String value,
+    protected void throwLoadingControlOriginDateParseFailureException(String dataDirectory, String originExp,
             ParseDateExpressionFailureException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the value of the origin date.");
@@ -129,8 +134,8 @@ public class DfDateAdjustmentPreparer {
         br.addElement("The date expression should be e.g. 'yyyy/MM/dd HH:mm:ss.SSS'.");
         br.addItem("Data Directory");
         br.addElement(dataDirectory);
-        br.addItem("Column Value");
-        br.addElement(value);
+        br.addItem("OriginDate Expression");
+        br.addElement(originExp);
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg, e);
     }
@@ -145,7 +150,7 @@ public class DfDateAdjustmentPreparer {
     // ===================================================================================
     //                                                               Adjustment Expression
     //                                                               =====================
-    protected Object handleColumnAdjustmentExp(String dataDirectory, Object rootLayerValue) {
+    protected Object handleColumnAdjustmentExp(String dataDirectory, String rootLayerKey, Object rootLayerValue) {
         // e.g. map:{ BIRTHDATE = addDay(6) }
         @SuppressWarnings("unchecked")
         final Map<String, Object> elementColumnMap = (Map<String, Object>) rootLayerValue;
@@ -153,6 +158,87 @@ public class DfDateAdjustmentPreparer {
         // to be flexible as column name key
         final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexibleOrdered();
         flColumnMap.putAll(elementColumnMap);
+
+        // e.g.
+        // ; SEA    = addDay($distanceDays) df:myOriginDate(2026/01/10)
+        // ; HANGAR = addDay($distanceDays) df:myOriginDate(2026/01/13, where pk from 1 to 10)
+        // ; MYSTIC = addDay($distanceDays) df:myOriginDate(2026/01/10, where pk from 1 to 2)
+        //                                  df:myOriginDate(2026/01/08, where pk from 4 to 5)
+        //                                  df:myOriginDate(2026/01/06)
+        //                                                 vvv
+        // ; SEA    = addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=8})
+        // ; HANGAR = addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=5}, where pk from 1 to 10)
+        // ; MYSTIC = addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=8}, where pk from 1 to 2)
+        //                                  df:myOriginDate(map:{years=0;months=0;days=10}, where pk from 4 to 5)
+        //                                  df:myOriginDate(map:{years=0;months=0;days=12})
+        for (Entry<String, Object> entry : flColumnMap.entrySet()) {
+            final String columnName = (String) entry.getKey();
+            final String adjustmentExp = (String) entry.getValue();
+            final String myOriginBegin = "df:myOriginDate(";
+            final String myOriginEnd = ")";
+
+            String filteredExp = adjustmentExp;
+            if (adjustmentExp.contains(myOriginBegin)) { // e.g. addDay($distanceDays) df:myOriginDate(2026/01/10)
+                final List<ScopeInfo> scopeList = Srl.extractScopeList(adjustmentExp, myOriginBegin, myOriginEnd);
+                for (ScopeInfo scopeInfo : scopeList) {
+                    String content = scopeInfo.getContent(); // e.g. 2026/01/13 || 2026/01/13, where pk from 1 to 10
+                    String myOriginExp = Srl.substringFirstFront(content, ","); // e.g. 2026/01/13
+                    final HandyDate originDate;
+                    try {
+                        originDate = new HandyDate(myOriginExp.trim()); // trim here to keep spaces to be fromStr
+                    } catch (ParseDateExpressionFailureException e) {
+                        throwLoadingControlMyOriginDateParseFailureException(dataDirectory, rootLayerKey, columnName, adjustmentExp,
+                                myOriginExp, e);
+                        return null; // unreachable
+                    }
+                    final String distanceExp = deriveMyOriginDistanceExp(originDate); // e.g. map:{years=0;months=0;days=5}
+                    filteredExp = switchOriginDateToDistance(myOriginBegin, filteredExp, myOriginExp, distanceExp);
+                }
+            }
+            flColumnMap.put(columnName, filteredExp); // replace
+        }
         return flColumnMap;
+    }
+
+    protected String deriveMyOriginDistanceExp(HandyDate originDate) {
+        final Map<String, Object> distanceMap = new LinkedHashMap<>();
+        final java.util.Date currentDate = DBFluteSystem.currentDate();
+        distanceMap.put("years", originDate.calculateCalendarDistanceYears(currentDate));
+        distanceMap.put("months", originDate.calculateCalendarDistanceMonths(currentDate));
+        distanceMap.put("days", originDate.calculateCalendarDistanceDays(currentDate));
+        return new DfMapStyle().toMapString(distanceMap); // e.g. map:{years=0;months=0;days=5}
+    }
+
+    protected String switchOriginDateToDistance(String myOriginBegin, String filteredExp, String myOriginExp, String distanceExp) {
+        final String fromStr = myOriginBegin + myOriginExp; // e.g. df:myOriginDate(2026/01/13
+        final String toStr = myOriginBegin + distanceExp; // e.g. df:myOriginDate(map:{years=0;months=0;days=5}
+        return Srl.replace(filteredExp, fromStr, toStr); // e.g. addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=5})
+    }
+
+    // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
+    protected void throwLoadingControlMyOriginDateParseFailureException(String dataDirectory, String rootLayerKey, String columnName,
+            String adjustmentExp, String myOriginExp, ParseDateExpressionFailureException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse the value of the origin date.");
+        br.addItem("Advcei");
+        br.addElement("Make sure your origin date in the loadingControlMap.dataprop.");
+        br.addElement("The date expression should be e.g. 'yyyy/MM/dd HH:mm:ss.SSS'.");
+        br.addElement("For example:");
+        br.addElement("  (x): df:myOriginDate(2026@01+13, where pk from 1 to 10)");
+        br.addElement("  (o): df:myOriginDate(2026/01/13, where pk from 1 to 10)");
+        br.addItem("Data Directory");
+        br.addElement(dataDirectory);
+        br.addItem("Table Name");
+        br.addElement(rootLayerKey);
+        br.addItem("Columm Name");
+        br.addElement(columnName);
+        br.addItem("DateAdjustment Expression");
+        br.addElement(adjustmentExp);
+        br.addItem("MyOriginDate Expression");
+        br.addElement(myOriginExp);
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg, e);
     }
 }

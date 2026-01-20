@@ -59,16 +59,6 @@ public class DfLoadingControlProp {
     public static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
     public static final String PROP_LARGE_TEXT_FILE_MAP = "largeTextFileMap";
 
-    // -----------------------------------------------------
-    //                                       Date Adjustment
-    //                                       ---------------
-    protected static final String KEY_ORIGIN_DATE = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
-    protected static final String KEY_MILLIS_COLUMN_LIST = DfDateAdjustmentPreparer.KEY_MILLIS_COLUMN_LIST;
-    protected static final String KEY_DATE_ADJ_ALL_MARK = DfDateAdjustmentPreparer.KEY_ALL_MARK;
-    protected static final String KEY_DISTANCE_YEARS = DfDateAdjustmentPreparer.KEY_DISTANCE_YEARS;
-    protected static final String KEY_DISTANCE_MONTHS = DfDateAdjustmentPreparer.KEY_DISTANCE_MONTHS;
-    protected static final String KEY_DISTANCE_DAYS = DfDateAdjustmentPreparer.KEY_DISTANCE_DAYS;
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
