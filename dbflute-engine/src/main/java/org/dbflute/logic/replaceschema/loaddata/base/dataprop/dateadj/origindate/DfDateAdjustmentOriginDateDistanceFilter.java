@@ -68,11 +68,13 @@ public class DfDateAdjustmentOriginDateDistanceFilter {
     //                                                                     Filter Distance
     //                                                                     ===============
     public String filterDistanceOnAdjustmentExp(String columnName, String adjustmentExp, Map<String, Object> dateAdjustmentMap) {
+        if (!hasDistanceVariable(adjustmentExp)) {
+            return adjustmentExp; // no related
+        }
         Integer years = null;
         Integer months = null;
         Integer days = null;
-        String havingDistanceExp = null;
-        boolean myOriginValid = false;
+        final boolean useRootOrigin;
         if (adjustmentExp.contains("df:myOriginDate(")) { // @since 1.3.2
             // e.g.
             // ; SEA    = addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=8})
@@ -80,26 +82,42 @@ public class DfDateAdjustmentOriginDateDistanceFilter {
             // ; MYSTIC = addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=8}, where MEMBER_ID from 1 to 2)
             //                                  df:myOriginDate(map:{years=0;months=0;days=10}, where MEMBER_ID from 4 to 5)
             //                                  df:myOriginDate(map:{years=0;months=0;days=12})
+            //                                  df:useRootOriginIfNoHit()
             final Map<String, String> distanceMap = deriveMyOriginDateDistanceMap(adjustmentExp);
             if (distanceMap != null) { // hit by where
                 years = Integer.valueOf(distanceMap.get("years")); // always integer, not null
                 months = Integer.valueOf(distanceMap.get("months")); // me too
                 days = Integer.valueOf(distanceMap.get("days")); // me too
-                havingDistanceExp = Srl.substringFirstFront(adjustmentExp, "df:").trim(); // not null
-                myOriginValid = true;
+                useRootOrigin = false;
+            } else { // no hit
+                if (adjustmentExp.contains("df:useRootOriginIfNoHit()")) {
+                    useRootOrigin = true;
+                } else { // no distance
+                    years = 0;
+                    months = 0;
+                    days = 0;
+                    useRootOrigin = false;
+                }
             }
+        } else { // as root origin
+            useRootOrigin = true;
         }
-        if (!myOriginValid) { // uses root originDate
+        if (useRootOrigin) {
             years = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_YEARS); // null allowed
             months = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_MONTHS); // me too
             days = (Integer) dateAdjustmentMap.get(KEY_DISTANCE_DAYS); // me too
-            havingDistanceExp = adjustmentExp; // not null
         }
-        if (havingDistanceExp == null) { // framework debug
-            String msg = "No way, havingDistanceExp was null: " + _dataDirectory + ", " + columnName + ", " + adjustmentExp;
-            throw new IllegalStateException(msg);
-        }
+        final String havingDistanceExp = extractHavingDistanceExp(adjustmentExp); // not null
         return evaluateDistance(years, months, days, havingDistanceExp);
+    }
+
+    protected boolean hasDistanceVariable(String adjustmentExp) {
+        return adjustmentExp.contains("$distance"); // e.g. $distance, $distanceDays, ...
+    }
+
+    protected String extractHavingDistanceExp(String adjustmentExp) { // without "df:" option
+        // e.g. addDay($distanceDays) df:myOriginDate(map:{years=0;months=0;days=8})
+        return Srl.substringFirstFront(adjustmentExp, "df:").trim();
     }
 
     protected String evaluateDistance(Integer years, Integer months, Integer days, String filtered) {
