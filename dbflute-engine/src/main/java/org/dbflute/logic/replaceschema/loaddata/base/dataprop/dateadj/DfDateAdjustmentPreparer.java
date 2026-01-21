@@ -46,6 +46,9 @@ public class DfDateAdjustmentPreparer {
     public static final String KEY_DISTANCE_MONTHS = "df:distanceMonths";
     public static final String KEY_DISTANCE_DAYS = "df:distanceDays";
 
+    public static final String MY_ORIGIN_DATE_BEGIN = "df:myOriginDate(";
+    public static final String MY_ORIGIN_DATE_END = ")";
+
     // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
@@ -174,8 +177,8 @@ public class DfDateAdjustmentPreparer {
         for (Entry<String, Object> entry : flColumnMap.entrySet()) {
             final String columnName = (String) entry.getKey();
             final String adjustmentExp = (String) entry.getValue();
-            final String myOriginBegin = "df:myOriginDate(";
-            final String myOriginEnd = ")";
+            final String myOriginBegin = MY_ORIGIN_DATE_BEGIN;
+            final String myOriginEnd = MY_ORIGIN_DATE_END;
 
             String filteredExp = adjustmentExp;
             if (adjustmentExp.contains(myOriginBegin)) { // e.g. addDay($distanceDays) df:myOriginDate(2026/01/10)

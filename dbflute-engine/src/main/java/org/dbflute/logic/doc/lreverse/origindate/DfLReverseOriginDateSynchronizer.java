@@ -37,6 +37,10 @@ import org.dbflute.util.Srl;
  */
 public class DfLReverseOriginDateSynchronizer {
 
+    protected static final String KEY_ORIGIN_DATE = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
+    protected static final String MY_ORIGIN_DATE_BEGIN = DfDateAdjustmentPreparer.MY_ORIGIN_DATE_BEGIN;
+    protected static final String MY_ORIGIN_DATE_END = DfDateAdjustmentPreparer.MY_ORIGIN_DATE_END;
+
     // ===================================================================================
     //                                                                         Synchronize
     //                                                                         ===========
@@ -126,15 +130,21 @@ public class DfLReverseOriginDateSynchronizer {
     //                                                                     OriginDate Line
     //                                                                     ===============
     protected boolean handleOriginDateSyncLine(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
-        // TODO jflute myOriginDate (2026/01/21)
-        return filterOriginDateAsRoot(mapFile, sb, line, resultSb);
+        final String newDateExp = prepareNewOriginDateExp();
+        final boolean rootOriginHandled = filterOriginDateAsRoot(mapFile, sb, line, resultSb, newDateExp);
+        final boolean myOriginHandled = filterOriginDateAsMyOrigin(mapFile, sb, line, resultSb, newDateExp);
+        final boolean eitherHandled = rootOriginHandled || myOriginHandled;
+        if (!eitherHandled) { // both no handling
+            sb.append(line).append(ln());
+        }
+        return eitherHandled;
     }
 
     // -----------------------------------------------------
     //                                    OriginDate as Root
     //                                    ------------------
-    protected boolean filterOriginDateAsRoot(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
-        final String keyOriginDate = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
+    protected boolean filterOriginDateAsRoot(File mapFile, StringBuilder sb, String line, StringBuilder resultSb, String newDateExp) {
+        final String keyOriginDate = KEY_ORIGIN_DATE;
         boolean handled = false;
         if (!line.trim().startsWith("#") && line.contains(keyOriginDate)) {
             final String frontStr = Srl.substringFirstFront(line, keyOriginDate);
@@ -149,20 +159,18 @@ public class DfLReverseOriginDateSynchronizer {
                 throwLoadingControlMapOriginDateParseFailureException(mapFile, line);
             }
             // can be synchronized here
-            final String newDateExp = prepareNewOriginDateExp();
             sb.append(frontStr).append(keyOriginDate).append(" = ").append(newDateExp);
             sb.append(lastRearStr);
+            sb.append(ln());
             handled = true;
-            resultSb.append(originDate).append(" -> ").append(newDateExp);
-        } else {
-            sb.append(line);
+            resultSb.append("df:originDate: ").append(originDate).append(" -> ").append(newDateExp);
+            resultSb.append(ln());
         }
-        sb.append("\n");
         return handled;
     }
 
     protected void throwLoadingControlMapOriginDateParseFailureException(File mapFile, String line) {
-        final String keyOriginDate = DfDateAdjustmentPreparer.KEY_ORIGIN_DATE;
+        final String keyOriginDate = KEY_ORIGIN_DATE;
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the origin date of loading control map.");
         br.addItem("Advice");
@@ -170,13 +178,77 @@ public class DfLReverseOriginDateSynchronizer {
         br.addElement("the origin date property setting should be like this:");
         br.addElement("(setting cannot have linefeed)");
         br.addElement("For example:");
+        br.addElement("  (x): " + keyOriginDate);
+        br.addElement("       = 2013/04/12 // *Bad: don't use linefeed");
+        br.addElement("  (x): " + keyOriginDate + " =");
+        br.addElement("       2013/04/12 // *Bad: don't use linefeed");
+        br.addElement("  (x): " + keyOriginDate + " =     // *Bad: empty originDate");
         br.addElement("  (o): " + keyOriginDate + " = 2013/04/12");
         br.addElement("  (o): " + keyOriginDate + " = 2013/04/12 ; ...");
         br.addElement("  (o): " + keyOriginDate + " = 2013/04/12 }");
-        br.addElement("  (x): " + keyOriginDate);
-        br.addElement("       = 2013/04/12 // *no linefeed");
-        br.addElement("  (x): " + keyOriginDate + " =");
-        br.addElement("       2013/04/12 // *no linefeed");
+        br.addItem("Current Line");
+        br.addElement(line);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                         My OriginDate
+    //                                         -------------
+    protected boolean filterOriginDateAsMyOrigin(File mapFile, StringBuilder sb, String line, StringBuilder resultSb, String newDateExp) {
+        final String originDateBegin = MY_ORIGIN_DATE_BEGIN;
+        final String originDateEnd = MY_ORIGIN_DATE_END;
+        final StringBuilder newLineSb = new StringBuilder();
+        boolean atLeastOneHandled = false;
+        String remainderLine = line;
+        if (!line.trim().startsWith("#")) {
+            while (remainderLine.contains(originDateBegin)) {
+                // zetsumyo
+                final String frontStr = Srl.substringFirstFront(remainderLine, originDateBegin); // e.g. addDay($distance)
+                final String rearStr = Srl.substringFirstRear(remainderLine, originDateBegin).trim(); // e.g. 2026/01/21) || 2026/01/21, ...)
+                if (!rearStr.contains(originDateEnd)) {
+                    throwLoadingControlMapMyOriginDateParseFailureException(mapFile, line);
+                }
+                final String myOriginDate = Srl.substringFirstFront(rearStr, ",", originDateEnd); // e.g. 2026/01/21
+                final String lastRearStr = Srl.substringFirstRear(rearStr, myOriginDate); // e.g. , where ...) ... || ) ...
+                final String lastRearBeforeEnd = Srl.substringFirstFront(lastRearStr, originDateEnd); // e.g. , where ...) || )
+                if (myOriginDate.trim().length() == 0) {
+                    throwLoadingControlMapOriginDateParseFailureException(mapFile, line);
+                }
+                // can be synchronized here
+                newLineSb.append(frontStr).append(originDateBegin); // e.g. addDay($distance) df:originDate(
+                newLineSb.append(newDateExp); // e.g. 2026/01/21
+                newLineSb.append(lastRearBeforeEnd).append(originDateEnd); // e.g. , where ...)
+                remainderLine = Srl.substringFirstRear(rearStr, originDateEnd); // may be next myOrigin
+                atLeastOneHandled = true;
+                resultSb.append("df:myOriginDate: ").append(myOriginDate).append(" -> ").append(newDateExp);
+                resultSb.append(ln());
+            }
+            if (atLeastOneHandled) {
+                if (!remainderLine.isEmpty()) { // comment line or myOriginDate rear
+                    newLineSb.append(remainderLine);
+                }
+                sb.append(newLineSb);
+                sb.append(ln());
+            }
+        }
+        return atLeastOneHandled;
+    }
+
+    protected void throwLoadingControlMapMyOriginDateParseFailureException(File mapFile, String line) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse the myOriginDate of loading control map.");
+        br.addItem("Advice");
+        br.addElement("If synchronization of myOriginDate is valid for LoadDataReverse,");
+        br.addElement("the origin date property setting should be like this:");
+        br.addElement("(setting cannot have linefeed)");
+        br.addElement("For example:");
+        br.addElement("  (x): addDay($distance) df:myOriginDate(2026/01/21 // *Bad: no end");
+        br.addElement("  (x): addDay($distance) df:myOriginDate(2026/01/21");
+        br.addElement("                         ) // *Bad: don't use linefeed");
+        br.addElement("  (x): addDay($distance) df:myOriginDate() // *Bad: no originDate");
+        br.addElement("  (o): addDay($distance) df:myOriginDate(2026/01/21) // Good");
+        br.addElement("  (o): addDay($distance) df:myOriginDate(2026/01/21, where ...) // Good");
         br.addItem("Current Line");
         br.addElement(line);
         final String msg = br.buildExceptionMessage();
@@ -227,5 +299,10 @@ public class DfLReverseOriginDateSynchronizer {
     //                                                                      ==============
     protected String resolvePath(File file) {
         return Srl.replace(file.getPath(), "\\", "/");
+    }
+
+    protected String ln() {
+        return DBFluteSystem.ln();
+
     }
 }

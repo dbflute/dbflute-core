@@ -209,7 +209,7 @@ public class DfLReverseProcess {
         _log.info("  df:originDate: " + syncResult);
         sectionInfoList.add("");
         sectionInfoList.add("[loadingControlMap.dataprop]");
-        sectionInfoList.add("df:originDate: " + syncResult);
+        sectionInfoList.add(syncResult);
     }
 
     // -----------------------------------------------------
@@ -228,7 +228,8 @@ public class DfLReverseProcess {
         }
         final Date currentDate = DfTypeUtil.toDate(DBFluteSystem.currentTimeMillis());
         final String currentExp = DfTypeUtil.toString(currentDate, "yyyy/MM/dd HH:mm:ss");
-        sb.append(ln()).append(ln()).append("Output Date: ").append(currentExp);
+        sb.append(ln()).append(ln());
+        sb.append("Output Date: ").append(currentExp).append(ln());
         final File dataPropFile = new File(resolvePath(baseDir) + "/reverse-data-result.dfmark");
         if (dataPropFile.exists()) {
             dataPropFile.delete();
