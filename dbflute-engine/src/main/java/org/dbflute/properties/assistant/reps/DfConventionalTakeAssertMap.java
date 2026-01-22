@@ -48,11 +48,11 @@ public class DfConventionalTakeAssertMap {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _currentRepsEnvType;
-    protected final Map<String, Object> _replaceSchemaMap;
-    protected final DfPropertyValueHandler _propertyValueHandler;
+    protected final String _currentRepsEnvType; // not null
+    protected final Map<String, Object> _replaceSchemaMap; // not null
+    protected final DfPropertyValueHandler _propertyValueHandler; // not null
 
-    protected Map<String, Map<String, Object>> _conventionalTakeAssertMap; // cache
+    protected Map<String, Map<String, Object>> _conventionalTakeAssertMap; // cache, null allowed, lazy-loaded
 
     // ===================================================================================
     //                                                                         Constructor
@@ -69,6 +69,11 @@ public class DfConventionalTakeAssertMap {
     //                                                                            ========
     // ; conventionalTakeAssertMap = map:{
     //     ; emptyTableMap = map:{
+    //         ; isFailure = true
+    //         ; tableExceptList = list:{}
+    //         ; tableTargetList = list:{}
+    //     }
+    //     ; nullOnlyColumnMap = map:{
     //         ; isFailure = true
     //         ; tableExceptList = list:{}
     //         ; tableTargetList = list:{}
@@ -107,28 +112,32 @@ public class DfConventionalTakeAssertMap {
     // ===================================================================================
     //                                                                         Empty Table
     //                                                                         ===========
+    // ; emptyTableMap = map:{
+    //     ; isFailure = true
+    //     ; workableRepsEnvTypeList = list:{ut}
+    //     ; tableExceptList = list:{}
+    //     ; tableTargetList = list:{}
+    //     ; errorIfFirstDateAfter = 2018/05/18
+    //     ; isFrameworkDebug = false
+    // }
     public boolean isEmptyTableFailure() {
         return _propertyValueHandler.isProperty("isFailure", false, getEmptyTableMap());
     }
 
     public boolean isEmptyTableWorkableEnv() {
-        @SuppressWarnings("unchecked")
-        final List<String> workableRepsEnvTypeList = (List<String>) getEmptyTableMap().get("workableRepsEnvTypeList");
-        if (workableRepsEnvTypeList != null) {
-            return Srl.containsElementAnyIgnoreCase(workableRepsEnvTypeList, "$$ALL$$", _currentRepsEnvType);
-        } else { // no property
-            String msg = "Not found the workableRepsEnvTypeList in emptyTableMap: " + getEmptyTableMap();
-            throw new DfIllegalPropertySettingException(msg);
-        }
+        return determineWorkableRepsEnvTypeList("emptyTableMap", getEmptyTableMap());
     }
 
     public boolean isEmptyTableTarget(String tableDbName) {
-        final Map<String, Object> emptyTableMap = getEmptyTableMap();
-        @SuppressWarnings("unchecked")
-        final List<String> tableTargetList = (List<String>) emptyTableMap.getOrDefault("tableTargetList", DfCollectionUtil.emptyList());
-        @SuppressWarnings("unchecked")
-        final List<String> tableExceptList = (List<String>) emptyTableMap.getOrDefault("tableExceptList", DfCollectionUtil.emptyList());
-        return DfNameHintUtil.isTargetByHint(tableDbName, tableTargetList, tableExceptList);
+        return determineTableTarget(tableDbName, getEmptyTableMap());
+    }
+
+    public Date getEmptyTableErrorIfFirstDateAfter() { // null allowed
+        return prepareErrorIfFirstDateAfter("errorIfFirstDateAfter", getEmptyTableMap());
+    }
+
+    public boolean isEmptyTableFrameworkDebug() {
+        return _propertyValueHandler.isProperty("isFrameworkDebug", false, getEmptyTableMap());
     }
 
     protected Map<String, Object> getEmptyTableMap() {
@@ -136,9 +145,76 @@ public class DfConventionalTakeAssertMap {
         return emptyTableMap != null ? emptyTableMap : DfCollectionUtil.emptyMap();
     }
 
-    public Date getErrorIfFirstDateAfter() { // null allowed
-        final String key = "errorIfFirstDateAfter";
-        final String prop = _propertyValueHandler.getProperty(key, null, getEmptyTableMap());
+    // ===================================================================================
+    //                                                                     nullOnly Column
+    //                                                                     ===============
+    // ; nullOnlyColumnMap = map:{
+    //     ; isFailure = true
+    //     ; workableRepsEnvTypeList = list:{ut}
+    //     ; tableExceptList = list:{}
+    //     ; tableTargetList = list:{}
+    //     ; isSkipIfEmptyTable = false
+    //     ; errorIfTableFirstDateAfter = 2025/12/18
+    //     ; errorIfColumnFirstDateAfter = 2026/01/22
+    //     ; isFrameworkDebug = false
+    // }
+    public boolean isNullOnlyColumnFailure() {
+        return _propertyValueHandler.isProperty("isFailure", false, getNullOnlyColumnMap());
+    }
+
+    public boolean isNullOnlyColumnWorkableEnv() {
+        return determineWorkableRepsEnvTypeList("nullOnlyColumnMap", getNullOnlyColumnMap());
+    }
+
+    public boolean isNullOnlyColumnTarget(String tableDbName) {
+        return determineTableTarget(tableDbName, getNullOnlyColumnMap());
+    }
+
+    public boolean isSkipIfEmptyTable() {
+        return _propertyValueHandler.isProperty("isSkipIfEmptyTable", false, getNullOnlyColumnMap());
+    }
+
+    public Date getNullOnlyColumnErrorIfTableFirstDateAfter() { // null allowed
+        return prepareErrorIfFirstDateAfter("errorIfTableFirstDateAfter", getNullOnlyColumnMap());
+    }
+
+    public Date getNullOnlyColumnErrorIfColumnFirstDateAfter() { // null allowed
+        return prepareErrorIfFirstDateAfter("errorIfColumnFirstDateAfter", getNullOnlyColumnMap());
+    }
+
+    public boolean isNullOnlyColumnFrameworkDebug() {
+        return _propertyValueHandler.isProperty("isFrameworkDebug", false, getNullOnlyColumnMap());
+    }
+
+    protected Map<String, Object> getNullOnlyColumnMap() {
+        final Map<String, Object> nullOnlyColumnMap = getConventionalTakeAssertMap().get("nullOnlyColumnMap");
+        return nullOnlyColumnMap != null ? nullOnlyColumnMap : DfCollectionUtil.emptyMap();
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected boolean determineWorkableRepsEnvTypeList(String mapTitle, Map<String, Object> emptyTableMap) {
+        @SuppressWarnings("unchecked")
+        final List<String> workableRepsEnvTypeList = (List<String>) emptyTableMap.get("workableRepsEnvTypeList");
+        if (workableRepsEnvTypeList != null) {
+            return Srl.containsElementAnyIgnoreCase(workableRepsEnvTypeList, "$$ALL$$", _currentRepsEnvType);
+        } else { // no property
+            String msg = "Not found the workableRepsEnvTypeList in " + mapTitle + ": " + emptyTableMap;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected boolean determineTableTarget(String tableDbName, Map<String, Object> targetMap) {
+        @SuppressWarnings("unchecked")
+        final List<String> tableTargetList = (List<String>) targetMap.getOrDefault("tableTargetList", DfCollectionUtil.emptyList());
+        @SuppressWarnings("unchecked")
+        final List<String> tableExceptList = (List<String>) targetMap.getOrDefault("tableExceptList", DfCollectionUtil.emptyList());
+        return DfNameHintUtil.isTargetByHint(tableDbName, tableTargetList, tableExceptList);
+    }
+
+    protected Date prepareErrorIfFirstDateAfter(String key, Map<String, Object> emptyTableMap) {
+        final String prop = _propertyValueHandler.getProperty(key, null, emptyTableMap);
         if (prop != null && prop.length() > EXAMPLE_DATE_EXPRESSION.length()) { // e.g. has time part
             throwConventionalTakeAssertIllegalDateExpressionFormatException(key, prop, null);
         }
@@ -150,9 +226,9 @@ public class DfConventionalTakeAssertMap {
         }
     }
 
-    // ===================================================================================
-    //                                                                           Exception
-    //                                                                           =========
+    // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
     protected void throwConventionalTakeAssertIllegalDateExpressionFormatException(String key, String prop, RuntimeException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Illegal format of the date expression for firstDate.");
@@ -175,5 +251,4 @@ public class DfConventionalTakeAssertMap {
             throw new IllegalStateException(msg);
         }
     }
-
 }

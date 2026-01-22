@@ -91,9 +91,16 @@ public class DfColumnMeta {
     // ===================================================================================
     //                                                                       Name Building
     //                                                                       =============
-    public String buildColumnSqlName() {
-        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+    public String getColumnSqlName() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.quoteColumnNameIfNeedsDirectUse(_columnName);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

@@ -279,7 +279,7 @@ public class DfCraftDiffAssertProvider {
             if (columnIndex > 0) {
                 sb.append(", ");
             }
-            sb.append(columnMeta.buildColumnSqlName());
+            sb.append(columnMeta.getColumnSqlName());
             ++columnIndex;
         }
         sb.append(ln()).append("  from ").append(tableSqlName);

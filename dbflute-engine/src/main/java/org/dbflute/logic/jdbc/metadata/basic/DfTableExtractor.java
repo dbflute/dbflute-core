@@ -114,12 +114,12 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
                     continue;
                 }
 
-                final DfTableMeta tableMetaInfo = new DfTableMeta();
-                tableMetaInfo.setTableName(tableName);
-                tableMetaInfo.setTableType(tableType);
-                tableMetaInfo.setUnifiedSchema(tableUnifiedSchema);
-                tableMetaInfo.setTableComment(tableComment);
-                tableList.add(tableMetaInfo);
+                final DfTableMeta tableMeta = new DfTableMeta();
+                tableMeta.setTableName(tableName);
+                tableMeta.setTableType(tableType);
+                tableMeta.setUnifiedSchema(tableUnifiedSchema);
+                tableMeta.setTableComment(tableComment);
+                tableList.add(tableMeta);
             }
         } finally {
             if (rs != null) {

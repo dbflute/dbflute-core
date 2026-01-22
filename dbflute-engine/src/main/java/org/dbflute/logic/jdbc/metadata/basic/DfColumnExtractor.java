@@ -57,12 +57,12 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableMeta The meta information of table. (NotNull)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
-        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
-        final String tableName = tableInfo.getTableName();
+    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
+        final UnifiedSchema unifiedSchema = tableMeta.getUnifiedSchema();
+        final String tableName = tableMeta.getTableName();
         return getColumnList(metaData, unifiedSchema, tableName);
     }
 

@@ -149,11 +149,17 @@ public class DfJdbcFacade {
     // -----------------------------------------------------
     //                                                 Count
     //                                                 -----
+    public int selectCount(String sql) {
+        final List<String> columnList = DfCollectionUtil.newArrayList("cnt");
+        final String cntStr = selectStringList(sql, columnList).get(0).get("cnt").trim();
+        return Integer.parseInt(cntStr);
+    }
+
     public int selectCountAll(String tableSqlName) {
         final List<String> columnList = DfCollectionUtil.newArrayList("cnt");
         final String sql = "select count(*) as cnt from " + tableSqlName;
         final String cntStr = selectStringList(sql, columnList).get(0).get("cnt").trim();
-        return Integer.valueOf(cntStr);
+        return Integer.parseInt(cntStr);
     }
 
     // -----------------------------------------------------
