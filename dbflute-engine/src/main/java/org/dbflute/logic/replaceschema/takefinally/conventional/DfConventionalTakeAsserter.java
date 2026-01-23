@@ -20,6 +20,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.dbflute.exception.DfTakeFinallyAssertionFailureEmptyTableException;
@@ -228,9 +229,18 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String table = tableMeta.getTableSqlName();
         final String column = columnMeta.getColumnSqlName();
-        final String sql = "select count(*) as cnt from " + table + " where " + column + " is not null";
-        final int notNullCount = facade.selectCount(sql);
-        return notNullCount == 0;
+        if (getBasicProperties().isDatabaseMySQL()) {
+            // for performance, effective? but just in case (2026/01/23)
+            final String alias = "existing";
+            final String sql = "select 1 as " + alias + " from " + table + " where " + column + " is not null limit 1";
+            final List<String> columnList = DfCollectionUtil.newArrayList(alias);
+            final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+            return !resultList.isEmpty();
+        } else {
+            final String sql = "select count(*) as cnt from " + table + " where " + column + " is not null";
+            final int notNullCount = facade.selectCount(sql);
+            return notNullCount == 0;
+        }
     }
 
     protected void throwTakeFinallyAssertionFailureNullOnlyColumnException(List<DfColumnMeta> emptyTableColumnList,
