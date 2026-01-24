@@ -712,7 +712,7 @@ ${database.schemaDescription}
 <div class="keywordsearch">
 	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
 	<ul id="suggestion-list" class="suggestionarea"></ul>
-	<span class="searchmemo">*Push 'tab' (primary tab order)</span>
+	<span class="searchmemo">*Push 'shift + command (ctrl) + , (comma)'</span>
 </div>
 <table>
 	<thead>
