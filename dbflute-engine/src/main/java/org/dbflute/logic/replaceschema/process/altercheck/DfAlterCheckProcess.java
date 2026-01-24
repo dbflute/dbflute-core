@@ -243,7 +243,8 @@ public class DfAlterCheckProcess extends DfAbstractAlterProcess {
         if (alterSqlFileList.isEmpty()) {
             // #for_now jflute restore only when empty, however when manual file making... (2026/01/23)
             // if second AlterDDL file is manually made, no restore prevous AlterDDL to alter directory
-            // to avoid "the existing file may be manually restored" or "file name conflict"
+            // to avoid "manually already restored" and "file name conflict"
+            // and "making unneeded file every time even if second AlterDDL file already exists"
             // so basically use DBFlute Intro for AlterCheck
             _unreleasedAlterAgent.restoreUnreleasedAlterSql();
             alterSqlFileList = findMigrationAlterSqlFileList();
