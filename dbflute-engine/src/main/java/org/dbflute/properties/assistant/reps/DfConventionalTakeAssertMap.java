@@ -136,6 +136,10 @@ public class DfConventionalTakeAssertMap {
         return prepareErrorIfFirstDateAfter("errorIfFirstDateAfter", getEmptyTableMap());
     }
 
+    public String getEmptyTableErrorMessage() { // null allowed
+        return _propertyValueHandler.getProperty("errorMessage", null, getEmptyTableMap());
+    }
+
     public boolean isEmptyTableFrameworkDebug() {
         return _propertyValueHandler.isProperty("isFrameworkDebug", false, getEmptyTableMap());
     }
@@ -180,6 +184,10 @@ public class DfConventionalTakeAssertMap {
 
     public Date getNullOnlyColumnErrorIfColumnFirstDateAfter() { // null allowed
         return prepareErrorIfFirstDateAfter("errorIfColumnFirstDateAfter", getNullOnlyColumnMap());
+    }
+
+    public String getNullOnlyColumnErrorMessage() {
+        return _propertyValueHandler.getProperty("errorMessage", null, getNullOnlyColumnMap());
     }
 
     public boolean isNullOnlyColumnFrameworkDebug() {

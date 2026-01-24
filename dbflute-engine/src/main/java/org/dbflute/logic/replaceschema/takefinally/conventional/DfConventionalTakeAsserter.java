@@ -120,7 +120,7 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
             }
         }
         if (!emptyTableList.isEmpty()) {
-            throwTakeFinallyAssertionFailureEmptyTableException(emptyTableList, tableFirstDate);
+            throwTakeFinallyAssertionFailureEmptyTableException(propMap, emptyTableList, tableFirstDate);
         }
     }
 
@@ -130,7 +130,8 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         return countAll == 0;
     }
 
-    protected void throwTakeFinallyAssertionFailureEmptyTableException(List<DfTableMeta> emptyTableList, Date tableFirstDate) {
+    protected void throwTakeFinallyAssertionFailureEmptyTableException(DfConventionalTakeAssertMap propMap,
+            List<DfTableMeta> emptyTableList, Date tableFirstDate) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the empty table (no-data) after ReplaceSchema.");
         br.addItem("Advice");
@@ -160,6 +161,11 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         }
         br.addItem("errorIfFirstDateAfter");
         br.addElement(tableFirstDate != null ? new HandyDate(tableFirstDate) : null);
+        final String errorMessage = propMap.getEmptyTableErrorMessage();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(errorMessage)) {
+            br.addItem("Project Message");
+            br.addElement(errorMessage);
+        }
         final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureEmptyTableException(msg);
     }
@@ -220,7 +226,7 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
             }
         }
         if (!emptyTableColumnList.isEmpty() || !nullOnlyColumnList.isEmpty()) {
-            throwTakeFinallyAssertionFailureNullOnlyColumnException(emptyTableColumnList, nullOnlyColumnList, tableFirstDate,
+            throwTakeFinallyAssertionFailureNullOnlyColumnException(propMap, emptyTableColumnList, nullOnlyColumnList, tableFirstDate,
                     columnFirstDate);
         }
     }
@@ -243,8 +249,8 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         }
     }
 
-    protected void throwTakeFinallyAssertionFailureNullOnlyColumnException(List<DfColumnMeta> emptyTableColumnList,
-            List<DfColumnMeta> nullOnlyColumnList, Date tableFirstDate, Date columnFirstDate) {
+    protected void throwTakeFinallyAssertionFailureNullOnlyColumnException(DfConventionalTakeAssertMap propMap,
+            List<DfColumnMeta> emptyTableColumnList, List<DfColumnMeta> nullOnlyColumnList, Date tableFirstDate, Date columnFirstDate) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the null-only column (no-data) after ReplaceSchema.");
         br.addItem("Advice");
@@ -280,6 +286,11 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
         br.addElement(tableFirstDate != null ? new HandyDate(tableFirstDate) : null);
         br.addItem("errorIfColumnFirstDateAfter");
         br.addElement(columnFirstDate != null ? new HandyDate(columnFirstDate) : null);
+        final String errorMessage = propMap.getNullOnlyColumnErrorMessage();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(errorMessage)) {
+            br.addItem("Project Message");
+            br.addElement(errorMessage);
+        }
         final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureEmptyTableException(msg);
     }
