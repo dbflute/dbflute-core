@@ -232,6 +232,7 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
     }
 
     protected boolean determineNullOnlyColumn(DfTableMeta tableMeta, DfColumnMeta columnMeta) {
+        // #for_now jflute if too many null-allowed columns exist, performance cost may be occurred (2026/01/24)
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String table = tableMeta.getTableSqlName();
         final String column = columnMeta.getColumnSqlName();
