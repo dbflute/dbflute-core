@@ -36,6 +36,16 @@ import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 
 /**
+ * SQL fire for CraftDiff assertion, which is entry point.
+ * <pre>
+ * this.fire() // called by e.g. DfSchemaXmlSerializer
+ *  |
+ *  |-DfCraftDiffAssertProvider // parse assert expression on SQL
+ *  |     |
+ *  |     | new (as assertion title)
+ *  |     v
+ *  |- DfCraftDiffAssertHandler // select and dump
+ * </pre>
  * @author jflute
  * @since 0.9.9.8 (2012/09/04 Tuesday)
  */
