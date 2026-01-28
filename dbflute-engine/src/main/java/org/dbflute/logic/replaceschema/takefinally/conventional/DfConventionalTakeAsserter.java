@@ -242,7 +242,7 @@ public class DfConventionalTakeAsserter extends DfAbstractRepsProcess {
             final String sql = "select 1 as " + alias + " from " + table + " where " + column + " is not null limit 1";
             final List<String> columnList = DfCollectionUtil.newArrayList(alias);
             final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
-            return !resultList.isEmpty();
+            return resultList.isEmpty();
         } else {
             final String sql = "select count(*) as cnt from " + table + " where " + column + " is not null";
             final int notNullCount = facade.selectCount(sql);
