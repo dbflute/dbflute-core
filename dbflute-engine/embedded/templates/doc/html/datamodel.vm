@@ -1169,20 +1169,20 @@ Incremental.prototype = {
 	 * Select suggestion
 	 */
 	selectSuggestion: function (ev) {
-		var keyCode = ev.keyCode,
+		var key = ev.key,
 			visibleChildNodes = this.filterVisibleChild(),
 			prevIdx;
 
-		if (keyCode === 38 || keyCode === 40) {
+		if (key === 'ArrowUp' || key === 'ArrowDown') {
 
 			if (visibleChildNodes.length) {
 				prevIdx = this.suggestionIdx;
 
-				if (keyCode === 40 && this.suggestionIdx < visibleChildNodes.length - 1) {
+				if (key === 'ArrowDown' && this.suggestionIdx < visibleChildNodes.length - 1) {
 					this.suggestionIdx++;
 				}
 
-				if (keyCode === 38 && this.suggestionIdx > 0) {
+				if (key === 'ArrowUp' && this.suggestionIdx > 0) {
 					this.suggestionIdx--;
 				}
 
@@ -1209,7 +1209,7 @@ Incremental.prototype = {
 	 * @param {Object} ev
 	 */
 	setInputValue: function (ev) {
-		var keyCode = ev.keyCode,
+		var key = ev.key,
 			visibleChildNodes = this.filterVisibleChild(),
 			currentSuggestionTxt,
 			selectedSection;
@@ -1217,7 +1217,7 @@ Incremental.prototype = {
 		if (visibleChildNodes.length) {
 			currentSuggestionTxt = this.util.getElemTxt(visibleChildNodes[this.suggestionIdx]);
 
-			if (keyCode === 13) {
+			if (key === 'Enter') {
 				this.targetInput.value = currentSuggestionTxt;
 				selectedSection = this.getSelectedSection(visibleChildNodes[this.suggestionIdx]);
 				this.clearSuggestion();
@@ -2767,10 +2767,16 @@ Decomment.prototype = {
 	 */
 	setupKeyDownEvent : function() {
 		document.onkeydown = function (e) {
-			// ESC
-			if(e.keyCode == 27){
-				var modalElement = document.getElementById("decomment-modal");
+			var modalElement = document.getElementById("decomment-modal");
+			// ESC to close modal
+			if (e.key === 'Escape') {
 				modalElement.style.display = "none";
+			}
+			// Cmd+Enter (Mac) or Ctrl+Enter (Windows) to submit
+			if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+				if (modalElement.style.display !== "none") {
+					document.getElementById("decomment-ok").click();
+				}
 			}
 		}
 	},
