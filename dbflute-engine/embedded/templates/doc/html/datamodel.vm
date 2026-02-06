@@ -2767,10 +2767,16 @@ Decomment.prototype = {
 	 */
 	setupKeyDownEvent : function() {
 		document.onkeydown = function (e) {
-			// ESC
-			if(e.keyCode == 27){
-				var modalElement = document.getElementById("decomment-modal");
+			var modalElement = document.getElementById("decomment-modal");
+			// ESC to close modal
+			if (e.key === 'Escape') {
 				modalElement.style.display = "none";
+			}
+			// Cmd+Enter (Mac) or Ctrl+Enter (Windows) to submit
+			if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+				if (modalElement.style.display !== "none") {
+					document.getElementById("decomment-ok").click();
+				}
 			}
 		}
 	},
