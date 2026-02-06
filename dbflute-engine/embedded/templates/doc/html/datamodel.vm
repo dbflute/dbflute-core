@@ -1540,7 +1540,9 @@ var DecommentUtil = new function(){
 		if (!decomment) {
 			return '';
 		}
-		return decomment.replace(/(?:dfalias|shalias):\s*\{[^}]*\}\s*\n?/g, '').trim();
+		var result = decomment.replace(/(?:dfalias|shalias):\s*\{[^}]*\}\s*\n?/g, '');
+		// remove leading <br> to prevent empty line when opening in plain schema html
+		return result.replace(/^<br\s*\/?>/i, '').trim();
 	}
 }
 
