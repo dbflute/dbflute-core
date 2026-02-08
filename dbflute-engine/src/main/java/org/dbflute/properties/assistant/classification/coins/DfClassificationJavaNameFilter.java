@@ -61,8 +61,13 @@ public class DfClassificationJavaNameFilter {
         // basic full-width marks
         _nameFromToMap.put("\uff05", "_PERCENT_");
         _nameFromToMap.put("\uff06", "_AND_");
-        _nameFromToMap.put("\uff08", "_");
-        _nameFromToMap.put("\uff09", "_");
+        _nameFromToMap.put("\uff08", "_"); // full-width (
+        _nameFromToMap.put("\uff09", "_"); // full-width )
+
+        // connectable full-width hyphens
+        _nameFromToMap.put("\u2010", "_");
+        _nameFromToMap.put("\u2212", "_");
+        _nameFromToMap.put("\uff0d", "_");
 
         // pinpoint full-width
         _nameFromToMap.put("\u3000", "_"); // full-width space
@@ -70,10 +75,6 @@ public class DfClassificationJavaNameFilter {
         _nameFromToMap.put("\u3002", "_"); // Japanese kuten
         _nameFromToMap.put("\u30fb", "_"); // Japanese chuten @since 1.3.1
         _nameFromToMap.put("\uff01", "_"); // full-width ! @since 1.3.1
-
-        // non-compilable hyphens
-        _nameFromToMap.put("\u2010", "_");
-        _nameFromToMap.put("\u2212", "_");
-        _nameFromToMap.put("\uff0d", "_");
+        _nameFromToMap.put("\uff0b", "_"); // full-width + @since 1.3.2
     }
 }
