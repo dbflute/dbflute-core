@@ -2601,7 +2601,7 @@ Decomment.prototype = {
 			// also setup click event on alias cell if it exists
 			var aliasElement = table.querySelector('.aliascell');
 			if (aliasElement) {
-				that.setupSaveTableClickEvent(tableName, aliasElement);
+				that.setupSaveTableClickEvent(tableName, aliasElement, { focusTarget: 'alias' });
 			}
 		});
 		var commentTables = document.querySelectorAll('.tablecomment')
@@ -2621,10 +2621,11 @@ Decomment.prototype = {
 	 * Setup save table comment click event to html
 	 * @param {string} tableName - Table name
 	 * @param {Object} commentElement - Comment element
+	 * @param {object} options - Options object (e.g. { focusTarget: 'alias' })
 	 */
-	setupSaveTableClickEvent: function(tableName, commentElement) {
+	setupSaveTableClickEvent: function(tableName, commentElement, options) {
 		var tableProperty = this.storeClient.getTablePickup(tableName) || new PickupTableProperty(tableName, null)
-		commentElement.onclick = this.createSaveDecommentFunction(tableProperty);
+		commentElement.onclick = this.createSaveDecommentFunction(tableProperty, options);
 	},
 
 	/**
@@ -2649,7 +2650,7 @@ Decomment.prototype = {
 				// also setup click event on alias cell if it exists
 				var aliasElement = column.querySelector('.aliascell');
 				if (aliasElement) {
-					aliasElement.onclick = that.createSaveDecommentFunction(columnProperty);
+					aliasElement.onclick = that.createSaveDecommentFunction(columnProperty, { focusTarget: 'alias' });
 				}
 			});
 		});
@@ -2658,10 +2659,12 @@ Decomment.prototype = {
 	/**
  	 * Create save decomment function
 	 * param {object} commentProperty - Comment property
+	 * param {object} options - Options object (e.g. { focusTarget: 'alias' })
 	 * returns {function} Save decomment function
 	 */
-	createSaveDecommentFunction: function (commentProperty) {
+	createSaveDecommentFunction: function (commentProperty, options) {
 		var that = this;
+		options = options || {};
  		return function () {
 			// prevent modal from opening if user is selecting text (for copy/paste)
 			var selection = window.getSelection();
@@ -2679,12 +2682,18 @@ Decomment.prototype = {
 			// Clean comment without dfalias:{} or shalias:{} in textarea
 			var cleanComment = DecommentUtil.removeAliasFromDecomment(previousWholeComment);
 			inputElement.value = cleanComment;
-			inputElement.focus();
 
 			// populate alias input
 			var aliasInputElement = document.getElementById("decomment-alias-input");
 			var previousAlias = commentProperty.getCurrentDisplayedAlias();
 			aliasInputElement.value = previousAlias;
+
+			// focus on alias input if opened from alias cell, otherwise focus on comment input
+			if (options.focusTarget === 'alias') {
+				aliasInputElement.focus();
+			} else {
+				inputElement.focus();
+			}
 
 			document.getElementById("decomment-close").onclick = function () {
 				modalElement.style.display = "none";
