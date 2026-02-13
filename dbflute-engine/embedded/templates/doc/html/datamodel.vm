@@ -2598,6 +2598,11 @@ Decomment.prototype = {
 			var tableName = table.querySelector('.namecell').getAttribute('data-name');
 			var commentElement = table.querySelector('.commentcell');
 			that.setupSaveTableClickEvent(tableName, commentElement);
+			// also setup click event on alias cell if it exists
+			var aliasElement = table.querySelector('.aliascell');
+			if (aliasElement) {
+				that.setupSaveTableClickEvent(tableName, aliasElement);
+			}
 		});
 		var commentTables = document.querySelectorAll('.tablecomment')
 		Array.prototype.forEach.call(commentTables, function (tableElement) {
@@ -2640,6 +2645,12 @@ Decomment.prototype = {
 				var columnName = column.querySelector('.columnnamecell').innerText.trim();
 				var columnProperty = that.storeClient.getColumnPickup(tableName, columnName) || new PickupTableProperty(tableName, columnName)
 				commentElement.onclick = that.createSaveDecommentFunction(columnProperty);
+
+				// also setup click event on alias cell if it exists
+				var aliasElement = column.querySelector('.aliascell');
+				if (aliasElement) {
+					aliasElement.onclick = that.createSaveDecommentFunction(columnProperty);
+				}
 			});
 		});
 	},
