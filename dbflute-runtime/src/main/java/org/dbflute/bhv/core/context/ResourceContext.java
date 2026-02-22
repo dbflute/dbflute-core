@@ -52,14 +52,14 @@ public class ResourceContext {
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<ResourceContext> threadLocal = new ThreadLocal<ResourceContext>();
+    private static final ThreadLocal<ResourceContext> _threadLocal = new ThreadLocal<ResourceContext>();
 
     /**
      * Get the context of resource by the key.
      * @return The context of resource. (NullAllowed)
      */
     public static ResourceContext getResourceContextOnThread() {
-        return threadLocal.get();
+        return _threadLocal.get();
     }
 
     /**
@@ -67,7 +67,7 @@ public class ResourceContext {
      * @param resourceContext The context of resource. (NotNull)
      */
     public static void setResourceContextOnThread(ResourceContext resourceContext) {
-        threadLocal.set(resourceContext);
+        _threadLocal.set(resourceContext);
     }
 
     /**
@@ -75,14 +75,15 @@ public class ResourceContext {
      * @return The determination, true or false.
      */
     public static boolean isExistResourceContextOnThread() {
-        return threadLocal.get() != null;
+        return _threadLocal.get() != null;
     }
 
     /**
      * Clear the context of resource on thread.
      */
     public static void clearResourceContextOnThread() {
-        threadLocal.set(null);
+        // https://github.com/dbflute/dbflute-core/issues/334
+        _threadLocal.remove(); // also internal entry is cleared @since 1.3.2
     }
 
     // ===================================================================================

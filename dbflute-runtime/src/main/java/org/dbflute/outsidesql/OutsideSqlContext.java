@@ -81,7 +81,8 @@ public class OutsideSqlContext {
      * Clear the context of outside-SQL on thread.
      */
     public static void clearOutsideSqlContextOnThread() {
-        _threadLocal.set(null);
+        // https://github.com/dbflute/dbflute-core/issues/334
+        _threadLocal.remove(); // also internal entry is cleared @since 1.3.2
     }
 
     // ===================================================================================

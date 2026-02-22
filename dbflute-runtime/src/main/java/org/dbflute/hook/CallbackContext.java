@@ -53,7 +53,12 @@ public class CallbackContext {
         }
 
         public void save(CallbackContext context) {
-            _defaultThreadLocal.set(context);
+            if (context != null) {
+                _defaultThreadLocal.set(context);
+            } else { // save(null) means clear
+                // https://github.com/dbflute/dbflute-core/issues/334
+                _defaultThreadLocal.remove(); // also internal entry is cleared @since 1.3.2
+            }
         }
     };
 

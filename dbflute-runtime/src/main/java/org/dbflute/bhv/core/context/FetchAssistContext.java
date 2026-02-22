@@ -64,7 +64,8 @@ public class FetchAssistContext {
      * Clear fetch-bean on thread.
      */
     public static void clearFetchBeanOnThread() {
-        _threadLocal.set(null);
+        // https://github.com/dbflute/dbflute-core/issues/334
+        _threadLocal.remove(); // also internal entry is cleared @since 1.3.2
     }
 
     // ===================================================================================

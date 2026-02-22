@@ -72,7 +72,8 @@ public class ConditionBeanContext {
      * Clear condition-bean on thread.
      */
     public static void clearConditionBeanOnThread() {
-        _conditionBeanLocal.set(null);
+        // https://github.com/dbflute/dbflute-core/issues/334
+        _conditionBeanLocal.remove(); // also internal entry is cleared @since 1.3.2
     }
 
     // ===================================================================================

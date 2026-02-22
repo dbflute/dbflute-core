@@ -15,6 +15,8 @@
  */
 package org.dbflute.hook;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +31,7 @@ import org.dbflute.hook.AccessContext.AccessProcessProvider;
 import org.dbflute.hook.AccessContext.AccessTimestampProvider;
 import org.dbflute.hook.AccessContext.AccessUserProvider;
 import org.dbflute.unit.RuntimeTestCase;
+import org.dbflute.util.DfReflectionUtil;
 
 /**
  * @author jflute
@@ -314,5 +317,53 @@ public class AccessContextTest extends RuntimeTestCase {
         } finally {
             assertTrue(AccessContext.isLocked());
         }
+    }
+
+    // ===================================================================================
+    //                                                                ThreadLocal internal
+    //                                                                ====================
+    public void test_ThreadLocalMap_size_removed() {
+        // ## Arrange ##
+        AccessContext accessContext = new AccessContext();
+        Date currentDate = currentDate();
+        accessContext.setAccessDate(currentDate);
+        Timestamp currentTimestamp = currentTimestamp();
+        accessContext.setAccessTimestamp(currentTimestamp);
+        accessContext.setAccessUser("accessUser");
+        accessContext.setAccessProcess("accessProcess");
+        accessContext.setAccessModule("accessModule");
+        accessContext.registerAccessValue("sea", "land");
+
+        // ## Act ##
+        int beforeLocalMapSize;
+        try {
+            AccessContext.setAccessContextOnThread(accessContext);
+            beforeLocalMapSize = extractLocalMapSize();
+        } finally {
+            AccessContext.clearAccessContextOnThread();
+        }
+
+        // ## Assert ##
+        int afterLocalMapSize = extractLocalMapSize();
+        log("before: " + beforeLocalMapSize); // e.g. 4
+        log("after:  " + afterLocalMapSize); // e.g. 3 since 1.3.2 || (4 until 1.3.1)
+
+        assertEquals(beforeLocalMapSize - 1, afterLocalMapSize);
+    }
+
+    // -----------------------------------------------------
+    //                                       Deep Reflection
+    //                                       ---------------
+    private int extractLocalMapSize() {
+        Object threadLocalMap = extractThreadLocalMap();
+        Field sizeField = DfReflectionUtil.getWholeField(threadLocalMap.getClass(), "size");
+        return (int) DfReflectionUtil.getValueForcedly(sizeField, threadLocalMap);
+    }
+
+    private Object extractThreadLocalMap() {
+        Method mapMethod = DfReflectionUtil.getWholeMethod(ThreadLocal.class, "getMap", new Class[] { Thread.class });
+        mapMethod.setAccessible(true);
+        ThreadLocal<AccessContext> threadLocal = AccessContext._defaultThreadLocal;
+        return DfReflectionUtil.invoke(mapMethod, threadLocal, new Object[] { Thread.currentThread() });
     }
 }

@@ -65,7 +65,8 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
             String msg = "Failed to close the data source handler of manual thread: " + handler;
             throw new IllegalStateException(msg, e);
         }
-        _handlerLocal.set(null);
+        // https://github.com/dbflute/dbflute-core/issues/334
+        _handlerLocal.remove(); // also internal entry is cleared @since 1.3.2
     }
 
     // ===================================================================================

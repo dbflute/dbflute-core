@@ -32,13 +32,13 @@ public class InternalMapContext {
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<Map<String, Object>>();
+    private static final ThreadLocal<Map<String, Object>> _threadLocal = new ThreadLocal<Map<String, Object>>();
 
     protected static void initializeIfNeeds() {
-        if (threadLocal.get() != null) {
+        if (_threadLocal.get() != null) {
             return;
         }
-        threadLocal.set(new HashMap<String, Object>());
+        _threadLocal.set(new HashMap<String, Object>());
     }
 
     /**
@@ -49,7 +49,7 @@ public class InternalMapContext {
     public static Object getObject(String key) {
         // no use lazy-load to suppress waste instance
         //initializeIfNeeds();
-        final Map<String, Object> map = threadLocal.get();
+        final Map<String, Object> map = _threadLocal.get();
         return map != null ? map.get(key) : null;
     }
 
@@ -60,12 +60,12 @@ public class InternalMapContext {
      */
     public static void setObject(String key, Object value) {
         initializeIfNeeds();
-        threadLocal.get().put(key, value);
+        _threadLocal.get().put(key, value);
     }
 
     public static Map<String, Object> internalMap() {
         initializeIfNeeds();
-        return threadLocal.get();
+        return _threadLocal.get();
     }
 
     /**
@@ -73,14 +73,15 @@ public class InternalMapContext {
      * @return The determination, true or false.
      */
     public static boolean isExistInternalMapContextOnThread() {
-        return (threadLocal.get() != null);
+        return (_threadLocal.get() != null);
     }
 
     /**
      * Clear internal-map-context on thread.
      */
     public static void clearInternalMapContextOnThread() {
-        threadLocal.set(null);
+        // https://github.com/dbflute/dbflute-core/issues/334
+        _threadLocal.remove(); // also internal entry is cleared @since 1.3.2
     }
 
     // ===================================================================================
