@@ -479,9 +479,19 @@ pre.spolicyviodisp {
 	outline: none;
 	border-color: #709dff;
 }
-.decommentmodal-ok-area {
-	text-align: right;
+.decommentmodal-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	margin-top: 24px;
+}
+.decommentmodal-guide-link {
+	font-size: 12px;
+	color: #5a8eff;
+	text-decoration: none;
+}
+.decommentmodal-guide-link:hover {
+	text-decoration: underline;
 }
 .decommentmodal-ok-btn {
 	display: inline-block;
@@ -991,13 +1001,16 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 	<div class="decommentmodalcontent">
 		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
 		<p>Input the new comment of <span id="decomment-modal-column-info" class="decomment-target-name"></span></p>
-		<textarea id="decomment-input" class="decommentinput" rows="10" placeholder="e.g. Table: MEMBER_ADDRESS -> Comment: Member address information with history management by validity period. Structurally one-to-many from member, but becomes one-to-one under business conditions (business one-to-one pattern). Members without address are allowed, so strictly 1:0..1."></textarea>
+		<textarea id="decomment-input" class="decommentinput" rows="10"></textarea>
 		<div class="decomment-alias-input-area">
 			<label for="decomment-alias-input" class="decomment-alias-label">Alias:</label>
-			<input type="text" id="decomment-alias-input" class="decomment-alias-input" placeholder="e.g. Table: MEMBER_ADDRESS -> Alias: Member Address Info"/>
+			<input type="text" id="decomment-alias-input" class="decomment-alias-input"/>
 		</div>
 		<div id="decomment-user-input" class="decomment-user-input"><input type="text" id="decomment-user-name" class="decomment-user-name" placeholder="User name"/><span class="decomment-user-name-desc">*required (saved in cookie)</span></div>
-		<div class="decommentmodal-ok-area"><button id="decomment-ok" class="decommentmodal-ok-btn">OK</button></div>
+		<div class="decommentmodal-footer">
+			<a href="https://jflute.hatenadiary.jp/entry/20170628/letsdbcomment" target="_blank" class="decommentmodal-guide-link">Learn more</a>
+			<button id="decomment-ok" class="decommentmodal-ok-btn">OK</button>
+		</div>
 	</div>
 </div>
 <!-- Notification Banner for informational messages -->
