@@ -440,20 +440,28 @@ pre.spolicyviodisp {
 	font-weight: bold;
 	color: #1a73e8;
 }
+.decomment-editor {
+	margin-top: 10px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: border-color 0.2s;
+}
+.decomment-editor:focus-within {
+	border-color: #709dff;
+}
 .decommentinput {
 	display: block;
 	width: 100%;
-	margin-top: 10px;
 	padding: 8px;
 	font-size: 12px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
+	border: none;
+	border-radius: 0;
 	box-sizing: border-box;
-	transition: border-color 0.2s;
+	resize: vertical;
 }
 .decommentinput:focus {
 	outline: none;
-	border-color: #709dff;
 }
 .decomment-alias-input-area {
 	margin-top: 20px;
@@ -525,6 +533,31 @@ pre.spolicyviodisp {
 }
 .decommentmodal-close-btn:hover {
 	background-color: #f0f0f0;
+}
+.decomment-toolbar {
+	display: flex;
+	gap: 4px;
+	padding: 2px 6px;
+	background-color: #f6f8fa;
+	border-bottom: 1px solid #ddd;
+}
+.decomment-toolbar-btn {
+	width: 22px;
+	height: 22px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	background: transparent;
+	cursor: pointer;
+	font-size: 11px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.15s, border-color 0.15s;
+	padding: 0;
+}
+.decomment-toolbar-btn:hover {
+	background-color: #eaeef2;
+	border-color: #ddd;
 }
 .decomment-user-input {
 	display: none;
@@ -1001,7 +1034,12 @@ ${schemaPolicyDisplay.policyMessageHtmlPreText}
 	<div class="decommentmodalcontent">
 		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
 		<p>Input the new comment of <span id="decomment-modal-column-info" class="decomment-target-name"></span></p>
-		<textarea id="decomment-input" class="decommentinput" rows="10"></textarea>
+		<div class="decomment-editor">
+			<div class="decomment-toolbar">
+				<button type="button" class="decomment-toolbar-btn" id="decomment-toolbar-strikethrough" title="Strikethrough (~~text~~)"><s>S</s></button>
+			</div>
+			<textarea id="decomment-input" class="decommentinput" rows="11"></textarea>
+		</div>
 		<div class="decomment-alias-input-area">
 			<label for="decomment-alias-input" class="decomment-alias-label">Alias:</label>
 			<input type="text" id="decomment-alias-input" class="decomment-alias-input"/>
@@ -1577,6 +1615,17 @@ var DecommentUtil = new function(){
 		var result = decomment.replace(/(?:dfalias|shalias):\s*\{[^}]*\}\s*\n?/g, '');
 		// remove leading <br> to prevent empty line when opening in plain schema html
 		return result.replace(/^<br\s*\/?>/i, '').trim();
+	},
+	/**
+	 * Render strikethrough (~~text~~) as HTML del tags
+	 * @param {string} string - text
+	 * @returns {string} text with ~~text~~ converted to <del>text</del>
+	 */
+	this.renderStrikethrough = function(string) {
+		if (!string) {
+			return string;
+		}
+		return string.replace(/~~(.+?)~~/g, '<del>$1</del>');
 	}
 }
 
@@ -2119,7 +2168,7 @@ PickupTableProperty.prototype = {
 			var decomment = this.decomments[key];
 			// strip dfalias:{} or shalias:{} from display
 			var cleanBody = DecommentUtil.removeAliasFromDecomment(decomment.body);
-			displayComment += cleanBody;
+			displayComment += DecommentUtil.renderStrikethrough(cleanBody);
 			if (this.isConflict() && decomment.pieceGitBranch) {
 				displayComment += '\n=======' + decomment.pieceGitBranch + ' (' + decomment.pieceOwner + ')';
 				if (key < commentCount - 1) {
@@ -2164,11 +2213,12 @@ PickupTableProperty.prototype = {
 	 * @return {string} display html comment
 	 */
 	getDisplayHtmlComment: function() {
-		var child = this.selectTargetHtmlElements()[0].childNodes[0];
-		if (child != null && child.nodeName === "#text") {
-			return child.nodeValue.trim();
+		var element = this.selectTargetHtmlElements()[0];
+		if (!element) {
+			return "";
 		}
-		return ""
+		var html = element.innerHTML.replace(/<span>@author\([^)]*\)<\/span>/g, '').trim();
+		return html.replace(/<del>([\s\S]+?)<\/del>/g, '~~$1~~');
 	},
 
 	/**
@@ -2360,7 +2410,7 @@ PickupColumnProperty.prototype = {
 			var decomment = this.decomments[key];
 			// strip dfalias:{} or shalias:{} from display
 			var cleanBody = DecommentUtil.removeAliasFromDecomment(decomment.body);
-			displayComment += cleanBody;
+			displayComment += DecommentUtil.renderStrikethrough(cleanBody);
 			if (this.isConflict() && decomment.pieceGitBranch) {
 				displayComment += '\n=======' + decomment.pieceGitBranch + ' (' + decomment.pieceOwner + ')';
 				if (key < commentCount - 1) {
@@ -2402,11 +2452,12 @@ PickupColumnProperty.prototype = {
 	 * @return {string} display html comment
 	 */
 	getDisplayHtmlComment: function() {
-		var child = this.selectTargetHtmlElement().childNodes[0];
-		if (child != null && child.nodeName === "#text") {
-			return child.nodeValue.trim();
+		var element = this.selectTargetHtmlElement();
+		if (!element) {
+			return "";
 		}
-		return ""
+		var html = element.innerHTML.replace(/<span>@author\([^)]*\)<\/span>/g, '').trim();
+		return html.replace(/<del>([\s\S]+?)<\/del>/g, '~~$1~~');
 	},
 
 	/**
@@ -2508,6 +2559,29 @@ PickupColumnProperty.prototype = {
 //
 // _/_/_/_/_/_/_/_/
 /**
+ * Apply formatting syntax around selected text in a textarea.
+ * If no text is selected, inserts the syntax markers and places the cursor between them.
+ * @param {HTMLTextAreaElement} textarea
+ * @param {string} syntax - the wrapping marker (e.g. '~~')
+ */
+function applyFormatting(textarea, syntax) {
+	var start = textarea.selectionStart;
+	var end = textarea.selectionEnd;
+	var selectedText = textarea.value.substring(start, end);
+	var before = textarea.value.substring(0, start);
+	var after = textarea.value.substring(end);
+	textarea.value = before + syntax + selectedText + syntax + after;
+	if (selectedText.length === 0) {
+		// place cursor between the markers
+		textarea.setSelectionRange(start + syntax.length, start + syntax.length);
+	} else {
+		// keep the wrapped text selected
+		textarea.setSelectionRange(start, end + syntax.length * 2);
+	}
+	textarea.focus();
+}
+
+/**
  * @author deco
  * @author cabos
  * @author jflute
@@ -2542,6 +2616,7 @@ Decomment.prototype = {
 		} else { // #plain_opening
 			this.reflectEmbeddedPickup();
 		}
+		this.setupFormattingToolbar();
 	},
 
 	/**
@@ -2894,6 +2969,24 @@ Decomment.prototype = {
 	getTableNameFromElement: function (table) {
 		var previousElement = table.previousElementSibling;
 		return previousElement.value;
+	},
+
+	/**
+	 * Setup formatting toolbar button events
+	 */
+	setupFormattingToolbar: function() {
+		var textarea = document.getElementById('decomment-input');
+		var buttons = [
+			{ id: 'decomment-toolbar-strikethrough', syntax: '~~' }
+		];
+		buttons.forEach(function(btn) {
+			var el = document.getElementById(btn.id);
+			if (!el) { return; }
+			el.addEventListener('mousedown', function(e) {
+				e.preventDefault();
+        applyFormatting(textarea, btn.syntax);
+			});
+		});
 	},
 
 	/**
