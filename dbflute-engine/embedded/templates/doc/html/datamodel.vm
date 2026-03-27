@@ -2568,17 +2568,22 @@ function applyFormatting(textarea, syntax) {
 	var start = textarea.selectionStart;
 	var end = textarea.selectionEnd;
 	var selectedText = textarea.value.substring(start, end);
-	var before = textarea.value.substring(0, start);
-	var after = textarea.value.substring(end);
-	textarea.value = before + syntax + selectedText + syntax + after;
+
+	textarea.focus();
 	if (selectedText.length === 0) {
-		// place cursor between the markers
+		// no selection: insert markers and place cursor between them
+		document.execCommand('insertText', false, syntax + syntax);
 		textarea.setSelectionRange(start + syntax.length, start + syntax.length);
+	} else if (selectedText.startsWith(syntax) && selectedText.endsWith(syntax) && selectedText.length > syntax.length * 2) {
+		// already wrapped: unwrap
+		var unwrapped = selectedText.slice(syntax.length, -syntax.length);
+		document.execCommand('insertText', false, unwrapped);
+		textarea.setSelectionRange(start, start + unwrapped.length);
 	} else {
-		// keep the wrapped text selected
+		// not wrapped: wrap
+		document.execCommand('insertText', false, syntax + selectedText + syntax);
 		textarea.setSelectionRange(start, end + syntax.length * 2);
 	}
-	textarea.focus();
 }
 
 /**
