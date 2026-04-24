@@ -1617,8 +1617,8 @@ var DecommentUtil = new function(){
 		return result.replace(/^<br\s*\/?>/i, '').trim();
 	},
 	/**
-	 * Render strikethrough (~~text~~) as HTML del tags
-	 * @param {string} string - text
+	 * Render strikethrough markdown syntax (~~text~~) as HTML del tags for display.
+	 * @param {string} string - decomment text where text wrapped in ~~ is the strikethrough target (e.g. ~~foo~~ renders foo as strikethrough)
 	 * @returns {string} text with ~~text~~ converted to <del>text</del>
 	 */
 	this.renderStrikethrough = function(string) {
@@ -2561,8 +2561,8 @@ PickupColumnProperty.prototype = {
 /**
  * Apply formatting syntax around selected text in a textarea.
  * If no text is selected, inserts the syntax markers and places the cursor between them.
- * @param {HTMLTextAreaElement} textarea
- * @param {string} syntax - the wrapping marker (e.g. '~~')
+ * @param {HTMLTextAreaElement} textarea - the textarea element containing the text to format
+ * @param {string} syntax - the wrapping marker to apply around the selected text (e.g. '~~' for strikethrough)
  */
 function applyFormatting(textarea, syntax) {
 	var start = textarea.selectionStart;
@@ -2989,7 +2989,7 @@ Decomment.prototype = {
 			if (!el) { return; }
 			el.addEventListener('mousedown', function(e) {
 				e.preventDefault();
-        applyFormatting(textarea, btn.syntax);
+				applyFormatting(textarea, btn.syntax);
 			});
 		});
 	},
