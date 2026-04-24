@@ -2595,10 +2595,12 @@ function applyFormatting(textarea, syntax) {
 			document.execCommand('insertText', false, unwrapped);
 			textarea.setSelectionRange(start, start + unwrapped.length);
 		} else {
-			// not wrapped: apply markers to each non-empty line individually
+			// not wrapped: apply markers to each non-empty line individually, skipping already-wrapped lines
 			// execCommand is used instead of textarea.value= to preserve the browser's native undo stack (Cmd+Z)
 			var wrapped = lines.map(function(line) {
-				return line.length === 0 ? line : syntax + line + syntax;
+				if (line.length === 0) { return line; }
+				if (line.startsWith(syntax) && line.endsWith(syntax) && line.length > syntax.length * 2) { return line; }
+				return syntax + line + syntax;
 			}).join('\n');
 			document.execCommand('insertText', false, wrapped);
 			textarea.setSelectionRange(start, start + wrapped.length);
