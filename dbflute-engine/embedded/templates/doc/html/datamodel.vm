@@ -2575,20 +2575,34 @@ function applyFormatting(textarea, syntax) {
 	var end = textarea.selectionEnd;
 	var selectedText = textarea.value.substring(start, end);
 
+	// focus first: execCommand requires the textarea to be focused to know where to act
 	textarea.focus();
 	if (selectedText.length === 0) {
-		// no selection: insert markers and place cursor between them
+		// no selection: insert empty markers and place cursor between them (e.g. "~~~~" -> cursor in middle)
 		document.execCommand('insertText', false, syntax + syntax);
 		textarea.setSelectionRange(start + syntax.length, start + syntax.length);
-	} else if (selectedText.startsWith(syntax) && selectedText.endsWith(syntax) && selectedText.length > syntax.length * 2) {
-		// already wrapped: unwrap
-		var unwrapped = selectedText.slice(syntax.length, -syntax.length);
-		document.execCommand('insertText', false, unwrapped);
-		textarea.setSelectionRange(start, start + unwrapped.length);
 	} else {
-		// not wrapped: wrap
-		document.execCommand('insertText', false, syntax + selectedText + syntax);
-		textarea.setSelectionRange(start, end + syntax.length * 2);
+		var lines = selectedText.split('\n');
+		// toggle off only if every non-empty line is already wrapped
+		var allWrapped = lines.every(function(line) {
+			return line.length === 0 || (line.startsWith(syntax) && line.endsWith(syntax) && line.length > syntax.length * 2);
+		});
+		if (allWrapped) {
+			// already wrapped on all lines: strip markers from each line individually
+			var unwrapped = lines.map(function(line) {
+				return line.length === 0 ? line : line.slice(syntax.length, -syntax.length);
+			}).join('\n');
+			document.execCommand('insertText', false, unwrapped);
+			textarea.setSelectionRange(start, start + unwrapped.length);
+		} else {
+			// not wrapped: apply markers to each non-empty line individually
+			// execCommand is used instead of textarea.value= to preserve the browser's native undo stack (Cmd+Z)
+			var wrapped = lines.map(function(line) {
+				return line.length === 0 ? line : syntax + line + syntax;
+			}).join('\n');
+			document.execCommand('insertText', false, wrapped);
+			textarea.setSelectionRange(start, start + wrapped.length);
+		}
 	}
 }
 
