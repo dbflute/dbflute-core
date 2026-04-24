@@ -2218,6 +2218,9 @@ PickupTableProperty.prototype = {
 			return "";
 		}
 		var html = element.innerHTML.replace(/<span>@author\([^)]*\)<\/span>/g, '').trim();
+		if (html === '&nbsp;') {
+			return '';
+		}
 		return html.replace(/<del>([\s\S]+?)<\/del>/g, '~~$1~~');
 	},
 
@@ -2457,6 +2460,9 @@ PickupColumnProperty.prototype = {
 			return "";
 		}
 		var html = element.innerHTML.replace(/<span>@author\([^)]*\)<\/span>/g, '').trim();
+		if (html === '&nbsp;') {
+			return '';
+		}
 		return html.replace(/<del>([\s\S]+?)<\/del>/g, '~~$1~~');
 	},
 
