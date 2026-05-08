@@ -851,7 +851,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #else
 		<td>${classificationName}</td>
 #end
-		<td class="clstypecell">#if ($classificationTop.isTableClassification())table#else implicit#if ($classificationTop.isCheckImplicitSet())<br />(check)#end#end</td>
+		<td class="clstypecell">#if ($classificationTop.isTableClassification())table#else implicit#end</td>
 		<td>#if ($classificationTop.hasTopComment())${classificationTop.topCommentForSchemaHtml}#else &nbsp;#end</td>
 		<td>
 			<table class="child">
