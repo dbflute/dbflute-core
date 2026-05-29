@@ -37,6 +37,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -66,6 +67,8 @@ public final class DfTypeUtil {
     public static final String SLASHED_DATE_PATTERN = "yyyy/MM/dd";
     public static final String COLONED_TIME_PATTERN = "HH:mm:ss";
     public static final String PLAIN_MILLIS_PATTERN = "SSS";
+    public static final String PLAIN_OFFSET_PATTERN = "XXX";
+    public static final String PLAIN_ZONED_PATTERN = "'['[VV]']'";
     public static final String HYPHENED_TIMESTAMP_PATTERN;
     static {
         HYPHENED_TIMESTAMP_PATTERN = HYPHENED_DATE_PATTERN + " " + COLONED_TIME_PATTERN + "." + PLAIN_MILLIS_PATTERN;
@@ -74,11 +77,21 @@ public final class DfTypeUtil {
     static {
         SLASHED_TIMESTAMP_PATTERN = SLASHED_DATE_PATTERN + " " + COLONED_TIME_PATTERN + "." + PLAIN_MILLIS_PATTERN;
     }
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // *hyphen basis in program, so the default patterns are hyphened
     // while, slash basis in human view (so HandyDate#toDisp() uses slashed)
+    //
+    // and LocalDate, LocalDateTime use the same patterns for unification in DBFlute
+    // (if you use e.g. ISO pattern, you should set the pattern explicitly)
+    // (default is basically for display e.g. log, so don't depend on it)
+    // _/_/_/_/_/_/_/_/
     public static final String DEFAULT_DATE_PATTERN = HYPHENED_DATE_PATTERN;
     public static final String DEFAULT_TIMESTAMP_PATTERN = HYPHENED_TIMESTAMP_PATTERN;
     public static final String DEFAULT_TIME_PATTERN = COLONED_TIME_PATTERN;
+
+    // also use HYPHENED_TIMESTAMP_PATTERN as base part here
+    public static final String DEFAULT_DATETIME_OFFSET_PATTERN = HYPHENED_TIMESTAMP_PATTERN + PLAIN_OFFSET_PATTERN;
+    public static final String DEFAULT_DATETIME_ZONED_PATTERN = HYPHENED_TIMESTAMP_PATTERN + PLAIN_OFFSET_PATTERN + PLAIN_ZONED_PATTERN;
 
     protected static final String NULL = "null";
     protected static final String[] EMPTY_STRINGS = new String[] {};
@@ -161,13 +174,14 @@ public final class DfTypeUtil {
             return doConvertToStringLocalDate((LocalDate) obj, pattern);
         } else if (obj instanceof LocalDateTime) {
             return doConvertToStringLocalDateTime((LocalDateTime) obj, pattern);
-        } else if (obj instanceof ZonedDateTime) { // @since 1.3.2
-            return doConvertToStringZonedDateTime((ZonedDateTime) obj, pattern);
         } else if (obj instanceof LocalTime) {
             return doConvertToStringLocalTime((LocalTime) obj, pattern);
+        } else if (obj instanceof OffsetDateTime) { // @since 1.3.2
+            return doConvertToStringOffsetDateTime((OffsetDateTime) obj, pattern);
+        } else if (obj instanceof ZonedDateTime) { // @since 1.3.2
+            return doConvertToStringZonedDateTime((ZonedDateTime) obj, pattern);
         } else if (obj instanceof Time) {
-            final String realPattern = pattern != null ? pattern : DEFAULT_TIME_PATTERN;
-            return doConvertToStringDate((Time) obj, (TimeZone) null, realPattern, (Locale) null);
+            return doConvertToStringDate((Time) obj, (TimeZone) null, pattern, (Locale) null);
         } else if (obj instanceof Date) {
             return doConvertToStringDate((Date) obj, (TimeZone) null, pattern, (Locale) null);
         } else if (obj instanceof Calendar) {
@@ -238,22 +252,6 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the zoned date-time to the instance that is string by the pattern.
-     * @param date The parsed zoned date-time to be string. (NullAllowed: if null, returns null)
-     * @param pattern The pattern format to parse as zoned date-time. (NotNull)
-     * @return The converted string. (NullAllowed: when the argument is null)
-     */
-    public static String toStringDate(ZonedDateTime date, String pattern) { // @since 1.3.2
-        assertPatternNotNull("toStringDate()", pattern);
-        return date != null ? doConvertToStringZonedDateTime(date, pattern) : null;
-    }
-
-    protected static String doConvertToStringZonedDateTime(ZonedDateTime value, String pattern) {
-        final String realPattern = pattern != null ? pattern : DEFAULT_TIMESTAMP_PATTERN; // only millisecond (not nanosecond) as default
-        return value.format(DateTimeFormatter.ofPattern(realPattern, chooseRealLocale(null)));
-    }
-
-    /**
      * Convert the local time to the instance that is string by the pattern.
      * @param date The parsed local time to be string. (NullAllowed: if null, returns null)
      * @param pattern The pattern format to parse as local time. (NotNull)
@@ -265,10 +263,43 @@ public final class DfTypeUtil {
     }
 
     protected static String doConvertToStringLocalTime(LocalTime value, String pattern) {
-        final String realPattern = pattern != null ? pattern : DEFAULT_TIME_PATTERN; // not use nanosecond part as default
+        final String realPattern = pattern != null ? pattern : DEFAULT_TIME_PATTERN;
         return value.format(DateTimeFormatter.ofPattern(realPattern, chooseRealLocale(null)));
     }
 
+    /**
+     * Convert the offset date-time to the instance that is string by the pattern.
+     * @param date The parsed offset date-time to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as offset date-time. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringDate(OffsetDateTime date, String pattern) { // @since 1.3.2
+        assertPatternNotNull("toStringDate()", pattern);
+        return date != null ? doConvertToStringOffsetDateTime(date, pattern) : null;
+    }
+
+    protected static String doConvertToStringOffsetDateTime(OffsetDateTime value, String pattern) {
+        final String realPattern = pattern != null ? pattern : DEFAULT_DATETIME_OFFSET_PATTERN;
+        return value.format(DateTimeFormatter.ofPattern(realPattern, chooseRealLocale(null)));
+    }
+
+    /**
+     * Convert the zoned date-time to the instance that is string by the pattern.
+     * @param date The parsed zoned date-time to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as zoned date-time. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringDate(ZonedDateTime date, String pattern) { // @since 1.3.2
+        assertPatternNotNull("toStringDate()", pattern);
+        return date != null ? doConvertToStringZonedDateTime(date, pattern) : null;
+    }
+
+    protected static String doConvertToStringZonedDateTime(ZonedDateTime value, String pattern) {
+        final String realPattern = pattern != null ? pattern : DEFAULT_DATETIME_ZONED_PATTERN;
+        return value.format(DateTimeFormatter.ofPattern(realPattern, chooseRealLocale(null)));
+    }
+
+    // util.Date
     public static String toStringDate(Date value, TimeZone timeZone, String pattern, Locale locale) {
         assertTimeZoneNotNull("toStringDate()", timeZone);
         assertPatternNotNull("toStringDate()", pattern);
@@ -1444,13 +1475,13 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                         ZonedDateTime
     //                                         -------------
+    // #for_now jflute internal function for now, needs to know zoned handling (2026/05/29)
     /**
      * @param obj The object to be converted. (NullAllowed: if null or empty, returns null)
      * @param timeZone The time-zone for the local date. (NotNull)
      * @return The zoned date-time. (NullAllowed: when the argument is null or empty)
      */
     protected static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
-        // internal function for now, needs to know zoned handling
         assertTimeZoneNotNull("toZonedDateTime()", timeZone);
         if (obj == null) {
             return null;

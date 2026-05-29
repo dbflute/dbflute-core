@@ -58,8 +58,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -468,18 +470,47 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     // -----------------------------------------------------
+    //                                       Offset DateTime
+    //                                       ---------------
+    public void test_toOffsetDateTime_fromUtilDate_timeZone() {
+        TimeZone targetZone = TimeZone.getTimeZone("Asia/Tokyo");
+        Date pureDate = toDate("2026-01-10 15:10:56.789", targetZone);
+        OffsetDateTime offsetDateTime = toZonedDateTime(pureDate, targetZone).toOffsetDateTime();
+
+        assertEquals("2026-01-10T15:10:56.789+09:00", offsetDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        assertEquals("2026/01/10 15:10:56.789+09:00", toStringDate(offsetDateTime, "yyyy/MM/dd HH:mm:ss.SSSXXX"));
+
+        assertEquals("2026-01-10 15:10:56.789+09:00", DfTypeUtil.toString(offsetDateTime));
+        assertEquals("2026-01-10 15:10:00.000+09:00", DfTypeUtil.toString(offsetDateTime.truncatedTo(ChronoUnit.MINUTES)));
+        assertEquals("2026-01-10 15:10:56+09:00", DfTypeUtil.toString(offsetDateTime, "yyyy-MM-dd HH:mm:ssXXX"));
+        assertEquals("2026/01/10 15:10+09:00", toStringDate(offsetDateTime, "yyyy/MM/dd HH:mmXXX"));
+    }
+
+    public void test_toOffsetDateTime_fromTimestamp_nanos() {
+        Timestamp timestamp = toTimestamp("2026-01-10 14:47:23.123456789");
+        String stampPattern = "yyyy/MM/dd HH:mm:ss.nnnnnnnnn";
+        TimeZone jpZone = TimeZone.getTimeZone("JAPAN");
+
+        // done jflute truncated microseconds, hope to keep nanos (2026/01/10)
+        //assertEquals("2026/01/10 05:47:23.123000000", toStringDate(toZonedDateTime(timestamp, jpZone), stampPattern));
+        assertEquals("2026/01/10 05:47:23.123456789", toStringDate(toZonedDateTime(timestamp, jpZone), stampPattern));
+    }
+
+    // -----------------------------------------------------
     //                                        Zoned DateTime
     //                                        --------------
     public void test_toZonedDateTime_fromUtilDate_timeZone() {
-        TimeZone gmt3Hour = TimeZone.getTimeZone("GMT+3");
-        Date pureDate = toDate("2026-01-10 15:10:56.789", gmt3Hour);
-        ZonedDateTime zonedDateTime = toZonedDateTime(pureDate, gmt3Hour);
+        TimeZone targetZone = TimeZone.getTimeZone("Asia/Tokyo");
+        Date pureDate = toDate("2026-01-10 15:10:56.789", targetZone);
+        ZonedDateTime zonedDateTime = toZonedDateTime(pureDate, targetZone);
 
-        assertEquals("2026-01-10T15:10:56.789+03:00[GMT+03:00]", zonedDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        assertEquals("2026/01/10 15:10:56.789GMT+03:00", toStringDate(zonedDateTime, "yyyy/MM/dd HH:mm:ss.SSS[VV]"));
+        assertEquals("2026-01-10T15:10:56.789+09:00[Asia/Tokyo]", zonedDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        assertEquals("2026/01/10 15:10:56.789+09:00[Asia/Tokyo]", toStringDate(zonedDateTime, "yyyy/MM/dd HH:mm:ss.SSSXXX'['[VV]']'"));
 
-        assertEquals("2026-01-10 15:10:56.789", DfTypeUtil.toString(zonedDateTime));
-        assertEquals("2026/01/10 15:10:56.789GMT+03:00", toStringDate(zonedDateTime, "yyyy/MM/dd HH:mm:ss.SSS[VV]"));
+        assertEquals("2026-01-10 15:10:56.789+09:00[Asia/Tokyo]", DfTypeUtil.toString(zonedDateTime));
+        assertEquals("2026-01-10 15:10:00.000+09:00[Asia/Tokyo]", DfTypeUtil.toString(zonedDateTime.truncatedTo(ChronoUnit.MINUTES)));
+        assertEquals("2026-01-10 15:10:56.789Asia/Tokyo", DfTypeUtil.toString(zonedDateTime, "yyyy-MM-dd HH:mm:ss.SSS[VV]"));
+        assertEquals("2026/01/10 15:10:56.789Asia/Tokyo", toStringDate(zonedDateTime, "yyyy/MM/dd HH:mm:ss.SSS[VV]"));
     }
 
     public void test_toZonedDateTime_fromTimestamp_nanos() {
