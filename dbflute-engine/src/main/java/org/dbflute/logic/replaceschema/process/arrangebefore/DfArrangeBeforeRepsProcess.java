@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.tools.ant.util.FileUtils;
+import org.dbflute.helper.filesystem.FileHierarchyTracer;
+import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.process.ProcessResult;
@@ -91,13 +93,14 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         if (!src.contains("/")) {
             throwRepsArrangeCopySrcNotPathException(src, dest);
         }
+        _log.info("[copy] src=" + src + ", dest=" + dest);
         final String pureName = Srl.substringLastRear(src, "/");
         if (pureName.startsWith("*.")) { // e.g. ./foo/*.sql
             final String ext = Srl.substringFirstRear(pureName, "*.");
             final File srcDir = new File(Srl.substringLastFront(src, "/*."));
             final List<String> elementList = extractElementList(ext, srcDir);
             final String extSuffix = "." + ext;
-            if (isDestDirectory(destFile)) { // copy to all files
+            if (canBeDestDirectory(destFile)) { // copy to all files
                 // /- - - - - - - - - - - - - - - - - - - - -
                 // src=./foo/*.sql, dest=./bar/ (dest=./bar)
                 // - - - - - - - - - -/
@@ -111,7 +114,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
                     destBaseDir = dest;
                 }
                 if (cleanOption) {
-                    deleteFile(ext, new File(destBaseDir));
+                    deleteFile(new File(destBaseDir), ext);
                 }
                 if (!elementList.isEmpty()) {
                     for (String element : elementList) {
@@ -151,20 +154,34 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
                     _log.info("*Not found the corresponding copy src file: " + src);
                 }
             }
-        } else {
-            // /- - - - - - - - - - - - - - - - - - - - -
-            // src=./foo/bar.sql, dest=./baz/qux.sql
+        } else { // orthodox
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // src=./sea, dest=./land                 (dir to dir)
+            // src=./foo/bar.sql, dest=./baz/qux.sql  (file to file)
             // - - - - - - - - - -/
             final File srcFile = new File(src);
             if (!srcFile.exists()) {
+                // #thinking jflute is throwing exception better? (2026/05/31)
                 _log.info("*Not existing the copy src file: " + src);
                 return;
             }
-            copyFile(srcFile, destFile);
+            if (srcFile.isDirectory()) {
+                if (canBeDestDirectory(destFile)) { // dir to dir
+                    if (cleanOption) {
+                        deleteFile(destFile, /*ext*/null);
+                    }
+                    copyDirectory(srcFile, destFile);
+                } else { // dir to file (mistake?)
+                    throwRepsArrangeCleanCopyDestFileButSrcDirectoryException(src, dest);
+                }
+            } else { // src as file
+                copyFile(srcFile, destFile); // file to file only allowed
+                // #for_now jflute srcFile to destDir is unsupported (now exception) (2026/05/31)
+            }
         }
     }
 
-    protected boolean isDestDirectory(File destFile) {
+    protected boolean canBeDestDirectory(File destFile) {
         if (destFile.exists() && destFile.isDirectory()) {
             return true;
         }
@@ -193,11 +210,18 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         return DfCollectionUtil.newArrayList(elementList);
     }
 
-    protected void deleteFile(String ext, File baseDir) {
-        final String extSuffix = "." + ext;
+    // -----------------------------------------------------
+    //                                           Delete File
+    //                                           -----------
+    protected void deleteFile(File baseDir, String ext) {
+        final String extSuffix = ext != null ? "." + ext : null;
         final File[] elementList = baseDir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return Srl.endsWith(name, extSuffix);
+                if (extSuffix != null) {
+                    return Srl.endsWith(name, extSuffix);
+                } else {
+                    return true; // all files as defailt
+                }
             }
         });
         if (elementList != null) {
@@ -208,6 +232,40 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         }
     }
 
+    // -----------------------------------------------------
+    //                                        Copy Directory
+    //                                        --------------
+    protected void copyDirectory(File srcFile, File destFile) {
+        final FileHierarchyTracer tracer = new FileHierarchyTracer();
+        tracer.trace(srcFile, new FileHierarchyTracingHandler() {
+            @Override
+            public boolean isTargetFileOrDir(File currentFile) {
+                return true;
+            }
+
+            @Override
+            public void handleFile(File currentFile) throws IOException {
+                final File destFilePath = prepareDestFilePath(srcFile, destFile, currentFile);
+                copyFile(currentFile, destFilePath);
+            }
+
+            protected File prepareDestFilePath(File srcFile, File destFile, File currentFile) throws IOException {
+                final String destRootPath = destFile.getCanonicalPath(); // e.g. /land
+                final String relativePath = deriveRelativePath(srcFile, currentFile); // e.g. choucho/beauty.txt
+                return new File(destRootPath + "/" + relativePath); // e.g. /land/choucho/beauty.txt
+            }
+
+            protected String deriveRelativePath(File srcFile, File currentFile) throws IOException {
+                final String srcDirPath = srcFile.getCanonicalPath(); // e.g. /sea/hangar/mystic (always no trailing slash)
+                final String currentFilePath = currentFile.getCanonicalPath(); // e.g. /sea/hangar/mystic/choucho/beauty.txt
+                return Srl.ltrim(Srl.substringFirstRear(currentFilePath, srcDirPath), "/"); // e.g. choucho/beauty.txt
+            }
+        });
+    }
+
+    // -----------------------------------------------------
+    //                                             Copy File
+    //                                             ---------
     protected void copyFile(File src, File dest) {
         _log.info("  copy " + src.getPath() + " to " + dest.getPath());
         if (dest.exists()) {
@@ -221,6 +279,9 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         }
     }
 
+    // -----------------------------------------------------
+    //                                        Copy Exception
+    //                                        --------------
     protected void throwRepsArrangeCopySrcNotPathException(String src, String dest) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The path in src was not a path expression.");
@@ -263,6 +324,19 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractRepsProcess {
         br.addItem("Found Files");
         br.addElement(first);
         br.addElement(second);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected void throwRepsArrangeCleanCopyDestFileButSrcDirectoryException(String src, String dest) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The dest is file when src is directory.");
+        br.addItem("Advice");
+        br.addElement("When src is directory, dest should be directory.");
+        br.addItem("Source");
+        br.addElement(src);
+        br.addItem("Destination");
+        br.addElement(dest);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
     }
