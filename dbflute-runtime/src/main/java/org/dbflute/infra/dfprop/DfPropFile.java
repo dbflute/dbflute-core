@@ -475,7 +475,7 @@ public class DfPropFile {
                 //  |  |-foo+.dfprop // if exists
                 //  |-foo.dfprop
                 //  |-foo+.dfprop    // no target
-                resolveOutsidePropInheritMap(handler, envPath, map);
+                resolveOutsideMap(handler, envPath, map);
             } else { // top driven in environment
                 // dfprop
                 //  |-env
@@ -484,8 +484,8 @@ public class DfPropFile {
                 //  |-foo+.dfprop    // if exists (second priority)
                 map = callReadingMapChecked(handler, dfpropPath);
                 if (map != null) {
-                    resolveOutsidePropInheritMap(handler, dfpropPath, map);
-                    resolveOutsidePropInheritMap(handler, envPath, map);
+                    resolveOutsideMap(handler, dfpropPath, map);
+                    resolveOutsideMap(handler, envPath, map);
                 }
             }
         } else { // no environment type
@@ -496,7 +496,7 @@ public class DfPropFile {
             //  |-foo+.dfprop    // if exists
             map = callReadingMapChecked(handler, dfpropPath);
             if (map != null) { // top driven without environment
-                resolveOutsidePropInheritMap(handler, dfpropPath, map);
+                resolveOutsideMap(handler, dfpropPath, map);
             }
         }
         if (map == null && !_returnsNullIfNotFound) {
@@ -516,21 +516,75 @@ public class DfPropFile {
         }
     }
 
-    protected <ELEMENT> boolean resolveOutsidePropInheritMap(DfPropReadingMapHandler<ELEMENT> handler, String path,
-            Map<String, ELEMENT> map) {
-        if (map == null) { // no parent
+    protected <ELEMENT> boolean resolveOutsideMap(DfPropReadingMapHandler<ELEMENT> handler, String path, Map<String, ELEMENT> baseMap) {
+        if (baseMap == null) { // no parent
             return false;
         }
         final String inheritPath = deriveInheritPath(path);
         if (inheritPath == null) {
             return false;
         }
-        final Map<String, ELEMENT> inheritMap = callReadingMapChecked(handler, inheritPath);
-        if (inheritMap == null) {
+        final Map<String, ELEMENT> outsideMap = callReadingMapChecked(handler, inheritPath);
+        if (outsideMap == null) {
             return false;
         }
-        map.putAll(inheritMap);
+        inheritMap(baseMap, outsideMap);
         return true;
+    }
+
+    // also key is generic to avoid String/Object generic headache
+    protected <KEY, ELEMENT> void inheritMap(Map<KEY, ELEMENT> baseMap, Map<KEY, ELEMENT> outsideMap) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // outsideMap extends baseMap
+        // _/_/_/_/
+        for (Entry<KEY, ELEMENT> entry : outsideMap.entrySet()) {
+            final KEY keyObj = entry.getKey();
+            final ELEMENT valueObj = entry.getValue();
+            if (!(keyObj instanceof String)) {
+                baseMap.put(keyObj, valueObj); // simply adding or overwriting
+                continue;
+            }
+            final String keyStr = (String) keyObj;
+            if (isNestedMergeValid(keyStr, valueObj)) { // e.g. ; seaHangar++ = map:{
+                final String realKey = extractPureKeyWithoutNestedMergeMark(keyStr); // e.g. seaHangar
+                @SuppressWarnings("unchecked")
+                final Map<KEY, ELEMENT> valueMap = (Map<KEY, ELEMENT>) valueObj;
+
+                final ELEMENT existingValue = baseMap.get(realKey);
+                if (existingValue != null) { // needs to merge
+                    if (existingValue instanceof Map<?, ?>) { // both map
+                        @SuppressWarnings("unchecked")
+                        final Map<KEY, ELEMENT> existingMap = (Map<KEY, ELEMENT>) existingValue;
+                        inheritMap(existingMap, valueMap); // recursive
+                    } else { // different type, simply adding reluctantly
+                        baseMap.put(keyObj, valueObj);
+                    }
+                } else { // simply adding
+                    @SuppressWarnings("unchecked")
+                    final KEY resolvedKey = (KEY) realKey;
+                    baseMap.put(resolvedKey, valueObj);
+                }
+            } else { // simply adding or overwriting
+                baseMap.put(keyObj, valueObj);
+            }
+        }
+        // memorable: traditional implementation (2026/06/01)
+        //map.putAll(inheritMap);
+    }
+
+    protected <ELEMENT> boolean isNestedMergeValid(String keyStr, ELEMENT valueObj) {
+        return keyStr.endsWith(getNestedMergeSuffix()) && valueObj instanceof Map<?, ?>;
+    }
+
+    protected String extractPureKeyWithoutNestedMergeMark(String keyStr) {
+        // e.g.
+        //  "seaHangar++" -> "seaHangar"
+        //  "seaHangar ++" -> "seaHangar"
+        return Srl.rtrim(Srl.substringLastFront(keyStr, getNestedMergeSuffix()), " ");
+    }
+
+    protected String getNestedMergeSuffix() { // @since 1.3.1-patch
+        return "++"; // e.g. ; seaHangar++ = map:{
     }
 
     // -----------------------------------------------------

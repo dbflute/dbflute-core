@@ -470,6 +470,68 @@ public class DfPropFileTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
+    //                                                                        Nested Merge
+    //                                                                        ============
+    public void test_readMap_NestedMerge_basic() {
+        // ## Arrange ##
+        DfPropFile propFile = createInheritPropFile();
+
+        // ## Act ##
+        Map<String, Object> map = propFile.readMap("/dfprop/nestedMergeMap.dfprop", "maihama");
+
+        // ## Assert ##
+        log(map);
+        assertEquals(9, map.size());
+        assertEquals(map.get("seaBroadway"), newLinkedHashMap("showName", "bbb"));
+        {
+            Map<String, String> showNameMap = newLinkedHashMap("over", "the", "the", "waves");
+            assertEquals(map.get("seaDockside"), newLinkedHashMap("showName", showNameMap, "stage", "side"));
+        }
+        {
+            Map<String, String> hangarMap = newLinkedHashMap("showName", "rhythms", "choucho", "beauty");
+            hangarMap.put("daichi", "dynamic");
+            assertEquals(map.get("seaHangar"), hangarMap);
+        }
+        assertEquals(map.get("landShowbase"), newLinkedHashMap("showName", "sdream", "shining", "jump"));
+        assertEquals(map.get("seaMagiclamp++"), "burn");
+        assertEquals(map.get("landOrleans"), newArrayList("mini", "o"));
+        assertEquals(map.get("landOrleans++"), newArrayList("party", "gra"));
+        assertEquals(map.get("landCastle"), "castleShow");
+        assertEquals(map.get("landCastle++"), newLinkedHashMap("parade", "float"));
+    }
+
+    protected DfPropFile createInheritPropFile() {
+        return new DfPropFile() {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
+                return prepareInheritMap(path);
+            }
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <ELEMENT> Map<String, ELEMENT> prepareInheritMap(String path) {
+        Map<String, Object> mockMap = newLinkedHashMap();
+        if ("/dfprop/nestedMergeMap.dfprop".equals(path)) {
+            mockMap.put("seaBroadway", newLinkedHashMap("showName", "bbb")); // base only
+            mockMap.put("seaDockside", newLinkedHashMap("showName", newLinkedHashMap("over", "the"), "stage", "dock"));
+            mockMap.put("seaHangar", newLinkedHashMap("showName", "mystic", "choucho", "beauty")); // merged
+            mockMap.put("landShowbase", newLinkedHashMap("showName", "oneman", "green", "beauty")); // overwritten
+            mockMap.put("landOrleans", newArrayList("mini", "o")); // simply added (out of merge)
+            mockMap.put("landCastle", "castleShow"); // type diff (out of merge)
+        } else if ("/dfprop/maihama/nestedMergeMap+.dfprop".equals(path)) {
+            mockMap.put("seaDockside++", newLinkedHashMap("showName++", newLinkedHashMap("the", "waves"), "stage", "side"));
+            mockMap.put("seaHangar++", newLinkedHashMap("showName", "rhythms", "daichi", "dynamic")); // merged
+            mockMap.put("landShowbase", newLinkedHashMap("showName", "sdream", "shining", "jump")); // overwrite
+            mockMap.put("seaMagiclamp++", "burn"); // simply added
+            mockMap.put("landOrleans++", newArrayList("party", "gra")); // simply added (out of merge)
+            mockMap.put("landCastle++", newLinkedHashMap("parade", "float")); // type diff (out of merge)
+        } else {
+            mockMap = null;
+        }
+        return (Map<String, ELEMENT>) mockMap;
+    }
+
+    // ===================================================================================
     //                                                                              Option
     //                                                                              ======
     public void test_readMap_Option_returnsNullIfNotFound_exists() throws Exception {
