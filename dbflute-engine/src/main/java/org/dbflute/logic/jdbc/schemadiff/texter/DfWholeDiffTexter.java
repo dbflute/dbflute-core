@@ -18,6 +18,8 @@ package org.dbflute.logic.jdbc.schemadiff.texter;
 import java.util.List;
 import java.util.function.Function;
 
+import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.jdbc.schemadiff.DfAbstractDiff.NextPreviousHandler;
 import org.dbflute.logic.jdbc.schemadiff.DfCraftRowDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfCraftTitleDiff;
@@ -96,7 +98,9 @@ public class DfWholeDiffTexter {
 
     protected void buildTableAdded(StringBuilder sb) {
         final List<DfTableDiff> diffList = _schemaDiff.getAddedTableDiffList();
-        setupSimpleDiffTable(sb, "Add", "Table", diffList, diff -> diff.getTableDispName());
+        setupSimpleDiffTable(sb, "Add", "Table", diffList, diff -> {
+            return filterDeprecated(diff.getTableDispName());
+        });
     }
 
     protected void buildTableChanged(StringBuilder sb) {
@@ -106,7 +110,7 @@ public class DfWholeDiffTexter {
         }
         appendRootTitleLineSep(sb).append(filterTitle("Change Table"));
         for (DfTableDiff tableDiff : changedTableDiffList) {
-            sb.append(_ln).append("  ").append(tableDiff.getTableDispName());
+            sb.append(_ln).append("  ").append(filterDeprecated(tableDiff.getTableDispName()));
             setupNextPreviousList(sb, tableDiff.getNextPreviousDiffList(), "    ");
 
             final List<DfNestDiffContent> nestDiffContentOrderedList = tableDiff.getNestDiffContentOrderedList();
@@ -123,7 +127,9 @@ public class DfWholeDiffTexter {
 
     protected void buildTableDeleted(StringBuilder sb) {
         final List<DfTableDiff> diffList = _schemaDiff.getDeletedTableDiffList();
-        setupSimpleDiffTable(sb, "Delete", "Table", diffList, diff -> diff.getTableDispName());
+        setupSimpleDiffTable(sb, "Delete", "Table", diffList, diff -> {
+            return filterDeprecated(diff.getTableDispName());
+        });
     }
 
     // ===================================================================================
@@ -284,5 +290,28 @@ public class DfWholeDiffTexter {
                 Size :: 50 -> 80
          */
         return "[" + title + "]";
+    }
+
+    // -----------------------------------------------------
+    //                                            Deprecated
+    //                                            ----------
+    protected String filterDeprecated(String tableName) {
+        if (isDeprecatedNextTable(tableName)) {
+            return "~" + tableName + "~"; // like markdown
+        } else {
+            return tableName;
+        }
+    }
+
+    protected boolean isDeprecatedNextTable(String tableName) {
+        final Database nextDb = _schemaDiff.getNextDb(); // basically not null
+        if (nextDb == null) { // but just in case
+            return false;
+        }
+        final Table table = nextDb.getTable(tableName);
+        if (table == null) { // no way but just in case
+            return false;
+        }
+        return table.isDeprecatedTable();
     }
 }

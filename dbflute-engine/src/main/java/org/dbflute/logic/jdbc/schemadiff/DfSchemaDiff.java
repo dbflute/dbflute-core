@@ -1702,6 +1702,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                            Accessor
     //                                                                            ========
     // -----------------------------------------------------
+    //                                           Load Schema
+    //                                           -----------
+    public Database getNextDb() {
+        return _nextDb;
+    }
+
+    public Database getPreviousDb() {
+        return _previousDb;
+    }
+
+    // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
     public String getDiffDate() { // as display string (for compatible)
