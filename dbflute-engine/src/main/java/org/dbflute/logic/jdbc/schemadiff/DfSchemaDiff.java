@@ -35,6 +35,7 @@ import org.dbflute.logic.jdbc.schemadiff.differ.DfConstraintKeyDiffer;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfForeignKeyDiffer;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfIndexDiffer;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfUniqueKeyDiffer;
+import org.dbflute.logic.jdbc.schemadiff.texter.DfWholeDiffTexter;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.assistant.document.textresolver.DfDocumentTextResolver;
@@ -482,6 +483,18 @@ public class DfSchemaDiff extends DfAbstractDiff {
         processSequence();
         processProcedure();
         processCraftDiff();
+
+        showAnalyzedDiff();
+    }
+
+    protected void showAnalyzedDiff() {
+        try {
+            final DfWholeDiffTexter texter = new DfWholeDiffTexter(this);
+            final String diffText = texter.generateDiffText();
+            _log.info("Analyzed #schemaDiff" + DBFluteSystem.ln() + diffText);
+        } catch (RuntimeException continued) { // just in case
+            _log.debug("*Failed to generate diff text.", continued);
+        }
     }
 
     // ===================================================================================
@@ -1731,12 +1744,20 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return _diffAuthor != null ? _documentTextResolver.resolveSchemaHtmlContent(_diffAuthor) : null;
     }
 
+    public String getNativeDiffAuthor() {
+        return _diffAuthor;
+    }
+
     public boolean hasDiffGitBranch() {
         return _diffGitBranch != null && _diffGitBranch.trim().length() > 0;
     }
 
     public String getDiffGitBranchHtmlExp() {
         return _diffGitBranch != null ? _documentTextResolver.resolveSchemaHtmlContent(_diffGitBranch) : null;
+    }
+
+    public String getNativeDiffGitBranch() {
+        return _diffGitBranch;
     }
 
     // -----------------------------------------------------

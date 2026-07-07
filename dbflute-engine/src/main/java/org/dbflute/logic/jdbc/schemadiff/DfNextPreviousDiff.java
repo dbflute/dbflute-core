@@ -103,10 +103,15 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
     //                                                                          Expression
     //                                                                          ==========
     public String getDisplayForHtml() {
+        final String plainSource = getDisplayPlain();
+        return escape(plainSource);
+    }
+
+    public String getDisplayPlain() {
         final StringBuilder sb = new StringBuilder();
         final boolean quote = _quoteDispIfNeeds && (canBeTrimmed() || canBeNullMark());
         sb.append(quoteIfNeeds(_previous, quote)).append(" -> ").append(quoteIfNeeds(_next, quote));
-        return escape(sb.toString());
+        return sb.toString();
     }
 
     protected boolean canBeTrimmed() {
