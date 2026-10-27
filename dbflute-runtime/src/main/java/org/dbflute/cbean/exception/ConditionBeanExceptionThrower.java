@@ -16,11 +16,14 @@
 package org.dbflute.cbean.exception;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.bhv.logging.invoke.ClientInvokeNameExtractor;
+import org.dbflute.bhv.logging.invoke.ClientInvokeNameResult;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.chelper.HpCBPurpose;
@@ -75,6 +78,7 @@ import org.dbflute.exception.SpecifyIllegalPurposeException;
 import org.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.dbflute.exception.SpecifyThatsBadTimingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.helper.stacktrace.InvokeNameResult;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -87,7 +91,16 @@ import org.dbflute.util.Srl;
  */
 public class ConditionBeanExceptionThrower implements Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final long serialVersionUID = 1L;
+
+    protected static final ArrayList<String> WARNING_INVOKE_EXP_TARGET_SUFFIX_LIST = DfCollectionUtil.newArrayList( //
+            "Controller", "Action", "Task", "Batch" // root
+            , "Service", "Logic" // middle
+            , "Searcher", "Dao", "Repository", "RepositoryImpl" // storage
+    );
 
     // ===================================================================================
     //                                                                       Set up Select
@@ -933,8 +946,8 @@ public class ConditionBeanExceptionThrower implements Serializable {
     }
 
     public void showQueryThatsBadTimingWarning(ConditionBean lockedCB) {
-        final QueryThatsBadTimingException ex = createQueryThatsBadTimingException(lockedCB);
-        ThatsBadTimingWLog.log(buildWarningOnlyRootMessage(), ex);
+        final QueryThatsBadTimingException cause = createQueryThatsBadTimingException(lockedCB);
+        ThatsBadTimingWLog.log(buildWarningOnlyRootMessage(), cause);
     }
 
     protected QueryThatsBadTimingException createQueryThatsBadTimingException(ConditionBean lockedCB) {
@@ -1008,7 +1021,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         final String hashtag = "#invalid_query #overriding_query";
         final String cbExp = DfTypeUtil.toClassTitle(baseCB) + " (for " + baseCB.getPurpose() + ")";
         final String queryExp = "column=" + columnDbName + ", conditionKey=" + key + ", newValue=" + value;
-        InvalidQueryAllowedWLog.log("The " + hashtag + " occurred at the condition-bean: " + cbExp + ": " + queryExp);
+        String msg = "The " + hashtag + " occurred at the condition-bean: " + cbExp //
+                + ": " + queryExp + " :: invoker=" + deriveCompatibleWarningInvokeExp();
+        InvalidQueryAllowedWLog.log(msg);
     }
 
     // -----------------------------------------------------
@@ -1045,7 +1060,9 @@ public class ConditionBeanExceptionThrower implements Serializable {
         for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
             queryExpList.add(invalidQueryInfo.buildDisplay());
         }
-        InvalidQueryAllowedWLog.log("The " + hashtag + " occurred at the condition-bean: " + cbExp + ": query=" + queryExpList);
+        String msg = "The " + hashtag + " occurred at the condition-bean: " + cbExp //
+                + ": query=" + queryExpList + " :: invoker=" + deriveCompatibleWarningInvokeExp();
+        InvalidQueryAllowedWLog.log(msg);
     }
 
     // -----------------------------------------------------
@@ -1506,12 +1523,47 @@ public class ConditionBeanExceptionThrower implements Serializable {
     }
 
     // ===================================================================================
-    //                                                                        Small Helper
-    //                                                                        ============
-    protected String buildWarningOnlyRootMessage() {
-        return "Treated as warning only. See the exception message.";
+    //                                                                  Compatible Warning
+    //                                                                  ==================
+    protected String buildWarningOnlyRootMessage() { // for compatible
+        return "Treated as warning only. See the exception message." // base
+                + " :: invoker=" + deriveCompatibleWarningInvokeExp(); // additional
     }
 
+    protected String deriveCompatibleWarningInvokeExp() { // since 1.3.2
+        try {
+            final List<String> suffixList = WARNING_INVOKE_EXP_TARGET_SUFFIX_LIST;
+            final ClientInvokeNameExtractor extractor = new ClientInvokeNameExtractor(suffixList, /*startIndex*/0);
+            final StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
+            final ClientInvokeNameResult wholeResult = extractor.extractClientInvoke(stackTrace);
+            final List<InvokeNameResult> invokeNameResultList = wholeResult.getInvokeNameResultList();
+
+            // e.g. {SeaController@index():38 -> HangarRepositoryImpl@select():62}
+            final StringBuilder sb = new StringBuilder();
+            boolean firstDone = false;
+            for (InvokeNameResult invokeNameResult : invokeNameResultList) {
+                final String simpleExp = buildInvokeNameSimpleExp(invokeNameResult);
+                if (firstDone) {
+                    sb.insert(0, " -> ");
+                }
+                sb.insert(0, simpleExp); // to reverse (e.g. caller -> called -> ...)
+                firstDone = true;
+            }
+            sb.insert(0, "{");
+            sb.append("}");
+            return sb.toString();
+        } catch (RuntimeException continued) { // as sub function
+            return "{unknown by error: " + continued.getClass() + "}";
+        }
+    }
+
+    protected String buildInvokeNameSimpleExp(InvokeNameResult result) {
+        return result.getSimpleClassName() + "@" + result.getMethodName() + "():" + result.getLineNumber();
+    }
+
+    // ===================================================================================
+    //                                                                      HashTag Helper
+    //                                                                      ==============
     protected void setupThatsBadTimingHashtag(ExceptionMessageBuilder br) {
         br.addElement(" #thats_badTiming");
     }

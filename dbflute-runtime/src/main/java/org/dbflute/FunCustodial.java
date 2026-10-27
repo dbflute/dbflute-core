@@ -15,21 +15,26 @@
  */
 package org.dbflute;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.dbflute.bhv.logging.invoke.ClientInvokeNameExtractor;
+import org.dbflute.bhv.logging.invoke.ClientInvokeNameResult;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.exception.CharParameterShortSizeException;
 import org.dbflute.exception.NonSpecifiedColumnAccessException;
 import org.dbflute.exception.UndefinedClassificationCodeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.helper.stacktrace.InvokeNameResult;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.jdbc.ShortCharHandlingMode;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -58,6 +63,15 @@ public class FunCustodial {
     // no volatile, because basically it changes before application open (and not severe logic)
     protected static boolean _nonSpecifiedColumnAccessWarningOnly; // since 1.2.7
     protected static boolean _locked = true; // since 1.2.7
+
+    // -----------------------------------------------------
+    //                                               Warning
+    //                                               -------
+    protected static final ArrayList<String> WARNING_INVOKE_EXP_TARGET_SUFFIX_LIST = DfCollectionUtil.newArrayList( //
+            "Controller", "Action", "Task", "Batch" // root
+            , "Service", "Logic" // middle
+            , "Searcher", "Dao", "Repository", "RepositoryImpl" // storage
+    );
 
     // ===================================================================================
     //                                                                    Value Conversion
@@ -194,7 +208,9 @@ public class FunCustodial {
         final NonSpecifiedColumnAccessException ex = new NonSpecifiedColumnAccessException(msg);
         if (_nonSpecifiedColumnAccessWarningOnly) { // since 1.2.7
             // #for_now jflute too difficult to implement the option by smart way (2023/07/17)
-            _log.warn("Treated as warning only. See the exception message.", ex);
+            String rootMsg = "Treated as warning only. See the exception message.";
+            rootMsg = rootMsg + " :: invoker=" + deriveCompatibleWarningInvokeExp();
+            _log.warn(rootMsg, ex);
         } else {
             throw ex;
         }
@@ -301,9 +317,46 @@ public class FunCustodial {
     }
 
     // ===================================================================================
+    //                                                Compatible Warning Invoke Expression
+    //                                                ====================================
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // copied from ConditionBeanExceptionThrower with small adjustment (2026/10/27)
+    // no recycle here as temporary function
+    // _/_/_/_/_/_/_/_/
+    protected static String deriveCompatibleWarningInvokeExp() { // since 1.3.2
+        try {
+            final List<String> suffixList = WARNING_INVOKE_EXP_TARGET_SUFFIX_LIST;
+            final ClientInvokeNameExtractor extractor = new ClientInvokeNameExtractor(suffixList, /*startIndex*/0);
+            final StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
+            final ClientInvokeNameResult wholeResult = extractor.extractClientInvoke(stackTrace);
+            final List<InvokeNameResult> invokeNameResultList = wholeResult.getInvokeNameResultList();
+
+            // e.g. {SeaController@index():38 -> HangarRepositoryImpl@select():62}
+            final StringBuilder sb = new StringBuilder();
+            boolean firstDone = false;
+            for (InvokeNameResult invokeNameResult : invokeNameResultList) {
+                final String simpleExp = buildInvokeNameSimpleExp(invokeNameResult);
+                if (firstDone) {
+                    sb.insert(0, " -> ");
+                }
+                sb.insert(0, simpleExp); // to reverse (e.g. caller -> called -> ...)
+                firstDone = true;
+            }
+            sb.insert(0, "{");
+            sb.append("}");
+            return sb.toString();
+        } catch (RuntimeException continued) { // as sub function
+            return "{unknown by error: " + continued.getClass() + "}";
+        }
+    }
+
+    protected static String buildInvokeNameSimpleExp(InvokeNameResult result) {
+        return result.getSimpleClassName() + "@" + result.getMethodName() + "():" + result.getLineNumber();
+    }
+
+    // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    //                                          ------------
     public static boolean isSameValue(Object value1, Object value2) {
         if (value1 == null && value2 == null) {
             return true;
